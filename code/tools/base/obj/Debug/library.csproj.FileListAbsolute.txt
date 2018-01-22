@@ -1,0 +1,7 @@
+E:\Git\yg\trunk\code\tools\base\bin\Debug\Library.dll
+E:\Git\yg\trunk\code\tools\base\bin\Debug\Library.pdb
+E:\Git\yg\trunk\code\tools\base\obj\Debug\Library.Properties.Resources.resources
+E:\Git\yg\trunk\code\tools\base\obj\Debug\library.csproj.GenerateResource.Cache
+E:\Git\yg\trunk\code\tools\base\obj\Debug\Library.dll
+E:\Git\yg\trunk\code\tools\base\obj\Debug\Library.pdb
+E:\Git\yg\trunk\code\tools\base\obj\Debug\library.csprojResolveAssemblyReference.cache

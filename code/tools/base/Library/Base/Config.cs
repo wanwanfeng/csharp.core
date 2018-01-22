@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Encrypt
+namespace Library
 {
     public class Config
     {     

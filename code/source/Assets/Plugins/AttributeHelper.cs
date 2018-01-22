@@ -5,7 +5,7 @@ using System.Linq;
 
 public class TypeValueAttribute : Attribute
 {
-    public Type value;
+    public Type value { get; protected set; }
 
     public TypeValueAttribute(Type value = null)
     {
@@ -15,7 +15,7 @@ public class TypeValueAttribute : Attribute
 
 public class StringValueAttribute : Attribute
 {
-    public string value;
+    public string value { get; protected set; }
 
     public StringValueAttribute(string value = "")
     {
@@ -23,9 +23,17 @@ public class StringValueAttribute : Attribute
     }
 }
 
+public class HookValueAttribute : StringValueAttribute
+{
+    public HookValueAttribute(string value = "")
+    {
+        this.value = value;
+    }
+}
+
 public class IntValueAttribute : Attribute
 {
-    public int value;
+    public int value { get; protected set; }
 
     public IntValueAttribute(int value = 0)
     {
@@ -35,7 +43,7 @@ public class IntValueAttribute : Attribute
 
 public class BoolValueAttribute : Attribute
 {
-    public bool value;
+    public bool value { get; protected set; }
 
     public BoolValueAttribute(bool value = false)
     {
@@ -82,6 +90,12 @@ public static class AttributeHelper
     {
         return GetCache<T, StringValueAttribute>()
             .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.value : "");
+    }
+
+    public static IDictionary<T, string> GetCacheHookValue<T>() where T : struct
+    {
+    return GetCache<T, HookValueAttribute>()
+        .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.value : "");
     }
 
     public static IDictionary<T, int> GetCacheIntValue<T>() where T : struct

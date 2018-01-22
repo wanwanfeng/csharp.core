@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using Library;
 
 namespace Encrypt
 {
@@ -21,7 +23,7 @@ namespace Encrypt
             get
             {
                 var path = Config.IniReadValue("Path", "defineRoot");
-                if (string.IsNullOrEmpty(path))
+                if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
                     DefineRoot = path = Environment.CurrentDirectory + "\\Root";
                 return path;
             }
@@ -33,7 +35,7 @@ namespace Encrypt
             get
             {
                 var path = Config.IniReadValue("Path", "defineSave");
-                if (string.IsNullOrEmpty(path))
+                if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
                     DefineSave = path = Environment.CurrentDirectory + "\\Save";
                 return path;
             }

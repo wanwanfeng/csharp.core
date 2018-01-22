@@ -81,13 +81,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scripts\Base\Event\EventActionListManager.cs" />
-    <Compile Include="Scripts\Base\Event\EventListManager.cs" />
-    <Compile Include="Scripts\Base\Extensions\ExtensionsForValue.cs" />
-    <Compile Include="Scripts\Base\Config.cs" />
-    <Compile Include="Scripts\Base\Debug.cs" />
     <Compile Include="Scripts\Base\Define.cs" />
-    <Compile Include="Scripts\Base\LocalEvent.cs" />
     <Compile Include="Scripts\Utils\MD5Utils.cs" />
     <Compile Include="Scripts\Utils\FileUtils.cs" />
     <EmbeddedResource Include="Form\EncryptFile.resx">
@@ -113,6 +107,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\base\library.csproj">
+      <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
+      <Name>library</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,3 +3,9 @@ D:\Git\EncryptFile\encrypt\bin\Debug\encrypt.exe
 D:\Git\EncryptFile\encrypt\bin\Debug\encrypt.pdb
 D:\Git\EncryptFile\encrypt\obj\Debug\encrypt.exe
 D:\Git\EncryptFile\encrypt\obj\Debug\encrypt.pdb
+E:\Git\yg\trunk\code\tools\encrypt\bin\Debug\encrypt.exe.config
+E:\Git\yg\trunk\code\tools\encrypt\obj\Debug\encrypt.exe
+E:\Git\yg\trunk\code\tools\encrypt\obj\Debug\encrypt.pdb
+E:\Git\yg\trunk\code\tools\encrypt\bin\Debug\encrypt.exe
+E:\Git\yg\trunk\code\tools\encrypt\bin\Debug\encrypt.pdb
+E:\Git\yg\trunk\code\tools\encrypt\obj\Debug\encrypt.csprojResolveAssemblyReference.cache

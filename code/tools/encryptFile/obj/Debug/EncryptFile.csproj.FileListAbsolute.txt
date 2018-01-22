@@ -17,3 +17,14 @@ D:\Git\EncryptFile\EncryptFile\obj\Debug\Encrypt.EncryptFile.resources
 D:\Git\EncryptFile\EncryptFile\obj\Debug\EncryptFile.csproj.GenerateResource.Cache
 D:\Git\Tools\EncryptFile\obj\Debug\EncryptFile.exe
 D:\Git\Tools\EncryptFile\obj\Debug\EncryptFile.pdb
+E:\Git\yg\trunk\code\tools\EncryptFile\obj\Debug\EncryptFile.exe
+E:\Git\yg\trunk\code\tools\EncryptFile\obj\Debug\EncryptFile.pdb
+E:\Git\yg\trunk\code\tools\EncryptFile\obj\Debug\encryptFile.csprojResolveAssemblyReference.cache
+E:\Git\yg\trunk\code\tools\EncryptFile\obj\Debug\Encrypt.EncryptFile.resources
+E:\Git\yg\trunk\code\tools\EncryptFile\obj\Debug\encryptFile.csproj.GenerateResource.Cache
+E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\readme.txt
+E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\config.ini
+E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\EncryptFile.exe
+E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\EncryptFile.pdb
+E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\Library.dll
+E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\Library.pdb

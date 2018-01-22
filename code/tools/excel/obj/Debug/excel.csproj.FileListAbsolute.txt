@@ -12,3 +12,13 @@ D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Debug\excel.exe
 D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Debug\excel.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Debug\LitJson.dll
 D:\Work\yuege\ygtools\trunk\code\tools\excel\obj\Debug\excel.csprojResolveAssemblyReference.cache
+E:\Git\yg\trunk\code\tools\excel\obj\Debug\excel.csprojResolveAssemblyReference.cache
+E:\Git\yg\trunk\code\tools\excel\obj\Debug\excel.csproj.ResolveComReference.cache
+E:\Git\yg\trunk\code\tools\excel\obj\Debug\excel.exe
+E:\Git\yg\trunk\code\tools\excel\obj\Debug\excel.pdb
+E:\Git\yg\trunk\code\tools\excel\bin\Debug\excel.exe.config
+E:\Git\yg\trunk\code\tools\excel\bin\Debug\excel.exe
+E:\Git\yg\trunk\code\tools\excel\bin\Debug\excel.pdb
+E:\Git\yg\trunk\code\tools\excel\bin\Debug\Library.dll
+E:\Git\yg\trunk\code\tools\excel\bin\Debug\LitJson.dll
+E:\Git\yg\trunk\code\tools\excel\bin\Debug\Library.pdb

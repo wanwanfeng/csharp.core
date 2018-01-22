@@ -1,0 +1,5 @@
+D:\Git\EncryptFile\encrypt\bin\Debug\encrypt.exe.config
+D:\Git\EncryptFile\encrypt\bin\Debug\encrypt.exe
+D:\Git\EncryptFile\encrypt\bin\Debug\encrypt.pdb
+D:\Git\EncryptFile\encrypt\obj\Debug\encrypt.exe
+D:\Git\EncryptFile\encrypt\obj\Debug\encrypt.pdb

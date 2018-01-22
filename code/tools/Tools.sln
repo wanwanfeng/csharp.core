@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "encryptFile", "EncryptFile\encryptFile.csproj", "{04099EE6-805A-40AC-BFB3-FD633A61EAE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "encrypt", "encrypt\encrypt.csproj", "{6CD363D5-33E7-4575-AD31-D77F99BD9551}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "excel", "excel\excel.csproj", "{576FD8F1-075A-49D0-AC86-47596B1B88B2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04099EE6-805A-40AC-BFB3-FD633A61EAE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04099EE6-805A-40AC-BFB3-FD633A61EAE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04099EE6-805A-40AC-BFB3-FD633A61EAE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04099EE6-805A-40AC-BFB3-FD633A61EAE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CD363D5-33E7-4575-AD31-D77F99BD9551}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CD363D5-33E7-4575-AD31-D77F99BD9551}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CD363D5-33E7-4575-AD31-D77F99BD9551}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CD363D5-33E7-4575-AD31-D77F99BD9551}.Release|Any CPU.Build.0 = Release|Any CPU
+		{576FD8F1-075A-49D0-AC86-47596B1B88B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{576FD8F1-075A-49D0-AC86-47596B1B88B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{576FD8F1-075A-49D0-AC86-47596B1B88B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{576FD8F1-075A-49D0-AC86-47596B1B88B2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

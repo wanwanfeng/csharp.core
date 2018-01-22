@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CustomExtensions;
 using Debug = UnityEngine.Debug;
 
 //增量更新
@@ -120,17 +121,17 @@ namespace Svn.Three
                 case Source.Master:
                 {
                     var queue = new Queue<string>(info.Split(','));
-                    version = queue.Count == 0 ? 0 : queue.Dequeue().ToInt();
-                    size = queue.Count == 0 ? 0 : queue.Dequeue().ToLong();
+                    version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
+                    size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
                 }
                     break;
                 case Source.Patch:
                 {
                     var queue = new Queue<string>(info.Split(','));
-                    version = queue.Count == 0 ? 0 : queue.Dequeue().ToInt();
+                    version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
                     action = queue.Count == 0 ? "" : queue.Dequeue();
-                    size = queue.Count == 0 ? 0 : queue.Dequeue().ToLong();
+                    size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
                 }
                     break;
@@ -170,8 +171,8 @@ namespace Svn.Three
                 var queue = new Queue<string[]>(info.Split(',').Select(p => p.Split('-')));
                 var strFirst = queue.Dequeue();
                 isMaster = strFirst[0] == "master";
-                first = strFirst[1].ToInt();
-                last = strFirst[2].ToInt();
+                first = strFirst[1].AsInt();
+                last = strFirst[2].AsInt();
                 url = info + (isMaster ? "/svn-master.txt" : "/svn-patch.txt");
                 local = url.Replace("/", "-");
                 hashText = (queue.Count == 0 ? "" : queue.Dequeue().First()).Trim();
@@ -268,8 +269,8 @@ namespace Svn.Three
                     return;
                 }
                 ResInfo.SvnVersion = text.First();
-                ResInfo.MinVersion = text.Skip(1).First().ToInt();
-                ResInfo.MaxVersion = text.Skip(2).First().ToInt();
+                ResInfo.MinVersion = text.Skip(1).First().AsInt();
+                ResInfo.MaxVersion = text.Skip(2).First().AsInt();
                 masterCache =
                     text.Skip(3).Select(p => new ResInfo(p, ResInfo.Source.Master))
                         .Where(p => !p.name.StartsWith("."))
@@ -292,13 +293,13 @@ namespace Svn.Three
                     return;
                 }
                 var svnVersion = text.First();
-                var minVersion = text.Skip(1).First().ToInt();
+                var minVersion = text.Skip(1).First().AsInt();
                 if (ResInfo.SvnVersion != svnVersion || ResInfo.MaxVersion != minVersion)
                 {
                     patchCache = new Dictionary<string, ResInfo>();
                     return;
                 }
-                ResInfo.MaxVersion = text.Skip(2).First().ToInt();
+                ResInfo.MaxVersion = text.Skip(2).First().AsInt();
                 patchCache = 
                     text.Skip(3).Select(p => new ResInfo(p, ResInfo.Source.Patch))
                     .Where(p => !p.name.StartsWith("."))

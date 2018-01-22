@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CustomExtensions;
 using Debug = UnityEngine.Debug;
 
 /// VersionMgr本地路径可解析版
@@ -108,8 +109,8 @@ namespace SVN.First
                 case Source.Master:
                     {
                     var queue = new Queue<string>(info.Split(','));
-                    pacthVersion = masterVersion = queue.Count == 0 ? 0 : queue.Dequeue().ToInt();
-                    size = queue.Count == 0 ? 0 : queue.Dequeue().ToLong();
+                    pacthVersion = masterVersion = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
+                    size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
                     }
                     break;
@@ -117,9 +118,9 @@ namespace SVN.First
                     {
                     var queue = new Queue<string>(info.Split(','));
                     masterVersion = MinVersion;
-                    pacthVersion = queue.Count == 0 ? masterVersion : queue.Dequeue().ToInt();
+                    pacthVersion = queue.Count == 0 ? masterVersion : queue.Dequeue().AsInt();
                     action = queue.Count == 0 ? "" : queue.Dequeue();
-                    size = queue.Count == 0 ? 0 : queue.Dequeue().ToLong();
+                    size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
 
                     pacthVersion = Mathf.Clamp(pacthVersion, masterVersion, MaxVersion);
@@ -129,7 +130,7 @@ namespace SVN.First
                     {
                     var queue = new Queue<string>(info.Split('@'));
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Replace(LocalRoot, "").Trim();
-                    pacthVersion = masterVersion = queue.Count == 0 ? 0 : queue.Dequeue().ToInt();
+                    pacthVersion = masterVersion = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
                     size = new FileInfo(info).Length;
                     }
                     break;
@@ -206,7 +207,7 @@ namespace SVN.First
                     var text =
                         www.text.Split('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).Select(p => p.Trim()).ToArray();
                     ResInfo.SvnVersion = text.First();
-                    ResInfo.MinVersion = text.Skip(1).First().ToInt();
+                    ResInfo.MinVersion = text.Skip(1).First().AsInt();
                     masterCache =
                         text.Skip(2).Select(p => new ResInfo(p, ResInfo.Source.Master))
                             .Where(p => !p.fileName.StartsWith("."))
@@ -229,14 +230,14 @@ namespace SVN.First
                     var text =
                         www.text.Split('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).Select(p => p.Trim()).ToArray();
                     var svnVersion = text.First();
-                    var minVersion = text.Skip(1).First().ToInt();
+                    var minVersion = text.Skip(1).First().AsInt();
                     if (ResInfo.SvnVersion != svnVersion || ResInfo.MinVersion != minVersion)
                     {
                         patchCache = new Dictionary<string, ResInfo>();
                     }
                     else
                     {
-                        ResInfo.MaxVersion = text.Skip(2).First().ToInt();
+                        ResInfo.MaxVersion = text.Skip(2).First().AsInt();
                         patchCache =
                             text.Skip(3).Select(p => new ResInfo(p, ResInfo.Source.Patch))
                                 .Where(p => !p.fileName.StartsWith("."))

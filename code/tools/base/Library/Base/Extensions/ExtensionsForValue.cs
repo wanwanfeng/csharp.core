@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Text;
 
-namespace CustomExtensions
+namespace Library.Extensions
 {
     /// <summary>
     /// 值类型扩展
@@ -53,17 +54,6 @@ namespace CustomExtensions
         {
             long v = 0;
             return long.TryParse(value, out v) ? v : 0;
-        }
-
-        /// <summary>
-        /// 转为uLong型
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static ulong AsuLong(this string value)
-        {
-            ulong v = 0;
-            return ulong.TryParse(value, out v) ? v : 0;
         }
 
         /// <summary>
@@ -198,7 +188,7 @@ namespace CustomExtensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static int[] AsIntArray(this string value, char separator = ';')
+        public static int[] AsIntArray(this string value, params char[] separator)
         {
             string[] str = value.AsStringArray(separator);
             return Array.ConvertAll(str, p => p.AsInt());
@@ -210,7 +200,7 @@ namespace CustomExtensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static float[] AsFloatArray(this string value, char separator = ';')
+        public static float[] AsFloatArray(this string value, params char[] separator)
         {
             string[] str = value.AsStringArray(separator);
             return Array.ConvertAll(str, p => p.AsFloat());
@@ -222,7 +212,7 @@ namespace CustomExtensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static double[] AsDoubleArray(this string value, char separator = ';')
+        public static double[] AsDoubleArray(this string value, params char[] separator)
         {
             string[] str = value.AsStringArray(separator);
             return Array.ConvertAll(str, p => p.AsDouble());
@@ -234,7 +224,7 @@ namespace CustomExtensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static bool[] AsBoolArray(this string value, char separator = ';')
+        public static bool[] AsBoolArray(this string value, params char[] separator)
         {
             string[] str = value.AsStringArray(separator);
             return Array.ConvertAll(str, p => p.AsBool());
@@ -246,10 +236,17 @@ namespace CustomExtensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static string[] AsStringArray(this string value, char separator = ',')
+        public static string[] AsStringArray(this string value, params char[] separator)
         {
-            var result = value.Split(separator);
-            return result;
+            try
+            {
+                var result = value.Split(separator.Length == 0 ? separator = new char[] {','} : separator);
+                return result;
+            }
+            catch (Exception)
+            {
+                return new string[0];
+            }
         }
 
         /// <summary>
@@ -263,8 +260,17 @@ namespace CustomExtensions
             try
             {
                 return content + string.Join(content, value.ToCharArray().AsStringArray());
+
+                char[] source = value.ToCharArray();
+                StringBuilder sbBuilder = new StringBuilder(value.Length + (content.Length)*value.Length);
+                foreach (var item in source)
+                {
+                    sbBuilder.Append(content);
+                    sbBuilder.Append(item);
+                }
+                return sbBuilder.ToString();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return null;
             }

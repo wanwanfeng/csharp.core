@@ -47,12 +47,14 @@
     <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
+    <Compile Include="Library\Base\Extensions\ExtensionsForStrings.cs" />
+    <Compile Include="Library\Base\Helper\NameAttribute.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
     <Compile Include="Library\Debug.cs" />
     <Compile Include="Library\Base\Helper\AttributeHelper.cs" />
     <Compile Include="Library\Base\Event\EventActionListManager.cs" />
     <Compile Include="Library\Base\Event\EventListManager.cs" />
-    <Compile Include="Library\Base\Extensions\CustomExtensions.cs" />
+    <Compile Include="Library\Base\Extensions\ExtensionsForValue.cs" />
     <Compile Include="Library\LocalEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

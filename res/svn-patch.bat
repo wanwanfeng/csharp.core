@@ -23,6 +23,15 @@ svn info --show-item url > temp.txt
 set /p url=<temp.txt
 echo 获取库地址：%url%
 
+set /p fo=请输入目标目录，然后回车：
+if not defined fo (
+	echo 未输入！
+	pause
+	exit
+)
+set url=%url%/%fo%
+echo 获取目标地址：%url%
+
 echo=    
 echo ----------------------------------------
 echo ----------- 获取最高版本号--------------

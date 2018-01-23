@@ -18,6 +18,21 @@ echo ----------------------------------------
 echo ------------- 获取库地址----------------
 echo ----------------------------------------
 
+set /p fo=请输入目标目录，然后回车：
+if not defined fo (
+	echo 未输入！
+	pause
+	exit
+)
+
+if not exist %fo% (
+	echo 目标地址不存在！
+	pause
+	exit
+)
+
+cd %fo%
+
 svn info --show-item url >temp.txt
 set /p url=<temp.txt
 echo 获取库地址：%url%
@@ -49,14 +64,14 @@ echo 请稍等...
 
 svn list -r %sv% %url%@%sv% -R -v >temp.txt
 
-set df=svn-master
-if exist %df%.txt del %df%.txt
-echo %version% >>%df%.txt	
-echo %sv% >>%df%.txt	
+set master=svn-master
+if exist %master%.txt del %master%.txt
+echo %version% >>%master%.txt	
+echo %sv% >>%master%.txt	
 for /f "tokens=1,2,3,4,5,6* delims= " %%i in ( temp.txt ) do (
 	REM echo %%i,%%j,%%k,%%l,%%m,%%n,%%o
 	if not "%%o"=="" (
-		echo %%i,%%k,%%o>>%df%.txt	
+		echo %%i,%%k,%%o>>%master%.txt	
 	)
 )
 del temp.txt
@@ -73,17 +88,16 @@ if not %yes%==y ( exit )
 
 call :getCdName foder
 echo !foder! 版本 %sv%
-echo 正在导出中...
+echo 正在导出中... %url%
 echo 根据项目大时间长短不定，请耐心等待...
 echo=
 REM pause
 
-set df=svn-master
-svn export -r %sv% %url%@%sv%
-
-if exist %df% rd /s/q %df%
-rename %cd%\!foder! %df%
-
+set df=!foder!-0-%sv%-master
+if exist %df% rd /s/q %df% mkdir %df%
+svn export -r %sv% %url%@%sv% %df%
+move %master%.txt %df%
+move %df% %cd%/../
 pause
 exit
 

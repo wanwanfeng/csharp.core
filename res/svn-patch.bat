@@ -138,8 +138,8 @@ del diff_list.txt
 move %patch%.txt %patch%
 
 call :getCdName foder
-rename %patch% !foder!-%sv%-%ev%-patch
-move !foder!-%sv%-%ev%-patch %cd%/../
+rename %patch% svn-!foder!-%sv%-%ev%-patch
+move svn-!foder!-%sv%-%ev%-patch %cd%/../
 pause
 
 goto :endLast

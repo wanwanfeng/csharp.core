@@ -83,8 +83,8 @@ namespace Encrypt
             {
                 progressBar1.Value = index*100/dic.Count;
                 res.Add(pair.Key);
-                res.Add(MD5Utils.Encrypt(Path.GetDirectoryName(pair.Value), Define.DefineKey) + "/" +
-                        MD5Utils.Encrypt(Path.GetFileName(pair.Value), Define.DefineKey));
+                res.Add(Library.Encrypt.MD5.Encrypt(Path.GetDirectoryName(pair.Value), Define.DefineKey) + "/" +
+                        Library.Encrypt.MD5.Encrypt(Path.GetFileName(pair.Value), Define.DefineKey));
             }
             File.WriteAllLines("sssss.txt", res.ToArray(), Encoding.UTF8);
             //if (this.button_md5.Focused)

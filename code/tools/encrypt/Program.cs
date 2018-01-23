@@ -22,7 +22,7 @@ namespace encrypt
                     string input = queue.Count == 0 ? "" : queue.Dequeue();
                     string key = queue.Count == 0 ? "" : queue.Dequeue();
                     string third = queue.Count == 0 ? "-h" : queue.Dequeue();
-                    res = EncryptUtils.GetMd5Hash(input, key, third != "-e");
+                    res = Library.Encrypt.MD5.Encrypt(input, key, third != "-e");
                 }
                     break;
                 case "aes":
@@ -31,13 +31,15 @@ namespace encrypt
                     string key = queue.Count == 0 ? "" : queue.Dequeue();
                     string third = queue.Count == 0 ? "-e" : queue.Dequeue();
                     var bytes = File.ReadAllBytes(input);
-                    var resBytes = third == "-d" ? EncryptUtils.Decrypt(bytes, key) : EncryptUtils.Encrypt(bytes, key);
+                    var resBytes = third == "-d"
+                        ? Library.Encrypt.AES.Decrypt(bytes, key)
+                        : Library.Encrypt.AES.Encrypt(bytes, key);
                     File.WriteAllBytes(input, resBytes);
                 }
                     break;
                 case "help":
                 {
-                   res = @"
+                    res = @"
 输入格式（类型，源串，密钥，其他）
 MD5加密（string:md5,string:input,string:[key],string[-h|-e]）
 AES加密（string:aes,string:input,string:[key],string[-e]）

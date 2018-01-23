@@ -1,86 +1,15 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using ICSharpCode;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace Wf
+namespace Library.Compress
 {
-    public class ThreadedAction
-    {
-        private float _progress = 0;
-        private bool _isDone = false;
-        public bool isSuccess = false;
-
-        #region
-
-        public ThreadedAction(Func<bool> func)
-        {
-            _progress = 0;
-            _isDone = isSuccess = false;
-            ThreadPool.QueueUserWorkItem((obj) =>
-            {
-                if (func != null)
-                    isSuccess = func();
-                _isDone = true;
-            });
-        }
-
-        public IEnumerator WaitForComplete()
-        {
-            while (!_isDone)
-                yield return null;
-        }
-
-        #endregion
-
-        #region
-
-        public ThreadedAction(Func<Action<float>, bool> func)
-        {
-            _progress = 0;
-            _isDone = isSuccess = false;
-            ThreadPool.QueueUserWorkItem((obj) =>
-            {
-                if (func != null)
-                    isSuccess = func((val) =>
-                    {
-                        _progress = val;
-                    });
-                _isDone = true;
-            });
-        }
-
-        public IEnumerator WaitForComplete(Action<float> action, bool difFrame = true)
-        {
-            while (!_isDone)
-            {
-                if (difFrame)
-                {
-                    var cur = _progress;
-                    yield return null;
-                    action(_progress - cur);
-                }
-                else
-                {
-                    yield return null;
-                    action(_progress);
-                }
-            }
-        }
-
-        #endregion
-    }
-
     public class DecompressUtils
     {
 
-#if false
         #region byte[], Stream相互转换
 
         /// <summary>
@@ -108,7 +37,6 @@ namespace Wf
         }
 
         #endregion
-#endif
 
         #region 压缩文件
 
@@ -117,7 +45,7 @@ namespace Wf
         /// </summary>
         /// <param name="inFile"></param>
         /// <param name="outFile"></param>
-        public static bool CompressFile(string inFile, string outFile)
+        public static string CompressFile(string inFile, string outFile)
         {
             return ICSharpGzipCode.CompressFileGzip(inFile, outFile);
         }
@@ -126,22 +54,22 @@ namespace Wf
         /// 压缩文件
         /// </summary>
         /// <param name="inFile"></param>
-        public static bool CompressFile(string inFile)
+        public static string CompressFile(string inFile)
         {
             string outFile = inFile + "temp";
             if (File.Exists(outFile))
                 File.Delete(outFile);
-            bool ret = CompressFile(inFile, outFile);
-            if (ret)
+            var ret = CompressFile(inFile, outFile);
+            if (string.IsNullOrEmpty(ret))
             {
                 try
                 {
                     File.Delete(inFile);
                     File.Move(outFile, inFile);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    ret = false;
+                    ret = e.Message;
                 }
             }
             return ret;
@@ -157,7 +85,7 @@ namespace Wf
         /// <param name="inFile"></param>
         /// <param name="outFile"></param>
         /// <param name="runAction"></param>
-        public static bool DecompressFile(string inFile, string outFile, Action<string, float> runAction)
+        public static string DecompressFile(string inFile, string outFile, Action<string, float> runAction)
         {
             return ICSharpGzipCode.DecompressFileGzip(inFile, outFile, runAction);
         }
@@ -167,16 +95,23 @@ namespace Wf
         /// </summary>
         /// <param name="inFile"></param>
         /// <param name="runAction"></param>
-        public static bool DecompressFile(string inFile, Action<string, float> runAction)
+        public static string DecompressFile(string inFile, Action<string, float> runAction)
         {
             string outFile = inFile + "temp";
             if (File.Exists(outFile))
                 File.Delete(outFile);
-            bool ret = DecompressFile(inFile, outFile, runAction);
-            if (ret)
+            var ret = DecompressFile(inFile, outFile, runAction);
+            if (string.IsNullOrEmpty(ret))
             {
-                File.Delete(inFile);
-                File.Move(outFile, inFile);
+                try
+                {
+                    File.Delete(inFile);
+                    File.Move(outFile, inFile);
+                }
+                catch (Exception e)
+                {
+                    ret = e.Message;
+                }
             }
             return ret;
         }
@@ -191,7 +126,7 @@ namespace Wf
         /// <param name="bs"></param>
         /// <param name="outFile"></param>
         /// <param name="runAction"></param>
-        public static bool DecompressMemory(byte[] bs, string outFile, Action<string, float> runAction)
+        public static string DecompressMemory(byte[] bs, string outFile, Action<string, float> runAction)
         {
             return ICSharpGzipCode.DecompressMemoryGzip(bs, outFile, runAction);
         }
@@ -277,7 +212,7 @@ namespace ICSharpCode
         /// </summary>
         /// <param name="inFile"></param>
         /// <param name="outFile"></param>
-        public static bool CompressFileGzip(string inFile, string outFile)
+        public static string CompressFileGzip(string inFile, string outFile)
         {
             try
             {
@@ -297,15 +232,14 @@ namespace ICSharpCode
                             ms.Close();
                             input.Close();
                             File.WriteAllBytes(outFile, ms.ToArray());
-                            return true;
+                            return "";
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError("CompressFileGzip：" + e.Message + "\n" + outFile);
-                return false;
+                return "CompressFileGzip：" + e.Message + "\n" + outFile;
             }
         }
 
@@ -316,7 +250,7 @@ namespace ICSharpCode
         /// <param name="outFile"></param>
         /// <param name="runAction"></param>
         /// <returns></returns>
-        public static bool DecompressMemoryGzip(Stream input, string outFile, Action<string, float> runAction)
+        public static string DecompressMemoryGzip(Stream input, string outFile, Action<string, float> runAction)
         {
             runAction(outFile, 0);
             try
@@ -333,14 +267,13 @@ namespace ICSharpCode
                             fsWrite.Write(buffer, 0, bytesRead);
                             runAction(outFile, (float) input.Position/input.Length);
                         }
-                        return true;
+                        return "";
                     }
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError("DecompressMemoryGzip：" + e.Message + "\n" + outFile);
-                return false;
+                return "DecompressMemoryGzip：" + e.Message + "\n" + outFile;
             }
             finally
             {
@@ -354,7 +287,7 @@ namespace ICSharpCode
         /// <param name="inFile"></param>
         /// <param name="outFile"></param>
         /// <param name="runAction"></param>
-        public static bool DecompressFileGzip(string inFile, string outFile, Action<string, float> runAction)
+        public static string DecompressFileGzip(string inFile, string outFile, Action<string, float> runAction)
         {
             using (FileStream input = new FileStream(inFile, FileMode.Open))
             {
@@ -368,7 +301,7 @@ namespace ICSharpCode
         /// <param name="bs"></param>
         /// <param name="outFile"></param>
         /// <param name="runAction"></param>
-        public static bool DecompressMemoryGzip(byte[] bs, string outFile, Action<string, float> runAction)
+        public static string DecompressMemoryGzip(byte[] bs, string outFile, Action<string, float> runAction)
         {
             using (Stream input = new MemoryStream(bs))
             {

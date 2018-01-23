@@ -264,7 +264,7 @@ namespace CustomExtensions
             {
                 return content + string.Join(content, value.ToCharArray().AsStringArray());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

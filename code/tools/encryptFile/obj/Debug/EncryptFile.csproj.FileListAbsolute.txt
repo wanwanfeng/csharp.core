@@ -28,3 +28,16 @@ E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\EncryptFile.exe
 E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\EncryptFile.pdb
 E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\Library.dll
 E:\Git\yg\trunk\code\tools\EncryptFile\bin\Debug\Library.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\EncryptFile.exe
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\EncryptFile.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\readme.txt
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\config.ini
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\EncryptFile.exe
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\EncryptFile.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\Library.dll
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\Library.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\encryptFile.csprojResolveAssemblyReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\Encrypt.EncryptFile.resources
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\encryptFile.csproj.GenerateResource.Cache
+D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\LitJson.dll

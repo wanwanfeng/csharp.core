@@ -1,17 +1,16 @@
-﻿#define MD5
-#define AES
-
-using System.Text;
+﻿using System.Text;
 using System.Security.Cryptography;
 using System;
 
-/// <summary>
-/// 加密解密工具
-/// </summary>
-public class EncryptUtils
+namespace Library.Encrypt
 {
+    /// <summary>
+    /// 加密解密工具
+    /// </summary>
     public class MD5
     {
+        public static bool IsOpen = true;
+
         //MD5加密  
         public static string Encrypt(string input, string key, bool isHead = true)
         {
@@ -40,9 +39,8 @@ public class EncryptUtils
         //MD5加密  
         public static string Encrypt(byte[] input)
         {
-#if !MD5
-            return Encoding.UTF8.GetString(input);
-#endif
+            if (!IsOpen)
+                return Encoding.UTF8.GetString(input);
             var md5Hash = System.Security.Cryptography.MD5.Create();
             byte[] data = md5Hash.ComputeHash(input);
             var sBuilder = new StringBuilder();
@@ -54,11 +52,15 @@ public class EncryptUtils
         }
     }
 
+    /// <summary>
+    /// 加密解密工具
+    /// </summary>
     public class AES
     {
         //加密和解密采用相同的key,具体值自己填，但是必须为32位//
-        public const string Head = "5986157849545freho950173582krhd0";
-        public const string Key = "59861578495186345095017358264920";
+        public static string Head = "5986157849545freho950173582krhd0";
+        public static string Key = "59861578495186345095017358264920";
+        public static bool IsOpen = true;
 
         /// <summary>
         ///  AES-256  内容加密
@@ -74,9 +76,8 @@ public class EncryptUtils
         /// </summary>
         public static byte[] Encrypt(byte[] toEncryptArray, string key = null)
         {
-#if !AES
-            return toEncryptArray;
-#endif
+            if (!IsOpen)
+                return toEncryptArray;
             //加密和解密采用相同的key,具体自己填，但是必须为32位//
             byte[] keyArray = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(key) ? Key : key);
             RijndaelManaged rDel = new RijndaelManaged();
@@ -101,9 +102,9 @@ public class EncryptUtils
         /// </summary>
         public static byte[] Decrypt(byte[] toEncryptArray, string key = null)
         {
-#if !AES
-            return toEncryptArray;
-#endif
+            if (!IsOpen)
+
+                return toEncryptArray;
             //加密和解密采用相同的key,具体值自己填，但是必须为32位//
             byte[] keyArray = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(key) ? Key : key);
 

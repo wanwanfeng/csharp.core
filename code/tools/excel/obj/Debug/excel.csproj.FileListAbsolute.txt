@@ -22,3 +22,6 @@ E:\Git\yg\trunk\code\tools\excel\bin\Debug\excel.pdb
 E:\Git\yg\trunk\code\tools\excel\bin\Debug\Library.dll
 E:\Git\yg\trunk\code\tools\excel\bin\Debug\LitJson.dll
 E:\Git\yg\trunk\code\tools\excel\bin\Debug\Library.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Debug\Library.dll
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Debug\Library.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Debug\ICSharpCode.SharpZipLib.dll

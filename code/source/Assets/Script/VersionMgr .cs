@@ -163,6 +163,7 @@ namespace SVN.NEW
             /// 最低包含文件名与版本信息
             /// </summary>
             public string formatPath { get; private set; }
+
             public string url { get; private set; }
             public int retryCount { get; set; }
 
@@ -171,21 +172,21 @@ namespace SVN.NEW
                 switch (source)
                 {
                     case Source.Master:
-                        {
-                            var queue = new Queue<string>(info.Split(','));
-                            version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
-                            size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
-                            path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
-                        }
+                    {
+                        var queue = new Queue<string>(info.Split(','));
+                        version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
+                        size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
+                        path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
+                    }
                         break;
                     case Source.Patch:
-                        {
-                            var queue = new Queue<string>(info.Split(','));
-                            version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
-                            action = queue.Count == 0 ? "" : queue.Dequeue();
-                            size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
-                            path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
-                        }
+                    {
+                        var queue = new Queue<string>(info.Split(','));
+                        version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
+                        action = queue.Count == 0 ? "" : queue.Dequeue();
+                        size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
+                        path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
+                    }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("source", source, null);
@@ -194,7 +195,7 @@ namespace SVN.NEW
                 name = Path.GetFileName(path);
                 url = string.Format("{0}?v={1}", path, version);
                 formatPath = string.Format("{0}@{1}", path, version);
-                formatPath = EncryptUtils.MD5.Encrypt(formatPath);
+                formatPath = Library.Encrypt.MD5.Encrypt(formatPath);
             }
 
             public override string ToString()
@@ -297,7 +298,7 @@ namespace SVN.NEW
                     patchList = new List<PatchListInfo>();
                 }
             }));
-       }
+        }
 
         /// <summary>
         /// 下载记录主资源列表的文本
@@ -345,10 +346,10 @@ namespace SVN.NEW
                     return;
                 }
                 MaxVersion = text.Skip(2).First().AsInt();
-                patchCache = 
+                patchCache =
                     text.Skip(3).Select(p => new ResInfo(p, ResInfo.Source.Patch))
-                    .Where(p => !p.name.StartsWith("."))
-                    .ToDictionary(p => p.path);
+                        .Where(p => !p.name.StartsWith("."))
+                        .ToDictionary(p => p.path);
             }));
         }
 
@@ -360,13 +361,14 @@ namespace SVN.NEW
             if (File.Exists(path))
             {
                 bytes = File.ReadAllBytes(path);
-                isDown = EncryptUtils.MD5.Encrypt(bytes) != info.hashText;
+                isDown = Library.Encrypt.MD5.Encrypt(bytes) != info.hashText;
             }
             if (isDown)
             {
                 yield return StartCoroutine(new Access().GetResult(this, info.url, res =>
                 {
-                    if (res == null || EncryptUtils.MD5.Encrypt(res) != info.hashText) return;
+                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.hashText)
+                        return;
                     bytes = res;
                     File.WriteAllBytes(path, bytes);
                 }));
@@ -442,10 +444,11 @@ namespace SVN.NEW
             while (lastList.Count != 0)
             {
                 var resInfo = lastList.Dequeue();
-                Debug.Log(string.Format("down...{0}...{1}", (float)lastList.Count / downList.Count, resInfo.url));
+                Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
                 yield return StartCoroutine(new Access().GetResult(this, resInfo.url, res =>
                 {
-                    if (res == null || EncryptUtils.MD5.Encrypt(res) != resInfo.hash) return;
+                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
+                        return;
                     string dir = Path.GetDirectoryName(LocalRoot + resInfo.formatPath);
                     if (dir != null && !Directory.Exists(dir))
                         Directory.CreateDirectory(dir);

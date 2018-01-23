@@ -94,7 +94,7 @@ echo 根据项目大时间长短不定，请耐心等待...
 echo=
 REM pause
 
-set df=!foder!-0-%sv%-master
+set df=svn-!foder!-0-%sv%-master
 if exist "%df%" rd /s/q "%df%" mkdir "%df%"
 svn export -r %sv% %url%@%sv% %df%
 move %master%.txt %df%

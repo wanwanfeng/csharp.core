@@ -7,7 +7,7 @@ set list=patch-list.txt
 if exist %list% del %list%
 
 for /f "tokens=1 delims=" %%i in ( ' dir /ad/b "svn*master" "svn*patch" ') do (
-	if exist "%%i.zip" (
+	if exist %%i.zip (
 		call :getSize "%cd%\%%i.zip" size	
 		echo !size!,%%i.zip>>%list%	
 	) else (

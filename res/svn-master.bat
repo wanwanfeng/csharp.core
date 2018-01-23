@@ -31,6 +31,7 @@ if not exist %fo% (
 	exit
 )
 
+del temp.txt
 cd %fo%
 
 svn info --show-item url >temp.txt
@@ -94,7 +95,7 @@ echo=
 REM pause
 
 set df=!foder!-0-%sv%-master
-if exist %df% rd /s/q %df% mkdir %df%
+if exist "%df%" rd /s/q "%df%" mkdir "%df%"
 svn export -r %sv% %url%@%sv% %df%
 move %master%.txt %df%
 move %df% %cd%/../

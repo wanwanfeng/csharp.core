@@ -19,9 +19,6 @@ echo ----------------------------------------
 echo ------------- 获取库地址----------------
 echo ----------------------------------------
 echo= 
-svn info --show-item url > temp.txt
-set /p url=<temp.txt
-echo 获取库地址：%url%
 
 set /p fo=请输入目标目录，然后回车：
 if not defined fo (
@@ -29,8 +26,19 @@ if not defined fo (
 	pause
 	exit
 )
-set url=%url%/%fo%
-echo 获取目标地址：%url%
+
+if not exist %fo% (
+	echo 目标地址不存在！
+	pause
+	exit
+)
+
+del temp.txt
+cd %fo%
+
+svn info --show-item url > temp.txt
+set /p url=<temp.txt
+echo 获取库地址：%url%
 
 echo=    
 echo ----------------------------------------
@@ -99,7 +107,7 @@ for /f "tokens=1* delims= " %%i in (diff_patch.txt) do (
 	REM echo %%i--%%j--%%~zj
 	REM echo %%~dj%%~pj%%~nj%%~xj
 	REM echo f | xcopy "%cd%\%%j" "%cd%\diffback\%%j" /e /f /y
-	call :getFile "%%j" %%i
+	call :getFile "%%j" "%%i"
 )
 
 echo=
@@ -127,6 +135,13 @@ del diff_patch.txt
 del diff_log.txt
 del diff_list.txt
 
+move %patch%.txt %patch%
+
+call :getCdName foder
+rename %patch% !foder!-%sv%-%ev%-patch
+move !foder!-%sv%-%ev%-patch %cd%/../
+pause
+
 goto :endLast
 exit
 
@@ -138,14 +153,14 @@ REM 路径内\替换成/
 set aaa=!aaa:\=/!
 REM 创建父目录
 set df=%patch%\%~1
-if not exist !df! (	mkdir !df!&&rd /s/q !df! )
-echo "%url%/!aaa!@%ev% -> !df!"
 if %bbb%==D (
 	echo %bbb%,!aaa! >>diff_list.txt
-)else (
+)else (	
+	if not exist "!df!" (	mkdir "!df!"&& rd /s/q "!df!" )
+	echo "%url%/!aaa!@%ev% -> !df!"
 	svn cat -r %ev% "%url%/!aaa!@%ev%" >!df! && ( echo %bbb%,!aaa!>>diff_list.txt )
 )
-REM pause
+::pause
 goto :eof
 
 REM echo ------根据日志获取文件低于限定的最高版本号---------
@@ -172,13 +187,23 @@ REM echo ------获取文件大小--------
 for %%i in (%~1) do set "%2=%%~zi"
 goto :eof
 
+REM echo ----------获取当前文件夹名字------------
+:getCdName 
+for %%i in ("%cd%") do set "%1=%%~ni"
+goto :eof
 
 REM echo ------排除文件操作--------
 :endLast
 
-find /i /v ".jpg" %patch%.txt >%patch%1.txt
+REM find /i /v ".jpg" %patch%.txt >%patch%1.txt
 goto :eof
 
 
 
+REM @echo off
+REM setlocal enabledelayedexpansion
+
+REM find /i /v ".jpg" svn-patch.txt >svn-patch11111.txt
+
+REM pause
 

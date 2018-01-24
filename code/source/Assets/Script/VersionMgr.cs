@@ -341,6 +341,9 @@ public class VersionMgr : MonoBehaviour
 
     private void Awake()
     {
+        patchList = new List<PatchListInfo>();
+        masterCache = new Dictionary<string, ResInfo>();
+        patchCache = new Dictionary<string, ResInfo>();
         if (!Directory.Exists(Access.LocalRoot))
             Directory.CreateDirectory(Access.LocalRoot);
     }
@@ -381,20 +384,14 @@ public class VersionMgr : MonoBehaviour
     {
         yield return StartCoroutine(new Access().FromRemote(this, PatchListInfo.PatchListName, res =>
         {
-            if (res != null)
-            {
-                patchList = Encoding.UTF8.GetString(res)
-                    .Split('\r', '\n')
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.Trim())
-                    .Select(p => new PatchListInfo(p))
-                    .OrderBy(p => p.first)
-                    .ToList();
-            }
-            else
-            {
-                patchList = new List<PatchListInfo>();
-            }
+            if (res == null) return;
+            patchList = Encoding.UTF8.GetString(res)
+                .Split('\r', '\n')
+                .Where(p => !string.IsNullOrEmpty(p))
+                .Select(p => p.Trim())
+                .Select(p => new PatchListInfo(p))
+                .OrderBy(p => p.first)
+                .ToList();
         }));
     }
 
@@ -407,11 +404,7 @@ public class VersionMgr : MonoBehaviour
     {
         yield return StartCoroutine(GetCacheText(info, text =>
         {
-            if (text == null)
-            {
-                masterCache = new Dictionary<string, ResInfo>();
-                return;
-            }
+            if (text == null) return;
             SvnVersion = text.First();
             MinVersion = text.Skip(1).First().AsInt();
             MaxVersion = text.Skip(1).First().AsInt();
@@ -431,18 +424,10 @@ public class VersionMgr : MonoBehaviour
     {
         yield return StartCoroutine(GetCacheText(info, text =>
         {
-            if (text == null)
-            {
-                patchCache = new Dictionary<string, ResInfo>();
-                return;
-            }
+            if (text == null) return;
             var svnVersion = text.First();
             var minVersion = text.Skip(1).First().AsInt();
-            if (SvnVersion != svnVersion || MaxVersion != minVersion)
-            {
-                patchCache = new Dictionary<string, ResInfo>();
-                return;
-            }
+            if (SvnVersion != svnVersion || MaxVersion != minVersion) return;
             MaxVersion = text.Skip(2).First().AsInt();
             patchCache =
                 text.Skip(3).Select(p => new ResInfo(p, ResInfo.Source.Patch))
@@ -515,28 +500,42 @@ public class VersionMgr : MonoBehaviour
             if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.zipHash) return;
             var zipName = Access.LocalRoot + info.name;
             File.WriteAllBytes(zipName, res);
-            if (string.IsNullOrEmpty(Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false)))
+            string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false);
+            if (string.IsNullOrEmpty(msg))
             {
                 File.Delete(Access.LocalRoot + info.name);
                 File.Move(Access.LocalRoot + info.fileUrl, info.fileLocal);
-                var folderName = zipName.Replace(Path.GetExtension(zipName), "");
-                var list =
-                    Directory.GetFiles(folderName, "*.*", SearchOption.AllDirectories)
-                        .Select(p => p.Replace("\\", "/"))
-                        .ToList();
-                foreach (string s in list)
-                {
-                    var file = s.Replace(folderName + "/", Access.LocalRoot);
-                    var dir =Path.GetDirectoryName(file);
-                    if (dir != null && !Directory.Exists(dir))
-                        Directory.CreateDirectory(dir);
-                    if (File.Exists(file))
-                        File.Delete(file);
-                    File.Move(s, file);
-                }
-                Directory.Delete(folderName, true);
+                FileMoveTo(zipName);
+            }
+            else
+            {
+                Debug.LogError("解压文件失败！" + msg);
             }
         }));
+    }
+
+    /// <summary>
+    /// 解压后的文件整合到预定义的目录结构
+    /// </summary>
+    /// <param name="zipName"></param>
+    private static void FileMoveTo(string zipName)
+    {
+        var folderName = zipName.Replace(Path.GetExtension(zipName), "");
+        var list =
+            Directory.GetFiles(folderName, "*.*", SearchOption.AllDirectories)
+                .Select(p => p.Replace("\\", "/"))
+                .ToList();
+        foreach (string s in list)
+        {
+            var file = s.Replace(folderName + "/", Access.LocalRoot);
+            var dir = Path.GetDirectoryName(file);
+            if (dir != null && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            if (File.Exists(file))
+                File.Delete(file);
+            File.Move(s, file);
+        }
+        Directory.Delete(folderName, true);
     }
 
     /// <summary>

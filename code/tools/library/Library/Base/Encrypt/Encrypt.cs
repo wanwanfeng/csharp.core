@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Security.Cryptography;
 using System;
+using System.IO;
 
 namespace Library.Encrypt
 {
@@ -9,6 +10,7 @@ namespace Library.Encrypt
     /// </summary>
     public class MD5
     {
+        public static System.Security.Cryptography.MD5 Md5Hash = System.Security.Cryptography.MD5.Create();
         public static bool IsOpen = true;
 
         //MD5加密  
@@ -41,14 +43,37 @@ namespace Library.Encrypt
         {
             if (!IsOpen)
                 return Encoding.UTF8.GetString(input);
-            var md5Hash = System.Security.Cryptography.MD5.Create();
-            byte[] data = md5Hash.ComputeHash(input);
+            byte[] data = Md5Hash.ComputeHash(input);
             var sBuilder = new StringBuilder();
             foreach (var bt in data)
             {
                 sBuilder.Append(bt.ToString("x2"));
             }
             return sBuilder.ToString();
+        }
+
+        /// <summary>
+        /// 校验文件MD5
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool ComparerFile(string hash, string path)
+        {
+            return File.Exists(path) && Encrypt(File.ReadAllBytes(path)) == hash;
+        }
+
+        /// <summary>
+        /// 校验字符串MD5
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="str"></param>
+        /// <param name="key"></param>
+        /// <param name="isHead"></param>
+        /// <returns></returns>
+        public static bool ComparerString(string hash, string str, string key = "", bool isHead = true)
+        {
+            return Encrypt(str, key, isHead) == hash;
         }
     }
 

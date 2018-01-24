@@ -196,7 +196,7 @@ public class VersionMgr : MonoBehaviour
             fileLocal = Access.persistentDataPath + fileUrl.Replace("/", "-");
             fileSize = queue.First().AsLong();
             fileHash = queue.Skip(1).First();
-            isNeedDownFile = !File.Exists(fileLocal) || Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fileLocal)) != fileHash;
+            isNeedDownFile = !Library.Encrypt.MD5.ComparerFile(fileHash, fileLocal);
 
             if ((isZip = Path.HasExtension(name)) != true) return;
             zipSize = queue.Skip(2).First().AsLong();
@@ -453,7 +453,6 @@ public class VersionMgr : MonoBehaviour
 
     private IEnumerator GetCacheText(PatchListInfo info, Action<string[]> callAction)
     {
-        byte[] bytes = new byte[0];
         if (info.isNeedDownFile)
         {
             if (info.isZip)
@@ -469,7 +468,7 @@ public class VersionMgr : MonoBehaviour
                 }));
             }
         }
-        bytes = File.ReadAllBytes(info.fileLocal);
+        byte[] bytes = File.ReadAllBytes(info.fileLocal);
         if (bytes.Length == 0)
         {
             callAction.Invoke(null);

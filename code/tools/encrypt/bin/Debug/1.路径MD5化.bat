@@ -1,14 +1,15 @@
-ï»¿@echo off
+@echo off
 setlocal enabledelayedexpansion
+
 (
 	REM echo test
 	echo image
 	REM echo test2
 	REM echo test3
 	REM echo test1
-) > temp.txt
-REM å¯†é’¥  "-e":æœ«å°¾è¿½åŠ å¯†é’¥ "-h":å¼€å§‹è¿½åŠ å¯†é’¥
-call :encryptMd5 "dsffdstdghfghfg" "-e"
+)> temp.txt
+REM ÃÜÔ¿  "-e":Ä©Î²×·¼ÓÃÜÔ¿ "-h":¿ªÊ¼×·¼ÓÃÜÔ¿
+call :encryptMd5 "" "-e"
 pause 
 exit
 
@@ -31,26 +32,28 @@ REM echo %folder%
 for /f "delims=" %%i in (' dir %cd%\%folder% /b/a-d/s ') do (
 	call :getFilePath %%~dpi filePath
 	set filePath=!filePath:\=/!
-	REM åŽ»é™¤æœ«å°¾/
+	REM È¥³ýÄ©Î²/
 	set filePath=!filePath:~0,-1!
 	set fileName=%%~nxi
-	echo !filePath!/!fileName!
 	
-	REM ::ç›¸å¯¹è·¯å¾„
-	( call encrypt.exe md5 "!filePath!" %key% %isHead%)>xx.txt
+	echo !filePath! %key% %isHead%
+	REM ::Ïà¶ÔÂ·¾¶
+	( call encrypt.exe md5 !filePath! "%key%" %isHead%)>xx.txt
 	set /p filePathMd5=<xx.txt
+	echo !filePathMd5!
 	set filePathMd5=temp\!filePathMd5!
-	REM echo !filePathMd5!
+	REM pause	
 	if not exist "!filePathMd5!" ( mkdir "!filePathMd5!")
 	
-	REM ::æ–‡ä»¶å
-	( call encrypt.exe md5 "!fileName!" %key% %isHead%)>xx.txt
+	echo !fileName! %key% %isHead%
+	REM ::ÎÄ¼þÃû
+	( call encrypt.exe md5 !fileName! "%key%" %isHead%)>xx.txt
 	set /p fileNameMd5=<xx.txt
+	echo !fileNameMd5!
 	set fileNameMd5=!fileNameMd5!%%~xi
-	echo !filePathMd5!\!fileNameMd5!
+	REM pause
+	
 	if exist "!filePathMd5!!fileNameMd5!" ( del "!filePathMd5!!fileNameMd5!" )
-
-	REM echo "%%i"
 	echo !filePathMd5!\!fileNameMd5! >> md5_encrypt_list.txt
 	echo f | xcopy "%%i" "%cd%\!filePathMd5!\!fileNameMd5!" /y/s/q
 	REM pause

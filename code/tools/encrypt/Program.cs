@@ -8,11 +8,30 @@ namespace encrypt
     {
         static void Main(string[] args)
         {
+            if (args.Length != 0)
+            {
+                GetValue(args);
+                return;
+            }
+
+            var list = new[,]
+            {
+                {"md5,image,,-e"},
+                {"md5,ff277dcb965c4e0b1bc16d38999e417a.jpg,,-e"}
+            };
+            foreach (string s in list)
+            {
+                GetValue(s.Split(','));
+            }
+            Console.ReadKey();
+        }
+
+        private static void GetValue(string[] args)
+        {
             Queue<string> queue = new Queue<string>(args);
             string type = queue.Count == 0 ? "" : queue.Dequeue();
             if (string.IsNullOrEmpty(type))
                 return;
-
 
             string res = "";
             switch (type)

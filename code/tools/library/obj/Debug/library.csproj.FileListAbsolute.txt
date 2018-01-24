@@ -16,3 +16,4 @@ D:\Work\yuege\ygtools\trunk\code\tools\library\bin\Debug\Library.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\library\bin\Debug\ICSharpCode.SharpZipLib.dll
 D:\Work\yuege\ygtools\trunk\code\tools\library\obj\Debug\Library.dll
 D:\Work\yuege\ygtools\trunk\code\tools\library\obj\Debug\Library.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\library\obj\Debug\library.csprojResolveAssemblyReference.cache

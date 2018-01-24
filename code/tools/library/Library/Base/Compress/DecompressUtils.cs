@@ -190,11 +190,14 @@ namespace Library.Compress
         /// </summary>
         /// <param name="zipfilename">要解压文件Zip(物理路径)</param>
         /// <param name="password">解压密码</param>
+        /// <param name="isHaveSelf">自身名称作为一级目录</param>
         /// <returns>异常信息</returns>
-        public static string UnMakeZipFile(string zipfilename, string password = "")
+        public static string UnMakeZipFile(string zipfilename, string password = "", bool isHaveSelf = true)
         {
             return ICSharpZipCode.UnMakeZipFile(zipfilename,
-                Path.GetDirectoryName(zipfilename) + "\\" + Path.GetFileNameWithoutExtension(zipfilename), password);
+                Path.GetDirectoryName(zipfilename) +
+                (isHaveSelf ? "\\" + Path.GetFileNameWithoutExtension(zipfilename) : ""),
+                password);
         }
 
         #endregion

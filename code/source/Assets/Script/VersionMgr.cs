@@ -34,33 +34,74 @@ using Debug = UnityEngine.Debug;
 
 public class VersionMgr : MonoBehaviour
 {
-    private class Access
+    static VersionMgr()
     {
-        private static Queue<string> urls = new Queue<string>();
+    //Library.Encrypt.MD5.IsOpen = false;
+    }
 
-        private static readonly int RetryCount = 5;
+    public class Access
+    {
+        public static string dataPath { get; private set; }
+        public static string persistentDataPath { get; private set; }
+
+        public static string streamingAssetsPath
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return "file:///" + dataPath + "/StreamingAssets/";
+#elif UNITY_STANDALONE_WIN
+                return "file:///" + dataPath + "/StreamingAssets/";
+#elif UNITY_ANDROID
+                return "jar:file://" + dataPath + "!/assets/";
+#elif UNITY_IPHONE || UNITY_IOS
+                return "file://" + dataPath + "/Raw/";  
+#endif
+            }
+        }
+
+        public static string LocalRoot
+        {
+            get { return persistentDataPath + "Temp/"; }
+        }
+
+        private static readonly Queue<string> urls = new Queue<string>();
 
         static Access()
         {
-            urls.Enqueue("http://192.168.8.60:8080/test/master/");
-            urls.Enqueue("http://192.168.8.60:8080/test/master/");
-            urls.Enqueue("http://192.168.8.60:8080/test/master/");
+            dataPath = Application.dataPath;
+            persistentDataPath = Application.persistentDataPath + "/";
+            urls.Enqueue("http://192.168.8.59:8080/test/master/");
+            urls.Enqueue("http://192.168.8.59:8080/test/master/");
+            urls.Enqueue("http://192.168.8.59:8080/test/master/");
         }
 
         private int retry = 0;
+        private static readonly int RetryCount = 5;
 
         public Access()
         {
             retry = 0;
         }
 
-        public IEnumerator GetResult(MonoBehaviour mono, string path, Action<byte[]> callAction)
+        /// <summary>
+        /// 远程加载
+        /// 失败后重试，最大重试5次，每次url取队列最新值
+        /// </summary>
+        /// <param name="mono"></param>
+        /// <param name="path"></param>
+        /// <param name="callAction"></param>
+        /// <returns></returns>
+        public IEnumerator FromRemote(MonoBehaviour mono, string path, Action<byte[]> callAction)
         {
             using (WWW www = new WWW(urls.Peek() + path))
             {
                 yield return www;
                 if (string.IsNullOrEmpty(www.error))
                 {
+#if UNITY_EDITOR
+                Debug.Log(Encoding.UTF8.GetString(www.bytes));
+#endif
                     callAction.Invoke(www.bytes);
                 }
                 else
@@ -69,7 +110,7 @@ public class VersionMgr : MonoBehaviour
                     {
                         retry++;
                         urls.Enqueue(urls.Dequeue());
-                        yield return mono.StartCoroutine(GetResult(mono, path, callAction));
+                        yield return mono.StartCoroutine(FromRemote(mono, path, callAction));
                     }
                     else
                     {
@@ -79,33 +120,96 @@ public class VersionMgr : MonoBehaviour
                 www.Dispose();
             }
         }
+
+        /// <summary>
+        /// 本地加载无须重试
+        /// </summary>
+        /// <param name="mono"></param>
+        /// <param name="path"></param>
+        /// <param name="callAction"></param>
+        /// <returns></returns>
+        private IEnumerator FromLocal(MonoBehaviour mono, string path, Action<byte[]> callAction)
+        {
+            using (WWW www = new WWW(path))
+            {
+                yield return www;
+                if (string.IsNullOrEmpty(www.error))
+                {
+#if UNITY_EDITOR
+                    Debug.Log(Encoding.UTF8.GetString(www.bytes));
+#endif
+                    callAction.Invoke(www.bytes);
+                }
+                else
+                {
+                    callAction.Invoke(null);
+                }
+                www.Dispose();
+            }
+        }
+
+        public IEnumerator FromStreamingAssetsPath(MonoBehaviour mono, string path, Action<byte[]> callAction)
+        {
+            yield return mono.StartCoroutine(FromLocal(mono, streamingAssetsPath + path, callAction));
+        }
+
+        public IEnumerator FromPersistentDataPath(MonoBehaviour mono, string path, Action<byte[]> callAction)
+        {
+            yield return mono.StartCoroutine(FromLocal(mono, persistentDataPath + path, callAction));
+        }
     }
 
     private class PatchListInfo
     {
+        public static string PatchListName = "patch-list.txt";
+        public static string MasterName = "/svn-master.txt";
+        public static string PatchName = "/svn-patch.txt";
+
+        public string name;
+        public string group; //主目录
         public bool isMaster; //主与补丁区分
         public int first; //开始版本号
         public int last; //结束版本好
-        public string url; //远程结构
-        public string local; //本地结构
 
-        public string hashText; //对应的记录文本hash
+        public bool isZip = false; //是否是压缩包
+        public string zipHash; //压缩包hash
+        public long zipSize; //压缩包大小
+
+        public bool isNeedDownFile = false;
+        public string fileUrl; //远程结构
+        public string fileLocal; //本地结构全路径
+        public string fileHash; //对应的记录文本hash
+        public long fileSize; //对应的记录文本大小
 
         public PatchListInfo(string info)
         {
-            var queue = new Queue<string[]>(info.Split(',').Select(p => p.Split('-')));
-            var strFirst = queue.Dequeue();
-            isMaster = strFirst[0] == "master";
-            first = strFirst[1].AsInt();
-            last = strFirst[2].AsInt();
-            url = info + (isMaster ? "/svn-master.txt" : "/svn-patch.txt");
-            local = url.Replace("/", "-");
-            hashText = (queue.Count == 0 ? "" : queue.Dequeue().First()).Trim();
+            string[] queue = info.Split(',');
+            //svn-潘之琳-0-9-master
+            name = queue.Last();
+            isMaster = name.Contains("master");
+            var strFirst = name.Split('-').ToArray();
+            group = strFirst[1];
+            first = strFirst[2].AsInt();
+            last = strFirst[3].AsInt();
+
+            fileUrl = Path.GetFileNameWithoutExtension(name) + (isMaster ? MasterName : PatchName);
+            fileLocal = Access.persistentDataPath + fileUrl.Replace("/", "-");
+            fileSize = queue.First().AsLong();
+            fileHash = queue.Skip(1).First();
+            isNeedDownFile = !File.Exists(fileLocal) || Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fileLocal)) != fileHash;
+
+            if ((isZip = Path.HasExtension(name)) != true) return;
+            zipSize = queue.Skip(2).First().AsLong();
+            zipHash = queue.Skip(3).First();
         }
 
         public override string ToString()
         {
-            return string.Format("Url: {0}, HashText: {1}, IsMaster: {2}", url, hashText, isMaster);
+            return
+                string.Format(
+                    "Name: {0}, Group: {1}, IsMaster: {2}, First: {3}, Last: {4}, IsZip: {5}, ZipHash: {6}, ZipSize: {7}, IsNeedDownFile: {8}, FileUrl: {9}, FileLocal: {10}, FileHash: {11}, FileSize: {12}",
+                    name, @group, isMaster, first, last, isZip, zipHash, zipSize, isNeedDownFile, fileUrl, fileLocal,
+                    fileHash, fileSize);
         }
     }
 
@@ -163,7 +267,6 @@ public class VersionMgr : MonoBehaviour
         public string formatPath { get; private set; }
 
         public string url { get; private set; }
-        public int retryCount { get; set; }
 
         public ResInfo(string info, Source source)
         {
@@ -174,6 +277,7 @@ public class VersionMgr : MonoBehaviour
                     var queue = new Queue<string>(info.Split(','));
                     version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
                     size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
+                    hash = queue.Count == 0 ? "" : queue.Dequeue();
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
                 }
                     break;
@@ -183,6 +287,7 @@ public class VersionMgr : MonoBehaviour
                     version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
                     action = queue.Count == 0 ? "" : queue.Dequeue();
                     size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
+                    hash = queue.Count == 0 ? "" : queue.Dequeue();
                     path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
                 }
                     break;
@@ -193,7 +298,7 @@ public class VersionMgr : MonoBehaviour
             name = Path.GetFileName(path);
             url = string.Format("{0}?v={1}", path, version);
             formatPath = string.Format("{0}@{1}", path, version);
-            formatPath = Library.Encrypt.MD5.Encrypt(formatPath);
+            //formatPath = Library.Encrypt.MD5.Encrypt(formatPath);
         }
 
         public override string ToString()
@@ -223,11 +328,6 @@ public class VersionMgr : MonoBehaviour
         set { maxVersion = value; }
     }
 
-    public static string LocalRoot
-    {
-        get { return Application.persistentDataPath + "/Temp/"; }
-    }
-
     private PatchListInfo LastAccessInfo { get; set; }
     private List<PatchListInfo> patchList { get; set; }
     private Dictionary<string, ResInfo> masterCache { get; set; }
@@ -241,18 +341,13 @@ public class VersionMgr : MonoBehaviour
 
     private void Awake()
     {
-        if (!Directory.Exists(LocalRoot))
-            Directory.CreateDirectory(LocalRoot);
-
-        localCache =
-            Directory.GetFiles(LocalRoot, "*.*", SearchOption.AllDirectories)
-                .Select(p => p.Replace("\\", "/").Replace(LocalRoot, "").Trim())
-                .ToList();
+        if (!Directory.Exists(Access.LocalRoot))
+            Directory.CreateDirectory(Access.LocalRoot);
     }
 
     private IEnumerator Start()
     {
-        yield return StartCoroutine(GetPatchList("patch-list.txt"));
+        yield return StartCoroutine(GetPatchList());
         foreach (var info in patchList)
         {
             if (LastAccessInfo != null && info.first != LastAccessInfo.last)
@@ -268,18 +363,23 @@ public class VersionMgr : MonoBehaviour
             }
             LastAccessInfo = info;
         }
+
+        localCache =
+            Directory.GetFiles(Access.LocalRoot, "*.*", SearchOption.AllDirectories)
+                .Select(p => p.Replace("\\", "/").Replace(Access.LocalRoot, "").Trim())
+                .ToList();
+
         yield return StartCoroutine(ResourceDelete());
-        yield return StartCoroutine(ResourceDownLoad());
+        //yield return StartCoroutine(ResourceDownLoad());
     }
 
     /// <summary>
     ///  下载记录补丁的文本获取补丁列表
     /// </summary>
-    /// <param name="fileName"></param>
     /// <returns></returns>
-    private IEnumerator GetPatchList(string fileName)
+    private IEnumerator GetPatchList()
     {
-        yield return StartCoroutine(new Access().GetResult(this, fileName, res =>
+        yield return StartCoroutine(new Access().FromRemote(this, PatchListInfo.PatchListName, res =>
         {
             if (res != null)
             {
@@ -314,9 +414,9 @@ public class VersionMgr : MonoBehaviour
             }
             SvnVersion = text.First();
             MinVersion = text.Skip(1).First().AsInt();
-            MaxVersion = text.Skip(2).First().AsInt();
+            MaxVersion = text.Skip(1).First().AsInt();
             masterCache =
-                text.Skip(3).Select(p => new ResInfo(p, ResInfo.Source.Master))
+                text.Skip(2).Select(p => new ResInfo(p, ResInfo.Source.Master))
                     .Where(p => !p.name.StartsWith("."))
                     .ToDictionary(p => p.path);
         }));
@@ -354,23 +454,22 @@ public class VersionMgr : MonoBehaviour
     private IEnumerator GetCacheText(PatchListInfo info, Action<string[]> callAction)
     {
         byte[] bytes = new byte[0];
-        var path = Application.persistentDataPath + "/" + info.local;
-        bool isDown = true;
-        if (File.Exists(path))
+        if (info.isNeedDownFile)
         {
-            bytes = File.ReadAllBytes(path);
-            isDown = Library.Encrypt.MD5.Encrypt(bytes) != info.hashText;
-        }
-        if (isDown)
-        {
-            yield return StartCoroutine(new Access().GetResult(this, info.url, res =>
+            if (info.isZip)
             {
-                if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.hashText)
-                    return;
-                bytes = res;
-                File.WriteAllBytes(path, bytes);
-            }));
+                yield return StartCoroutine(GetRemoteZip(info));
+            }
+            else
+            {
+                yield return StartCoroutine(new Access().FromRemote(this, info.fileUrl, res =>
+                {
+                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.fileHash) return;
+                    File.WriteAllBytes(info.fileLocal, res);
+                }));
+            }
         }
+        bytes = File.ReadAllBytes(info.fileLocal);
         if (bytes.Length == 0)
         {
             callAction.Invoke(null);
@@ -383,6 +482,9 @@ public class VersionMgr : MonoBehaviour
             .ToArray());
     }
 
+    /// <summary>
+    /// 补丁包与主资源包相比较
+    /// </summary>
     private void CompareMasterAndPatch()
     {
         foreach (var pair in patchCache)
@@ -403,6 +505,42 @@ public class VersionMgr : MonoBehaviour
     }
 
     /// <summary>
+    /// 下载记录主资源压缩包
+    /// </summary>
+    /// <param name="info"></param>
+    /// <returns></returns>
+    private IEnumerator GetRemoteZip(PatchListInfo info)
+    {
+        yield return StartCoroutine(new Access().FromRemote(this, info.name, res =>
+        {
+            if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.zipHash) return;
+            var zipName = Access.LocalRoot + info.name;
+            File.WriteAllBytes(zipName, res);
+            if (string.IsNullOrEmpty(Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false)))
+            {
+                File.Delete(Access.LocalRoot + info.name);
+                File.Move(Access.LocalRoot + info.fileUrl, info.fileLocal);
+                var folderName = zipName.Replace(Path.GetExtension(zipName), "");
+                var list =
+                    Directory.GetFiles(folderName, "*.*", SearchOption.AllDirectories)
+                        .Select(p => p.Replace("\\", "/"))
+                        .ToList();
+                foreach (string s in list)
+                {
+                    var file = s.Replace(folderName + "/", Access.LocalRoot);
+                    var dir =Path.GetDirectoryName(file);
+                    if (dir != null && !Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                    if (File.Exists(file))
+                        File.Delete(file);
+                    File.Move(s, file);
+                }
+                Directory.Delete(folderName, true);
+            }
+        }));
+    }
+
+    /// <summary>
     /// 删除多余资源,清理空间
     /// </summary>
     /// <returns></returns>
@@ -411,13 +549,13 @@ public class VersionMgr : MonoBehaviour
         var delList = localCache.Except(masterCache.Values.Select(p => p.formatPath)).ToList();
         Debug.Log(delList.Count + "\r\n" + string.Join("\n", delList.Select(p => p.ToString()).ToArray()));
 
-        //yield break;
+        yield break;
         foreach (var path in delList)
         {
             try
             {
-                if (File.Exists(LocalRoot + path))
-                    File.Delete(LocalRoot + path);
+                if (File.Exists(Access.LocalRoot + path))
+                    File.Delete(Access.LocalRoot + path);
             }
             catch (Exception e)
             {
@@ -443,14 +581,14 @@ public class VersionMgr : MonoBehaviour
         {
             var resInfo = lastList.Dequeue();
             Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
-            yield return StartCoroutine(new Access().GetResult(this, resInfo.url, res =>
+            yield return StartCoroutine(new Access().FromRemote(this, resInfo.url, res =>
             {
                 if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
                     return;
-                string dir = Path.GetDirectoryName(LocalRoot + resInfo.formatPath);
+                string dir = Path.GetDirectoryName(Access.LocalRoot + resInfo.formatPath);
                 if (dir != null && !Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
-                File.WriteAllBytes(LocalRoot + resInfo.formatPath, res);
+                File.WriteAllBytes(Access.LocalRoot + resInfo.formatPath, res);
             }));
         }
     }
@@ -477,7 +615,7 @@ public class VersionMgr : MonoBehaviour
                 yield break;
             }
 
-            using (WWW www = new WWW(LocalRoot + resInfo.formatPath))
+            using (WWW www = new WWW(Access.LocalRoot + resInfo.formatPath))
             {
                 yield return www;
                 callAction.Invoke(www);

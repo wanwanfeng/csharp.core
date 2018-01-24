@@ -6,7 +6,7 @@ REM dir /b/ad >patch-list.txt
 set list=patch-list.txt
 if exist %list% del %list%
 
-for /f "tokens=1 delims=" %%i in ( ' dir /ad/b "svn*master" "svn*patch" ') do (
+for /f "tokens=1 delims=" %%i in ( ' dir /ad /b /od "svn*master" "svn*patch" ') do (
 	echo %%i
 	if exist %%i.zip (
 		call :getMD5 "%%i.zip" md5
@@ -20,12 +20,12 @@ for /f "tokens=1 delims=" %%i in ( ' dir /ad/b "svn*master" "svn*patch" ') do (
 pause
 exit
 
-REM echo ------鑾峰彇鏂囦欢澶у皬--------
+REM echo ------获取文件大小--------
 :getSize 
 for %%i in ("%~1") do set "%2=%%~zi"
 goto :eof
 
-REM echo ------鑾峰彇鏂囦欢MD5--------
+REM echo ------获取文件MD5--------
 :getMD5 
 set md5txt=md5.txt
 if exist %md5txt% del %md5txt%

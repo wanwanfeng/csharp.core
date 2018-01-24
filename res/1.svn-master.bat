@@ -130,11 +130,12 @@ REM echo ------获取文件MD5--------
 :getMD5 
 set md5txt=md5.txt
 if exist %md5txt% del %md5txt%
-echo "%~1"
 certutil -hashfile "%~1" MD5 > %md5txt% && (
 	for /f "skip=1 tokens=1 delims=" %%i in ( %md5txt% ) do (
-		set "%2=%%i"
-		echo %%i
+		set aaa=%%i
+		set aaa=!aaa: =!
+		set "%2=!aaa!"
+		echo !aaa!
 		del %md5txt%
 		goto :eof
 	)

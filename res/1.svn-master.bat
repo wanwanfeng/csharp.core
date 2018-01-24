@@ -72,7 +72,7 @@ echo %sv% >>%master%.txt
 for /f "tokens=1,2,3,4,5,6* delims= " %%i in ( temp.txt ) do (
 	REM echo %%i,%%j,%%k,%%l,%%m,%%n,%%o
 	if not "%%o"=="" (
-		echo %%i,%%k,%%o>>%master%.txt	
+		 ( echo %%i,%%k,%%o)>>%master%.txt	
 	)
 )
 del temp.txt
@@ -97,7 +97,26 @@ REM pause
 set df=svn-!foder!-0-%sv%-master
 if exist "%df%" rd /s/q "%df%" mkdir "%df%"
 svn export -r %sv% %url%@%sv% %df%
+
+pause 
+REM echo=    
+REM echo ----------------------------------------
+REM echo ---------------- 追加MD5----------------
+REM echo ----------------------------------------
+rename %master%.txt temp.txt
+set master=svn-master
+if exist %master%.txt del %master%.txt
+echo %version% >>%master%.txt	
+echo %sv% >>%master%.txt	
+for /f "skip=2 tokens=1,2,3 delims=," %%i in ( temp.txt ) do (
+	call :getMD5 "%df%/%%k" md5	
+	( echo %%i,%%j,!md5!,%%k) >>%master%.txt
+)
+del temp.txt
+
+rem 移动
 move %master%.txt %df%
+if exist "%cd%/../%df%" rd /s/q "%cd%/../%df%"
 move %df% %cd%/../
 pause
 exit
@@ -105,4 +124,20 @@ exit
 REM echo ----------获取当前文件夹名字------------
 :getCdName 
 for %%i in ("%cd%") do set "%1=%%~ni"
+goto :eof
+
+REM echo ------获取文件MD5--------
+:getMD5 
+set md5txt=md5.txt
+if exist %md5txt% del %md5txt%
+echo "%~1"
+certutil -hashfile "%~1" MD5 > %md5txt% && (
+	for /f "skip=1 tokens=1 delims=" %%i in ( %md5txt% ) do (
+		set "%2=%%i"
+		echo %%i
+		del %md5txt%
+		goto :eof
+	)
+) || ( echo "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" )
+set "%2="
 goto :eof

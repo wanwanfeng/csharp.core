@@ -91,8 +91,7 @@ echo ----------------------------------------
 echo ---------- 获取版本差异列表 ------------
 echo ----------------------------------------
 
-svn diff -r %sv%:%ev% --summarize > diff_patch.txt
-
+( svn diff -r %sv%:%ev% --summarize) > diff_patch.txt
 echo= 
 echo ----------------------------------------
 echo -----------获取每个差异文件-------------
@@ -112,7 +111,7 @@ for /f "tokens=1* delims= " %%i in (diff_patch.txt) do (
 
 echo=
 echo ----------------------------------------
-echo ------获取每个差异文本的文件大小--------
+echo ----获取每个差异文本的文件大小与MD5-----
 echo ----------------------------------------
 
 REM pause
@@ -123,13 +122,13 @@ echo %sv% >> %patch%.txt
 echo %ev% >> %patch%.txt
 
 for /f "tokens=1,2 delims=," %%i in (diff_list.txt) do (
-	call :getSize %cd%\%patch%\%%j size	
+	call :getMD5 "%cd%\%patch%\%%j" md5
+	call :getSize "%cd%\%patch%\%%j" size	
 	if %%i==A call :getVersion "%%j" vv
 	if %%i==M call :getVersion "%%j" vv	
-	echo !vv!,%%i,!size!,%%j >> %patch%.txt
-	REM pause
+	( echo !vv!,%%i,!size!,!md5!,%%j) >> %patch%.txt
 )
-pause
+rem pause
 
 del diff_patch.txt
 del diff_log.txt
@@ -138,8 +137,10 @@ del diff_list.txt
 move %patch%.txt %patch%
 
 call :getCdName foder
-rename %patch% svn-!foder!-%sv%-%ev%-patch
-move svn-!foder!-%sv%-%ev%-patch %cd%/../
+set fName=svn-!foder!-%sv%-%ev%-patch
+rename "%patch%" "%fName%"
+if exist  "%cd%/../%fName%" rd /s/q "%cd%/../%fName%"
+move "%fName%" %cd%/../
 pause
 
 goto :endLast
@@ -156,9 +157,9 @@ set df=%patch%\%~1
 if %bbb%==D (
 	echo %bbb%,!aaa! >>diff_list.txt
 )else (	
-	if not exist "!df!" (	mkdir "!df!"&& rd /s/q "!df!" )
+	if not exist "!df!" (	mkdir "!df!" && rd /s/q "!df!" )
 	echo "%url%/!aaa!@%ev% -> !df!"
-	svn cat -r %ev% "%url%/!aaa!@%ev%" >!df! && ( echo %bbb%,!aaa!>>diff_list.txt )
+	svn cat -r %ev% "%url%/!aaa!@%ev%" >!df! && ( ( echo %bbb%,!aaa!)>>diff_list.txt ) || echo "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 )
 ::pause
 goto :eof
@@ -168,9 +169,7 @@ REM echo ------根据日志获取文件低于限定的最高版本号---------
 set aaa=%~1
 REM 路径内\替换成/
 set aaa=!aaa:\=/!
-REM 去除最后一个空格
-set aaa=%aaa:~0,-1%
-echo log "%url%/!aaa!@%ev%"
+rem echo log "%url%/!aaa!@%ev%"
 svn log -r %ev%:0 "%url%/!aaa!@%ev%" -q -l1 --stop-on-copy >diff_log.txt
 for /f "skip=1 eol=- tokens=1 delims=|" %%i in ( diff_log.txt ) do (
 	set vv=%%i
@@ -178,18 +177,34 @@ for /f "skip=1 eol=- tokens=1 delims=|" %%i in ( diff_log.txt ) do (
 	set vv=!vv: =!
 	echo "%url%/%aaa%@%ev%->!vv!"
 	set "%2=!vv!"
+	goto :eof
 )
 REM pause
-goto :eof
-
-REM echo ------获取文件大小--------
-:getSize 
-for %%i in (%~1) do set "%2=%%~zi"
 goto :eof
 
 REM echo ----------获取当前文件夹名字------------
 :getCdName 
 for %%i in ("%cd%") do set "%1=%%~ni"
+goto :eof
+
+REM echo ------获取文件大小--------
+:getSize 
+for %%i in ("%~1") do set "%2=%%~zi"
+goto :eof
+
+REM echo ------获取文件MD5--------
+:getMD5 
+set md5txt=md5.txt
+if exist %md5txt% del %md5txt%
+certutil -hashfile "%~1" MD5 > %md5txt% && (
+	for /f "skip=1 tokens=1 delims=" %%i in ( %md5txt% ) do (
+		set "%2=%%i"
+		echo %%i
+		del %md5txt%
+		goto :eof
+	)
+)
+set "%2="
 goto :eof
 
 REM echo ------排除文件操作--------

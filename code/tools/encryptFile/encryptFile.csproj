@@ -111,7 +111,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\base\library.csproj">
+    <ProjectReference Include="..\library\library.csproj">
       <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
       <Name>library</Name>
     </ProjectReference>

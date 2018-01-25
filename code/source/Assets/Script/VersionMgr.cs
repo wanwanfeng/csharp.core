@@ -237,29 +237,20 @@ public class VersionMgr : MonoBehaviour
             D, //delete
         }
 
+        /// <summary>
+        /// 相对于旧得版本的文件操作行为
+        /// </summary>
+        public Action action = Action.N;
+
         public string path { get; private set; }
         public string name { get; private set; }
         public int version { get; private set; }
         public long size { get; private set; }
         public string hash { get; private set; }
-        public PatchInfo PatchInfo { get; private set; }
-
-        /// <summary>
-        /// 相对于旧得版本的文件操作行为
-        /// </summary>
-        public Action action = Action.N;
-        /// <summary>
-        /// 转化本地文件路径使用
-        /// 和其余信息一起被格式化
-        /// 最低包含文件名与版本信息
-        /// </summary>
-        public string formatPath { get; private set; }
-
         public string url { get; private set; }
 
         public ResInfo(PatchInfo patchListInfo, string info, Source source)
         {
-            PatchInfo = patchListInfo;
             switch (source)
             {
                 case Source.Master:
@@ -297,10 +288,6 @@ public class VersionMgr : MonoBehaviour
 
             name = Path.GetFileName(path);
             url = string.Format("{0}?v={1}", path, version);
-            formatPath = string.Format("{0}@{1}", path, version);
-#if MD5
-            formatPath = Library.Encrypt.MD5.Encrypt(formatPath);
-#endif
         }
 
         public override string ToString()
@@ -311,6 +298,14 @@ public class VersionMgr : MonoBehaviour
 
     public class VersionInfo : MonoBehaviour
     {
+        public event Action<State> OnActionState;
+
+        private void ActionState(State state)
+        {
+            if (OnActionState != null)
+                OnActionState.Invoke(state);
+        }
+
         /// <summary>
         /// svn版本
         /// </summary>
@@ -377,14 +372,16 @@ public class VersionMgr : MonoBehaviour
         /// <returns></returns>
         private IEnumerator GetMasterCache(PatchInfo info)
         {
+            ActionState(State.GetMasterList);
             yield return StartCoroutine(GetCacheText(info, text =>
             {
+                ActionState(State.ApplyMasterList);
                 if (text == null) return;
                 SvnVersion = text.First();
                 MinVersion = text.Skip(1).First().AsInt();
                 MaxVersion = text.Skip(1).First().AsInt();
                 masterCache =
-                    text.Skip(2).Select(p => new ResInfo(info,p, ResInfo.Source.Master))
+                    text.Skip(2).Select(p => new ResInfo(info, p, ResInfo.Source.Master))
                         .Where(p => !p.name.StartsWith("."))
                         .ToDictionary(p => p.path);
             }));
@@ -397,15 +394,18 @@ public class VersionMgr : MonoBehaviour
         /// <returns></returns>
         private IEnumerator GetPatchCache(PatchInfo info)
         {
+            ActionState(State.GetPatchList);
             yield return StartCoroutine(GetCacheText(info, text =>
             {
-                if (text == null) return;
+                ActionState(State.ApplyPatchList);
+                if (text == null)
+                    return;
                 var svnVersion = text.First();
                 var minVersion = text.Skip(1).First().AsInt();
                 if (SvnVersion != svnVersion || MaxVersion != minVersion) return;
                 MaxVersion = text.Skip(2).First().AsInt();
                 patchCache =
-                    text.Skip(3).Select(p => new ResInfo(info,p, ResInfo.Source.Patch))
+                    text.Skip(3).Select(p => new ResInfo(info, p, ResInfo.Source.Patch))
                         .Where(p => !p.name.StartsWith("."))
                         .ToDictionary(p => p.path);
             }));
@@ -417,10 +417,12 @@ public class VersionMgr : MonoBehaviour
             {
                 if (info.isZip)
                 {
+                    ActionState(State.DownPatchZip);
                     yield return StartCoroutine(GetRemoteZip(info));
                 }
                 else
                 {
+                    ActionState(State.DownPathList);
                     yield return StartCoroutine(new Access().FromRemote(this, info.fileUrl, res =>
                     {
                         if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.fileHash) return;
@@ -448,18 +450,20 @@ public class VersionMgr : MonoBehaviour
         /// <returns></returns>
         private IEnumerator GetRemoteZip(PatchInfo info)
         {
+            ActionState(State.DownPatchZip);
             yield return StartCoroutine(new Access().FromRemote(this, info.name, res =>
             {
                 if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.zipHash) return;
                 var zipName = Access.LocalPatchRoot + info.name;
                 File.WriteAllBytes(zipName, res);
+                ActionState(State.UnMakePatchZip);
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false);
                 if (string.IsNullOrEmpty(msg))
                 {
                     //File.Delete(zipName);
                     FileHelper.CreateDirectory(info.fileLocal);
                     File.Move(Access.LocalPatchRoot + info.fileUrl, info.fileLocal);
-                    //FileMoveTo(zipName);
+                    FileMoveTo(zipName);
                 }
                 else
                 {
@@ -472,8 +476,9 @@ public class VersionMgr : MonoBehaviour
         /// 解压后的文件整合到预定义的目录结构
         /// </summary>
         /// <param name="zipName"></param>
-        private static void FileMoveTo(string zipName)
+        private void FileMoveTo(string zipName)
         {
+            ActionState(State.ApplyPatchZip);
             var folderName = zipName.Replace(Path.GetExtension(zipName), "");
             var list =
                 Directory.GetFiles(folderName, "*.*", SearchOption.AllDirectories)
@@ -496,7 +501,7 @@ public class VersionMgr : MonoBehaviour
         /// <returns></returns>
         private IEnumerator ResourceDelete()
         {
-            var delList = masterCache.Values.Select(p => p.action == ResInfo.Action.D).ToList();
+            var delList = masterCache.Values.Where(p => p.action == ResInfo.Action.D).ToList();
             Debug.Log(delList.Count + "\r\n" + string.Join("\n", delList.Select(p => p.ToString()).ToArray()));
 
             //yield break;
@@ -530,13 +535,15 @@ public class VersionMgr : MonoBehaviour
             while (lastList.Count != 0)
             {
                 var resInfo = lastList.Dequeue();
+                ActionState(State.DownResource);
                 Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
                 yield return StartCoroutine(new Access().FromRemote(this, resInfo.url, res =>
                 {
                     if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
                         return;
-                    FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.formatPath);
-                    File.WriteAllBytes(Access.LocalTempRoot + resInfo.formatPath, res);
+                    ActionState(State.ApplyResource);
+                    FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.path);
+                    File.WriteAllBytes(Access.LocalTempRoot + resInfo.path, res);
                 }));
             }
         }
@@ -552,12 +559,14 @@ public class VersionMgr : MonoBehaviour
         [Description("正在应用某主资源压缩包文件资源")] ApplyMasterZip,
 
         [Description("获取某主资源包文件的包含文件列表")] GetMasterList,
+        [Description("正在应用某主资源包文件的包含文件列表")] ApplyMasterList,
 
         [Description("下载某补丁文件压缩包")] DownPatchZip,
         [Description("解压某补丁文件压缩包")] UnMakePatchZip,
         [Description("正在应用某补丁压缩包文件资源")] ApplyPatchZip,
 
         [Description("获取某补丁文件的包含文件列表")] GetPatchList,
+        [Description("正在应用某补丁文件的包含文件列表")] ApplyPatchList,
 
         [Description("获取某主资源包文件的包含文件列表")] DownResource,
         [Description("获取某主资源包文件的包含文件列表")] ApplyResource,

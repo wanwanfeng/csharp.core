@@ -232,7 +232,7 @@ public class VersionMgr : MonoBehaviour
         {
             return
                 string.Format(
-                    "Name: {0}, Group: {1}, IsMaster: {2}, First: {3}, Last: {4}, IsZip: {5}, ZipHash: {6}, ZipSize: {7}, IsNeedDownFile: {8}, FileUrl: {9}, FileLocal: {10}, FileHash: {11}, FileSize: {12}",
+                    "Name: {0},Group: {1},IsMaster: {2},First: {3},Last: {4},IsZip: {5},ZipHash: {6},ZipSize: {7},IsNeedDownFile: {8},FileUrl: {9},FileLocal: {10},FileHash: {11},FileSize: {12}",
                     name, @group, isMaster, first, last, isZip, zipHash, zipSize, isNeedDownFile, fileUrl, fileLocal,
                     fileHash, fileSize);
         }
@@ -632,17 +632,22 @@ public class VersionMgr : MonoBehaviour
     }
 
     Texture2D texture2D = null;
+
     private void OnGUI()
     {
         if (texture2D == null)
             texture2D = Access.FileToTexture2D("10253312_640x640_0.jpg");
         if (texture2D != null)
-        GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
+            GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
+        GUILayout.Label("SvnVersion:" + VersionInfo.SvnVersion);
+        GUILayout.Label("MinVersion:" + VersionInfo.MinVersion);
+        GUILayout.Label("MaxVersion:" + VersionInfo.MaxVersion);
 
-        //GUILayout.Label("LastAccess:" + LastAccessInfo);
-        //GUILayout.Label("SvnVersion:" + SvnVersion);
-        //GUILayout.Label("MinVersion:" + MinVersion);
-        //GUILayout.Label("MaxVersion:" + MaxVersion);
+
+        foreach (var versionInfo in patchListCache)
+        {
+            GUILayout.Label(string.Format("LastAccess:{0}", versionInfo.Value.LastAccessInfo));
+        }
     }
 
 
@@ -650,26 +655,27 @@ public class VersionMgr : MonoBehaviour
 
     private IEnumerator LoadObject(string path, Action<WWW> callAction)
     {
-        ResInfo resInfo = null;
-        //if (masterCache.TryGetValue(path, out resInfo))
-        //{
-        //    if (resInfo.action == ResInfo.Action.D)
-        //    {
-        //        Debug.LogError("访问已被删除资源!");
-        //        yield break;
-        //    }
-
-        //    using (WWW www = new WWW(Access.LocalRoot + resInfo.formatPath))
-        //    {
-        //        yield return www;
-        //        callAction.Invoke(www);
-        //        www.Dispose();
-        //        yield break;
-        //    }
-        //}
-        Debug.LogError("访问不被控制的资源!");
-        yield break;
-        callAction.Invoke(null);
+        foreach (var cache in patchListCache.Values)
+        {
+            ResInfo resInfo = null;
+            if (cache.masterCache.TryGetValue(path, out resInfo))
+            {
+                if (resInfo.action == ResInfo.Action.D)
+                {
+                    Debug.LogError("访问已被删除资源!");
+                    yield break;
+                }
+                using (WWW www = new WWW(Access.LocalTempRoot + resInfo.path))
+                {
+                    yield return www;
+                    callAction.Invoke(www);
+                    www.Dispose();
+                    yield break;
+                }
+            }
+            Debug.LogError("访问不被控制的资源!");
+            callAction.Invoke(null);
+        }
     }
 
     public IEnumerator Load(string path, Action<Texture2D> callAction)

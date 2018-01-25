@@ -1,12 +1,15 @@
-﻿using System;
+﻿//#define MD5
+
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Library.Extensions;
-using UnityEngine.VR;
+using Library.Helper;
 using Debug = UnityEngine.Debug;
 
 //增量更新
@@ -35,11 +38,6 @@ using Debug = UnityEngine.Debug;
 
 public class VersionMgr : MonoBehaviour
 {
-    static VersionMgr()
-    {
-    //Library.Encrypt.MD5.IsOpen = false;
-    }
-
     public class Access
     {
         public static string dataPath { get; private set; }
@@ -61,9 +59,14 @@ public class VersionMgr : MonoBehaviour
             }
         }
 
-        public static string LocalRoot
+        public static string LocalTempRoot
         {
             get { return persistentDataPath + "Temp/"; }
+        }
+
+        public static string LocalPatchRoot
+        {
+            get { return persistentDataPath + "Patch/"; }
         }
 
         private static readonly Queue<string> urls = new Queue<string>();
@@ -198,7 +201,7 @@ public class VersionMgr : MonoBehaviour
             last = strFirst[3].AsInt();
 
             fileUrl = Path.GetFileNameWithoutExtension(name) + (isMaster ? MasterName : PatchName);
-            fileLocal = Access.persistentDataPath + fileUrl.Replace("/", "-");
+            fileLocal = Access.LocalPatchRoot + fileUrl.Replace("/", "-");
             fileSize = queue.First().AsLong();
             fileHash = queue.Skip(1).First();
 
@@ -295,7 +298,9 @@ public class VersionMgr : MonoBehaviour
             name = Path.GetFileName(path);
             url = string.Format("{0}?v={1}", path, version);
             formatPath = string.Format("{0}@{1}", path, version);
-            //formatPath = Library.Encrypt.MD5.Encrypt(formatPath);
+#if MD5
+            formatPath = Library.Encrypt.MD5.Encrypt(formatPath);
+#endif
         }
 
         public override string ToString()
@@ -304,7 +309,7 @@ public class VersionMgr : MonoBehaviour
         }
     }
 
-    public class VersionCache : MonoBehaviour
+    public class VersionInfo : MonoBehaviour
     {
         /// <summary>
         /// svn版本
@@ -446,14 +451,15 @@ public class VersionMgr : MonoBehaviour
             yield return StartCoroutine(new Access().FromRemote(this, info.name, res =>
             {
                 if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.zipHash) return;
-                var zipName = Access.LocalRoot + info.name;
+                var zipName = Access.LocalPatchRoot + info.name;
                 File.WriteAllBytes(zipName, res);
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false);
                 if (string.IsNullOrEmpty(msg))
                 {
-                    File.Delete(Access.LocalRoot + info.name);
-                    File.Move(Access.LocalRoot + info.fileUrl, info.fileLocal);
-                    FileMoveTo(zipName);
+                    //File.Delete(zipName);
+                    FileHelper.CreateDirectory(info.fileLocal);
+                    File.Move(Access.LocalPatchRoot + info.fileUrl, info.fileLocal);
+                    //FileMoveTo(zipName);
                 }
                 else
                 {
@@ -475,10 +481,8 @@ public class VersionMgr : MonoBehaviour
                     .ToList();
             foreach (string s in list)
             {
-                var file = s.Replace(folderName + "/", Access.LocalRoot);
-                var dir = Path.GetDirectoryName(file);
-                if (dir != null && !Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
+                var file = s.Replace(folderName + "/", Access.LocalTempRoot);
+                FileHelper.CreateDirectory(file);
                 if (File.Exists(file))
                     File.Delete(file);
                 File.Move(s, file);
@@ -500,8 +504,8 @@ public class VersionMgr : MonoBehaviour
             {
                 try
                 {
-                    if (File.Exists(Access.LocalRoot + path))
-                        File.Delete(Access.LocalRoot + path);
+                    if (File.Exists(Access.LocalTempRoot + path))
+                        File.Delete(Access.LocalTempRoot + path);
                 }
                 catch (Exception e)
                 {
@@ -531,22 +535,40 @@ public class VersionMgr : MonoBehaviour
                 {
                     if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
                         return;
-                    string dir = Path.GetDirectoryName(Access.LocalRoot + resInfo.formatPath);
-                    if (dir != null && !Directory.Exists(dir))
-                        Directory.CreateDirectory(dir);
-                    File.WriteAllBytes(Access.LocalRoot + resInfo.formatPath, res);
+                    FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.formatPath);
+                    File.WriteAllBytes(Access.LocalTempRoot + resInfo.formatPath, res);
                 }));
             }
         }
     }
 
-    private Dictionary<string,VersionCache> patchListCache { get; set; }
+    public enum State
+    {
+        None,
+        [Description("下载补丁文件列表")] DownPathList,
+
+        [Description("下载某主资源包文件压缩包")] DownMasterZip,
+        [Description("解压某主资源包文件压缩包")] UnMakeMasterZip,
+        [Description("正在应用某主资源压缩包文件资源")] ApplyMasterZip,
+
+        [Description("获取某主资源包文件的包含文件列表")] GetMasterList,
+
+        [Description("下载某补丁文件压缩包")] DownPatchZip,
+        [Description("解压某补丁文件压缩包")] UnMakePatchZip,
+        [Description("正在应用某补丁压缩包文件资源")] ApplyPatchZip,
+
+        [Description("获取某补丁文件的包含文件列表")] GetPatchList,
+
+        [Description("获取某主资源包文件的包含文件列表")] DownResource,
+        [Description("获取某主资源包文件的包含文件列表")] ApplyResource,
+    }
+
+    private Dictionary<string,VersionInfo> patchListCache { get; set; }
 
     private void Awake()
     {
-        patchListCache = new Dictionary<string, VersionCache>();
-        if (!Directory.Exists(Access.LocalRoot))
-            Directory.CreateDirectory(Access.LocalRoot);
+        patchListCache = new Dictionary<string, VersionInfo>();
+        FileHelper.CreateDirectory(Access.LocalTempRoot);
     }
 
     private IEnumerator Start()
@@ -567,6 +589,8 @@ public class VersionMgr : MonoBehaviour
         yield return StartCoroutine(new Access().FromRemote(this, PatchInfo.PatchListName, res =>
         {
             if (res == null) return;
+            FileHelper.CreateDirectory(Access.LocalPatchRoot + PatchInfo.PatchListName);
+            File.WriteAllBytes(Access.LocalPatchRoot + PatchInfo.PatchListName, res);
             patchListCache = Encoding.UTF8.GetString(res)
                 .Split('\r', '\n')
                 .Where(p => !string.IsNullOrEmpty(p))
@@ -575,7 +599,7 @@ public class VersionMgr : MonoBehaviour
                 .ToLookup(p => p.group)
                 .ToDictionary(p => p.Key, q =>
                 {
-                    var go = gameObject.AddComponent<VersionCache>();
+                    var go = gameObject.AddComponent<VersionInfo>();
                     go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
                     return go;
                 });
@@ -613,6 +637,7 @@ public class VersionMgr : MonoBehaviour
         //    }
         //}
         Debug.LogError("访问不被控制的资源!");
+        yield break;
         callAction.Invoke(null);
     }
 

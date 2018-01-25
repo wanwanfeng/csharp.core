@@ -180,7 +180,7 @@ namespace Library.Compress
         /// <param name="unZipDir">解压目的路径(物理路径)</param>
         /// <param name="password">解压密码</param>
         /// <returns>异常信息</returns>
-        public static string UnMakeZipFile(string zipfilename, string unZipDir, string password = "")
+        public static string UnMakeZipFileTo(string zipfilename, string unZipDir, string password = "")
         {
             return ICSharpZipCode.UnMakeZipFile(zipfilename, unZipDir, password);
         }

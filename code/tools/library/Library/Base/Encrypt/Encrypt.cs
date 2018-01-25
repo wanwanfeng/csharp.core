@@ -103,6 +103,7 @@ namespace Library.Encrypt
         {
             if (!IsOpen)
                 return toEncryptArray;
+
             //加密和解密采用相同的key,具体自己填，但是必须为32位//
             byte[] keyArray = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(key) ? Key : key);
             RijndaelManaged rDel = new RijndaelManaged();
@@ -128,8 +129,8 @@ namespace Library.Encrypt
         public static byte[] Decrypt(byte[] toEncryptArray, string key = null)
         {
             if (!IsOpen)
-
                 return toEncryptArray;
+
             //加密和解密采用相同的key,具体值自己填，但是必须为32位//
             byte[] keyArray = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(key) ? Key : key);
 
@@ -152,7 +153,7 @@ namespace Library.Encrypt
                 isEncrypt = false;
                 return toE;
             }
-            isEncrypt = toE.Substring(0, 32) != Head;
+            isEncrypt = toE.Substring(0, Head.Length) != Head;
             return isEncrypt ? (Head + Encrypt(toE, key)) : toE;
         }
 
@@ -166,8 +167,8 @@ namespace Library.Encrypt
                 isDecrypt = false;
                 return toD;
             }
-            isDecrypt = toD.Substring(0, 32) == Head;
-            return isDecrypt ? Decrypt(toD.Substring(32, toD.Length - 32), key) : toD;
+            isDecrypt = toD.Substring(0, Head.Length) == Head;
+            return isDecrypt ? Decrypt(toD.Substring(Head.Length, toD.Length - Head.Length), key) : toD;
         }
     }
 }

@@ -104,7 +104,7 @@ public class VersionMgr : MonoBehaviour
                 if (string.IsNullOrEmpty(www.error))
                 {
 #if UNITY_EDITOR
-                Debug.Log(Encoding.UTF8.GetString(www.bytes));
+                    Debug.Log(Encoding.UTF8.GetString(www.bytes));
 #endif
                     callAction.Invoke(www.bytes);
                 }
@@ -160,6 +160,24 @@ public class VersionMgr : MonoBehaviour
         public IEnumerator FromPersistentDataPath(MonoBehaviour mono, string path, Action<byte[]> callAction)
         {
             yield return mono.StartCoroutine(FromLocal(mono, persistentDataPath + path, callAction));
+        }
+
+        public static Texture2D FileToTexture2D(string path)
+        {
+            path = LocalTempRoot + path;
+            if (!File.Exists(path))
+                return null;
+            Texture2D texture = new Texture2D(0, 0);
+            texture.LoadImage(File.ReadAllBytes(path));
+            return texture;
+        }
+
+        public static string FileToString(string path)
+        {
+            path = LocalTempRoot + path;
+            if (!File.Exists(path))
+                return null;
+            return File.ReadAllText(path);
         }
     }
 
@@ -281,10 +299,8 @@ public class VersionMgr : MonoBehaviour
                     throw new ArgumentOutOfRangeException("source", source, null);
             }
 
-            if (patchListInfo.isZip)
-            {
+            if (patchListInfo.isZip || action != Action.D)
                 action = Action.N;
-            }
 
             name = Path.GetFileName(path);
             url = string.Format("{0}?v={1}", path, version);
@@ -615,8 +631,14 @@ public class VersionMgr : MonoBehaviour
         }));
     }
 
+    Texture2D texture2D = null;
     private void OnGUI()
     {
+        if (texture2D == null)
+            texture2D = Access.FileToTexture2D("10253312_640x640_0.jpg");
+        if (texture2D != null)
+        GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
+
         //GUILayout.Label("LastAccess:" + LastAccessInfo);
         //GUILayout.Label("SvnVersion:" + SvnVersion);
         //GUILayout.Label("MinVersion:" + MinVersion);

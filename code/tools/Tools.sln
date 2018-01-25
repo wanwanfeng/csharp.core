@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "library-u", "library-u\libr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "library-ue", "library-ue\library-ue.csproj", "{03E61B0C-84A1-44BA-ADE5-55D8804012D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "svnVersion", "svnVersion\svnVersion.csproj", "{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{03E61B0C-84A1-44BA-ADE5-55D8804012D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03E61B0C-84A1-44BA-ADE5-55D8804012D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03E61B0C-84A1-44BA-ADE5-55D8804012D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

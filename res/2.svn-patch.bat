@@ -134,11 +134,16 @@ del diff_patch.txt
 del diff_log.txt
 del diff_list.txt
 
-move %patch%.txt %patch%
+rem move %patch%.txt %patch%
 
 call :getCdName foder
 set fName=svn-!foder!-%sv%-%ev%-patch
-rename "%patch%" "%fName%"
+if exist  "%cd%\%fName%" rd /s/q "%cd%\%fName%"
+mkdir "%cd%\%fName%"
+
+move %patch%.txt "%fName%"
+rename "%patch%" "!foder!"
+move !foder! "%fName%"
 if exist  "%cd%/../%fName%" rd /s/q "%cd%/../%fName%"
 move "%fName%" %cd%/../
 pause

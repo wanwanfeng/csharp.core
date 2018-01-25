@@ -41,3 +41,7 @@ D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\encryptFile.csprojR
 D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\Encrypt.EncryptFile.resources
 D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\obj\Debug\encryptFile.csproj.GenerateResource.Cache
 D:\Work\yuege\ygtools\trunk\code\tools\EncryptFile\bin\Debug\LitJson.dll
+D:\Work\yuege\ygtools\trunk\res\config.ini
+D:\Work\yuege\ygtools\trunk\res\EncryptFile.exe
+D:\Work\yuege\ygtools\trunk\res\EncryptFile.pdb
+D:\Work\yuege\ygtools\trunk\res\EncryptFile.XML

@@ -94,7 +94,8 @@ echo 根据项目大时间长短不定，请耐心等待...
 echo=
 REM pause
 
-set df=svn-!foder!-0-%sv%-master
+set dff=svn-!foder!-0-%sv%-master
+set df=%dff%\!foder!
 if exist "%df%" rd /s/q "%df%" mkdir "%df%"
 svn export -r %sv% %url%@%sv% %df%
 
@@ -115,9 +116,9 @@ for /f "skip=2 tokens=1,2,3 delims=," %%i in ( temp.txt ) do (
 del temp.txt
 
 rem 移动
-move %master%.txt %df%
-if exist "%cd%/../%df%" rd /s/q "%cd%/../%df%"
-move %df% %cd%/../
+move %master%.txt %dff%
+if exist "%cd%/../%dff%" rd /s/q "%cd%/../%dff%"
+move %dff% %cd%/../
 pause
 exit
 

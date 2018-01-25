@@ -16,6 +16,9 @@ using Debug = UnityEngine.Debug;
 //每更新一次，资源放在新的文件夹目录内，老资源不会被覆盖
 //目录结构如下
 //
+//
+//注:文本编码均需为UTF8
+//
 //│  
 //├─master-00-02
 //│      svn-master.txt
@@ -266,9 +269,28 @@ public class VersionMgr : MonoBehaviour
         public long size { get; private set; }
         public string hash { get; private set; }
         public string url { get; private set; }
+        public PatchInfo patchInfo { get; private set; }
+
+        public bool isNeedDownFile
+        {
+            get
+            {
+                if (action == Action.D)
+                    return false;
+                if (action == Action.A)
+                    return true;
+                if (action == Action.M)
+                    return true;
+                if (!File.Exists(Access.LocalTempRoot + path))
+                    return true;
+                var temp = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(Access.LocalTempRoot + path));
+                return hash != temp;
+            }
+        }
 
         public ResInfo(PatchInfo patchListInfo, string info, Source source)
         {
+            patchInfo = patchListInfo;
             switch (source)
             {
                 case Source.Master:
@@ -299,7 +321,7 @@ public class VersionMgr : MonoBehaviour
                     throw new ArgumentOutOfRangeException("source", source, null);
             }
 
-            if (patchListInfo.isZip || action != Action.D)
+            if (patchListInfo.isZip && action != Action.D)
                 action = Action.N;
 
             name = Path.GetFileName(path);
@@ -345,6 +367,7 @@ public class VersionMgr : MonoBehaviour
 
         [SerializeField]
         public string GroupName { get; private set; }
+
         public PatchInfo LastAccessInfo { get; set; }
         private List<PatchInfo> patchList { get; set; }
         public Dictionary<string, ResInfo> masterCache { get; set; }
@@ -396,10 +419,7 @@ public class VersionMgr : MonoBehaviour
                 SvnVersion = text.First();
                 MinVersion = text.Skip(1).First().AsInt();
                 MaxVersion = text.Skip(1).First().AsInt();
-                masterCache =
-                    text.Skip(2).Select(p => new ResInfo(info, p, ResInfo.Source.Master))
-                        .Where(p => !p.name.StartsWith("."))
-                        .ToDictionary(p => p.path);
+                masterCache = text.Skip(2).Select(p => new ResInfo(info, p, ResInfo.Source.Master)).Where(p => !p.name.StartsWith(".")).ToDictionary(p => p.path);
             }));
         }
 
@@ -420,10 +440,7 @@ public class VersionMgr : MonoBehaviour
                 var minVersion = text.Skip(1).First().AsInt();
                 if (SvnVersion != svnVersion || MaxVersion != minVersion) return;
                 MaxVersion = text.Skip(2).First().AsInt();
-                patchCache =
-                    text.Skip(3).Select(p => new ResInfo(info, p, ResInfo.Source.Patch))
-                        .Where(p => !p.name.StartsWith("."))
-                        .ToDictionary(p => p.path);
+                patchCache = text.Skip(3).Select(p => new ResInfo(info, p, ResInfo.Source.Patch)).Where(p => !p.name.StartsWith(".")).ToDictionary(p => p.path);
             }));
         }
 
@@ -452,11 +469,7 @@ public class VersionMgr : MonoBehaviour
                 callAction.Invoke(null);
                 yield break;
             }
-            callAction.Invoke(Encoding.UTF8.GetString(bytes)
-                .Split('\r', '\n')
-                .Where(p => !string.IsNullOrEmpty(p))
-                .Select(p => p.Trim())
-                .ToArray());
+            callAction.Invoke(Encoding.UTF8.GetString(bytes).Split('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).Select(p => p.Trim()).ToArray());
         }
 
         /// <summary>
@@ -476,8 +489,10 @@ public class VersionMgr : MonoBehaviour
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false);
                 if (string.IsNullOrEmpty(msg))
                 {
-                    //File.Delete(zipName);
+                    File.Delete(zipName);
                     FileHelper.CreateDirectory(info.fileLocal);
+                    if (File.Exists(info.fileLocal))
+                        File.Delete(info.fileLocal);
                     File.Move(Access.LocalPatchRoot + info.fileUrl, info.fileLocal);
                     FileMoveTo(zipName);
                 }
@@ -496,10 +511,7 @@ public class VersionMgr : MonoBehaviour
         {
             ActionState(State.ApplyPatchZip);
             var folderName = zipName.Replace(Path.GetExtension(zipName), "");
-            var list =
-                Directory.GetFiles(folderName, "*.*", SearchOption.AllDirectories)
-                    .Select(p => p.Replace("\\", "/"))
-                    .ToList();
+            var list = Directory.GetFiles(folderName, "*.*", SearchOption.AllDirectories).Select(p => p.Replace("\\", "/")).ToList();
             foreach (string s in list)
             {
                 var file = s.Replace(folderName + "/", Access.LocalTempRoot);
@@ -521,17 +533,22 @@ public class VersionMgr : MonoBehaviour
             Debug.Log(delList.Count + "\r\n" + string.Join("\n", delList.Select(p => p.ToString()).ToArray()));
 
             //yield break;
+            bool isDelete = false;
             foreach (var path in delList)
             {
                 try
                 {
-                    if (File.Exists(Access.LocalTempRoot + path))
+                    if ((isDelete = File.Exists(Access.LocalTempRoot + path)) == true)
                         File.Delete(Access.LocalTempRoot + path);
                 }
                 catch (Exception e)
                 {
                     Debug.Log(e.Message);
                     throw;
+                }
+                finally
+                {
+                    Debug.Log(isDelete);
                 }
             }
             yield break;
@@ -543,24 +560,37 @@ public class VersionMgr : MonoBehaviour
         /// <returns></returns>
         private IEnumerator ResourceDownLoad()
         {
-            var downList = masterCache.Values.Where(p => p.action == ResInfo.Action.A || p.action == ResInfo.Action.M).ToList();
+            var downList = masterCache.Values.Where(p => p.isNeedDownFile).ToList();
             Debug.Log(downList.Count + "\r\n" + string.Join("\n", downList.Select(p => p.ToString()).ToArray()));
 
-            //yield break;
-            var lastList = new Queue<ResInfo>(downList);
-            while (lastList.Count != 0)
+            var dic = downList.ToLookup(p => p.patchInfo).ToDictionary(p => p.Key, q => new List<ResInfo>(q));
+
+            foreach (KeyValuePair<PatchInfo, List<ResInfo>> keyValuePair in dic)
             {
-                var resInfo = lastList.Dequeue();
-                ActionState(State.DownResource);
-                Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
-                yield return StartCoroutine(new Access().FromRemote(this, resInfo.url, res =>
+                if (keyValuePair.Key == null)
                 {
-                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
-                        return;
-                    ActionState(State.ApplyResource);
-                    FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.path);
-                    File.WriteAllBytes(Access.LocalTempRoot + resInfo.path, res);
-                }));
+                    //yield break;
+                    var lastList = new Queue<ResInfo>(keyValuePair.Value);
+                    while (lastList.Count != 0)
+                    {
+                        var resInfo = lastList.Dequeue();
+                        ActionState(State.DownResource);
+                        Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
+                        yield return StartCoroutine(new Access().FromRemote(this, resInfo.url, res =>
+                        {
+                            if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
+                                return;
+                            ActionState(State.ApplyResource);
+                            FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.path);
+                            File.WriteAllBytes(Access.LocalTempRoot + resInfo.path, res);
+                        }));
+                    }
+                }
+                else
+                {
+                    ActionState(State.DownResource);
+                    yield return StartCoroutine(GetRemoteZip(keyValuePair.Key));
+                }
             }
         }
     }
@@ -588,7 +618,7 @@ public class VersionMgr : MonoBehaviour
         [Description("获取某主资源包文件的包含文件列表")] ApplyResource,
     }
 
-    private Dictionary<string,VersionInfo> patchListCache { get; set; }
+    private Dictionary<string, VersionInfo> patchListCache { get; set; }
 
     private void Awake()
     {
@@ -616,18 +646,12 @@ public class VersionMgr : MonoBehaviour
             if (res == null) return;
             FileHelper.CreateDirectory(Access.LocalPatchRoot + PatchInfo.PatchListName);
             File.WriteAllBytes(Access.LocalPatchRoot + PatchInfo.PatchListName, res);
-            patchListCache = Encoding.UTF8.GetString(res)
-                .Split('\r', '\n')
-                .Where(p => !string.IsNullOrEmpty(p))
-                .Select(p => p.Trim())
-                .Select(p => new PatchInfo(p))
-                .ToLookup(p => p.group)
-                .ToDictionary(p => p.Key, q =>
-                {
-                    var go = gameObject.AddComponent<VersionInfo>();
-                    go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
-                    return go;
-                });
+            patchListCache = Encoding.UTF8.GetString(res).Split('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).Select(p => p.Trim()).Select(p => new PatchInfo(p)).ToLookup(p => p.group).ToDictionary(p => p.Key, q =>
+            {
+                var go = gameObject.AddComponent<VersionInfo>();
+                go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
+                return go;
+            });
         }));
     }
 
@@ -650,11 +674,14 @@ public class VersionMgr : MonoBehaviour
         }
     }
 
-
     #region Load
 
     private IEnumerator LoadObject(string path, Action<WWW> callAction)
     {
+#if MD5
+        path = Library.Encrypt.MD5.Encrypt(path); 
+#endif
+
         foreach (var cache in patchListCache.Values)
         {
             ResInfo resInfo = null;
@@ -680,32 +707,27 @@ public class VersionMgr : MonoBehaviour
 
     public IEnumerator Load(string path, Action<Texture2D> callAction)
     {
-        yield return StartCoroutine(LoadObject(path, www =>
-        { callAction.Invoke(www == null ? Resources.Load<Texture2D>(path) : www.texture); }));
+        yield return StartCoroutine(LoadObject(path, www => { callAction.Invoke(www == null ? Resources.Load<Texture2D>(path) : www.texture); }));
     }
 
     public IEnumerator Load(string path, Action<AudioClip> callAction)
     {
-        yield return StartCoroutine(LoadObject(path, www =>
-        { callAction.Invoke(www == null ? Resources.Load<AudioClip>(path) : www.audioClip); }));
+        yield return StartCoroutine(LoadObject(path, www => { callAction.Invoke(www == null ? Resources.Load<AudioClip>(path) : www.audioClip); }));
     }
 
     public IEnumerator Load(string path, Action<byte[]> callAction)
     {
-        yield return StartCoroutine(LoadObject(path, www =>
-        { callAction.Invoke(www == null ? Resources.Load<TextAsset>(path).bytes : www.bytes); }));
+        yield return StartCoroutine(LoadObject(path, www => { callAction.Invoke(www == null ? Resources.Load<TextAsset>(path).bytes : www.bytes); }));
     }
 
     public IEnumerator Load(string path, Action<string> callAction)
     {
-        yield return StartCoroutine(LoadObject(path, www =>
-        { callAction.Invoke(www == null ? Resources.Load<TextAsset>(path).text : www.text); }));
+        yield return StartCoroutine(LoadObject(path, www => { callAction.Invoke(www == null ? Resources.Load<TextAsset>(path).text : www.text); }));
     }
 
     public IEnumerator Load(string path, Action<MovieTexture> callAction)
     {
-        yield return StartCoroutine(LoadObject(path,
-            www => { callAction.Invoke(www == null ? Resources.Load<MovieTexture>(path) : www.movie); }));
+        yield return StartCoroutine(LoadObject(path, www => { callAction.Invoke(www == null ? Resources.Load<MovieTexture>(path) : www.movie); }));
     }
 
     public IEnumerator Load(string path, Action<AssetBundle> callAction)

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Library;
+using Library.Helper;
 
 namespace Encrypt
 {
@@ -79,13 +80,17 @@ namespace Encrypt
             var dic = list.ToDictionary(p => p, q => q.Replace(Define.DefineRoot.Replace("\\", "/") + "/", ""));
             var res = new List<string>();
             int index = 0;
+            string newname = "";
             foreach (KeyValuePair<string, string> pair in dic)
             {
                 progressBar1.Value = index*100/dic.Count;
-                res.Add(pair.Key);
-                res.Add(Library.Encrypt.MD5.Encrypt(Path.GetDirectoryName(pair.Value), Define.DefineKey) + "/" +
-                        Library.Encrypt.MD5.Encrypt(Path.GetFileName(pair.Value), Define.DefineKey));
+                res.Add(pair.Value);
+
+                res.Add(newname = Library.Encrypt.MD5.Encrypt(pair.Value, Define.DefineKey));
+                FileHelper.CreateDirectory(newname = Define.DefineRoot.Replace("\\", "/") + "/" + newname);
+                File.Move(pair.Key, newname);
             }
+
             File.WriteAllLines("sssss.txt", res.ToArray(), Encoding.UTF8);
             //if (this.button_md5.Focused)
             //{

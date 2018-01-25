@@ -1,0 +1,7 @@
+D:\Work\yuege\ygtools\trunk\res\svnVersion.exe.config
+D:\Work\yuege\ygtools\trunk\res\svnVersion.XML
+D:\Work\yuege\ygtools\trunk\res\svnVersion.exe
+D:\Work\yuege\ygtools\trunk\res\svnVersion.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\svnVersion.csprojResolveAssemblyReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\svnVersion.exe
+D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\svnVersion.pdb

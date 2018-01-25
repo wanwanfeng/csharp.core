@@ -44,7 +44,13 @@
             this.textBox_In = new System.Windows.Forms.TextBox();
             this.button_clear_in = new System.Windows.Forms.Button();
             this.textBox_Exclude = new System.Windows.Forms.TextBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
             this.panel2.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel2
@@ -64,7 +70,7 @@
             this.panel2.Controls.Add(this.textBox_In);
             this.panel2.Controls.Add(this.button_clear_in);
             this.panel2.Controls.Add(this.textBox_Exclude);
-            this.panel2.Location = new System.Drawing.Point(15, 22);
+            this.panel2.Location = new System.Drawing.Point(6, 6);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(660, 366);
             this.panel2.TabIndex = 13;
@@ -74,16 +80,16 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(19, 279);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(35, 12);
+            this.label5.Size = new System.Drawing.Size(53, 12);
             this.label5.TabIndex = 24;
-            this.label5.Text = "密钥:";
+            this.label5.Text = "MD5密钥:";
             // 
             // textBox_Key
             // 
             this.textBox_Key.AllowDrop = true;
-            this.textBox_Key.Location = new System.Drawing.Point(54, 276);
+            this.textBox_Key.Location = new System.Drawing.Point(78, 276);
             this.textBox_Key.Name = "textBox_Key";
-            this.textBox_Key.Size = new System.Drawing.Size(480, 21);
+            this.textBox_Key.Size = new System.Drawing.Size(456, 21);
             this.textBox_Key.TabIndex = 23;
             this.textBox_Key.TextChanged += new System.EventHandler(this.TextChanged_In);
             // 
@@ -156,7 +162,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 125);
+            this.label4.Location = new System.Drawing.Point(18, 108);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(155, 12);
             this.label4.TabIndex = 12;
@@ -183,7 +189,7 @@
             // textBox_In
             // 
             this.textBox_In.AllowDrop = true;
-            this.textBox_In.Location = new System.Drawing.Point(20, 145);
+            this.textBox_In.Location = new System.Drawing.Point(20, 128);
             this.textBox_In.Name = "textBox_In";
             this.textBox_In.Size = new System.Drawing.Size(615, 21);
             this.textBox_In.TabIndex = 7;
@@ -193,7 +199,7 @@
             // 
             // button_clear_in
             // 
-            this.button_clear_in.Location = new System.Drawing.Point(560, 118);
+            this.button_clear_in.Location = new System.Drawing.Point(560, 101);
             this.button_clear_in.Name = "button_clear_in";
             this.button_clear_in.Size = new System.Drawing.Size(75, 23);
             this.button_clear_in.TabIndex = 5;
@@ -210,16 +216,59 @@
             this.textBox_Exclude.TabIndex = 4;
             this.textBox_Exclude.TextChanged += new System.EventHandler(this.TextChanged_In);
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Location = new System.Drawing.Point(12, 12);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(691, 413);
+            this.tabControl1.TabIndex = 14;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.panel2);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(683, 387);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "路径加密";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(683, 387);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "文件加密";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(683, 387);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "文件压缩";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
             // EncryptFile
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(691, 407);
-            this.Controls.Add(this.panel2);
+            this.ClientSize = new System.Drawing.Size(716, 440);
+            this.Controls.Add(this.tabControl1);
             this.Name = "EncryptFile";
             this.Text = "Excel Export";
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -242,6 +291,10 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textBox_Key;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage3;
 
 
 

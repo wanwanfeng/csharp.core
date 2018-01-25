@@ -8,12 +8,18 @@ if exist %list% del %list%
 
 for /f "tokens=1 delims=" %%i in ( ' dir /ad /b /od "svn*master" "svn*patch" ') do (
 	echo %%i
-	if exist %%i.zip (
-		call :getMD5 "%%i.zip" md5
-		call :getSize "%%i.zip" size	
-		echo !size!,!md5!,%%i.zip>>%list%	
-	) else (
-		echo %%i>>%list%
+	if exist %%i\svn-patch.txt ( set ha=%%i\svn-patch.txt)
+	if exist %%i\svn-master.txt ( set ha=%%i\svn-master.txt) 
+	if not exist %%i.zip (
+		call :getMD5 "!ha!" md5
+		call :getSize "!ha!" size
+		echo !size!,!md5!,%%i>>%list%
+	)else (
+		call :getMD5 "!ha!" md5
+		call :getSize "!ha!" size
+		call :getMD5 "%%i.zip" md52
+		call :getSize "%%i.zip" size2
+		echo !size!,!md5!,!size2!,!md52!,%%i.zip>>%list%
 	)
 )
 

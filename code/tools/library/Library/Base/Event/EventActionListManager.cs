@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class EventActionListManager<K, T> : EventListManager<K, Action<T>>
 {
-    public void throwEvent(K key, T param)
+    public void throwEvent(K key, T param = default(T))
     {
         List<Action<T>> list = null;
         if (eventDic.TryGetValue(key, out list))

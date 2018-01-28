@@ -83,7 +83,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Base\Define.cs" />
-    <Compile Include="Scripts\Utils\FileUtils.cs" />
     <EmbeddedResource Include="Form\EncryptFile.resx">
       <DependentUpon>EncryptFile.cs</DependentUpon>
     </EmbeddedResource>

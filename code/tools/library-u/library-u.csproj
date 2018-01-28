@@ -7,7 +7,7 @@
     <ProjectGuid>{D13A02EA-EBC9-4F88-8887-A6E006FB0FB0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UnityEngine</RootNamespace>
+    <RootNamespace>UnityEngine.Library</RootNamespace>
     <AssemblyName>Library-U</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -44,6 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Attribute\EnumFlagsAttribute.cs" />
+    <Compile Include="Library\Base\BaseMonoBehaviour.cs" />
+    <Compile Include="Library\Extensions\ExtensionsForMathf.cs" />
+    <Compile Include="Library\Extensions\ExtensionsForUnity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

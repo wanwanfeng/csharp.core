@@ -57,7 +57,7 @@ namespace Library.Helper
     {
         #region enum
 
-        private static IDictionary<T, TA> GetCache<T, TA>() where TA : Attribute
+        public static IDictionary<T, TA> GetCache<T, TA>() where TA : Attribute
         {
             IDictionary<T, TA> cache = new Dictionary<T, TA>();
             foreach (var value in Enum.GetValues(typeof (T)))

@@ -18,3 +18,6 @@ D:\Work\yuege\ygtools\trunk\code\tools\encrypt\obj\Debug\encrypt.csprojResolveAs
 D:\Work\yuege\ygtools\trunk\code\tools\encrypt\obj\Debug\encrypt.exe
 D:\Work\yuege\ygtools\trunk\code\tools\encrypt\obj\Debug\encrypt.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\encrypt\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\Git\yg\trunk\code\tools\encrypt\bin\Debug\Library.dll
+E:\Git\yg\trunk\code\tools\encrypt\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\Git\yg\trunk\code\tools\encrypt\bin\Debug\Library.pdb

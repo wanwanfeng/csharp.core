@@ -16,8 +16,8 @@ namespace encrypt
 
             var list = new[,]
             {
-                {"md5,image,,-e"},
-                {"md5,ff277dcb965c4e0b1bc16d38999e417a.jpg,,-e"}
+                {"md5,image"},
+                {"md5,ff277dcb965c4e0b1bc16d38999e417a.jpg"}
             };
             foreach (string s in list)
             {
@@ -39,9 +39,7 @@ namespace encrypt
                 case "md5":
                 {
                     string input = queue.Count == 0 ? "" : queue.Dequeue();
-                    string key = queue.Count == 0 ? "" : queue.Dequeue();
-                    string third = queue.Count == 0 ? "-h" : queue.Dequeue();
-                    res = Library.Encrypt.MD5.Encrypt(input, key, third != "-e");
+                    res = Library.Encrypt.MD5.Encrypt(input);
                 }
                     break;
                 case "aes":

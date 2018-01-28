@@ -45,3 +45,7 @@ D:\Work\yuege\ygtools\trunk\res\config.ini
 D:\Work\yuege\ygtools\trunk\res\EncryptFile.exe
 D:\Work\yuege\ygtools\trunk\res\EncryptFile.pdb
 D:\Work\yuege\ygtools\trunk\res\EncryptFile.XML
+E:\Git\yg\trunk\res\config.ini
+E:\Git\yg\trunk\res\EncryptFile.XML
+E:\Git\yg\trunk\res\EncryptFile.exe
+E:\Git\yg\trunk\res\EncryptFile.pdb

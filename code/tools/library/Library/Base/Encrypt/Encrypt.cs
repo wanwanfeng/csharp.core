@@ -14,25 +14,6 @@ namespace Library.Encrypt
         public static bool IsOpen = true;
 
         //MD5加密  
-        public static string Encrypt(string input, string key, bool isHead = true)
-        {
-            if (!string.IsNullOrEmpty(key))
-            {
-                if (isHead)
-                    input = key + input;
-                else
-                    input = input + key;
-            }
-            return Encrypt(input);
-        }
-
-        //MD5加密  
-        public static string Encrypt(byte[] input, string key, bool isHead = true)
-        {
-            return Encrypt(Encoding.UTF8.GetString(input));
-        }
-
-        //MD5加密  
         public static string Encrypt(string input)
         {
             return Encrypt(Encoding.UTF8.GetBytes(input));
@@ -46,9 +27,7 @@ namespace Library.Encrypt
             byte[] data = Md5Hash.ComputeHash(input);
             var sBuilder = new StringBuilder();
             foreach (var bt in data)
-            {
                 sBuilder.Append(bt.ToString("x2"));
-            }
             return sBuilder.ToString();
         }
 
@@ -68,12 +47,10 @@ namespace Library.Encrypt
         /// </summary>
         /// <param name="hash"></param>
         /// <param name="str"></param>
-        /// <param name="key"></param>
-        /// <param name="isHead"></param>
         /// <returns></returns>
-        public static bool ComparerString(string hash, string str, string key = "", bool isHead = true)
+        public static bool ComparerString(string hash, string str)
         {
-            return Encrypt(str, key, isHead) == hash;
+            return Encrypt(str) == hash;
         }
     }
 

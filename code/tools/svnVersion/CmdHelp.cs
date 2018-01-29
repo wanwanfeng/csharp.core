@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Helper;
 
 namespace svnVersion
 {
@@ -90,9 +91,31 @@ namespace svnVersion
         }
 
 
-        public virtual void HaHa()
+        public virtual bool HaHa()
         {
-            
+            return true;
+        }
+
+        protected bool PathToMd5(string folder, string targetDir, List<List<string>> cao)
+        {
+            if (folder == null) return false;
+            Console.Write("\n是否将路径MD5化（y/n），然后回车：");
+            bool yes = Console.ReadLine() == "y";
+            if (!yes) return false;
+            var targetMd5Dir = targetDir.Replace(folder, Library.Encrypt.MD5.Encrypt(folder));
+            foreach (var s in cao)
+            {
+                string fullPath = targetDir + "/" + s.Last();
+                string targetFullPath = targetMd5Dir + "/" + Library.Encrypt.MD5.Encrypt(s.Last());
+                if (!File.Exists(fullPath)) continue;
+                FileHelper.CreateDirectory(targetFullPath);
+                File.Copy(fullPath, targetFullPath, true);
+            }
+            if (File.Exists(targetDir + ".txt"))
+            {
+                File.Move(targetDir + ".txt", targetMd5Dir + ".txt");
+            }
+            return true;
         }
     }
 }

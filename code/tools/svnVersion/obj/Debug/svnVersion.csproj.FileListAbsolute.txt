@@ -9,3 +9,6 @@ E:\Git\yg\trunk\res\svnVersion.XML
 E:\Git\yg\trunk\code\tools\svnVersion\obj\Debug\svnVersion.exe
 E:\Git\yg\trunk\code\tools\svnVersion\obj\Debug\svnVersion.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\svnVersion.csprojResolveAssemblyReference.cache
+E:\Git\yg\trunk\res\svnVersion.exe
+E:\Git\yg\trunk\res\svnVersion.pdb
+E:\Git\yg\trunk\code\tools\svnVersion\obj\Debug\svnVersion.csprojResolveAssemblyReference.cache

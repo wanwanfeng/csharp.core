@@ -7,7 +7,7 @@ namespace svnVersion
 {
     internal class Program
     {
-        public static bool Runing = true;
+        public static bool isRuning = true;
 
         private static void Main(string[] args)
         {
@@ -27,9 +27,9 @@ namespace svnVersion
 
             if (cmdHelp != null)
             {
-                while (Runing)
+                while (isRuning)
                 {
-                    cmdHelp.HaHa();
+                    isRuning = !cmdHelp.HaHa();
                 }
             }
         }

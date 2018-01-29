@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Library.Extensions;
 using Library.Helper;
 
@@ -14,7 +16,7 @@ namespace svnVersion
         public int targetVersion { get; private set; }
         public string[] targetList { get; private set; }
 
-        public override void HaHa()
+        public override bool HaHa()
         {
             svnVersion = Run("svn --version --quiet").Last();
             Console.WriteLine("SVN版本：" + svnVersion);
@@ -26,8 +28,8 @@ namespace svnVersion
             {
                 Console.WriteLine("目标地址不存在");
                 Console.ReadKey();
-                Program.Runing = false;
-                return;
+                Program.isRuning = false;
+                return false;
             }
 
             svnUrl = Run("svn info --show-item url").Last();
@@ -46,28 +48,57 @@ namespace svnVersion
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
             targetList = Run(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, svnUrl));
-            targetList = targetList.Where(s => !s.EndsWith("/")).ToArray();//去除文件夹
+            targetList = targetList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
             int index = 0;
+            var cao = new List<List<string>>();
             foreach (string s in targetList)
             {
-                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "        " +
-                                  s.Split(' ').Where(value => !string.IsNullOrEmpty(value)).ToArray().JoinToString(","));
+                List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
+                var last = res.Skip(6).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
+                List<string> list = new List<string>();
+
+                list.Add("A");
+                list.Add(res.First().Trim());
+                list.Add(res.Skip(2).First().Trim());
+                list.Add(Library.Encrypt.MD5.Encrypt(last));
+                list.Add(last);
+
+                cao.Add(new List<string>(list));
+                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + list.ToArray().JoinToString(","));
             }
 
             Console.Write("\n是否导出目标版本号文件（y/n），然后回车：");
             var yes = Console.ReadLine() == "y";
-            if (yes)
+            string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + string.Format("/svn-{0}-0-{1}-master", folder, targetVersion);
+            if (!yes)
+            {
+                File.WriteAllLines(targetDir + ".txt", cao.Select(q => q.ToArray().JoinToString(",")), new UTF8Encoding(false));
+                return false;
+            }
+            else
             {
                 Console.WriteLine("正在导出中...");
                 Console.WriteLine("根据项目大时间长短不定，请耐心等待...");
-                string targetDir = Environment.CurrentDirectory + string.Format("/svn-{0}-0-{1}-master", folder, targetVersion);
+
                 FileHelper.CreateDirectory(targetDir);
                 targetList = Run(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir));
+
+                index = 0;
+                foreach (var s in cao)
+                {
+                    var last = s.Last();
+                    Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + last);
+                    string fullPath = targetDir + "/" + last;
+                    if (File.Exists(fullPath))
+                        s.Insert(s.Count - 2, Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath)));
+                }
+                File.WriteAllLines(targetDir + ".txt", cao.Select(q => q.ToArray().JoinToString(",")),
+                    new UTF8Encoding(false));
             }
 
-
-            Console.ReadKey();
+            if (!PathToMd5(folder, targetDir, cao)) return false;
+            return true;
         }
     }
 }

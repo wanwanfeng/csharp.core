@@ -116,11 +116,9 @@ echo ----------------------------------------
 
 REM pause
 if exist %patch%.txt del %patch%.txt
-
 echo %version% >> %patch%.txt
 echo %sv% >> %patch%.txt
 echo %ev% >> %patch%.txt
-
 for /f "tokens=1,2 delims=," %%i in (diff_list.txt) do (
 	call :getMD5 "%cd%\%patch%\%%j" md5
 	call :getSize "%cd%\%patch%\%%j" size	
@@ -141,9 +139,12 @@ set fName=svn-!foder!-%sv%-%ev%-patch
 if exist  "%cd%\%fName%" rd /s/q "%cd%\%fName%"
 mkdir "%cd%\%fName%"
 
-move %patch%.txt "%fName%"
+rename %patch%.txt %fName%.txt
+move %fName%.txt %cd%/../
+
 rename "%patch%" "!foder!"
 move !foder! "%fName%"
+
 if exist  "%cd%/../%fName%" rd /s/q "%cd%/../%fName%"
 move "%fName%" %cd%/../
 pause

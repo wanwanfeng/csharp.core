@@ -2,7 +2,6 @@
 setlocal enabledelayedexpansion
 
 REM cd %cd%\..\
-
 if exist temp.txt	del temp.txt
 
 echo ----------------------------------------
@@ -116,7 +115,9 @@ for /f "skip=2 tokens=1,2,3 delims=," %%i in ( temp.txt ) do (
 del temp.txt
 
 rem ÒÆ¶¯
-move %master%.txt %dff%
+rename %master%.txt %dff%.txt
+move %dff%.txt %cd%/../
+
 if exist "%cd%/../%dff%" rd /s/q "%cd%/../%dff%"
 move %dff% %cd%/../
 pause

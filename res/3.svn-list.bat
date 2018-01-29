@@ -2,14 +2,16 @@
 setlocal enabledelayedexpansion
 
 REM dir /b/ad >patch-list.txt
-
 set list=patch-list.txt
 if exist %list% del %list%
 
 for /f "tokens=1 delims=" %%i in ( ' dir /ad /b /od "svn*master" "svn*patch" ') do (
 	echo %%i
-	if exist %%i\svn-patch.txt ( set ha=%%i\svn-patch.txt)
-	if exist %%i\svn-master.txt ( set ha=%%i\svn-master.txt) 
+	if not exist %%i.txt (
+		echo error!!!!  recode is not exist!
+	) else (
+		set ha=%%i.txt
+	)
 	if not exist %%i.zip (
 		call :getMD5 "!ha!" md5
 		call :getSize "!ha!" size

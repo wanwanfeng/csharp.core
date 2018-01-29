@@ -14,15 +14,11 @@ namespace Library.Helper
             this.anotherNames = anotherName;
         }
 
-        public static string GetMainName<T>(string anotherName)
+        public static string[] GetAnotherNames<T>(string mainName)
         {
-            foreach (var field in typeof (T).GetFields())
-            {
-                var anothersNames = GetAnotherNames<T>(field.Name);
-                if (anothersNames.Contains(anotherName))
-                    return field.Name;
-            }
-            return null;
+            var atts = typeof(T).GetField(mainName).GetCustomAttributes(true);
+            var att = atts.OfType<NameAttribute>().FirstOrDefault();
+            return att == null ? new string[0] : att.anotherNames;
         }
 
         public static string GetAnotherName<T>(string mainName)
@@ -30,11 +26,15 @@ namespace Library.Helper
             return GetAnotherNames<T>(mainName).FirstOrDefault();
         }
 
-        public static string[] GetAnotherNames<T>(string mainName)
+        public static string GetMainName<T>(string anotherName)
         {
-            var atts = typeof (T).GetField(mainName).GetCustomAttributes(true);
-            var att = atts.OfType<NameAttribute>().FirstOrDefault();
-            return att == null ? new string[0] : att.anotherNames;
+            foreach (var field in typeof(T).GetFields())
+            {
+                var anothersNames = GetAnotherNames<T>(field.Name);
+                if (anothersNames.Contains(anotherName))
+                    return field.Name;
+            }
+            return null;
         }
     }
 }

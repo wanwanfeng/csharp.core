@@ -10,12 +10,16 @@ namespace Library.Thread
         private bool _isDone = false;
         public bool isSuccess = false;
 
-        #region
-
-        public ThreadAction(Func<bool> func)
+        public ThreadAction()
         {
             _progress = 0;
             _isDone = isSuccess = false;
+        }
+
+        #region
+
+        public ThreadAction(Func<bool> func) : this()
+        {
             ThreadPool.QueueUserWorkItem((obj) =>
             {
                 if (func != null)
@@ -34,10 +38,8 @@ namespace Library.Thread
 
         #region
 
-        public ThreadAction(Func<Action<float>, bool> func)
+        public ThreadAction(Func<Action<float>, bool> func) : this()
         {
-            _progress = 0;
-            _isDone = isSuccess = false;
             ThreadPool.QueueUserWorkItem((obj) =>
             {
                 if (func != null)

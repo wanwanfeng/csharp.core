@@ -261,14 +261,14 @@ namespace Library.Extensions
             {
                 return content + string.Join(content, value.ToCharArray().AsStringArray());
 
-                char[] source = value.ToCharArray();
-                StringBuilder sbBuilder = new StringBuilder(value.Length + (content.Length)*value.Length);
-                foreach (var item in source)
-                {
-                    sbBuilder.Append(content);
-                    sbBuilder.Append(item);
-                }
-                return sbBuilder.ToString();
+                //char[] source = value.ToCharArray();
+                //StringBuilder sbBuilder = new StringBuilder(value.Length + (content.Length)*value.Length);
+                //foreach (var item in source)
+                //{
+                //    sbBuilder.Append(content);
+                //    sbBuilder.Append(item);
+                //}
+                //return sbBuilder.ToString();
             }
             catch (Exception)
             {

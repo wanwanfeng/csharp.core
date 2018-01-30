@@ -1,0 +1,3 @@
+D:\Work\yuege\ygtools\trunk\res\svnVersion.exe
+D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Release\svnVersion.csprojResolveAssemblyReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Release\svnVersion.exe

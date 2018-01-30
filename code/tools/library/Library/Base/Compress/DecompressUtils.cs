@@ -146,11 +146,10 @@ namespace Library.Compress
         public static string MakeZipFile(string zipDir, int compressionLevel = 0, string password = "",
             string comment = "")
         {
-            return ICSharpZipCode.MakeZipFile(zipDir,
-                Directory.GetFiles(zipDir, "*.*", SearchOption.AllDirectories)
-                    .Select(p => p.Replace(zipDir + "\\", ""))
-                    .ToArray(), zipDir + ".zip",
-                compressionLevel, password, comment);
+            var list = Directory.GetFiles(zipDir, "*.*", SearchOption.AllDirectories)
+                .Select(p => p.Replace(zipDir + "\\", ""))
+                .ToArray();
+            return ICSharpZipCode.MakeZipFile(zipDir, list, zipDir + ".zip", compressionLevel, password, comment);
         }
 
         /// <summary>
@@ -323,7 +322,8 @@ namespace ICSharpCode
     public class ICSharpZipCode
     {
         private static readonly System.Text.RegularExpressions.Regex NewRegex =
-            new System.Text.RegularExpressions.Regex(@"^(([a-zA-Z]:)|(\\{2}\w+)\$?)(\\(\w[\w   ]*.*))");
+            //new System.Text.RegularExpressions.Regex(@"^(([a-zA-Z]:)|(\\{2}\w+)\$?)(\\(\w[\w   ]*.*))");
+            new System.Text.RegularExpressions.Regex(@"^(([0-9a-zA-Z]:)|(\\{2}\w+)\$?)(\\(\w[\w   ]*.*))");
 
         public enum CodePage : int
         {
@@ -357,18 +357,18 @@ namespace ICSharpCode
             try
             {
                 //使用正则表达式-判断压缩文件路径
-                if (!string.IsNullOrEmpty(fileNameRoot) && !NewRegex.Match(fileNameRoot).Success)
-                {
-                    File.Delete(fileNameRoot);
-                    return "压缩文件夹的路径有误!";
-                }
+                //if (!string.IsNullOrEmpty(fileNameRoot) && !NewRegex.Match(fileNameRoot).Success)
+                //{
+                //    File.Delete(fileNameRoot);
+                //    return "压缩文件夹的路径有误!";
+                //}
 
-                //使用正则表达式-判断压缩文件路径
-                if (!NewRegex.Match(zipedfiledname).Success)
-                {
-                    File.Delete(zipedfiledname);
-                    return "压缩文件的路径有误!";
-                }
+                ////使用正则表达式-判断压缩文件路径
+                //if (!NewRegex.Match(zipedfiledname).Success)
+                //{
+                //    File.Delete(zipedfiledname);
+                //    return "压缩文件的路径有误!";
+                //}
                 //创建ZipFileOutPutStream
                 ZipOutputStream newzipstream = new ZipOutputStream(File.Open(zipedfiledname, FileMode.OpenOrCreate));
 

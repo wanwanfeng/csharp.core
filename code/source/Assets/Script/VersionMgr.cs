@@ -1,4 +1,4 @@
-﻿//#define MD5
+﻿#define MD5
 
 using System;
 using UnityEngine;
@@ -110,7 +110,7 @@ public class VersionMgr : MonoBehaviour
                 if (string.IsNullOrEmpty(www.error))
                 {
 #if UNITY_EDITOR
-                    Debug.Log(Encoding.UTF8.GetString(www.bytes));
+                    Debug.Log(Encoding.UTF8.GetString(www.bytes)??"");
 #endif
                     callAction.Invoke(www.bytes);
                 }
@@ -146,7 +146,7 @@ public class VersionMgr : MonoBehaviour
                 if (string.IsNullOrEmpty(www.error))
                 {
 #if UNITY_EDITOR
-                    Debug.Log(Encoding.ASCII.GetString(www.bytes));
+                    Debug.Log(Encoding.UTF8.GetString(www.bytes));
 #endif
                     callAction.Invoke(www.bytes);
                 }
@@ -251,13 +251,6 @@ public class VersionMgr : MonoBehaviour
     /// </summary>
     public class ResInfo
     {
-        public enum Source
-        {
-            Master,
-            Patch,
-            Local
-        }
-
         public enum Action
         {
             N,
@@ -291,45 +284,32 @@ public class VersionMgr : MonoBehaviour
                     return true;
                 if (!File.Exists(Access.LocalTempRoot + path))
                     return true;
-                var temp = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(Access.LocalTempRoot + path));
-                return hash != temp;
+                return !Library.Encrypt.MD5.ComparerFile(hash, Access.LocalTempRoot + path);
             }
         }
 
-        public ResInfo(PatchInfo patchListInfo, string info, Source source)
+        public ResInfo(PatchInfo patchListInfo, string info)
         {
             patchInfo = patchListInfo;
-            switch (source)
-            {
-                case Source.Master:
-                {
-                    var queue = new Queue<string>(info.Split(','));
-                    version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
-                    action = Action.A;
-                    size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
-                    hash = queue.Count == 0 ? "" : queue.Dequeue();
-                    path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
-                }
-                    break;
-                case Source.Patch:
-                {
-                    var queue = new Queue<string>(info.Split(','));
-                    version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
-                    var temp = queue.Count == 0 ? "" : queue.Dequeue();
-                    if (Enum.IsDefined(typeof (Action), temp))
-                        action = (Action) Enum.Parse(typeof (Action), temp);
-                    else
-                        action = Action.N;
-                    size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
-                    hash = queue.Count == 0 ? "" : queue.Dequeue();
-                    path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
-                }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("source", source, null);
-            }
 
+            var queue = new Queue<string>(info.Split(','));
+
+            var temp = queue.Count == 0 ? "" : queue.Dequeue();
+            if (Enum.IsDefined(typeof (Action), temp))
+                action = (Action) Enum.Parse(typeof (Action), temp);
+            else
+                action = Action.N;
+
+            version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
+            size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
+            hash = queue.Count == 0 ? "" : queue.Dequeue();
+            path = queue.Count == 0 ? "" : queue.Dequeue();
+#if !MD5
+            path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
+#endif
             if (patchListInfo.isZip && action != Action.D)
+                action = Action.N;
+            if (Library.Encrypt.MD5.ComparerFile(hash, Access.LocalTempRoot + path))
                 action = Action.N;
 
             name = Path.GetFileName(path);
@@ -430,12 +410,10 @@ public class VersionMgr : MonoBehaviour
             {
                 ActionState(State.ApplyMasterList);
                 if (text == null) return;
-                SvnVersion = text.First();
-                MinVersion = text.Skip(1).First().AsInt();
-                MaxVersion = text.Skip(1).First().AsInt();
+                MinVersion = info.first;
+                MaxVersion = info.last;
                 patchCache[info.fileUrl] =
-                    text.Skip(2)
-                        .Select(p => new ResInfo(info, p, ResInfo.Source.Master))
+                    text.Select(p => new ResInfo(info, p))
                         .Where(p => !p.name.StartsWith("."))
                         .ToDictionary(p => p.path);
             }));
@@ -452,15 +430,11 @@ public class VersionMgr : MonoBehaviour
             yield return StartCoroutine(GetCacheText(info, text =>
             {
                 ActionState(State.ApplyPatchList);
-                if (text == null)
-                    return;
-                var svnVersion = text.First();
-                var minVersion = text.Skip(1).First().AsInt();
-                if (SvnVersion != svnVersion || MaxVersion != minVersion) return;
-                MaxVersion = text.Skip(2).First().AsInt();
+                if (text == null) return;
+                MinVersion = info.first;
+                MaxVersion = info.last;
                 patchCache[info.fileUrl] =
-                    text.Skip(3)
-                        .Select(p => new ResInfo(info, p, ResInfo.Source.Patch))
+                    text.Select(p => new ResInfo(info, p))
                         .Where(p => !p.name.StartsWith("."))
                         .ToDictionary(p => p.path);
             }));
@@ -484,7 +458,7 @@ public class VersionMgr : MonoBehaviour
                 yield break;
             }
             callAction.Invoke(
-                Encoding.Default.GetString(bytes)
+                Encoding.UTF8.GetString(bytes)
                     .Split('\r', '\n')
                     .Where(p => !string.IsNullOrEmpty(p))
                     .Select(p => p.Trim())
@@ -511,12 +485,11 @@ public class VersionMgr : MonoBehaviour
                 }
                 catch (Exception e)
                 {
-                    Debug.Log(e.Message);
-                    throw;
+                    Debug.LogError(e.Message);
                 }
                 finally
                 {
-                    Debug.Log(isDelete);
+                    //Debug.Log(isDelete);
                 }
             }
             yield break;
@@ -535,7 +508,12 @@ public class VersionMgr : MonoBehaviour
 
             foreach (KeyValuePair<PatchInfo, List<ResInfo>> keyValuePair in dic)
             {
-                if (keyValuePair.Key == null)
+                if (keyValuePair.Key.isZip)
+                {
+                    ActionState(State.DownResource);
+                    yield return StartCoroutine(GetRemoteZip(keyValuePair.Key));
+                }
+                else
                 {
                     //yield break;
                     var lastList = new Queue<ResInfo>(keyValuePair.Value);
@@ -544,20 +522,18 @@ public class VersionMgr : MonoBehaviour
                         var resInfo = lastList.Dequeue();
                         ActionState(State.DownResource);
                         Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
-                        yield return StartCoroutine(new Access().FromRemote(this, resInfo.url, res =>
-                        {
-                            if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
-                                return;
-                            ActionState(State.ApplyResource);
-                            FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.path);
-                            File.WriteAllBytes(Access.LocalTempRoot + resInfo.path, res);
-                        }));
+                        yield return
+                            StartCoroutine(new Access().FromRemote(this, keyValuePair.Key.name + "/" + resInfo.url,
+                                res =>
+                                {
+                                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
+                                        return;
+                                    ActionState(State.ApplyResource);
+                                    FileHelper.CreateDirectory(Access.LocalTempRoot + resInfo.path);
+                                    File.WriteAllBytes(Access.LocalTempRoot + resInfo.path, res);
+                                    resInfo.action = ResInfo.Action.N;
+                                }));
                     }
-                }
-                else
-                {
-                    ActionState(State.DownResource);
-                    yield return StartCoroutine(GetRemoteZip(keyValuePair.Key));
                 }
             }
         }
@@ -576,7 +552,7 @@ public class VersionMgr : MonoBehaviour
                 var zipName = Access.LocalPatchRoot + info.name;
                 File.WriteAllBytes(zipName, res);
                 ActionState(State.UnMakePatchZip);
-                string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", false);
+                string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", true);
                 if (string.IsNullOrEmpty(msg))
                 {
                     File.Delete(zipName);
@@ -611,34 +587,15 @@ public class VersionMgr : MonoBehaviour
                     .OrderByDescending(p => p.Length)
                     .ToList();
 
-            Debug.Log(string.Join("\n",
-                dic.Values.Where(p => p.isNeedDownFile).Select(p => p.path).OrderByDescending(p => p.Length).ToArray()));
-            Debug.Log(string.Join("\n", list.ToArray()));
-
-            foreach (
-                var pair in dic.Values.Where(p => p.isNeedDownFile).Select(p => p.path).OrderByDescending(p => p.Length)
-                )
+            foreach (string s in list)
             {
-                foreach (string s in list)
-                {
-                    if (!s.EndsWith(pair)) continue;
-                    var target = Access.LocalTempRoot + pair;
-                    FileHelper.CreateDirectory(target);
-                    if (File.Exists(target))
-                        File.Delete(target);
-                    File.Move(s, target);
-                }
+                var file = s.Replace(folderName + "/", Access.LocalTempRoot);
+                FileHelper.CreateDirectory(file);
+                if (File.Exists(file))
+                    File.Delete(file);
+                File.Move(s, file);
             }
-
-            //foreach (string s in list)
-            //{
-            //    var file = s.Replace(folderName + "/", Access.LocalTempRoot);
-            //    FileHelper.CreateDirectory(file);
-            //    if (File.Exists(file))
-            //        File.Delete(file);
-            //    File.Move(s, file);
-            //}
-            //Directory.Delete(folderName, true);
+            Directory.Delete(folderName, true);
         }
     }
 
@@ -667,6 +624,33 @@ public class VersionMgr : MonoBehaviour
 
     private Dictionary<string, VersionInfo> patchListCache { get; set; }
 
+    /// <summary>
+    ///  下载记录补丁的文本获取补丁列表
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator GetPatchList()
+    {
+        yield return StartCoroutine(new Access().FromRemote(this, PatchInfo.PatchListName, res =>
+        {
+            if (res == null) return;
+            FileHelper.CreateDirectory(Access.LocalPatchRoot + PatchInfo.PatchListName);
+            File.WriteAllBytes(Access.LocalPatchRoot + PatchInfo.PatchListName, res);
+            patchListCache =
+                Encoding.UTF8.GetString(res)
+                    .Split('\r', '\n')
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .Select(p => p.Trim())
+                    .Select(p => new PatchInfo(p))
+                    .ToLookup(p => p.group)
+                    .ToDictionary(p => p.Key, q =>
+                    {
+                        var go = gameObject.AddComponent<VersionInfo>();
+                        go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
+                        return go;
+                    });
+        }));
+    }
+
     private void Awake()
     {
         patchListCache = new Dictionary<string, VersionInfo>();
@@ -682,39 +666,14 @@ public class VersionMgr : MonoBehaviour
         }
     }
 
-    /// <summary>
-    ///  下载记录补丁的文本获取补丁列表
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator GetPatchList()
-    {
-        yield return StartCoroutine(new Access().FromRemote(this, PatchInfo.PatchListName, res =>
-        {
-            if (res == null) return;
-            FileHelper.CreateDirectory(Access.LocalPatchRoot + PatchInfo.PatchListName);
-            File.WriteAllBytes(Access.LocalPatchRoot + PatchInfo.PatchListName, res);
-            patchListCache =
-                Encoding.ASCII.GetString(res)
-                    .Split('\r', '\n')
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.Trim())
-                    .Select(p => new PatchInfo(p))
-                    .ToLookup(p => p.group)
-                    .ToDictionary(p => p.Key, q =>
-                    {
-                        var go = gameObject.AddComponent<VersionInfo>();
-                        go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
-                        return go;
-                    });
-        }));
-    }
-
     private Texture2D texture2D = null;
 
     private void OnGUI()
     {
         if (texture2D == null)
             texture2D = Access.FileToTexture2D("10253312_640x640_0.jpg");
+        if (texture2D == null)
+            texture2D = Access.FileToTexture2D(Library.Encrypt.MD5.Encrypt("10253312_640x640_0.jpg"));
         if (texture2D != null)
             GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
         GUILayout.Label("SvnVersion:" + VersionInfo.SvnVersion);

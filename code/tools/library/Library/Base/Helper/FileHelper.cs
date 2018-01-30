@@ -15,7 +15,7 @@ namespace Library.Helper
         public static void CreateDirectory(string path)
         {
             var dir = Path.GetDirectoryName(path);
-            if (dir != null && !Directory.Exists(dir))
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
         }
 

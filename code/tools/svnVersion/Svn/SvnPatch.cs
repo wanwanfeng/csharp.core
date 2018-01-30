@@ -8,8 +8,13 @@ using Library.Helper;
 
 namespace svnVersion
 {
-    public class SvnPatch : CmdHelp
+    public class SvnPatch : SvnCommon
     {
+        public string Name
+        {
+            get { return "svn-{0}-{1}-{2}-patch"; }
+        }
+
         public string svnVersion { get; private set; }
         public string svnUrl { get; private set; }
         public int highVersion { get; private set; }
@@ -17,31 +22,26 @@ namespace svnVersion
         public int endVersion { get; private set; }
         public string[] diffList { get; private set; }
 
-        public override bool HaHa()
+        public override void Run()
         {
-            svnVersion = Run("svn --version --quiet").Last();
+            StartCmd();
+            svnVersion = RunCmd("svn --version --quiet").Last();
             Console.WriteLine("SVN版本：" + svnVersion);
 
             Console.Write("请输入目标目录，然后回车：");
             string folder = Console.ReadLine();
-            if (string.IsNullOrEmpty(folder))
-                return false;
-
-            string fullFolder = Environment.CurrentDirectory + "/" + folder;
-            if (!Directory.Exists(fullFolder))
+            if (folder != null && !Directory.Exists(folder))
             {
                 Console.WriteLine("目标地址不存在");
-                Console.ReadKey();
-                Program.isRuning = false;
-                return false;
+                return;
             }
 
-            svnUrl = Run("svn info --show-item url").Last();
+            svnUrl = RunCmd("svn info --show-item url").Last();
             svnUrl += "/" + folder;
             Console.WriteLine("库地址：" + svnUrl);
 
             Console.WriteLine("");
-            highVersion = Run("svn info --show-item last-changed-revision").Last().AsInt();
+            highVersion = RunCmd("svn info --show-item last-changed-revision").Last().AsInt();
             Console.WriteLine("最高版本号：" + highVersion);
 
             Console.Write("请输入起始版本号(输入数字)，然后回车：");
@@ -56,7 +56,7 @@ namespace svnVersion
 
             Console.WriteLine("\n正在获取版本差异信息...");
 
-            diffList = Run(string.Format("svn diff -r {0}:{1} --summarize", startVersion, endVersion));
+            diffList = RunCmd(string.Format("svn diff -r {0}:{1} --summarize", startVersion, endVersion));
             diffList = diffList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
             int index = 0;
@@ -77,7 +77,7 @@ namespace svnVersion
             Console.Write("\n正在导出差异文件...");
             Console.WriteLine("正在导出中...");
             Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
-            string targetDir = string.Format("svn-{0}-{2}-{1}-patch", folder, endVersion, startVersion);
+            string targetDir = string.Format(Name, folder, startVersion, endVersion);
 
             foreach (var s in cao)
             {
@@ -92,11 +92,11 @@ namespace svnVersion
                     Console.WriteLine("is now : " + s.Last());
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Last();
                     FileHelper.CreateDirectory(fullPath);
-                    Run(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Last(), fullPath));
+                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Last(), fullPath));
                     if (File.Exists(fullPath))
                     {
                         var array =
-                            Run(string.Format("svn log -r {0}:0 \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
+                            RunCmd(string.Format("svn log -r {0}:0 \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
                                 svnUrl, s.Last()));
                         s.Insert(1, array.Skip(1).First().Split(' ').First().Replace("r", ""));
                         s.Insert(2, new FileInfo(fullPath).Length.ToString());
@@ -105,10 +105,12 @@ namespace svnVersion
                 }
             }
             File.WriteAllLines(targetDir + ".txt",
-                cao.Where(q => q.Count == 6).Select(q => q.ToArray().JoinToString(",")), new UTF8Encoding(false));
+                cao.Where(q => q.Count == 6).Select(q => q.ToArray().JoinToString(",")).ToArray(),
+                new UTF8Encoding(false));
 
-            if (!PathToMd5(folder, targetDir, cao)) return false;
-            return true;
+            PathToMd5(folder, targetDir, cao);
+            MakeFolder(folder, targetDir);
+            EndCmd();
         }
     }
 }

@@ -1,36 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using svnVersion;
 
 namespace svnVersion
 {
     internal class Program
     {
-        public static bool isRuning = true;
+        private static bool isRuning = true;
 
         private static void Main(string[] args)
         {
-            CmdHelp cmdHelp = null;
+            string mes =
+                @"1,SvnMaster [输入master或m]
+2,SvnPatch [输入patch或p]
+3,SvnUpdate [输入list或l]";
+            Console.WriteLine(mes);
+            Console.Write("请输入选择，然后回车：");
+            SvnCommon svnCommon = null;
             var haha = Console.ReadLine();
             switch (haha)
             {
                 case "master":
                 case "m":
-                    cmdHelp = new SvnMaster();
+                    svnCommon = new SvnMaster();
                     break;
                 case "patch":
                 case "p":
-                    cmdHelp = new SvnPatch();
+                    svnCommon = new SvnPatch();
+                    break;
+                case "list":
+                case "l":
+                    svnCommon = new SvnUpdate();
                     break;
             }
 
-            if (cmdHelp != null)
+            if (svnCommon == null) return;
+
+            while (isRuning)
             {
-                while (isRuning)
-                {
-                    isRuning = !cmdHelp.HaHa();
-                }
+                svnCommon.Run();
+                Console.WriteLine("按y键继续,按其余键退出......");
+                isRuning = Console.ReadLine() == "y";
             }
         }
     }

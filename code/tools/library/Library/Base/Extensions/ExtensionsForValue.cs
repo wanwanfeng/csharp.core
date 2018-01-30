@@ -270,7 +270,7 @@ namespace Library.Extensions
                 }
                 return sbBuilder.ToString();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

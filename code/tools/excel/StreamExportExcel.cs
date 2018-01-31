@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace excel
@@ -16,7 +15,7 @@ namespace excel
         /// <param name="vals"></param>
         public static void WriteToExcel(string filename, List<List<object>> vals)
         {
-            DataTable dt = new DataTable();
+            var dt = new System.Data.DataTable();
             bool isInit = false;
             foreach (List<object> objects in vals)
             {
@@ -25,7 +24,7 @@ namespace excel
                     isInit = true;
                     foreach (object o in objects)
                     {
-                        dt.Columns.Add(o.ToString(), typeof (String));
+                        dt.Columns.Add(o.ToString(), typeof(String));
                     }
                     continue;
                 }

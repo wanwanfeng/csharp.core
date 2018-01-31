@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using  Microsoft.Office.Interop.Excel;
 
@@ -438,10 +437,12 @@ namespace excel
 
         public static void WriteToExcel(string filename, List<List<object>> vals)
         {
+            //http://bbs.csdn.net/topics/390201171
             ActionExcel(filename, workbook =>
             {
                 var workSheet = (Worksheet) workbook.ActiveSheet;
                 Console.WriteLine(workSheet.Name);
+                //第一种：Excel.Application的Cell by Cell
                 for (int j = 0; j < vals.Count; j++)
                 {
                     for (int i = 0; i < vals[j].Count; i++)

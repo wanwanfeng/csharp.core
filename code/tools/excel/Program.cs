@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Library.Helper;
 using LitJson;
@@ -58,7 +56,7 @@ namespace excel
             Console.ReadKey();
         }
 
-        #region Json
+        #region Json->
 
         /// <summary>
         /// json->csv
@@ -84,7 +82,6 @@ namespace excel
         /// <summary>
         /// json->xlsx
         /// </summary>
-        /// <param name="isOne"></param>
         private static void ReadJsonToExcel()
         {
             List<string> files;
@@ -98,6 +95,9 @@ namespace excel
             }
         }
 
+        /// <summary>
+        /// / json->xlsx
+        /// </summary>
         private static void ReadJsonToOneExcel()
         {
             List<string> files;
@@ -167,7 +167,7 @@ namespace excel
 
         #endregion
 
-        #region Excel
+        #region Excel->
 
         /// <summary>
         /// xlsx->json

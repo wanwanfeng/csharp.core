@@ -59,19 +59,20 @@ namespace svnVersion
             diffList = RunCmd(string.Format("svn diff -r {0}:{1} --summarize", startVersion, endVersion));
             diffList = diffList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
+            Dictionary<string, SvnFileInfo> cache = new Dictionary<string, SvnFileInfo>();
             int index = 0;
-            var cao = new List<List<string>>();
             foreach (string s in diffList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
                 string last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
                 last = (last.StartsWith(folder) ? last.Replace(folder + "/", "") : last);
-                List<string> list = new List<string>();
-                list.Add(res.First().Trim());
-                list.Add(Library.Encrypt.MD5.Encrypt(last));
-                list.Add(last);
-                cao.Add(new List<string>(list));
-                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "        " + list.ToArray().JoinToString(","));
+                SvnFileInfo svnFileInfo = new SvnFileInfo()
+                {
+                    action = res.First().Trim(),
+                    path = last,
+                };
+                cache[svnFileInfo.path] = svnFileInfo;
+                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + svnFileInfo);
             }
 
             Console.Write("\n正在导出差异文件...");
@@ -79,37 +80,29 @@ namespace svnVersion
             Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
 
-            foreach (var s in cao)
+            foreach (var s in cache)
             {
-                if (s.First() == "D")
+                if (s.Value.action != "D")
                 {
-                    s.Insert(1, "");
-                    s.Insert(2, "");
-                    s.Insert(s.Count - 2, "");
-                }
-                else
-                {
-                    Console.WriteLine("is now : " + s.Last());
-                    string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Last();
+                    Console.WriteLine("is now : " + s.Key);
+                    string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Last(), fullPath));
+                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
                     if (File.Exists(fullPath))
                     {
                         var array =
                             RunCmd(string.Format("svn log -r {0}:0 \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
-                                svnUrl, s.Last()));
-                        s.Insert(1, array.Skip(1).First().Split(' ').First().Replace("r", ""));
-                        s.Insert(2, new FileInfo(fullPath).Length.ToString());
-                        s.Insert(s.Count - 2, Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath)));
+                                svnUrl, s.Key));
+                        s.Value.version = array.Skip(1).First().Split(' ').First().Replace("r", "");
+                        s.Value.content_size = new FileInfo(fullPath).Length.ToString();
+                        s.Value.content_md5 = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath));
                     }
                 }
             }
-            File.WriteAllLines(targetDir + ".txt",
-                cao.Where(q => q.Count == 6).Select(q => q.ToArray().JoinToString(",")).ToArray(),
+            File.WriteAllLines(targetDir + ".txt", cache.Select(q => q.Value.ToString()).ToArray(),
                 new UTF8Encoding(false));
-
-            PathToMd5(folder, targetDir, cao);
-            MakAESEncrypt(folder, targetDir);
+            PathToMd5(folder, targetDir, cache);
+            MakAESEncrypt(folder, targetDir, cache);
             MakeFolder(folder, targetDir);
             EndCmd();
         }

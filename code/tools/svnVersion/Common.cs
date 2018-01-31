@@ -2,20 +2,31 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Library.Helper;
 
 namespace svnVersion
 {
     public class SvnFileInfo
     {
-        public string action;
-        public int version;
-        public string size;
-        public string value_md5;
         public string path;
-        public string path_md5;
-        public bool isEncrypt = false;
+        public string action;
+        public string version;
+        public string content_md5;
+        public string content_size;
         public string encrypt_md5;
+        public string encrypt_size;
+
+        public string path_md5
+        {
+            get { return Library.Encrypt.MD5.Encrypt(path); }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", path_md5, action, version, content_md5, content_size,
+                encrypt_md5, encrypt_size, path);
+        }
     }
 
     public class SvnPatchInfo
@@ -24,10 +35,13 @@ namespace svnVersion
         public string content_md5;
         public string path;
         public string path__md5;
-        public bool isZip = false;
         public string zip_md5;
-        public bool isEncrypt = false;
         public string encrypt_md5;
+
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", path, size, content_md5, path__md5, encrypt_md5);
+        }
     }
 
     public class SvnCommon : CmdHelp
@@ -42,9 +56,20 @@ namespace svnVersion
         {
             get { return ""; }
         }
+
         public virtual void Run()
         {
 
+        }
+
+        protected void DeleteInfo(string targetMd5Dir, bool onlyDir = false)
+        {
+            if (Directory.Exists(targetMd5Dir))
+                Directory.Delete(targetMd5Dir, true);
+            if (onlyDir)
+                return;
+            if (File.Exists(targetMd5Dir + ".txt"))
+                File.Delete(targetMd5Dir + ".txt");
         }
 
         /// <summary>
@@ -52,32 +77,30 @@ namespace svnVersion
         /// </summary>
         /// <param name="folder"></param>
         /// <param name="targetDir"></param>
-        /// <param name="cao"></param>
-        protected void PathToMd5(string folder, string targetDir, List<List<string>> cao)
+        /// <param name="cache"></param>
+        protected void PathToMd5(string folder, string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
             if (folder == null) return;
             Console.Write("\n是否将路径MD5化（y/n），然后回车：");
             bool yes = Console.ReadLine() == "y";
-            if (!yes) return;
+
             var targetMd5Dir = targetDir.Replace(folder, Library.Encrypt.MD5.Encrypt(folder + key_md5));
-            if (Directory.Exists(targetMd5Dir))
-                Directory.Delete(targetMd5Dir, true);
-            foreach (var s in cao)
+            DeleteInfo(targetMd5Dir);
+
+            if (!yes) return;
+
+            foreach (var s in cache)
             {
-                string fullPath = targetDir + "/" + s.Last();
-                string targetFullPath = targetMd5Dir + "/" + Library.Encrypt.MD5.Encrypt(s.Last() + key_md5);
+                string fullPath = targetDir + "/" + s.Key;
+                string targetFullPath = targetMd5Dir + "/" + Library.Encrypt.MD5.Encrypt(s.Key + key_md5);
                 if (!File.Exists(fullPath)) continue;
                 FileHelper.CreateDirectory(targetFullPath);
                 File.Copy(fullPath, targetFullPath, true);
             }
-            if (Directory.Exists(targetDir))
-                Directory.Delete(targetDir, true);
-            if (File.Exists(targetDir + ".txt"))
-            {
-                if (File.Exists(targetMd5Dir + ".txt"))
-                    File.Delete(targetMd5Dir + ".txt");
-                File.Move(targetDir + ".txt", targetMd5Dir + ".txt");
-            }
+
+            DeleteInfo(targetDir);
+            File.WriteAllLines(targetMd5Dir + ".txt", cache.Select(q => q.Value.ToString()).ToArray(),
+                new UTF8Encoding(false));
         }
 
         /// <summary>
@@ -85,20 +108,30 @@ namespace svnVersion
         /// </summary>
         /// <param name="folder"></param>
         /// <param name="targetDir"></param>
-        protected void MakAESEncrypt(string folder, string targetDir)
+        /// <param name="cache"></param>
+        protected void MakAESEncrypt(string folder, string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
             if (folder == null) return;
             Console.Write("\n是否对文件夹内每个文件进行加密（y/n），然后回车：");
             bool yes = Console.ReadLine() == "y";
             if (!yes) return;
-
             var targetMd5Dir = targetDir.Replace(folder, Library.Encrypt.MD5.Encrypt(folder + key_md5));
-            var target = Directory.Exists(targetMd5Dir) ? targetMd5Dir : targetDir;
-            var file = FileHelper.GetFiles(target, SearchOption.AllDirectories);
-            foreach (string s in file)
+            bool md5 = Directory.Exists(targetMd5Dir);
+            foreach (var s in cache)
             {
-                File.WriteAllBytes(s, Library.Encrypt.AES.Encrypt(File.ReadAllBytes(s), key_aes));
+                string fullPath = "";
+                if (!md5)
+                    fullPath = targetDir + "/" + s.Key;
+                else
+                    fullPath = targetMd5Dir + "/" + Library.Encrypt.MD5.Encrypt(s.Key + key_md5);
+                if (!File.Exists(fullPath)) continue;
+                var bytes = Library.Encrypt.AES.Encrypt(File.ReadAllBytes(fullPath), key_aes);
+                s.Value.encrypt_md5 = Library.Encrypt.MD5.Encrypt(fullPath + key_md5);
+                s.Value.encrypt_size = bytes.Length.ToString();
+                File.WriteAllBytes(fullPath, bytes);
             }
+            File.WriteAllLines(targetMd5Dir + ".txt", cache.Select(q => q.Value.ToString()).ToArray(),
+                new UTF8Encoding(false));
         }
 
         /// <summary>
@@ -130,6 +163,7 @@ namespace svnVersion
                 Console.WriteLine("文件压缩成功！");
             else
                 Console.WriteLine("文件压缩失败！" + message);
+            DeleteInfo(folder, true);
         }
     }
 }

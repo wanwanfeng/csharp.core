@@ -54,55 +54,47 @@ namespace svnVersion
             targetList = targetList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
             int index = 0;
-            var cao = new List<List<string>>();
+
+            Dictionary<string, SvnFileInfo> cache = new Dictionary<string, SvnFileInfo>();
             foreach (string s in targetList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
                 var last = res.Skip(6).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
-                List<string> list = new List<string>();
-
-                list.Add("A");
-                list.Add(res.First().Trim());
-                list.Add(res.Skip(2).First().Trim());
-                list.Add(Library.Encrypt.MD5.Encrypt(last));
-                list.Add(last);
-
-                cao.Add(new List<string>(list));
-                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + list.ToArray().JoinToString(","));
+                SvnFileInfo svnFileInfo = new SvnFileInfo()
+                {
+                    action = "A",
+                    version = res.First().Trim(),
+                    content_size = res.Skip(2).First().Trim(),
+                    path = last,
+                };
+                cache[svnFileInfo.path] = svnFileInfo;
+                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + svnFileInfo);
             }
 
             Console.Write("\n是否导出目标版本号文件（y/n），然后回车：");
             var yes = Console.ReadLine() == "y";
             string targetDir = string.Format(Name, folder, targetVersion);
-            if (!yes)
-            {
-                File.WriteAllLines(targetDir + ".txt", cao.Select(q => q.ToArray().JoinToString(",")).ToArray(),
-                    new UTF8Encoding(false));
-                return;
-            }
-            else
+            if (Directory.Exists(targetDir))
+                Directory.Delete(targetDir, true);
+            if (yes)
             {
                 Console.WriteLine("正在导出中...");
                 Console.WriteLine("根据项目大时间长短不定，请耐心等待...");
-
                 FileHelper.CreateDirectory(Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir);
                 targetList = RunCmd(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir));
 
                 index = 0;
-                foreach (var s in cao)
+                foreach (var s in cache)
                 {
-                    var last = s.Last();
-                    Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + last);
-                    string fullPath = targetDir + "/" + last;
+                    Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + s.Key);
+                    string fullPath = targetDir + "/" + s.Key;
                     if (File.Exists(fullPath))
-                        s.Insert(s.Count - 2, Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath)));
+                        s.Value.content_md5 = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath));
                 }
-                File.WriteAllLines(targetDir + ".txt", cao.Select(q => q.ToArray().JoinToString(",")).ToArray(),
-                    new UTF8Encoding(false));
             }
-
-            PathToMd5(folder, targetDir, cao);
-            MakAESEncrypt(folder, targetDir);
+            File.WriteAllLines(targetDir + ".txt", cache.Select(q => q.Value.ToString()).ToArray(), new UTF8Encoding(false));
+            PathToMd5(folder, targetDir, cache);
+            MakAESEncrypt(folder, targetDir, cache);
             MakeFolder(folder, targetDir);
             EndCmd();
         }

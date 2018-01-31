@@ -102,6 +102,7 @@ namespace svnVersion
             }
 
             PathToMd5(folder, targetDir, cao);
+            MakAESEncrypt(folder, targetDir);
             MakeFolder(folder, targetDir);
             EndCmd();
         }

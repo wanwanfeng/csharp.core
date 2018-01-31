@@ -109,6 +109,7 @@ namespace svnVersion
                 new UTF8Encoding(false));
 
             PathToMd5(folder, targetDir, cao);
+            MakAESEncrypt(folder, targetDir);
             MakeFolder(folder, targetDir);
             EndCmd();
         }

@@ -14,7 +14,7 @@ namespace excel
     {
         JsonToCsv = 1,
         JsonToExcel = 2,
-        JsonToExcelOneSheet = 3,
+        JsonToOneExcel = 3,
         XlsxToJson = 4,
     }
 
@@ -42,8 +42,8 @@ namespace excel
                     case CaoType.JsonToExcel:
                         ReadJsonToExcel();
                         break;
-                    case CaoType.JsonToExcelOneSheet:
-                        ReadJsonToExcel(true);
+                    case CaoType.JsonToOneExcel:
+                        ReadJsonToOneExcel();
                         break;
                     case CaoType.XlsxToJson:
                         ReadExcelToJson();
@@ -85,7 +85,7 @@ namespace excel
         /// json->xlsx
         /// </summary>
         /// <param name="isOne"></param>
-        private static void ReadJsonToExcel(bool isOne = false)
+        private static void ReadJsonToExcel()
         {
             List<string> files;
             if (!CheckPath(out files)) return;
@@ -93,16 +93,22 @@ namespace excel
             {
                 Console.WriteLine(" is now : " + file);
                 List<List<object>> vals = GetJsonDataArray(File.ReadAllText(file));
-                if (isOne)
-                {
-                    OfficeWorkbooks.WriteToExcelOne(file, vals);
-                }
-                else
-                {
-                    StreamExportExcel.WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
-                }
+                //StreamExportExcel.WriteToExcel(Path.ChangeExtension(file, ".xls"), vals);
+                OfficeWorkbooks.WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
             }
-            //EditorExcelTools.MS_ExportExcel(Path.ChangeExtension(file, ".xls"), keys, vals);
+        }
+
+        private static void ReadJsonToOneExcel()
+        {
+            List<string> files;
+            if (!CheckPath(out files)) return;
+            Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>();
+            foreach (string file in files)
+            {
+                Console.WriteLine(" is now : " + file);
+                dic[file] = GetJsonDataArray(File.ReadAllText(file));
+            }
+            OfficeWorkbooks.WriteToExcelOne(dic);
         }
 
         private static bool CheckPath(out List<string> files, string exce = ".json")
@@ -190,9 +196,13 @@ namespace excel
                             jsonData[o.ToString()] = queueVal.Dequeue().ToString();
                         resJsonDatas.Add(jsonData);
                     }
-                    string newPath = Path.GetDirectoryName(file) + Path.GetFileNameWithoutExtension(file) + "_" +
-                                     keyValuePair.Key + ".json";
-                    FileHelper.CreateDirectory(newPath);
+                    string newPath = Path.ChangeExtension(file, ".json");
+                    if (vals.Count > 1)
+                    {
+                        newPath = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) +
+                                         "\\" + keyValuePair.Key + ".json";
+                        FileHelper.CreateDirectory(newPath);
+                    }
                     File.WriteAllText(newPath, JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
                 }
             }

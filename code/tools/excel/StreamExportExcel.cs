@@ -16,63 +16,22 @@ namespace excel
         /// <param name="vals"></param>
         public static void WriteToExcel(string filename, List<List<object>> vals)
         {
-            DataTable dt = new DataTable(Path.GetFileNameWithoutExtension(filename));
+            DataTable dt = new DataTable();
+            bool isInit = false;
             foreach (List<object> objects in vals)
             {
-                foreach (object o in objects)
+                if (!isInit)
                 {
-                    DataColumn dc = new DataColumn();
-                    dt.Columns.Add(dc);
+                    isInit = true;
+                    foreach (object o in objects)
+                    {
+                        dt.Columns.Add(o.ToString(), typeof (String));
+                    }
+                    continue;
                 }
                 dt.Rows.Add(objects.ToArray());
             }
-            ExportExcelByFileStream(filename, dt);
-        }
-
-
-        public static void ExportExcelByFileStream(string filename, DataTable dt)
-        {
-            //设置导出文件路径
-            string path = Environment.CurrentDirectory + "/Export";
-
-            //设置新建文件路径及名称
-            string savePath = path + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".xls";
-
-            //创建文件
-            FileStream file = new FileStream(savePath, FileMode.CreateNew, FileAccess.Write);
-
-            //以指定的字符编码向指定的流写入字符
-            StreamWriter sw = new StreamWriter(file, Encoding.GetEncoding("GB2312"));
-
-            StringBuilder strbu = new StringBuilder();
-
-            //写入标题
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                strbu.Append(dt.Columns[i].ColumnName + "\t");
-            }
-            //加入换行字符串
-            strbu.Append(Environment.NewLine);
-
-            //写入内容
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    strbu.Append(dt.Rows[i][j] + "\t");
-                }
-                strbu.Append(Environment.NewLine);
-            }
-
-            sw.Write(strbu.ToString());
-            sw.Flush();
-            file.Flush();
-
-            sw.Close();
-            sw.Dispose();
-
-            file.Close();
-            file.Dispose();
+            File.WriteAllBytes(filename, ExportExcelByMemoryStream(dt));
         }
 
         public static byte[] ExportExcelByMemoryStream(DataTable dt)

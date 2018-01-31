@@ -211,7 +211,7 @@ namespace Excel
             {
                 File.Create(path);
                 string sqlCreate = "CREATE TABLE TestSheet ({0})";
-                string key = string.Join(",", keys.Select(p => string.Format("[{0}] VarChar", p)));
+                string key = string.Join(",", keys.Select(p => string.Format("[{0}] VarChar", p)).ToArray());
                 var cmd = new System.Data.OleDb.OleDbCommand(string.Format(sqlCreate, key), connection);
                 connection.Open();
                 cmd.ExecuteNonQuery();

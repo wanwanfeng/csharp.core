@@ -1,46 +1,60 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Excel;
+using Library.Helper;
 using LitJson;
 
 namespace excel
 {
+    public enum CaoType
+    {
+        JsonToCsv = 1,
+        JsonToExcel = 2,
+        JsonToExcelOneSheet = 3,
+        XlsxToJson = 4,
+    }
+
+
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Console.WriteLine(
-                @"请选择：
-1：json->csv
-2：json->xlsx
-3：xlsx->json"
-                );
-            string s = Console.ReadLine();
-            switch (s)
+            Console.WriteLine("----------命令索引----------");
+            foreach (var value in Enum.GetValues(typeof(CaoType)))
             {
-                case "1":
-                    ReadjsonToCsv();
-                    break;
-                case "2":
-                    ReadJsonToExcel();
-                    break;
-                case "3":
-                    ReadExcelToJson();
-                    break;
-
-                default:
-                    break;
+                Console.WriteLine("\t" + (int) value + "：" + value);
+            }
+            Console.WriteLine("----------------------------");
+            Console.Write("请选择，然后回车：");
+            string s = Console.ReadLine();
+            if (s != null)
+            {
+                CaoType caoType = (CaoType) Enum.Parse(typeof (CaoType), s);
+                switch (caoType)
+                {
+                    case CaoType.JsonToCsv:
+                        ReadjsonToCsv();
+                        break;
+                    case CaoType.JsonToExcel:
+                        ReadJsonToExcel();
+                        break;
+                    case CaoType.JsonToExcelOneSheet:
+                        ReadJsonToExcel(true);
+                        break;
+                    case CaoType.XlsxToJson:
+                        ReadExcelToJson();
+                        break;
+                    default:
+                        Console.Write("不存在的命令！");
+                        break;
+                }
             }
             GC.Collect();
+            Console.Write("请按任意键退出...");
             Console.ReadKey();
         }
 
@@ -61,12 +75,9 @@ namespace excel
                 List<string> res = new List<string>();
                 foreach (List<object> objects in vals)
                 {
-                    res.Add(string.Join(",", objects.Select(p =>
-                    {
-                        return "\"" + p + "\"";
-                    })));
+                    res.Add(string.Join(",", objects.Select(p => "\"" + p + "\"").ToArray()));
                 }
-                File.WriteAllLines(Path.ChangeExtension(file, ".csv"), res, Encoding.UTF8);
+                File.WriteAllLines(Path.ChangeExtension(file, ".csv"), res.ToArray(), Encoding.UTF8);
             }
         }
 
@@ -84,11 +95,11 @@ namespace excel
                 List<List<object>> vals = GetJsonDataArray(File.ReadAllText(file));
                 if (isOne)
                 {
-                    Haha.WriteToExcelOne(file, vals);
+                    OfficeWorkbooks.WriteToExcelOne(file, vals);
                 }
                 else
                 {
-                    Haha.WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
+                    StreamExportExcel.WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
                 }
             }
             //EditorExcelTools.MS_ExportExcel(Path.ChangeExtension(file, ".xls"), keys, vals);
@@ -96,6 +107,14 @@ namespace excel
 
         private static bool CheckPath(out List<string> files, string exce = ".json")
         {
+            //OpenFileDialog fd = new OpenFileDialog();
+            //fd.Filter = "EXCEL文件(*.xls)|*.xls|EXCEL文件(*.xlsx)|*.xlsx";
+
+            //if (fd.ShowDialog() == DialogResult.OK)
+            //{
+            //    //这里面就可以对选择的文件进行处理了
+            //}
+
             string path = (Environment.CurrentDirectory + "/json/").Replace("\\", "/");
             if (!Directory.Exists(path))
             {
@@ -155,25 +174,27 @@ namespace excel
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                List<List<object>> vals = Haha.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
-
-                Queue<List<object>> queue = new Queue<List<object>>(vals);
-                List<object> keyList = queue.Dequeue();
-                List<JsonData> resDatases = new List<JsonData>();
-                while (queue.Count != 0)
+                Dictionary<string, List<List<object>>> vals = OfficeWorkbooks.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
+                foreach (KeyValuePair<string, List<List<object>>> keyValuePair in vals)
                 {
-                    Queue<object> queueVal = new Queue<object>(queue.Dequeue());
-                    JsonData jsonData = new JsonData();
-                    foreach (object o in keyList)
+                    Console.WriteLine(" is now sheet: " + keyValuePair.Key);
+                    Queue<List<object>> queue = new Queue<List<object>>(keyValuePair.Value);
+                    List<object> keyList = queue.Dequeue();
+                    JsonData resJsonDatas = new JsonData();
+                    resJsonDatas.SetJsonType(JsonType.Array);
+                    while (queue.Count != 0)
                     {
-                        jsonData[o.ToString()] = queueVal.Dequeue().ToString();
+                        Queue<object> queueVal = new Queue<object>(queue.Dequeue());
+                        JsonData jsonData = new JsonData();
+                        foreach (object o in keyList)
+                            jsonData[o.ToString()] = queueVal.Dequeue().ToString();
+                        resJsonDatas.Add(jsonData);
                     }
-                    resDatases.Add(jsonData);
+                    string newPath = Path.GetDirectoryName(file) + Path.GetFileNameWithoutExtension(file) + "_" +
+                                     keyValuePair.Key + ".json";
+                    FileHelper.CreateDirectory(newPath);
+                    File.WriteAllText(newPath, JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
                 }
-                File.WriteAllText(
-                    Path.GetDirectoryName(file) + "/json/" + Path.GetFileNameWithoutExtension(file) + ".json",
-                    LitJson.JsonMapper.ToJson(resDatases),
-                    Encoding.UTF8);
             }
         }
 

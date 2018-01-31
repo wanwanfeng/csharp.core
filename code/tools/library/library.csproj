@@ -46,12 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Library\Base\Attribute\NameAttribute.cs" />
     <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
     <Compile Include="Library\Base\Extensions\ExtensionsForStrings.cs" />
     <Compile Include="Library\Base\Helper\FileHelper.cs" />
-    <Compile Include="Library\Base\Helper\NameAttribute.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
     <Compile Include="Library\Debug.cs" />
     <Compile Include="Library\Base\Helper\AttributeHelper.cs" />

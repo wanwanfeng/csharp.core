@@ -1,0 +1,10 @@
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Release\excel.exe.config
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Release\excel.exe
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Release\excel.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Release\Library.dll
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Release\LitJson.dll
+D:\Work\yuege\ygtools\trunk\code\tools\excel\bin\Release\ICSharpCode.SharpZipLib.dll
+D:\Work\yuege\ygtools\trunk\code\tools\excel\obj\Release\excel.csprojResolveAssemblyReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\excel\obj\Release\excel.csproj.ResolveComReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\excel\obj\Release\excel.exe
+D:\Work\yuege\ygtools\trunk\code\tools\excel\obj\Release\excel.pdb

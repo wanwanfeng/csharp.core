@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Excel;
 using Library.Helper;
 using LitJson;
 
@@ -181,6 +182,8 @@ namespace excel
             {
                 Console.WriteLine(" is now : " + file);
                 Dictionary<string, List<List<object>>> vals = OfficeWorkbooks.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
+
+                Dictionary<string, List<List<object>>> vals = EditorExcelTools.CacheDictionary.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
                 foreach (KeyValuePair<string, List<List<object>>> keyValuePair in vals)
                 {
                     Console.WriteLine(" is now sheet: " + keyValuePair.Key);

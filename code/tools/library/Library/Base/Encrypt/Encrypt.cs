@@ -11,7 +11,6 @@ namespace Library.Encrypt
     public class MD5
     {
         public static System.Security.Cryptography.MD5 Md5Hash = System.Security.Cryptography.MD5.Create();
-        public static bool IsOpen = true;
 
         //MD5加密  
         public static string Encrypt(string input)
@@ -22,8 +21,6 @@ namespace Library.Encrypt
         //MD5加密  
         public static string Encrypt(byte[] input)
         {
-            if (!IsOpen)
-                return Encoding.UTF8.GetString(input);
             byte[] data = Md5Hash.ComputeHash(input);
             var sBuilder = new StringBuilder();
             foreach (var bt in data)

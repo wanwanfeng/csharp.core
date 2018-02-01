@@ -53,7 +53,7 @@ namespace Excel
         /// <param name="path"></param>
         /// <param name="rowCollection"></param>
         /// <returns></returns>
-        private static Dictionary<int, List<Cell>> GetDictionary(string path, DataRowCollection rowCollection)
+        public static Dictionary<int, List<Cell>> GetDictionary(string path, DataRowCollection rowCollection)
         {
             int curHang = 0;
             var remarks = rowCollection[curHang].ItemArray.ToList();

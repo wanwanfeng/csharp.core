@@ -44,10 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EditorExcelTools.cs" />
-    <Compile Include="StreamExportExcel.cs" />
-    <Compile Include="OfficeWorkbooks.cs" />
-    <Compile Include="KillExcel.cs" />
+    <Compile Include="Script\EditorExcelTools.cs" />
+    <Compile Include="Script\StreamExportExcel.cs" />
+    <Compile Include="Script\OfficeWorkbooks.cs" />
+    <Compile Include="Script\Base\KillExcel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

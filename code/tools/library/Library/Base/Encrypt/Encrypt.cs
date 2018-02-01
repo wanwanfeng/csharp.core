@@ -66,11 +66,15 @@ namespace Library.Encrypt
 
         /// <summary>
         ///  AES-256  内容加密
+        /// 成功加密时返回值
+        /// 否则返回空
         /// </summary>
         public static string Encrypt(string toE, string key = null)
         {
+            if (string.IsNullOrEmpty(toE)) return null;
+            if (toE.Substring(0, Head.Length) == Head) return null;
             byte[] resultArray = Encrypt(Encoding.UTF8.GetBytes(toE), key);
-            return Convert.ToBase64String(resultArray, 0, resultArray.Length);
+            return Head + Convert.ToBase64String(resultArray, 0, resultArray.Length);
         }
 
         /// <summary>
@@ -78,8 +82,7 @@ namespace Library.Encrypt
         /// </summary>
         public static byte[] Encrypt(byte[] toEncryptArray, string key = null)
         {
-            if (!IsOpen)
-                return toEncryptArray;
+            if (!IsOpen) return toEncryptArray;
 
             //加密和解密采用相同的key,具体自己填，但是必须为32位//
             byte[] keyArray = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(key) ? Key : key);
@@ -97,6 +100,9 @@ namespace Library.Encrypt
         /// </summary>
         public static string Decrypt(string toD, string key = null)
         {
+            if (string.IsNullOrEmpty(toD)) return null;
+            if (toD.Substring(0, Head.Length) != Head) return null;
+            toD = toD.Substring(Head.Length, toD.Length - Head.Length);
             return Encoding.UTF8.GetString(Decrypt(Convert.FromBase64String(toD), key));
         }
 
@@ -105,8 +111,7 @@ namespace Library.Encrypt
         /// </summary>
         public static byte[] Decrypt(byte[] toEncryptArray, string key = null)
         {
-            if (!IsOpen)
-                return toEncryptArray;
+            if (!IsOpen) return toEncryptArray;
 
             //加密和解密采用相同的key,具体值自己填，但是必须为32位//
             byte[] keyArray = Encoding.UTF8.GetBytes(string.IsNullOrEmpty(key) ? Key : key);
@@ -118,34 +123,6 @@ namespace Library.Encrypt
             ICryptoTransform cTransform = rDel.CreateDecryptor();
 
             return cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
-        }
-
-        /// <summary>
-        /// 内容加密
-        /// </summary>
-        public static string Encrypt(string toE, out bool isEncrypt, string key = null)
-        {
-            if (string.IsNullOrEmpty(toE))
-            {
-                isEncrypt = false;
-                return toE;
-            }
-            isEncrypt = toE.Substring(0, Head.Length) != Head;
-            return isEncrypt ? (Head + Encrypt(toE, key)) : toE;
-        }
-
-        /// <summary>
-        /// 内容解密
-        /// </summary>
-        public static string Decrypt(string toD, out bool isDecrypt, string key = null)
-        {
-            if (string.IsNullOrEmpty(toD))
-            {
-                isDecrypt = false;
-                return toD;
-            }
-            isDecrypt = toD.Substring(0, Head.Length) == Head;
-            return isDecrypt ? Decrypt(toD.Substring(Head.Length, toD.Length - Head.Length), key) : toD;
         }
     }
 }

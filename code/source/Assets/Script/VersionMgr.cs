@@ -42,7 +42,9 @@ using SvnVersion;
 
 public class VersionMgr : MonoBehaviour
 {
+    public static string SvnVersion { get; set; }
     protected static string KeyMd5 { get; private set; }
+
     static VersionMgr()
     {
         KeyMd5 = "";
@@ -336,33 +338,15 @@ public class VersionMgr : MonoBehaviour
 
     public class VersionInfo : MonoBehaviour
     {
+        public int MinVersion { get; set; }
+        public int MaxVersion { get; set; }
+
         public event Action<State> OnActionState;
 
         private void ActionState(State state)
         {
             if (OnActionState != null)
                 OnActionState.Invoke(state);
-        }
-
-        /// <summary>
-        /// svn版本
-        /// </summary>
-        public static string SvnVersion { get; set; }
-
-        /// <summary>
-        /// svn主资源起始版本号
-        /// </summary>
-        public static int MinVersion { get; set; }
-
-        /// <summary>
-        /// svn主资源结束版本号
-        /// </summary>
-        private static int maxVersion;
-
-        public static int MaxVersion
-        {
-            get { return Math.Max(maxVersion, MinVersion); }
-            set { maxVersion = value; }
         }
 
         [SerializeField]
@@ -425,12 +409,11 @@ public class VersionMgr : MonoBehaviour
             if (bytes.Length == 0) yield break;
 
             ActionState(State.ApplyPatchList);
-            MinVersion = info.first;
-            MaxVersion = info.last;
-
             var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(bytes));
             var svnFileInfos = LitJson.JsonMapper.ToObject<SvnFileInfo[]>(content);
             patchCache[info.fileUrl] = svnFileInfos.Select(p => new ResInfo(info, p)).ToDictionary(p => p.path);
+            MinVersion = Math.Min(MinVersion, info.first);
+            MaxVersion = Math.Max(MaxVersion, info.last);
         }
 
         /// <summary>
@@ -598,8 +581,9 @@ public class VersionMgr : MonoBehaviour
             File.WriteAllBytes(Access.LocalPatchRoot + PatchInfo.PatchListName, res);
 
             var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(res));
-            var svnPatchInfos = LitJson.JsonMapper.ToObject<SvnPatchInfo[]>(content);
-            patchListCache = svnPatchInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
+            var svnInfo = LitJson.JsonMapper.ToObject<SvnInfo>(content);
+            SvnVersion = svnInfo.svnVersion;
+            patchListCache = svnInfo.svnInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
                 .ToDictionary(p => p.Key, q =>
                 {
                     var go = gameObject.AddComponent<VersionInfo>();
@@ -634,14 +618,13 @@ public class VersionMgr : MonoBehaviour
             texture2D = Access.FileToTexture2D(Library.Encrypt.MD5.Encrypt("10253312_640x640_0.jpg"));
         if (texture2D != null)
             GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
-        GUILayout.Label("SvnVersion:" + VersionInfo.SvnVersion);
-        GUILayout.Label("MinVersion:" + VersionInfo.MinVersion);
-        GUILayout.Label("MaxVersion:" + VersionInfo.MaxVersion);
-
-
+        GUILayout.Label("SvnVersion:" + SvnVersion);
+        if (patchListCache == null)
+            return;
         foreach (var versionInfo in patchListCache)
         {
-            GUILayout.Label(string.Format("LastAccess:{0}", versionInfo.Value.LastAccessInfo));
+            GUILayout.Label(string.Format("{0}:{1}-{2}", versionInfo.Value.GroupName, versionInfo.Value.MinVersion,
+                versionInfo.Value.MaxVersion));
         }
     }
 

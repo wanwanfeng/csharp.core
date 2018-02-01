@@ -72,16 +72,12 @@ namespace SvnVersion
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
             File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(cache.Values.ToArray()), TxTEncoding);
-            return;
-            File.WriteAllLines(fileName, cache.Select(q => q.Value.ToString()).ToArray(), TxTEncoding);
         }
 
-        protected void WriteToTxt(string fileName, List<SvnPatchInfo> cache)
+        protected void WriteToTxt(string fileName, SvnInfo svnInfo)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(cache.ToArray()), TxTEncoding);
-            return;
-            File.WriteAllLines(fileName, cache.Select(q => q.ToString()).ToArray(), TxTEncoding);
+            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(svnInfo), TxTEncoding);
         }
 
         protected void EncryptFile(string fileName)

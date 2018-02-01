@@ -16,9 +16,15 @@ namespace SvnVersion
 
         public override void Run()
         {
+            StartCmd();
+            svnVersion = RunCmd("svn --version --quiet").Last();
+            Console.WriteLine("SVN版本：" + svnVersion);
+            EndCmd();
+
             var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory, "*-*-*-*");
             if (array.Length == 0) return;
-            var dic = array.ToLookup(Path.GetFileNameWithoutExtension).ToDictionary(p => p.Key, q => new List<string>(q));
+            var dic = array.ToLookup(Path.GetFileNameWithoutExtension)
+                .ToDictionary(p => p.Key, q => new List<string>(q));
             if (dic.Count == 0) return;
             List<SvnPatchInfo> svnPatchInfos = new List<SvnPatchInfo>();
 
@@ -51,7 +57,12 @@ namespace SvnVersion
                 svnPatchInfo.firstVersion = xx.Skip(1).First().AsInt();
                 svnPatchInfo.lastVersion = xx.Skip(2).First().AsInt();
             }
-            WriteToTxt(Name, svnPatchInfos);
+
+            WriteToTxt(Name, new SvnInfo()
+            {
+                svnVersion = svnVersion,
+                svnInfos = svnPatchInfos.OrderBy(p => p.group).ThenBy(p => p.firstVersion).ToList()
+            });
             if (yes) EncryptFile(Name);
         }
     }

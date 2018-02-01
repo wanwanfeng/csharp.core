@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace SvnVersion
 {
     public class SvnFileInfo
@@ -40,5 +42,11 @@ namespace SvnVersion
             return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", group, firstVersion, lastVersion, path, content_hash,
                 content_size, zip_hash, zip_size);
         }
+    }
+
+    public class SvnInfo
+    {
+        public string svnVersion;
+        public List<SvnPatchInfo> svnInfos;
     }
 }

@@ -1,4 +1,1 @@
-,,svn-≈À÷Æ¡’-9-20-patch
-1004,cda11f4e3254ce58e0e0a1c1fe65fd8a,svn-e49c39d8e2ccedd4acd20ece19e42a6d-9-20-patch
-1004,cda11f4e3254ce58e0e0a1c1fe65fd8a,svn-≈À÷Æ¡’-0-9-master
-2116,a6d95061bb0eeebfb4068a90aa04c180,svn-e49c39d8e2ccedd4acd20ece19e42a6d-0-9-master
+{"svnVersion":"1.9.7","svnInfos":[{"group":"e49c39d8e2ccedd4acd20ece19e42a6d","firstVersion":0,"lastVersion":9,"path":"e49c39d8e2ccedd4acd20ece19e42a6d-00000000-00000009-master","content_hash":"8b76aee4e37cd955830daddbcb8e9d06","content_size":"4517","zip_hash":"6f8d262105b1f7dc446fc01c3d5c4ae3","zip_size":"805064"},{"group":"e49c39d8e2ccedd4acd20ece19e42a6d","firstVersion":9,"lastVersion":20,"path":"e49c39d8e2ccedd4acd20ece19e42a6d-00000009-00000020-patch","content_hash":"39a88332c4d376ee3e5a5c5ef75bf269","content_size":"2223","zip_hash":"cdabefb44c115c36500fef768b389795","zip_size":"317617"}]}

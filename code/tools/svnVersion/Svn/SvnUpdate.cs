@@ -5,50 +5,54 @@ using System.Linq;
 using System.Text;
 using Library.Extensions;
 
-namespace svnVersion
+namespace SvnVersion
 {
     public class SvnUpdate : SvnCommon
     {
+        public override string Name
+        {
+            get { return "patch-list"; }
+        }
+
         public override void Run()
         {
-            List<string> folder = new List<string>();
-            folder.AddRange(Directory.GetDirectories(Environment.CurrentDirectory, "svn-*-master", SearchOption.TopDirectoryOnly));
-            folder.AddRange(Directory.GetDirectories(Environment.CurrentDirectory, "svn-*-patch", SearchOption.TopDirectoryOnly));
-            if (folder.Count == 0) return;
-            List<List<string>> cao = new List<List<string>>();
-            foreach (string s in folder)
+            var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory, "*-*-*-*");
+            if (array.Length == 0) return;
+            var dic = array.ToLookup(Path.GetFileNameWithoutExtension).ToDictionary(p => p.Key, q => new List<string>(q));
+            if (dic.Count == 0) return;
+            List<SvnPatchInfo> svnPatchInfos = new List<SvnPatchInfo>();
+
+            Console.Write("\n是否对文件进行加密（y/n），然后回车：");
+            bool yes = Console.ReadLine() == "y";
+
+            foreach (KeyValuePair<string, List<string>> pair in dic)
             {
-                List<string> res = new List<string>();
-                var txt = s + ".txt";
-                var zip = s + ".zip";
+                SvnPatchInfo svnPatchInfo = new SvnPatchInfo();
+                svnPatchInfos.Add(svnPatchInfo);
+                svnPatchInfo.path = pair.Key;
 
-                if (File.Exists(txt))
+                var txt = pair.Value.FirstOrDefault(p => p.EndsWith(".txt"));
+                var zip = pair.Value.FirstOrDefault(p => p.EndsWith(".zip"));
+
+                if (txt != null && File.Exists(txt))
                 {
-                    res.Add(new FileInfo(txt).Length.ToString());
-                    res.Add(Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(txt)));
+                    if (yes) EncryptFile(txt);
+                    svnPatchInfo.content_hash = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(txt));
+                    svnPatchInfo.content_size = new FileInfo(txt).Length.ToString();
                 }
-                else
+                if (zip != null && File.Exists(zip))
                 {
-                    res.Add("");
-                    res.Add("");
+                    svnPatchInfo.zip_hash = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(zip));
+                    svnPatchInfo.zip_size = new FileInfo(zip).Length.ToString();
                 }
-                if (File.Exists(zip))
-                {
-                    res.Add(new FileInfo(zip).Length.ToString());
-                    res.Add(Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(zip)));
-                    res.Add(Path.GetFileName(zip));
-                }
-                else
-                {
-                    res.Add("");
-                    res.Add("");
-                    res.Add(Path.GetFileNameWithoutExtension(s));
-                }
-                cao.Add(res);
+
+                var xx = pair.Key.Split('-');
+                svnPatchInfo.group = xx.First();
+                svnPatchInfo.firstVersion = xx.Skip(1).First().AsInt();
+                svnPatchInfo.lastVersion = xx.Skip(2).First().AsInt();
             }
-
-            File.WriteAllLines("patch-list.txt", cao.Select(q => q.ToArray().JoinToString(",")).ToArray(),
-                new UTF8Encoding(false));
+            WriteToTxt(Name, svnPatchInfos);
+            if (yes) EncryptFile(Name);
         }
     }
 }

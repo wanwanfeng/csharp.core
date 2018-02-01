@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace svnVersion
+namespace SvnVersion
 {
     public abstract class CmdHelp
     {

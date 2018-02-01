@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace svnVersion
+namespace SvnVersion
 {
     internal class Program
     {

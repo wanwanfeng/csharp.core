@@ -7,7 +7,7 @@
     <ProjectGuid>{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>svnVersion</RootNamespace>
+    <RootNamespace>SvnVersion</RootNamespace>
     <AssemblyName>svnVersion</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -36,12 +36,15 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LitJson">
+      <HintPath>..\unity-bin\LitJson.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common.cs" />
+    <Compile Include="Svn\SvnCommon.cs" />
     <Compile Include="Svn\SvnUpdate.cs" />
     <Compile Include="Svn\SvnPatch.cs" />
     <Compile Include="Svn\SvnMaster.cs" />

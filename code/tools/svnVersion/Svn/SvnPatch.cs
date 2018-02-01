@@ -6,18 +6,15 @@ using System.Text;
 using Library.Extensions;
 using Library.Helper;
 
-namespace svnVersion
+namespace SvnVersion
 {
     public class SvnPatch : SvnCommon
     {
-        public string Name
+        public override string Name
         {
-            get { return "svn-{0}-{1}-{2}-patch"; }
+            get { return "{0}-{1:D8}-{2:D8}-patch"; }
         }
 
-        public string svnVersion { get; private set; }
-        public string svnUrl { get; private set; }
-        public int highVersion { get; private set; }
         public int startVersion { get; private set; }
         public int endVersion { get; private set; }
         public string[] diffList { get; private set; }
@@ -25,34 +22,21 @@ namespace svnVersion
         public override void Run()
         {
             StartCmd();
-            svnVersion = RunCmd("svn --version --quiet").Last();
-            Console.WriteLine("SVN版本：" + svnVersion);
+            base.Run();
 
-            Console.Write("请输入目标目录，然后回车：");
-            string folder = Console.ReadLine();
-            if (folder != null && !Directory.Exists(folder))
-            {
-                Console.WriteLine("目标地址不存在");
-                return;
-            }
-
-            svnUrl = RunCmd("svn info --show-item url").Last();
-            svnUrl += "/" + folder;
-            Console.WriteLine("库地址：" + svnUrl);
-
-            Console.WriteLine("");
-            highVersion = RunCmd("svn info --show-item last-changed-revision").Last().AsInt();
-            Console.WriteLine("最高版本号：" + highVersion);
-
-            Console.Write("请输入起始版本号(输入数字)，然后回车：");
+            Console.Write("请输入起始版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
             startVersion = Console.ReadLine().AsInt();
-            startVersion = Math.Min(startVersion, highVersion);
+            startVersion = Math.Max(startVersion, lowVersion);
             Console.WriteLine("起始版本号：" + startVersion);
 
-            Console.Write("请输入结束版本号(输入数字)，然后回车：");
+            Console.Write("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
             endVersion = Console.ReadLine().AsInt();
             endVersion = Math.Min(endVersion, highVersion);
+            endVersion = Math.Max(endVersion, lowVersion);
             Console.WriteLine("结束版本号：" + endVersion);
+
+            if (startVersion == endVersion)
+                return;
 
             Console.WriteLine("\n正在获取版本差异信息...");
 
@@ -80,6 +64,7 @@ namespace svnVersion
             Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
 
+            List<string> del = new List<string>();
             foreach (var s in cache)
             {
                 if (s.Value.action != "D")
@@ -91,16 +76,20 @@ namespace svnVersion
                     if (File.Exists(fullPath))
                     {
                         var array =
-                            RunCmd(string.Format("svn log -r {0}:0 \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
-                                svnUrl, s.Key));
-                        s.Value.version = array.Skip(1).First().Split(' ').First().Replace("r", "");
-                        s.Value.content_size = new FileInfo(fullPath).Length.ToString();
-                        s.Value.content_md5 = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath));
+                            RunCmd(string.Format("svn log -r {0}:{3} \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
+                                svnUrl, s.Key, lowVersion));
+                        s.Value.version = array.Skip(1).First().Split(' ').First().Replace("r", "").Trim();
+                        SetContent(fullPath, s.Value);
+                    }
+                    else
+                    {
+                        del.Add(s.Key);
                     }
                 }
             }
-            File.WriteAllLines(targetDir + ".txt", cache.Select(q => q.Value.ToString()).ToArray(),
-                new UTF8Encoding(false));
+            foreach (string s in del)
+                cache.Remove(s);
+            WriteToTxt(targetDir, cache);
             PathToMd5(folder, targetDir, cache);
             MakAESEncrypt(folder, targetDir, cache);
             MakeFolder(folder, targetDir);

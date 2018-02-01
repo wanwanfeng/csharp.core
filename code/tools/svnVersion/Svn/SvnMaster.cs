@@ -6,48 +6,29 @@ using System.Text;
 using Library.Extensions;
 using Library.Helper;
 
-namespace svnVersion
+namespace SvnVersion
 {
     public class SvnMaster : SvnCommon
     {
-        public string Name
+        public override string Name
         {
-            get { return "svn-{0}-0-{1}-master"; }
+            get { return "{0}-{1:D8}-{2:D8}-master"; }
         }
 
-        public string svnVersion { get; private set; }
-        public string svnUrl { get; private set; }
-        public int highVersion { get; private set; }
         public int targetVersion { get; private set; }
         public string[] targetList { get; private set; }
 
         public override void Run()
         {
             StartCmd();
-            svnVersion = RunCmd("svn --version --quiet").Last();
-            Console.WriteLine("SVN版本：" + svnVersion);
+            base.Run();
 
-            Console.Write("请输入目标目录，然后回车：");
-            string folder = Console.ReadLine();
-            if (folder != null && !Directory.Exists(folder))
-            {
-                Console.WriteLine("目标地址不存在");
-                return;
-            }
-
-            svnUrl = RunCmd("svn info --show-item url").Last();
-            svnUrl += "/" + folder;
-            Console.WriteLine("库地址：" + svnUrl);
-
-            Console.WriteLine("");
-            highVersion = RunCmd("svn info --show-item last-changed-revision").Last().AsInt();
-            Console.WriteLine("最高版本号：" + highVersion);
-
-            Console.Write("请输入目标版本号(输入数字)，然后回车：");
+            Console.Write("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
             targetVersion = Console.ReadLine().AsInt();
+            targetVersion = Math.Max(targetVersion, lowVersion);
             targetVersion = Math.Min(targetVersion, highVersion);
             Console.WriteLine("目标版本号：" + targetVersion);
-
+            Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
             targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, svnUrl));
@@ -73,7 +54,7 @@ namespace svnVersion
 
             Console.Write("\n是否导出目标版本号文件（y/n），然后回车：");
             var yes = Console.ReadLine() == "y";
-            string targetDir = string.Format(Name, folder, targetVersion);
+            string targetDir = string.Format(Name, folder, 0, targetVersion);
             if (Directory.Exists(targetDir))
                 Directory.Delete(targetDir, true);
             if (yes)
@@ -89,10 +70,10 @@ namespace svnVersion
                     Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + s.Key);
                     string fullPath = targetDir + "/" + s.Key;
                     if (File.Exists(fullPath))
-                        s.Value.content_md5 = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(fullPath));
+                        SetContent(fullPath, s.Value);
                 }
             }
-            File.WriteAllLines(targetDir + ".txt", cache.Select(q => q.Value.ToString()).ToArray(), new UTF8Encoding(false));
+            WriteToTxt(targetDir, cache);
             PathToMd5(folder, targetDir, cache);
             MakAESEncrypt(folder, targetDir, cache);
             MakeFolder(folder, targetDir);

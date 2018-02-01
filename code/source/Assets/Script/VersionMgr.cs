@@ -11,6 +11,7 @@ using System.Text;
 using Library.Extensions;
 using Library.Helper;
 using Debug = UnityEngine.Debug;
+using SvnVersion;
 
 //增量更新
 //每更新一次，资源放在新的文件夹目录内，老资源不会被覆盖
@@ -41,6 +42,14 @@ using Debug = UnityEngine.Debug;
 
 public class VersionMgr : MonoBehaviour
 {
+    protected static string KeyMd5 { get; private set; }
+    static VersionMgr()
+    {
+        KeyMd5 = "";
+        Library.Encrypt.AES.Key = Library.Encrypt.MD5.Encrypt("YmbEV0FVzZN/SvKCCoJje/jSpM");
+        Library.Encrypt.AES.Head = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl";
+    }
+
     public class Access
     {
         public static string dataPath { get; private set; }
@@ -187,68 +196,66 @@ public class VersionMgr : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 对应patch-list.txt
-    /// </summary>
     public class PatchInfo
     {
         public static string PatchListName = "patch-list.txt";
 
-        public string name;
-        public string group; //主目录
-        public bool isMaster; //主与补丁区分
+        public string group; //资源包所属
+        public string name;//资源包名称
         public int first; //开始版本号
-        public int last; //结束版本好
-
-        public bool isZip = false; //是否是压缩包
-        public string zipHash; //压缩包hash
-        public long zipSize; //压缩包大小
-
+        public int last; //结束版本号 
 
         public string fileUrl; //远程文本
         public string fileLocal; //本地对应远程全路径文本
         public string fileHash; //对应的记录文本hash
         public long fileSize; //对应的记录文本大小
 
+        /// <summary>
+        /// 记录文本是否需要下载
+        /// </summary>
         public bool isNeedDownFile
         {
             get { return !Library.Encrypt.MD5.ComparerFile(fileHash, fileLocal); }
         }
 
-        public PatchInfo(string info)
+        public string zipHash; //压缩包hash
+        public long zipSize; //压缩包大小
+
+        //是否是压缩包
+        public bool isZip
         {
-            string[] queue = info.Split(',');
-            //svn-潘之琳-0-9-master
-            name = queue.Last();
-            isMaster = name.Contains("master");
-            var strFirst = name.Split('-').ToArray();
-            group = strFirst[1];
-            first = strFirst[2].AsInt();
-            last = strFirst[3].AsInt();
+            get { return !string.IsNullOrEmpty(zipHash); }
+        }
+
+        public string zipName
+        {
+            get { return name + ".zip"; }
+        }
+
+        public SvnPatchInfo info;
+
+        public PatchInfo(SvnPatchInfo svnPatchInfo)
+        {
+            info = svnPatchInfo;
+            name = svnPatchInfo.path;
+            group = svnPatchInfo.group;
+            first = svnPatchInfo.firstVersion;
+            last = svnPatchInfo.lastVersion;
+            fileSize = svnPatchInfo.content_size.AsLong();
+            fileHash = svnPatchInfo.content_hash;
+            zipSize = svnPatchInfo.zip_size.AsLong();
+            zipHash = svnPatchInfo.zip_hash;
 
             fileUrl = Path.GetFileNameWithoutExtension(name) + ".txt";
             fileLocal = Access.LocalPatchRoot + fileUrl.Replace("/", "-");
-            fileSize = queue.First().AsLong();
-            fileHash = queue.Skip(1).First();
-
-            if ((isZip = Path.HasExtension(name)) != true) return;
-            zipSize = queue.Skip(2).First().AsLong();
-            zipHash = queue.Skip(3).First();
         }
 
         public override string ToString()
         {
-            return
-                string.Format(
-                    "Name: {0},Group: {1},IsMaster: {2},First: {3},Last: {4},IsZip: {5},ZipHash: {6},ZipSize: {7},IsNeedDownFile: {8},FileUrl: {9},FileLocal: {10},FileHash: {11},FileSize: {12}",
-                    name, @group, isMaster, first, last, isZip, zipHash, zipSize, isNeedDownFile, fileUrl, fileLocal,
-                    fileHash, fileSize);
+            return info.ToString();
         }
     }
 
-    /// <summary>
-    /// 对应svn-?-master.txt或svn-?-patch.txt
-    /// </summary>
     public class ResInfo
     {
         public enum Action
@@ -263,7 +270,6 @@ public class VersionMgr : MonoBehaviour
         /// 相对于旧得版本的文件操作行为
         /// </summary>
         public Action action = Action.N;
-
         public string path { get; private set; }
         public string name { get; private set; }
         public int version { get; private set; }
@@ -271,6 +277,18 @@ public class VersionMgr : MonoBehaviour
         public string hash { get; private set; }
         public string url { get; private set; }
         public PatchInfo patchInfo { get; private set; }
+        public SvnFileInfo svnFileInfo { get; private set; }
+
+        public string localhash
+        {
+            get
+            {
+                if (!File.Exists(Access.LocalTempRoot + path))
+                    return "";
+                var temp = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(Access.LocalTempRoot + path));
+                return temp;
+            }
+        }
 
         public bool isNeedDownFile
         {
@@ -282,34 +300,28 @@ public class VersionMgr : MonoBehaviour
                     return true;
                 if (action == Action.M)
                     return true;
-                if (!File.Exists(Access.LocalTempRoot + path))
-                    return true;
-                return !Library.Encrypt.MD5.ComparerFile(hash, Access.LocalTempRoot + path);
+                return hash != localhash;
             }
         }
 
-        public ResInfo(PatchInfo patchListInfo, string info)
+        public ResInfo(PatchInfo info, SvnFileInfo fileInfo)
         {
-            patchInfo = patchListInfo;
-
-            var queue = new Queue<string>(info.Split(','));
-
-            var temp = queue.Count == 0 ? "" : queue.Dequeue();
-            if (Enum.IsDefined(typeof (Action), temp))
-                action = (Action) Enum.Parse(typeof (Action), temp);
+            patchInfo = info;
+            svnFileInfo = fileInfo;
+            if (Enum.IsDefined(typeof (Action), svnFileInfo.action))
+                action = (Action) Enum.Parse(typeof (Action), svnFileInfo.action);
             else
                 action = Action.N;
-
-            version = queue.Count == 0 ? 0 : queue.Dequeue().AsInt();
-            size = queue.Count == 0 ? 0 : queue.Dequeue().AsLong();
-            hash = queue.Count == 0 ? "" : queue.Dequeue();
-            path = queue.Count == 0 ? "" : queue.Dequeue();
-#if !MD5
-            path = queue.Count == 0 ? "" : queue.Dequeue().Replace("\\", "/").Trim();
+            size = svnFileInfo.content_size.AsLong();
+            hash = svnFileInfo.content_hash;
+            path = svnFileInfo.path;
+            version = svnFileInfo.version.AsInt();
+#if MD5
+            path = svnFileInfo.path_md5;
 #endif
-            if (patchListInfo.isZip && action != Action.D)
+            if (patchInfo.isZip && action != Action.D)
                 action = Action.N;
-            if (Library.Encrypt.MD5.ComparerFile(hash, Access.LocalTempRoot + path))
+            if (hash == localhash)
                 action = Action.N;
 
             name = Path.GetFileName(path);
@@ -318,7 +330,7 @@ public class VersionMgr : MonoBehaviour
 
         public override string ToString()
         {
-            return string.Format("Path: {0}, Size: {1}, Action: {2}, version: {3}", path, size, action, version);
+            return svnFileInfo.ToString();
         }
     }
 
@@ -375,15 +387,8 @@ public class VersionMgr : MonoBehaviour
             {
                 if (LastAccessInfo != null && info.first != LastAccessInfo.last)
                     yield break;
-                if (info.isMaster)
-                {
-                    yield return StartCoroutine(GetMasterCache(info));
-                }
-                else
-                {
-                    yield return StartCoroutine(GetPatchCache(info));
-                    LastAccessInfo = info;
-                }
+                yield return StartCoroutine(GetPatchCache(info));
+                LastAccessInfo = info;
             }
 
             foreach (var pair in patchCache)
@@ -399,48 +404,11 @@ public class VersionMgr : MonoBehaviour
         }
 
         /// <summary>
-        /// 下载记录主资源列表的文本
-        /// </summary>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        private IEnumerator GetMasterCache(PatchInfo info)
-        {
-            ActionState(State.GetMasterList);
-            yield return StartCoroutine(GetCacheText(info, text =>
-            {
-                ActionState(State.ApplyMasterList);
-                if (text == null) return;
-                MinVersion = info.first;
-                MaxVersion = info.last;
-                patchCache[info.fileUrl] =
-                    text.Select(p => new ResInfo(info, p))
-                        .Where(p => !p.name.StartsWith("."))
-                        .ToDictionary(p => p.path);
-            }));
-        }
-
-        /// <summary>
-        /// 下载每一个补丁文本获取补丁文件列表
+        /// 下载记录主资源或补丁列表的文件列表
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
         private IEnumerator GetPatchCache(PatchInfo info)
-        {
-            ActionState(State.GetPatchList);
-            yield return StartCoroutine(GetCacheText(info, text =>
-            {
-                ActionState(State.ApplyPatchList);
-                if (text == null) return;
-                MinVersion = info.first;
-                MaxVersion = info.last;
-                patchCache[info.fileUrl] =
-                    text.Select(p => new ResInfo(info, p))
-                        .Where(p => !p.name.StartsWith("."))
-                        .ToDictionary(p => p.path);
-            }));
-        }
-
-        private IEnumerator GetCacheText(PatchInfo info, Action<string[]> callAction)
         {
             if (info.isNeedDownFile)
             {
@@ -451,18 +419,18 @@ public class VersionMgr : MonoBehaviour
                     File.WriteAllBytes(info.fileLocal, res);
                 }));
             }
+
+            ActionState(State.GetPatchList);
             byte[] bytes = File.ReadAllBytes(info.fileLocal);
-            if (bytes.Length == 0)
-            {
-                callAction.Invoke(null);
-                yield break;
-            }
-            callAction.Invoke(
-                Encoding.UTF8.GetString(bytes)
-                    .Split('\r', '\n')
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.Trim())
-                    .ToArray());
+            if (bytes.Length == 0) yield break;
+
+            ActionState(State.ApplyPatchList);
+            MinVersion = info.first;
+            MaxVersion = info.last;
+
+            var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(bytes));
+            var svnFileInfos = LitJson.JsonMapper.ToObject<SvnFileInfo[]>(content);
+            patchCache[info.fileUrl] = svnFileInfos.Select(p => new ResInfo(info, p)).ToDictionary(p => p.path);
         }
 
         /// <summary>
@@ -546,10 +514,10 @@ public class VersionMgr : MonoBehaviour
         private IEnumerator GetRemoteZip(PatchInfo info)
         {
             ActionState(State.DownPatchZip);
-            yield return StartCoroutine(new Access().FromRemote(this, info.name, res =>
+            yield return StartCoroutine(new Access().FromRemote(this, info.zipName, res =>
             {
                 if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.zipHash) return;
-                var zipName = Access.LocalPatchRoot + info.name;
+                var zipName = Access.LocalPatchRoot + info.zipName;
                 File.WriteAllBytes(zipName, res);
                 ActionState(State.UnMakePatchZip);
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", true);
@@ -604,19 +572,12 @@ public class VersionMgr : MonoBehaviour
         None,
         [Description("下载补丁文件列表")] DownPathList,
 
-        [Description("下载某主资源包文件压缩包")] DownMasterZip,
-        [Description("解压某主资源包文件压缩包")] UnMakeMasterZip,
-        [Description("正在应用某主资源压缩包文件资源")] ApplyMasterZip,
+        [Description("下载某主资源或补丁压缩包")]DownPatchZip,
+        [Description("解压某资源或补丁文件压缩包")]UnMakePatchZip,
+        [Description("正在应用某主资源或补丁压缩包文件资源")]ApplyPatchZip,
 
-        [Description("获取某主资源包文件的包含文件列表")] GetMasterList,
-        [Description("正在应用某主资源包文件的包含文件列表")] ApplyMasterList,
-
-        [Description("下载某补丁文件压缩包")] DownPatchZip,
-        [Description("解压某补丁文件压缩包")] UnMakePatchZip,
-        [Description("正在应用某补丁压缩包文件资源")] ApplyPatchZip,
-
-        [Description("获取某补丁文件的包含文件列表")] GetPatchList,
-        [Description("正在应用某补丁文件的包含文件列表")] ApplyPatchList,
+        [Description("获取某主资源或补丁文件的包含文件列表")]GetPatchList,
+        [Description("正在应用某主资源或补丁文件的包含文件列表")]ApplyPatchList,
 
         [Description("获取某主资源包文件的包含文件列表")] DownResource,
         [Description("获取某主资源包文件的包含文件列表")] ApplyResource,
@@ -635,19 +596,16 @@ public class VersionMgr : MonoBehaviour
             if (res == null) return;
             FileHelper.CreateDirectory(Access.LocalPatchRoot + PatchInfo.PatchListName);
             File.WriteAllBytes(Access.LocalPatchRoot + PatchInfo.PatchListName, res);
-            patchListCache =
-                Encoding.UTF8.GetString(res)
-                    .Split('\r', '\n')
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.Trim())
-                    .Select(p => new PatchInfo(p))
-                    .ToLookup(p => p.group)
-                    .ToDictionary(p => p.Key, q =>
-                    {
-                        var go = gameObject.AddComponent<VersionInfo>();
-                        go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
-                        return go;
-                    });
+
+            var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(res));
+            var svnPatchInfos = LitJson.JsonMapper.ToObject<SvnPatchInfo[]>(content);
+            patchListCache = svnPatchInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
+                .ToDictionary(p => p.Key, q =>
+                {
+                    var go = gameObject.AddComponent<VersionInfo>();
+                    go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
+                    return go;
+                });
         }));
     }
 

@@ -42,7 +42,7 @@ namespace UnityEditor
             tempHeight = singleWindow ? 0 : 40;
         }
 
-        public static T 新Window<T>(bool utility, string title, bool singleWindow) where T : BaseEditorWindow
+        public static T NewWindow<T>(bool utility, string title, bool singleWindow) where T : BaseEditorWindow
         {
             var instance = singleWindow ? GetWindow<T>(utility, title) : CreateInstance<T>();
             instance.singleWindow = singleWindow;
@@ -53,7 +53,7 @@ namespace UnityEditor
             return instance;
         }
 
-        public static T 新Window<T>(bool singleWindow) where T : BaseEditorWindow
+        public static T NewWindow<T>(bool singleWindow) where T : BaseEditorWindow
         {
             var instance = singleWindow ? GetWindow<T>(typeof(T).Name) : CreateInstance<T>();
             instance.singleWindow = singleWindow;

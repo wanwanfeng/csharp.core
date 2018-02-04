@@ -45,12 +45,21 @@ namespace SvnVersion
             svnVersion = RunCmd("svn --version --quiet").Last();
             Console.WriteLine("SVN版本：" + svnVersion);
 
-            Console.Write("请输入目标目录，然后回车：");
-            folder = Console.ReadLine();
-            if (folder != null && !Directory.Exists(folder))
+            bool yes = false;
+            while (yes == false)
             {
-                Console.WriteLine("目标地址不存在");
-                return;
+                Console.Write("请输入目标目录，然后回车：");
+                folder = Console.ReadLine();
+                if (folder != null && !Directory.Exists(folder))
+                {
+                    Console.WriteLine("未输入目录或不存在!");
+                    //Console.Write("\n是否将本目录作为目标目录（y/n）：");
+                    //yes = Console.ReadLine() == "y";
+                }
+                else
+                {
+                    break;
+                }
             }
 
             svnUrl = RunCmd("svn info --show-item url").Last();
@@ -117,7 +126,7 @@ namespace SvnVersion
         protected void PathToMd5(string dir, string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
             if (dir == null) return;
-            Console.Write("\n是否将路径MD5化（y/n），然后回车：");
+            Console.Write("\n是否将路径MD5化（y/n）：");
             bool yes = Console.ReadLine() == "y";
 
             var targetMd5Dir = targetDir.Replace(dir, Library.Encrypt.MD5.Encrypt(dir + KeyMd5));
@@ -147,7 +156,7 @@ namespace SvnVersion
         protected void MakAESEncrypt(string dir, string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
             if (dir == null) return;
-            Console.Write("\n是否对文件夹内每个文件进行加密（y/n），然后回车：");
+            Console.Write("\n是否对文件夹内每个文件进行加密（y/n）：");
             bool yes = Console.ReadLine() == "y";
             if (!yes) return;
             var targetMd5Dir = targetDir.Replace(dir, Library.Encrypt.MD5.Encrypt(dir + KeyMd5));
@@ -176,7 +185,7 @@ namespace SvnVersion
         protected void MakeFolder(string dir, string targetDir)
         {
             if (dir == null) return;
-            Console.Write("\n是否将文件夹压缩（y/n），然后回车：");
+            Console.Write("\n是否将文件夹压缩（y/n）：");
             bool yes = Console.ReadLine() == "y";
             if (!yes) return;
 

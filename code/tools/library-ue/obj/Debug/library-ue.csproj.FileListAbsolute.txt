@@ -3,3 +3,8 @@ D:\Work\yuege\ygtools\trunk\code\tools\unity-bin\Library-E.dll
 D:\Work\yuege\ygtools\trunk\code\tools\unity-bin\Library-E.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\library-ue\obj\Debug\Library-E.dll
 D:\Work\yuege\ygtools\trunk\code\tools\library-ue\obj\Debug\Library-E.pdb
+E:\Git\yg\trunk\code\tools\unity-bin\Library-E.dll
+E:\Git\yg\trunk\code\tools\unity-bin\Library-E.pdb
+E:\Git\yg\trunk\code\tools\library-ue\obj\Debug\library-ue.csprojResolveAssemblyReference.cache
+E:\Git\yg\trunk\code\tools\library-ue\obj\Debug\Library-E.dll
+E:\Git\yg\trunk\code\tools\library-ue\obj\Debug\Library-E.pdb

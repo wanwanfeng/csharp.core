@@ -49,10 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Attribute\EnumFlagsAttribute.cs" />
+    <Compile Include="Library\Base\ILoad.cs" />
+    <Compile Include="Library\Base\BaseLoad.cs" />
     <Compile Include="Library\Base\BaseMonoBehaviour.cs" />
     <Compile Include="Library\Extensions\ExtensionsForMathf.cs" />
     <Compile Include="Library\Extensions\ExtensionsForUnity.cs" />
     <Compile Include="Library\Helper\LitJsonHelper.cs" />
+    <Compile Include="Library\Singleton\Singleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

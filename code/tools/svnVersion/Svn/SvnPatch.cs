@@ -89,11 +89,7 @@ namespace SvnVersion
             }
             foreach (string s in del)
                 cache.Remove(s);
-            WriteToTxt(targetDir, cache);
-            PathToMd5(folder, targetDir, cache);
-            MakAESEncrypt(folder, targetDir, cache);
-            MakeFolder(folder, targetDir);
-            EndCmd();
+            Common(targetDir, cache);
         }
     }
 }

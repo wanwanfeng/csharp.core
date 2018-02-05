@@ -73,11 +73,7 @@ namespace SvnVersion
                         SetContent(fullPath, s.Value);
                 }
             }
-            WriteToTxt(targetDir, cache);
-            PathToMd5(folder, targetDir, cache);
-            MakAESEncrypt(folder, targetDir, cache);
-            MakeFolder(folder, targetDir);
-            EndCmd();
+            Common(targetDir, cache);
         }
     }
 }

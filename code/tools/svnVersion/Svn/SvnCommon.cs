@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Library;
 using Library.Extensions;
 using Library.Helper;
 
@@ -11,12 +12,24 @@ namespace SvnVersion
     public class SvnCommon : CmdHelp
     {
         protected static string KeyMd5 { get; private set; }
+        protected static string Exclude { get; private set; }
 
         static SvnCommon()
         {
-            KeyMd5 = "";
-            Library.Encrypt.AES.Key = Library.Encrypt.MD5.Encrypt("YmbEV0FVzZN/SvKCCoJje/jSpM");
-            Library.Encrypt.AES.Head = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl";
+            KeyMd5 = Config.IniReadValue("Config", "md5key").Trim();
+            Library.Encrypt.AES.Key = Config.IniReadValue("Config", "aeskey").Trim();
+            Library.Encrypt.AES.Head = Config.IniReadValue("Config", "aeshead").Trim();
+            Exclude = Config.IniReadValue("Config", "exclude").Trim();
+        }
+
+        public SvnCommon()
+        {
+            Console.WriteLine("--------------------------------------");
+            Console.WriteLine("KeyMd5:" + KeyMd5);
+            Console.WriteLine("AES.Key:" + Library.Encrypt.AES.Key);
+            Console.WriteLine("AES.Head:" + Library.Encrypt.AES.Head);
+            Console.WriteLine("Exclude:" + Exclude);
+            Console.WriteLine("--------------------------------------");
         }
 
         public virtual string Name
@@ -77,32 +90,65 @@ namespace SvnVersion
             Console.WriteLine("");
         }
 
-        protected void WriteToTxt(string fileName, Dictionary<string, SvnFileInfo> cache)
+        public void Common(string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
-            fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(cache.Values.ToArray()), TxTEncoding);
+            Console.WriteLine("");
+            ExcludeFile(folder, targetDir, cache);
+            var count = cache.Values.Count(p => !p.action.Equals("D"));
+            if (count == 0)
+            {
+                Console.WriteLine("可更新文件数目为零！");
+                Console.WriteLine("按任意键退出！");
+                DeleteInfo(targetDir);
+            }
+            else
+            {
+                Console.WriteLine(string.Format("可更新文件数目为{0}！", count));
+                Console.WriteLine(string.Format("大小为{0}B！", cache.Values.Sum(p => p.content_size.AsInt()).ToString("N")));
+                WriteToTxt(targetDir, cache);
+                PathToMd5(folder, targetDir, cache);
+                MakAESEncrypt(folder, targetDir, cache);
+                MakeFolder(folder, targetDir);
+                EndCmd();
+            }
         }
 
-        protected void WriteToTxt(string fileName, SvnInfo svnInfo)
+        /// <summary>
+        /// 排除预定义的文件类型
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="targetDir"></param>
+        /// <param name="cache"></param>
+        protected void ExcludeFile(string dir, string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
-            fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(svnInfo), TxTEncoding);
-        }
-
-        protected void EncryptFile(string fileName)
-        {
-            fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, Library.Encrypt.AES.Encrypt(File.ReadAllText(fileName)), TxTEncoding);
-        }
-
-        protected void DeleteInfo(string dir, bool onlyDir = false)
-        {
-            if (Directory.Exists(dir))
-                Directory.Delete(dir, true);
-            if (onlyDir)
-                return;
-            if (File.Exists(dir + ".txt"))
-                File.Delete(dir + ".txt");
+            var array = Exclude.Split(',');
+            if (array.Length == 0) return;
+            var deleteKey = new List<string>();
+            foreach (var s in cache)
+            {
+                foreach (var s1 in array)
+                {
+                    if (!s.Key.EndsWith(s1)) continue;
+                    deleteKey.Add(s.Key);
+                    try
+                    {
+                        if (File.Exists(targetDir + "/" + s.Key))
+                        {
+                            File.Delete(targetDir + "/" + s.Key);
+                            Console.WriteLine("删除成功..." + s.Key);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("删除失败..." + s.Key);
+                        throw;
+                    }
+                }
+            }
+            foreach (var key in deleteKey)
+            {
+                cache.Remove(key);
+            }
         }
 
         /// <summary>
@@ -208,5 +254,37 @@ namespace SvnVersion
                 Console.WriteLine("文件压缩失败！" + message);
             DeleteInfo(dir, true);
         }
+
+        #region
+
+        protected void WriteToTxt(string fileName, Dictionary<string, SvnFileInfo> cache)
+        {
+            fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
+            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(cache.Values.ToArray()), TxTEncoding);
+        }
+
+        protected void WriteToTxt(string fileName, SvnInfo svnInfo)
+        {
+            fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
+            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(svnInfo), TxTEncoding);
+        }
+
+        protected void EncryptFile(string fileName)
+        {
+            fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
+            File.WriteAllText(fileName, Library.Encrypt.AES.Encrypt(File.ReadAllText(fileName)), TxTEncoding);
+        }
+
+        protected void DeleteInfo(string dir, bool onlyDir = false)
+        {
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, true);
+            if (onlyDir)
+                return;
+            if (File.Exists(dir + ".txt"))
+                File.Delete(dir + ".txt");
+        }
+
+        #endregion
     }
 }

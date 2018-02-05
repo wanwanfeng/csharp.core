@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Editor\Attribute\EnumFlagsAttributeDrawer.cs" />
+    <Compile Include="Library\Editor\Menu\ShowMenu.cs" />
     <Compile Include="Library\Editor\Window\BaseDoubleWindow.cs" />
     <Compile Include="Library\Editor\Window\BaseEditorWindow.cs" />
     <Compile Include="Library\Editor\Window\BaseToolBarWindow.cs" />

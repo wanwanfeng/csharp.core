@@ -1,0 +1,25 @@
+ManifestFileVersion: 0
+CRC: 1048992622
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: menu_bgm/bgm_0001.unity3d
+      Dependencies: {}
+    Info_1:
+      Name: menu_bgm/bgm_0002.unity3d
+      Dependencies: {}
+    Info_2:
+      Name: menu_bgm/bgm_0003.unity3d
+      Dependencies: {}
+    Info_3:
+      Name: menu_bgm/bgm_0004.unity3d
+      Dependencies: {}
+    Info_4:
+      Name: menu_bgm/bgm_0005.unity3d
+      Dependencies: {}
+    Info_5:
+      Name: menu_bgm/bgm_0006.unity3d
+      Dependencies: {}
+    Info_6:
+      Name: menu_bgm/bgm_0101.unity3d
+      Dependencies: {}

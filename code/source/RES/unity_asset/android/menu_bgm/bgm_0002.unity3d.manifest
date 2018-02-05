@@ -1,0 +1,16 @@
+ManifestFileVersion: 0
+CRC: 2675186326
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 77957a2e0af5ee2bfdf4b534fb069838
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: c516f2a3b2b6b67ef759f6410a790acd
+HashAppended: 0
+ClassTypes:
+- Class: 83
+  Script: {instanceID: 0}
+Assets:
+- Assets/Editor Default Resources/menu_bgm/bgm_0002.mp3
+Dependencies: []

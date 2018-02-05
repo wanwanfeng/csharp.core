@@ -55,6 +55,7 @@ namespace SvnVersion
 
         public virtual void Run()
         {
+            StartCmd();
             svnVersion = RunCmd("svn --version --quiet").Last();
             Console.WriteLine("SVN版本：" + svnVersion);
 
@@ -121,7 +122,7 @@ namespace SvnVersion
         /// <param name="cache"></param>
         protected void ExcludeFile(string dir, string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
-            var array = Exclude.Split(',');
+            var array = Exclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
             if (array.Length == 0) return;
             var deleteKey = new List<string>();
             foreach (var s in cache)
@@ -277,12 +278,29 @@ namespace SvnVersion
 
         protected void DeleteInfo(string dir, bool onlyDir = false)
         {
-            if (Directory.Exists(dir))
-                Directory.Delete(dir, true);
+            try
+            {
+                if (Directory.Exists(dir))
+                    Directory.Delete(dir, true);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("删除文件夹失败！{0}", dir);                
+                throw;
+            }
             if (onlyDir)
                 return;
-            if (File.Exists(dir + ".txt"))
-                File.Delete(dir + ".txt");
+            try
+            {
+                if (File.Exists(dir + ".txt"))
+                    File.Delete(dir + ".txt");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("删除文件失败！{0}", dir + ".txt");
+                throw;
+            }
+           
         }
 
         #endregion

@@ -68,26 +68,47 @@ namespace SvnVersion
             process.Close();
         }
 
-        public string[] RunCmd(string input)
+        public string[] RunCmd(string input,bool isFile = false)
         {
+            Console.WriteLine(input);
             process.Start(); //启动程序
             //向cmd窗口发送输入信息
-            process.StandardInput.WriteLine(input + "&exit");
-            process.StandardInput.AutoFlush = true;
-            //p.StandardInput.WriteLine("exit");
-            //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
-            //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
-            process.WaitForExit();
-            //获取cmd窗口的输出信息
-            StreamReader reader = process.StandardOutput;
-            List<string> res = new List<string>() {reader.ReadLine()};
-            while (!reader.EndOfStream)
+            if (isFile)
             {
-                res.Add(reader.ReadLine());
+                var temp = DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss") + ".txt";
+                process.StandardInput.WriteLine(input + ">" + temp + "&exit");
+                process.StandardInput.AutoFlush = true;
+                process.WaitForExit();
+                string[] array = File.ReadAllLines(temp);
+                //File.Delete(temp);
+                return array;
             }
-            Console.WriteLine("");
-            Console.WriteLine(res[3].Replace("&exit",""));
-            return res.Skip(4).ToArray();
+            else
+            {
+                process.StandardInput.WriteLine(input + "&exit");
+                process.StandardInput.AutoFlush = true;
+                //p.StandardInput.WriteLine("exit");
+                //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
+                //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+                process.WaitForExit();
+                //获取cmd窗口的输出信息
+
+                //string output = process.StandardOutput.ReadToEnd();
+                //List<string> res = output.Split('\r','\n').Where(p=>!string.IsNullOrEmpty(p)).ToList();
+                //Console.WriteLine("");
+                //Console.WriteLine(res[2].Replace("&exit", ""));
+                //return res.Skip(3).ToArray();
+
+                StreamReader reader = process.StandardOutput;
+                List<string> res = new List<string>() {reader.ReadLine()};
+                while (!reader.EndOfStream)
+                {
+                    res.Add(reader.ReadLine());
+                }
+                Console.WriteLine("");
+                Console.WriteLine(res[3].Replace("&exit", ""));
+                return res.Skip(4).ToArray();
+            }
         }
     }
 }

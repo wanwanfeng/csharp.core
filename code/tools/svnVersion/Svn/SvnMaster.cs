@@ -16,11 +16,9 @@ namespace SvnVersion
         }
 
         public int targetVersion { get; private set; }
-        public string[] targetList { get; private set; }
 
         public override void Run()
         {
-            StartCmd();
             base.Run();
 
             Console.Write("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
@@ -31,7 +29,7 @@ namespace SvnVersion
             Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
-            targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, svnUrl));
+            var targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, svnUrl), true);
             targetList = targetList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
             int index = 0;
@@ -55,14 +53,14 @@ namespace SvnVersion
             Console.Write("\n是否导出目标版本号文件（y/n），然后回车：");
             var yes = Console.ReadLine() == "y";
             string targetDir = string.Format(Name, folder, 0, targetVersion);
-            if (Directory.Exists(targetDir))
-                Directory.Delete(targetDir, true);
+            DeleteInfo(targetDir);
+
             if (yes)
             {
                 Console.WriteLine("正在导出中...");
                 Console.WriteLine("根据项目大时间长短不定，请耐心等待...");
                 FileHelper.CreateDirectory(Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir);
-                targetList = RunCmd(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir));
+                RunCmd(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir), true);
 
                 index = 0;
                 foreach (var s in cache)

@@ -74,7 +74,7 @@ namespace Library.Encrypt
             //加密和解密采用相同的key,具体自己填，但是必须为32位//
             RijndaelManaged rm = new RijndaelManaged
             {
-                Key = Encoding.UTF8.GetBytes(Key),
+                Key = Encoding.UTF8.GetBytes(MD5.Encrypt(Key)),
                 Mode = CipherMode.ECB,
                 Padding = PaddingMode.PKCS7
             };
@@ -97,7 +97,7 @@ namespace Library.Encrypt
             //加密和解密采用相同的key,具体值自己填，但是必须为32位//
             RijndaelManaged rm = new RijndaelManaged
             {
-                Key = Encoding.UTF8.GetBytes(Key),
+                Key = Encoding.UTF8.GetBytes(MD5.Encrypt(Key)),
                 Mode = CipherMode.ECB,
                 Padding = PaddingMode.PKCS7
             };

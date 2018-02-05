@@ -47,29 +47,60 @@ namespace SvnVersion
                     path = last,
                 };
                 cache[svnFileInfo.path] = svnFileInfo;
-                Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + svnFileInfo);
+                Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
             }
+            if (!ExcludeFile(cache)) return;
 
-            Console.Write("\n是否导出目标版本号文件（y/n），然后回车：");
+            Console.Write("\n是否导出目标版本号文件（y/n）：");
             var yes = Console.ReadLine() == "y";
             string targetDir = string.Format(Name, folder, 0, targetVersion);
             DeleteInfo(targetDir);
 
+            //if (yes)
+            //{
+            //    Console.WriteLine("正在导出中...");
+            //    Console.WriteLine("根据项目大时间长短不定，请耐心等待...");
+            //    FileHelper.CreateDirectory(Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir);
+            //    RunCmd(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir), true);
+
+            //    index = 0;
+            //    foreach (var s in cache)
+            //    {
+            //        Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + s.Key);
+            //        string fullPath = targetDir + "/" + s.Key;
+            //        if (File.Exists(fullPath))
+            //            SetContent(fullPath, s.Value);
+            //    }
+            //}
+
             if (yes)
             {
-                Console.WriteLine("正在导出中...");
-                Console.WriteLine("根据项目大时间长短不定，请耐心等待...");
-                FileHelper.CreateDirectory(Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir);
-                RunCmd(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir), true);
-
+                List<string> del = new List<string>();
                 index = 0;
                 foreach (var s in cache)
                 {
-                    Console.WriteLine((++index).ToString().PadLeft(5, '0') + "\t" + s.Key);
-                    string fullPath = targetDir + "/" + s.Key;
+                    Console.Clear();
+                    Console.WriteLine("\n正在导出文件...");
+                    Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
+                    Console.WriteLine("正在导出中...{0}", ((float) (++index)/cache.Count).ToString("P"));
+                    Console.WriteLine("is now: {0}", s.Key);
+                    Console.WriteLine();
+                    string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
+                    FileHelper.CreateDirectory(fullPath);
+                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
+
                     if (File.Exists(fullPath))
+                    {
                         SetContent(fullPath, s.Value);
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        del.Add(s.Key);
+                    }
                 }
+                foreach (string s in del)
+                    cache.Remove(s);
             }
             Common(targetDir, cache);
         }

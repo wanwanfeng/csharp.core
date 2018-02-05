@@ -11,15 +11,20 @@ namespace SvnVersion
 {
     public class SvnCommon : CmdHelp
     {
+        protected static int PathToMd5Depth { get; private set; }
         protected static string KeyMd5 { get; private set; }
         protected static string Exclude { get; private set; }
+        protected static string Platform { get; private set; }
 
         static SvnCommon()
         {
+            PathToMd5Depth = Config.IniReadValue("Config", "pathtomd5depth").Trim().AsInt();
+            PathToMd5Depth = Math.Min(PathToMd5Depth, 2);
             KeyMd5 = Config.IniReadValue("Config", "md5key").Trim();
             Library.Encrypt.AES.Key = Config.IniReadValue("Config", "aeskey").Trim();
             Library.Encrypt.AES.Head = Config.IniReadValue("Config", "aeshead").Trim();
             Exclude = Config.IniReadValue("Config", "exclude").Trim();
+            Platform = Config.IniReadValue("Config", "platform").Trim();
         }
 
         public SvnCommon()
@@ -29,6 +34,7 @@ namespace SvnVersion
             Console.WriteLine("AES.Key:" + Library.Encrypt.AES.Key);
             Console.WriteLine("AES.Head:" + Library.Encrypt.AES.Head);
             Console.WriteLine("Exclude:" + Exclude);
+            Console.WriteLine("Platform:" + Platform);
             Console.WriteLine("--------------------------------------");
         }
 
@@ -93,62 +99,74 @@ namespace SvnVersion
 
         public void Common(string targetDir, Dictionary<string, SvnFileInfo> cache)
         {
+            Console.WriteLine("可更新文件总大小为{0}B！", cache.Values.Sum(p => p.content_size.AsInt()).ToString("N"));
+            WriteToTxt(targetDir, cache);
+            PathToMd5(folder, targetDir, cache);
+            MakAESEncrypt(folder, targetDir, cache);
+            MakeFolder(folder, targetDir);
+            EndCmd();
+        }
+
+        /// <summary>
+        /// 排除预定义
+        /// </summary>
+        /// <param name="cache"></param>
+        protected bool ExcludeFile(Dictionary<string, SvnFileInfo> cache)
+        {
             Console.WriteLine("");
-            ExcludeFile(folder, targetDir, cache);
+
+            //排除预定义的后缀
+            var array = Exclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+            if (array.Length > 0)
+            {
+                var deleteKey = new List<string>();
+                foreach (var s in cache)
+                {
+                    foreach (var s1 in array)
+                    {
+                        string extension = Path.GetExtension(s.Key);
+                        if (string.IsNullOrEmpty(extension) || extension == s1)
+                            deleteKey.Add(s.Key);
+                    }
+                }
+                foreach (var key in deleteKey)
+                {
+                    cache.Remove(key);
+                }
+            }
+
+           //排除非选择的平台
+           array =  Platform.Split('|',',');
+            if (array.Length > 1)
+            {
+                var deleteKey = new List<string>();
+                foreach (var s in cache)
+                {
+                    foreach (var s1 in array.Skip(1).Where(p => !p.Equals(array.First())))
+                    {
+                        if (s.Key.ToLower().Contains(s1))
+                            deleteKey.Add(s.Key);
+                    }
+                }
+                foreach (var key in deleteKey)
+                {
+                    cache.Remove(key);
+                }
+            }
+
             var count = cache.Values.Count(p => !p.action.Equals("D"));
             if (count == 0)
             {
                 Console.WriteLine("可更新文件数目为零！");
                 Console.WriteLine("按任意键退出！");
-                DeleteInfo(targetDir);
+                return false;
             }
             else
             {
-                Console.WriteLine(string.Format("可更新文件数目为{0}！", count));
-                Console.WriteLine(string.Format("大小为{0}B！", cache.Values.Sum(p => p.content_size.AsInt()).ToString("N")));
-                WriteToTxt(targetDir, cache);
-                PathToMd5(folder, targetDir, cache);
-                MakAESEncrypt(folder, targetDir, cache);
-                MakeFolder(folder, targetDir);
-                EndCmd();
-            }
-        }
-
-        /// <summary>
-        /// 排除预定义的文件类型
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <param name="targetDir"></param>
-        /// <param name="cache"></param>
-        protected void ExcludeFile(string dir, string targetDir, Dictionary<string, SvnFileInfo> cache)
-        {
-            var array = Exclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-            if (array.Length == 0) return;
-            var deleteKey = new List<string>();
-            foreach (var s in cache)
-            {
-                foreach (var s1 in array)
-                {
-                    if (!s.Key.EndsWith(s1)) continue;
-                    deleteKey.Add(s.Key);
-                    try
-                    {
-                        if (File.Exists(targetDir + "/" + s.Key))
-                        {
-                            File.Delete(targetDir + "/" + s.Key);
-                            Console.WriteLine("删除成功..." + s.Key);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("删除失败..." + s.Key);
-                        throw;
-                    }
-                }
-            }
-            foreach (var key in deleteKey)
-            {
-                cache.Remove(key);
+                Console.WriteLine("可更新文件数目为{0}！", count);
+                Console.WriteLine("按任意键继续！");
+                Console.ReadKey();
+                return true;
             }
         }
 
@@ -181,10 +199,28 @@ namespace SvnVersion
 
             if (!yes) return;
 
+            int index = 0;
             foreach (var s in cache)
             {
+                Console.WriteLine();
+                Console.WriteLine("正在转化中...{0}", ((float)(++index) / cache.Count).ToString("P"));
+                Console.WriteLine("is now: {0}", s.Key);
+                Console.WriteLine();
+
                 string fullPath = targetDir + "/" + s.Key;
-                string targetFullPath = targetMd5Dir + "/" + Library.Encrypt.MD5.Encrypt(s.Key + KeyMd5);
+                string targetFullPath = targetMd5Dir + "/";
+                if (PathToMd5Depth == 0)
+                {
+                    targetFullPath += Library.Encrypt.MD5.Encrypt(s.Key + KeyMd5);
+                }
+                else
+                {
+                    var dirD = Path.GetDirectoryName(s.Key);
+                    var nameD = Path.GetFileName(s.Key);
+                    targetFullPath += Library.Encrypt.MD5.Encrypt(dirD + KeyMd5);
+                    targetFullPath += "/";
+                    targetFullPath += Library.Encrypt.MD5.Encrypt(nameD + KeyMd5);
+                }
                 if (!File.Exists(fullPath)) continue;
                 FileHelper.CreateDirectory(targetFullPath);
                 File.Copy(fullPath, targetFullPath, true);
@@ -208,8 +244,17 @@ namespace SvnVersion
             if (!yes) return;
             var targetMd5Dir = targetDir.Replace(dir, Library.Encrypt.MD5.Encrypt(dir + KeyMd5));
             bool md5 = Directory.Exists(targetMd5Dir);
+
+            int index = 0;
             foreach (var s in cache)
             {
+                Console.Clear();
+                Console.WriteLine("\n正在加密文件...");
+                Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
+                Console.WriteLine("正在加密中...{0}", ((float)(++index) / cache.Count).ToString("P"));
+                Console.WriteLine("is now: {0}", s.Key);
+                Console.WriteLine();
+
                 string fullPath = "";
                 if (!md5)
                     fullPath = targetDir + "/" + s.Key;
@@ -248,7 +293,7 @@ namespace SvnVersion
         private void MakeZip(string dir)
         {
             if (!Directory.Exists(dir)) return;
-            string message = Library.Compress.DecompressUtils.MakeZipFile(dir);
+            string message = Library.Compress.DecompressUtils.MakeZipFile(dir, 9);
             if (string.IsNullOrEmpty(message))
                 Console.WriteLine("文件压缩成功！");
             else

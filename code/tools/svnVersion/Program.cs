@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SvnVersion
+namespace FileVersion
 {
     internal class Program
     {
@@ -9,34 +9,46 @@ namespace SvnVersion
         private static void Main(string[] args)
         {
             string mes =
-                @"1,SvnMaster [输入master或m]
-2,SvnPatch [输入patch或p]
-3,SvnUpdate [输入list或l]";
+                @"1,SvnMaster [输入sm]
+2,SvnPatch [输入sp]
+3,SvnUpdate [输入sl]
+";
+//1,GitMaster [输入gm]
+//2,GitPatch [输入gp]
+//3,GitUpdate [输入gl]
+//";
             Console.WriteLine(mes);
             Console.Write("请输入选择，然后回车：");
-            SvnCommon svnCommon = null;
+            CommonBase commonBase = null;
             var haha = Console.ReadLine();
             switch (haha)
             {
-                case "master":
-                case "m":
-                    svnCommon = new SvnMaster();
+                case "sm":
+                    commonBase = new SvnMaster();
                     break;
-                case "patch":
-                case "p":
-                    svnCommon = new SvnPatch();
+                case "sp":
+                    commonBase = new SvnPatch();
                     break;
-                case "list":
-                case "l":
-                    svnCommon = new SvnUpdate();
+                case "sl":
+                    commonBase = new SvnUpdate();
+                    break;
+                case "gm":
+                    commonBase = new GitMaster();
+                    break;
+                case "gp":
+                    commonBase = new GitPatch();
+                    break;
+                case "gl":
+                    commonBase = new GitUpdate();
                     break;
             }
 
-            if (svnCommon == null) return;
+            if (commonBase == null) return;
 
             while (isRuning)
             {
-                svnCommon.Run();
+                if (commonBase.isInstall)
+                    commonBase.Run();
                 Console.WriteLine("按y键继续,按其余键退出......");
                 isRuning = Console.ReadLine() == "y";
             }

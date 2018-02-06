@@ -7,7 +7,7 @@ using Library.Extensions;
 
 namespace FileVersion
 {
-    public class SvnUpdate : SvnCommon
+    public class GitUpdate : GitCommon
     {
         public override string Name
         {
@@ -57,7 +57,7 @@ namespace FileVersion
 
             WriteToTxt(Name, new VersionInfo()
             {
-                svnVersion = svnVersion,
+                svnVersion = gitVersion,
                 svnInfos = svnPatchInfos.OrderBy(p => p.group).ThenBy(p => p.firstVersion).ToList()
             });
             if (yes) EncryptFile(Name);

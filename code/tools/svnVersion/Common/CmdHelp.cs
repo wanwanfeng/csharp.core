@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SvnVersion
+namespace FileVersion
 {
     public abstract class CmdHelp
     {
@@ -80,7 +80,7 @@ namespace SvnVersion
                 process.StandardInput.AutoFlush = true;
                 process.WaitForExit();
                 string[] array = File.ReadAllLines(temp);
-                File.Delete(temp);
+                //File.Delete(temp);
                 return array;
             }
             else

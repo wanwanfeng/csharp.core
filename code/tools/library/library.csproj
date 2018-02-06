@@ -53,7 +53,7 @@
     <Compile Include="Library\Base\Extensions\ExtensionsForStrings.cs" />
     <Compile Include="Library\Base\Helper\FileHelper.cs" />
     <Compile Include="Library\Base\Helper\XmlHelper.cs" />
-    <Compile Include="Library\Base\SvnInfo\SvnInfo.cs" />
+    <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
     <Compile Include="Library\Debug.cs" />
     <Compile Include="Library\Base\Helper\AttributeHelper.cs" />

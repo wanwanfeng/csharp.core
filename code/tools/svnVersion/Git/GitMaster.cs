@@ -8,7 +8,7 @@ using Library.Helper;
 
 namespace FileVersion
 {
-    public class SvnMaster : SvnCommon
+    public class GitMaster : GitCommon
     {
         public override string Name
         {
@@ -29,7 +29,7 @@ namespace FileVersion
             Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
-            var targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, svnUrl), true);
+            var targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, gitUrl), true);
             targetList = targetList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
             int index = 0;
@@ -87,7 +87,7 @@ namespace FileVersion
                     Console.WriteLine();
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
+                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, gitUrl, s.Key, fullPath));
 
                     if (File.Exists(fullPath))
                     {

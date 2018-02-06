@@ -7,8 +7,8 @@
     <ProjectGuid>{32C3F2CD-87BC-4BC4-8C44-CBAE98315BFB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SvnVersion</RootNamespace>
-    <AssemblyName>svnVersion</AssemblyName>
+    <RootNamespace>fileVersion</RootNamespace>
+    <AssemblyName>fileVersion</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\client\source\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\Git\pal3\MyPal3\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -44,11 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CommonBase.cs" />
+    <Compile Include="Git\GitCommon.cs" />
+    <Compile Include="Git\GitMaster.cs" />
+    <Compile Include="Git\GitPatch.cs" />
+    <Compile Include="Git\GitUpdate.cs" />
     <Compile Include="Svn\SvnCommon.cs" />
     <Compile Include="Svn\SvnUpdate.cs" />
     <Compile Include="Svn\SvnPatch.cs" />
     <Compile Include="Svn\SvnMaster.cs" />
-    <Compile Include="CmdHelp.cs" />
+    <Compile Include="Common\CmdHelp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

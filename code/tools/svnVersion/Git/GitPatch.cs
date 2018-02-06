@@ -8,7 +8,7 @@ using Library.Helper;
 
 namespace FileVersion
 {
-    public class SvnPatch : SvnCommon
+    public class GitPatch : GitCommon
     {
         public override string Name
         {
@@ -39,9 +39,9 @@ namespace FileVersion
 
             Console.WriteLine("\n正在获取版本差异信息...");
 
-            diffList = RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl),
+            diffList = RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, gitUrl),
                 true);
-            diffList = diffList.Select(p => p.Replace(svnUrl + "/", "")).Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
+            diffList = diffList.Select(p => p.Replace(gitUrl + "/", "")).Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
             int index = 0;
@@ -75,12 +75,12 @@ namespace FileVersion
                 {
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
+                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, gitUrl, s.Key, fullPath));
                     if (File.Exists(fullPath))
                     {
                         var array =
                             RunCmd(string.Format("svn log -r {0}:{3} \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
-                                svnUrl, s.Key, lowVersion));
+                                gitUrl, s.Key, lowVersion));
                         s.Value.version = array.Skip(1).First().Split(' ').First().Replace("r", "").Trim();
                         SetContent(fullPath, s.Value);
                         Console.WriteLine();

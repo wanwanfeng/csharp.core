@@ -1,9 +1,8 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace SvnVersion
+namespace FileVersion
 {
-    public class SvnFileInfo
+    public class FileDetailInfo
     {
         public string path;
         public string action;
@@ -26,7 +25,7 @@ namespace SvnVersion
         }
     }
 
-    public class SvnPatchInfo
+    public class FilePatchInfo
     {
         public string group;
         public int firstVersion;
@@ -44,9 +43,9 @@ namespace SvnVersion
         }
     }
 
-    public class SvnInfo
+    public class VersionInfo
     {
         public string svnVersion;
-        public List<SvnPatchInfo> svnInfos;
+        public List<FilePatchInfo> svnInfos;
     }
 }

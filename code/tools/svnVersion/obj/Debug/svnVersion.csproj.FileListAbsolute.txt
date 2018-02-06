@@ -12,3 +12,6 @@ D:\Work\yuege\ygtools\trunk\res\config.ini
 D:\Work\yuege\client\source\config.ini
 D:\Work\yuege\client\source\svnVersion.exe
 D:\Work\yuege\client\source\svnVersion.pdb
+D:\Git\pal3\MyPal3\config.ini
+D:\Git\pal3\MyPal3\svnVersion.exe
+D:\Git\pal3\MyPal3\svnVersion.pdb

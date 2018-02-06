@@ -71,6 +71,22 @@ public class VersionMgr : MonoBehaviour
             }
         }
 
+        public static string Proto
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return "file:///";
+#elif UNITY_STANDALONE_WIN
+                return "file:///" ;
+#elif UNITY_ANDROID
+                return "jar:file://" ;
+#elif UNITY_IPHONE || UNITY_IOS
+                return "file://";  
+#endif
+            }
+        }
+
         public static string PersistentDataTempPath
         {
             get { return PersistentDataPath + "Temp/"; }
@@ -86,23 +102,23 @@ public class VersionMgr : MonoBehaviour
             get { return StreamingAssetsPath + "Temp/"; }
         }
 
-        private static readonly Queue<string> urls = new Queue<string>();
 
         static Access()
         {
             DataPath = Application.dataPath;
             PersistentDataPath = Application.persistentDataPath + "/";
-            urls.Enqueue("http://127.0.0.1:8080/test/master/");
-            urls.Enqueue("http://127.0.0.1:8080/test/master/");
-            urls.Enqueue("http://127.0.0.1:8080/test/master/");
         }
 
         private int retry = 0;
         private static readonly int RetryCount = 5;
+        private readonly Queue<string> urls = new Queue<string>();
 
         public Access()
         {
             retry = 0;
+            urls.Enqueue("http://127.0.0.1:8080/test/master/");
+            urls.Enqueue("http://127.0.0.1:8080/test/master/");
+            urls.Enqueue("http://127.0.0.1:8080/test/master/");
         }
 
         /// <summary>
@@ -113,7 +129,7 @@ public class VersionMgr : MonoBehaviour
         /// <param name="path"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
-        public IEnumerator FromRemote(MonoBehaviour mono, string path, Action<byte[]> callAction)
+        public IEnumerator FromRemote(MonoBehaviour mono, string path, Action<WWW> callAction)
         {
             using (WWW www = new WWW(urls.Peek() + path))
             {
@@ -126,7 +142,7 @@ public class VersionMgr : MonoBehaviour
 #if UNITY_EDITOR
                     Debug.Log(Encoding.UTF8.GetString(www.bytes) ?? "");
 #endif
-                    callAction.Invoke(www.bytes);
+                    callAction.Invoke(www);
                 }
                 else
                 {
@@ -138,6 +154,9 @@ public class VersionMgr : MonoBehaviour
                     }
                     else
                     {
+#if UNITY_EDITOR
+                        Debug.LogError("is faild ! " + www.url);
+#endif
                         callAction.Invoke(null);
                     }
                 }
@@ -145,45 +164,48 @@ public class VersionMgr : MonoBehaviour
             }
         }
 
+        private IEnumerator FromQueue(MonoBehaviour mono, string path, Action<WWW> callAction)
+        {
+            int length = urls.Count;
+            for (int i = 0; i < length - 1; i++)
+                urls.Enqueue(urls.Dequeue());
+            yield return mono.StartCoroutine(FromRemote(mono, path, callAction));
+        }
+
+        public IEnumerator FromPersistentDataPath(MonoBehaviour mono, string path, Action<WWW> callAction)
+        {
+            urls.Enqueue(Proto + PersistentDataPath);
+            yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
+        }
+
+        public IEnumerator FromPersistentDataTempPath(MonoBehaviour mono, string path, Action<WWW> callAction)
+        {
+            urls.Enqueue(Proto + PersistentDataTempPath);
+            yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
+        }
+
+        public IEnumerator FromStreamingAssetsPath(MonoBehaviour mono, string path, Action<WWW> callAction)
+        {
+            urls.Enqueue(StreamingAssetsPath);
+            yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
+        }
+
         /// <summary>
-        /// 本地加载无须重试
+        /// PersistentDataPath
         /// </summary>
-        /// <param name="mono"></param>
         /// <param name="path"></param>
-        /// <param name="callAction"></param>
         /// <returns></returns>
-        private static IEnumerator FromLocal(MonoBehaviour mono, string path, Action<byte[]> callAction)
-        {
-            using (WWW www = new WWW(path))
-            {
-                yield return www;
-                if (string.IsNullOrEmpty(www.error))
-                {
-#if UNITY_EDITOR
-                    Debug.Log(Encoding.UTF8.GetString(www.bytes));
-#endif
-                    callAction.Invoke(www.bytes);
-                }
-                else
-                {
-                    callAction.Invoke(null);
-                }
-                www.Dispose();
-            }
-        }
-
-        public static IEnumerator FromStreamingAssetsPath(MonoBehaviour mono, string path, Action<byte[]> callAction)
-        {
-            path = StreamingAssetsPath + path;
-            yield return mono.StartCoroutine(FromLocal(mono, path, callAction));
-        }
-
         public static byte[] FromPersistentDataPath(string path)
         {
             path = PersistentDataPath + path;
             return File.Exists(path) ? File.ReadAllBytes(path) : null;
         }
 
+        /// <summary>
+        /// PersistentDataTempPath
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static byte[] FromPersistentDataTempPath(string path)
         {
             path = PersistentDataTempPath + path;
@@ -197,6 +219,17 @@ public class VersionMgr : MonoBehaviour
             Texture2D texture = new Texture2D(0, 0);
             texture.LoadImage(bytes);
             return texture;
+        }
+
+        internal static string ConvertToMd5(string path)
+        {
+            //return Library.Encrypt.MD5.Encrypt(path + KeyMd5);
+            var dirD = Path.GetDirectoryName(path);
+            var nameD = Path.GetFileName(path);
+            string hash = Library.Encrypt.MD5.Encrypt(dirD + KeyMd5);
+            hash += "/";
+            hash += Library.Encrypt.MD5.Encrypt(nameD + KeyMd5);
+            return hash;
         }
     }
 
@@ -420,8 +453,8 @@ public class VersionMgr : MonoBehaviour
                 ActionState(State.DownPathList);
                 yield return StartCoroutine(new Access().FromRemote(this, info.fileUrl, res =>
                 {
-                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.fileHash) return;
-                    File.WriteAllBytes(info.fileLocal, res);
+                    if (res == null || Library.Encrypt.MD5.Encrypt(res.bytes) != info.fileHash) return;
+                    File.WriteAllBytes(info.fileLocal, res.bytes);
                 }));
             }
 
@@ -504,11 +537,11 @@ public class VersionMgr : MonoBehaviour
                             StartCoroutine(new Access().FromRemote(this, keyValuePair.Key.name + "/" + resInfo.url,
                                 res =>
                                 {
-                                    if (res == null || Library.Encrypt.MD5.Encrypt(res) != resInfo.hash)
+                                    if (res == null || Library.Encrypt.MD5.Encrypt(res.bytes) != resInfo.hash)
                                         return;
                                     ActionState(State.ApplyResource);
                                     FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
-                                    File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res);
+                                    File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res.bytes);
                                     resInfo.action = ResInfo.Action.N;
                                 }));
                     }
@@ -526,9 +559,9 @@ public class VersionMgr : MonoBehaviour
             ActionState(State.DownPatchZip);
             yield return StartCoroutine(new Access().FromRemote(this, info.zipName, res =>
             {
-                if (res == null || Library.Encrypt.MD5.Encrypt(res) != info.zipHash) return;
+                if (res == null || Library.Encrypt.MD5.Encrypt(res.bytes) != info.zipHash) return;
                 var zipName = Access.PersistentDataPatchPath + info.zipName;
-                File.WriteAllBytes(zipName, res);
+                File.WriteAllBytes(zipName, res.bytes);
                 ActionState(State.UnMakePatchZip);
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", true);
                 if (string.IsNullOrEmpty(msg))
@@ -603,21 +636,20 @@ public class VersionMgr : MonoBehaviour
     /// <returns></returns>
     private IEnumerator GetResourcesAndStreamingAssetsData()
     {
-        resourcesCache = GetCache(Resources.Load<TextAsset>("resources").text);
-        yield return StartCoroutine(Access.FromStreamingAssetsPath(this, "streamingAssets.txt", res =>
+        resourcesCache = GetCache(Resources.Load<TextAsset>("resources").bytes);
+        yield return StartCoroutine(new Access().FromStreamingAssetsPath(this, "streamingAssets.txt", res =>
         {
-            streamingAssetsCache = GetCache(Encoding.UTF8.GetString(res));
+            streamingAssetsCache = GetCache(res.bytes);
         }));
     }
 
-    private Dictionary<string, List<string>> GetCache(string text)
+    private Dictionary<string, List<string>> GetCache(byte[] bytes)
     {
-        return
-            text.Split('\r', '\n')
-                .Where(p => !string.IsNullOrEmpty(p))
-                .Select(p => p.Split(','))
-                .ToLookup(p => p.First(), q => q.Last())
-                .ToDictionary(p => p.Key, q => new List<string>(q));
+        return Encoding.UTF8.GetString(bytes).Split('\r', '\n')
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Select(p => p.Split(','))
+            .ToLookup(p => p.First(), q => q.Last())
+            .ToDictionary(p => p.Key, q => new List<string>(q));
     }
 
     /// <summary>
@@ -630,9 +662,9 @@ public class VersionMgr : MonoBehaviour
         {
             if (res == null) return;
             FileHelper.CreateDirectory(Access.PersistentDataPatchPath + PatchInfo.PatchListName);
-            File.WriteAllBytes(Access.PersistentDataPatchPath + PatchInfo.PatchListName, res);
+            File.WriteAllBytes(Access.PersistentDataPatchPath + PatchInfo.PatchListName, res.bytes);
 
-            var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(res));
+            var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(res.bytes));
             var versionInfo = LitJson.JsonMapper.ToObject<FileVersion.VersionInfo>(content);
             SoftwareVersion = versionInfo.softwareVersion;
             patchListCache = versionInfo.pathInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
@@ -667,7 +699,7 @@ public class VersionMgr : MonoBehaviour
         }
 
 
-        StartCoroutine(Load("557028_1.jpg", tex =>
+        StartCoroutine(Load("image/10253318_640x640_0.jpg", tex =>
         {
             texture2D = tex;
         }));
@@ -678,9 +710,9 @@ public class VersionMgr : MonoBehaviour
     private void OnGUI()
     {
         if (texture2D == null)
-            texture2D = Access.FileToTexture2D("557028_1.jpg");
+            texture2D = Access.FileToTexture2D("image/10253312_640x640_0.jpg");
         if (texture2D == null)
-            texture2D = Access.FileToTexture2D(Library.Encrypt.MD5.Encrypt("10253312_640x640_0.jpg"));
+            texture2D = Access.FileToTexture2D(Access.ConvertToMd5("image/10253312_640x640_0.jpg"));
         if (texture2D != null)
             GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
         GUILayout.Label("SvnVersion:" + SoftwareVersion);
@@ -697,7 +729,7 @@ public class VersionMgr : MonoBehaviour
 
     private IEnumerator LoadObject(string path, Action<WWW, UnityEngine.Object> callAction)
     {
-        string hash = Library.Encrypt.MD5.Encrypt(path);
+        string hash = Access.ConvertToMd5(path);
         foreach (var cache in patchListCache.Values)
         {
             ResInfo resInfo = null;
@@ -713,21 +745,13 @@ public class VersionMgr : MonoBehaviour
                     callAction.Invoke(null, Resources.Load(path));
                     yield break;
                 case ResInfo.DataType.StreamingAssetsPath:
-                    using (WWW www = new WWW(Access.StreamingAssetsPath + path))
-                    {
-                        yield return www;
-                        callAction.Invoke(www, null);
-                        www.Dispose();
-                        yield break;
-                    }
+                    yield return StartCoroutine(new Access().FromStreamingAssetsPath(this, path,
+                        www => { callAction.Invoke(www, null); }));
+                    yield break;
                 default:
-                    using (WWW www = new WWW(Access.PersistentDataTempPath + hash))
-                    {
-                        yield return www;
-                        callAction.Invoke(www, null);
-                        www.Dispose();
-                        yield break;
-                    }
+                    yield return StartCoroutine(new Access().FromPersistentDataTempPath(this, resInfo.path,
+                        www => { callAction.Invoke(www, null); }));
+                    yield break;
             }
         }
 

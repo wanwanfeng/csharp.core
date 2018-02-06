@@ -8,10 +8,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FileVersion;
 using Library.Extensions;
 using Library.Helper;
 using Debug = UnityEngine.Debug;
-using SvnVersion;
 
 //增量更新
 //每更新一次，资源放在新的文件夹目录内，老资源不会被覆盖
@@ -22,27 +22,25 @@ using SvnVersion;
 //
 //│  
 //├─master-00-02
-//│      svn-master.txt
+//├─master-00-02.txt
 //│      
 //├─patch-02-09
-//│      svn-patch.txt
+//├─patch-02-09.txt
 //│      
 //├─patch-09-20
-//│      svn-patch.txt
+//├─patch-09-20.txt
 //│      
 //├─patch-20-23
-//│      svn-patch.txt
+//├─patch-20-23.txt
 //│      
 //├─patch-23-33
-//│      svn-patch.txt
+//├─patch-23-33.txt
 //│      
-//└─patch-33-40
-//        svn-patch.txt
-//
+
 
 public class VersionMgr : MonoBehaviour
 {
-    public static string SvnVersion { get; set; }
+    public static string SoftwareVersion { get; set; }
     protected static string KeyMd5 { get; private set; }
 
     static VersionMgr()
@@ -238,19 +236,16 @@ public class VersionMgr : MonoBehaviour
             get { return name + ".zip"; }
         }
 
-        public SvnPatchInfo info;
-
-        public PatchInfo(SvnPatchInfo svnPatchInfo)
+        public PatchInfo(FilePatchInfo info)
         {
-            info = svnPatchInfo;
-            name = svnPatchInfo.path;
-            group = svnPatchInfo.group;
-            first = svnPatchInfo.firstVersion;
-            last = svnPatchInfo.lastVersion;
-            fileSize = svnPatchInfo.content_size.AsLong();
-            fileHash = svnPatchInfo.content_hash;
-            zipSize = svnPatchInfo.zip_size.AsLong();
-            zipHash = svnPatchInfo.zip_hash;
+            name = info.path;
+            group = info.group;
+            first = info.firstVersion;
+            last = info.lastVersion;
+            fileSize = info.content_size.AsLong();
+            fileHash = info.content_hash;
+            zipSize = info.zip_size.AsLong();
+            zipHash = info.zip_hash;
 
             fileUrl = Path.GetFileNameWithoutExtension(name) + ".txt";
             fileLocal = Access.PersistentDataPatchPath + fileUrl.Replace("/", "-");
@@ -258,7 +253,7 @@ public class VersionMgr : MonoBehaviour
 
         public override string ToString()
         {
-            return info.ToString();
+            return string.Format("Group: {0}, Name: {1}, FileHash: {2}, ZipHash: {3}, ZipSize: {4}, isNeedDownFile: {5}", @group, name, fileHash, zipHash, zipSize, isNeedDownFile);
         }
     }
 
@@ -293,7 +288,6 @@ public class VersionMgr : MonoBehaviour
         public string hash { get; private set; }
         public string url { get; private set; }
         public PatchInfo patchInfo { get; private set; }
-        public SvnFileInfo svnFileInfo { get; private set; }
 
         public string localhash
         {
@@ -327,19 +321,18 @@ public class VersionMgr : MonoBehaviour
             action = Action.N;
         }
 
-        public ResInfo(PatchInfo info, SvnFileInfo fileInfo)
+        public ResInfo(PatchInfo info, FileDetailInfo fileInfo)
         {
             this.dataType = DataType.PersistentDataPath;
             patchInfo = info;
-            svnFileInfo = fileInfo;
-            if (Enum.IsDefined(typeof (Action), svnFileInfo.action))
-                action = (Action) Enum.Parse(typeof (Action), svnFileInfo.action);
+            if (Enum.IsDefined(typeof(Action), fileInfo.action))
+                action = (Action)Enum.Parse(typeof(Action), fileInfo.action);
             else
                 action = Action.N;
-            size = svnFileInfo.content_size.AsLong();
-            hash = svnFileInfo.content_hash;
-            path = svnFileInfo.path_md5;
-            version = svnFileInfo.version.AsInt();
+            size = fileInfo.content_size.AsLong();
+            hash = fileInfo.content_hash;
+            path = fileInfo.path_md5;
+            version = fileInfo.version.AsInt();
             if (patchInfo.isZip && action != Action.D)
                 action = Action.N;
             if (hash == localhash)
@@ -351,9 +344,7 @@ public class VersionMgr : MonoBehaviour
 
         public override string ToString()
         {
-            if (svnFileInfo==null)
-                return string.Format("{0},{1},{2}", path, dataType, action);
-            return svnFileInfo.ToString();
+            return string.Format("DataType: {0}, Action: {1}, path: {2}, version: {3}, hash: {4}, isNeedDownFile: {5}", dataType, action, path, version, hash, isNeedDownFile);
         }
     }
 
@@ -440,8 +431,10 @@ public class VersionMgr : MonoBehaviour
 
             ActionState(State.ApplyPatchList);
             var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(bytes));
-            var svnFileInfos = LitJson.JsonMapper.ToObject<SvnFileInfo[]>(content);
-            patchCache[info.fileUrl] = svnFileInfos.Select(p => new ResInfo(info, p)).ToDictionary(p => p.path);
+            patchCache[info.fileUrl] =
+                LitJson.JsonMapper.ToObject<FileDetailInfo[]>(content)
+                    .Select(p => new ResInfo(info, p))
+                    .ToDictionary(p => p.path);
             MinVersion = Math.Min(MinVersion, info.first);
             MaxVersion = Math.Max(MaxVersion, info.last);
         }
@@ -640,9 +633,9 @@ public class VersionMgr : MonoBehaviour
             File.WriteAllBytes(Access.PersistentDataPatchPath + PatchInfo.PatchListName, res);
 
             var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(res));
-            var svnInfo = LitJson.JsonMapper.ToObject<SvnInfo>(content);
-            SvnVersion = svnInfo.svnVersion;
-            patchListCache = svnInfo.svnInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
+            var versionInfo = LitJson.JsonMapper.ToObject<FileVersion.VersionInfo>(content);
+            SoftwareVersion = versionInfo.softwareVersion;
+            patchListCache = versionInfo.pathInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
                 .ToDictionary(p => p.Key, q =>
                 {
                     var go = gameObject.AddComponent<VersionInfo>();
@@ -690,7 +683,7 @@ public class VersionMgr : MonoBehaviour
             texture2D = Access.FileToTexture2D(Library.Encrypt.MD5.Encrypt("10253312_640x640_0.jpg"));
         if (texture2D != null)
             GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
-        GUILayout.Label("SvnVersion:" + SvnVersion);
+        GUILayout.Label("SvnVersion:" + SoftwareVersion);
         if (patchListCache == null)
             return;
         foreach (var versionInfo in patchListCache)

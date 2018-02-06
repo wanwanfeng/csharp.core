@@ -6,16 +6,15 @@ namespace FileVersion
 {
     public class GitCommon : CommonBase
     {
-        public string gitVersion { get; protected set; }
         public string gitUrl { get; protected set; }
 
         public GitCommon()
         {
             StartCmd();
-            gitVersion = RunCmd("git --version").Last();
-            isInstall = gitVersion.StartsWith("git");
+            softwareVersion = RunCmd("git --version").Last();
+            isInstall = softwareVersion.StartsWith("git");
             if (isInstall)
-                Console.WriteLine("Git版本：" + gitVersion);
+                Console.WriteLine("Git版本：" + softwareVersion);
             else
                 Console.WriteLine("未安装Git命令行工具，请先安装！");
         }

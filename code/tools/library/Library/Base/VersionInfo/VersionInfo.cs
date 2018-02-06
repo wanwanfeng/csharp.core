@@ -45,7 +45,7 @@ namespace FileVersion
 
     public class VersionInfo
     {
-        public string svnVersion;
-        public List<FilePatchInfo> svnInfos;
+        public string softwareVersion;
+        public List<FilePatchInfo> pathInfos;
     }
 }

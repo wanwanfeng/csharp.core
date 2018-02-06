@@ -11,7 +11,15 @@ namespace FileVersion
 {
     public class CommonBase : CmdHelp
     {
+        /// <summary>
+        /// 是否已经安装svn或git
+        /// </summary>
         public bool isInstall = false;
+
+        /// <summary>
+        /// svn或git版本号
+        /// </summary>
+        public string softwareVersion { get; protected set; }
 
         protected static int PathToMd5Depth { get; private set; }
         protected static string KeyMd5 { get; private set; }
@@ -61,7 +69,7 @@ namespace FileVersion
 
         public virtual void Run()
         {
-           
+
         }
 
         public void Common(string targetDir, Dictionary<string, FileDetailInfo> cache)
@@ -102,8 +110,8 @@ namespace FileVersion
                 }
             }
 
-           //排除非选择的平台
-           array =  Platform.Split('|',',');
+            //排除非选择的平台
+            array = Platform.Split('|', ',');
             if (array.Length > 1)
             {
                 var deleteKey = new List<string>();
@@ -170,7 +178,7 @@ namespace FileVersion
             foreach (var s in cache)
             {
                 Console.WriteLine();
-                Console.WriteLine("正在转化中...{0}", ((float)(++index) / cache.Count).ToString("P"));
+                Console.WriteLine("正在转化中...{0}", ((float) (++index)/cache.Count).ToString("P"));
                 Console.WriteLine("is now: {0}", s.Key);
                 Console.WriteLine();
 
@@ -218,7 +226,7 @@ namespace FileVersion
                 Console.Clear();
                 Console.WriteLine("\n正在加密文件...");
                 Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
-                Console.WriteLine("正在加密中...{0}", ((float)(++index) / cache.Count).ToString("P"));
+                Console.WriteLine("正在加密中...{0}", ((float) (++index)/cache.Count).ToString("P"));
                 Console.WriteLine("is now: {0}", s.Key);
                 Console.WriteLine();
 
@@ -297,7 +305,7 @@ namespace FileVersion
             }
             catch (Exception)
             {
-                Console.WriteLine("删除文件夹失败！{0}", dir);                
+                Console.WriteLine("删除文件夹失败！{0}", dir);
                 throw;
             }
             if (onlyDir)
@@ -312,9 +320,59 @@ namespace FileVersion
                 Console.WriteLine("删除文件失败！{0}", dir + ".txt");
                 throw;
             }
-           
+
         }
 
         #endregion
+
+        /// <summary>
+        /// 最后一步形成补丁列表
+        /// </summary>
+        protected void UpdatePathList()
+        {
+            var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory, "*-*-*-*");
+            if (array.Length == 0) return;
+            var dic = array.ToLookup(Path.GetFileNameWithoutExtension)
+                .ToDictionary(p => p.Key, q => new List<string>(q));
+            if (dic.Count == 0) return;
+            List<FilePatchInfo> svnPatchInfos = new List<FilePatchInfo>();
+
+            Console.Write("\n是否对文件进行加密（y/n），然后回车：");
+            bool yes = Console.ReadLine() == "y";
+
+            foreach (KeyValuePair<string, List<string>> pair in dic)
+            {
+                FilePatchInfo svnPatchInfo = new FilePatchInfo();
+                svnPatchInfos.Add(svnPatchInfo);
+                svnPatchInfo.path = pair.Key;
+
+                var txt = pair.Value.FirstOrDefault(p => p.EndsWith(".txt"));
+                var zip = pair.Value.FirstOrDefault(p => p.EndsWith(".zip"));
+
+                if (txt != null && File.Exists(txt))
+                {
+                    if (yes) EncryptFile(txt);
+                    svnPatchInfo.content_hash = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(txt));
+                    svnPatchInfo.content_size = new System.IO.FileInfo(txt).Length.ToString();
+                }
+                if (zip != null && File.Exists(zip))
+                {
+                    svnPatchInfo.zip_hash = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(zip));
+                    svnPatchInfo.zip_size = new System.IO.FileInfo(zip).Length.ToString();
+                }
+
+                var xx = pair.Key.Split('-');
+                svnPatchInfo.group = xx.First();
+                svnPatchInfo.firstVersion = xx.Skip(1).First().AsInt();
+                svnPatchInfo.lastVersion = xx.Skip(2).First().AsInt();
+            }
+
+            WriteToTxt(Name, new VersionInfo()
+            {
+                softwareVersion = softwareVersion,
+                pathInfos = svnPatchInfos.OrderBy(p => p.group).ThenBy(p => p.firstVersion).ToList()
+            });
+            if (yes) EncryptFile(Name);
+        }
     }
 }

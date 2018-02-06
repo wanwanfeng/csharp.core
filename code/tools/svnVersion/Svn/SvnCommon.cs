@@ -7,16 +7,15 @@ namespace FileVersion
 {
     public class SvnCommon : CommonBase
     {
-        public string svnVersion { get; protected set; }
         public string svnUrl { get; protected set; }
 
         public SvnCommon()
         {
             StartCmd();
-            svnVersion = RunCmd("svn --version --quiet").Last();
-            isInstall = svnVersion.Replace(".", "").AsInt() != 0;
+            softwareVersion = RunCmd("svn --version --quiet").Last();
+            isInstall = softwareVersion.Replace(".", "").AsInt() != 0;
             if (isInstall)
-                Console.WriteLine("SVN版本：" + svnVersion);
+                Console.WriteLine("SVN版本：" + softwareVersion);
             else
                 Console.WriteLine("未安装Svn命令行工具，请先安装！");
         }

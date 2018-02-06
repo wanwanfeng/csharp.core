@@ -11,6 +11,7 @@ public class TestBundle : MonoBehaviour
 
     public void Init(string url)
     {
+        Application.runInBackground = true;
         if (assetBundle != null)
             assetBundle.Unload(true);
 
@@ -27,20 +28,42 @@ public class TestBundle : MonoBehaviour
             assetBundle = www.assetBundle;
             www.Dispose();
 
-            AudioClip clip = assetBundle.LoadAsset<AudioClip>(GetPath(assetBundle, path));
-            var go = new GameObject(clip.name).AddComponent<AudioSource>();
-            go.clip = clip;
-            go.Play();
+            string ex = "";
+            string real = GetPath(assetBundle, path, ref ex);
+            if (string.IsNullOrEmpty(ex))
+            {
+                yield break;
+            }
+
+            switch (ex)
+            {
+                case ".mp3":
+                case ".wav":
+                {
+                    AudioClip clip = assetBundle.LoadAsset<AudioClip>(real);
+                    var go = FindObjectOfType<AudioSource>() ?? new GameObject("audioClip").AddComponent<AudioSource>();
+                    go.clip = clip;
+                    go.loop = true;
+                    go.Play();
+                }
+                    break;
+                case "":
+                {
+
+                }
+                    break;
+            }
         }
     }
 
-    public string GetPath(AssetBundle bundle, string path)
+    public string GetPath(AssetBundle bundle, string path,ref string ex)
     {
         Debug.Log(string.Join(",", bundle.GetAllAssetNames()));
         foreach (var allAssetName in bundle.GetAllAssetNames())
         {
             if (allAssetName.Contains(path))
             {
+                ex = Path.GetExtension(allAssetName);
                 return allAssetName;
             }
         }

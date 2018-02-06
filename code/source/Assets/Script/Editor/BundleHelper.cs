@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Library.Helper;
 using UnityEditor;
 
 public class BundleHelper : Editor
@@ -63,6 +62,7 @@ public class BundleHelper : Editor
             AssetBundleBuild assetBundleBuild = new AssetBundleBuild();
             assetBundleBuild.assetBundleName = p + ".unity3d";
             assetBundleBuild.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(p);
+            assetBundleBuild.assetBundleVariant="";
             return assetBundleBuild;
         }).ToArray();
         BuildPipeline.BuildAssetBundles(GetBundleRoot(), builds, GetBuildAssetBundleOptions(),

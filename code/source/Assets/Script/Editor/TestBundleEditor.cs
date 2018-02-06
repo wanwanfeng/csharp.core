@@ -11,7 +11,6 @@ public class TestBundleEditor : Editor
     {
         testBundle = (TestBundle) target;
         testBundle.assets = UnityEditor.AssetDatabase.GetAllAssetBundleNames();
-        testBundle.index = 0;
     }
 
     public override void OnInspectorGUI()

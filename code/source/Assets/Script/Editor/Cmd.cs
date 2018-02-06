@@ -14,8 +14,8 @@ public class Cmd : Editor
     public static void GetFileData()
     {
         string[] paths = AssetDatabase.GetAllAssetPaths();
-        GetValue("Assets/StreamingAssets/streamingAssets.txt", "StreamingAssets/", paths);
-        GetValue("Assets/Resources/resources.txt", "Resources/", paths.Where(p => !p.Contains("Editor/")).ToArray());
+        GetValue("Assets/StreamingAssets/streamingAssets.txt", "/StreamingAssets/", paths);
+        GetValue("Assets/Resources/resources.txt", "/Resources/", paths.Where(p => !p.Contains("Editor/")).ToArray());
     }
 
     private static void GetValue(string path, string flag, string[] list)

@@ -174,6 +174,7 @@ public class VersionMgr : MonoBehaviour
 
         public IEnumerator FromPersistentDataTempPath(MonoBehaviour mono, string path, Action<WWW> callAction)
         {
+            urls.Clear();
             urls.Enqueue(Proto + PersistentDataTempPath);
             yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
         }
@@ -215,7 +216,7 @@ public class VersionMgr : MonoBehaviour
             return texture;
         }
 
-        internal static string ConvertToMd5(string path)
+        internal static string PathConvertToMd5(string path)
         {
             //return Library.Encrypt.MD5.Encrypt(path + KeyMd5);
             var dirD = Path.GetDirectoryName(path);
@@ -548,7 +549,7 @@ public class VersionMgr : MonoBehaviour
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        private IEnumerator GetRemoteZip(PatchInfo info)
+        public IEnumerator GetRemoteZip(PatchInfo info)
         {
             ActionState(State.DownPatchZip);
             yield return StartCoroutine(new Access().FromRemote(this, info.zipName, res =>
@@ -706,7 +707,7 @@ public class VersionMgr : MonoBehaviour
         if (texture2D == null)
             texture2D = Access.FileToTexture2D("image/10253312_640x640_0.jpg");
         if (texture2D == null)
-            texture2D = Access.FileToTexture2D(Access.ConvertToMd5("image/10253312_640x640_0.jpg"));
+            texture2D = Access.FileToTexture2D(Access.PathConvertToMd5("image/10253312_640x640_0.jpg"));
         if (texture2D != null)
             GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
         GUILayout.Label("SvnVersion:" + SoftwareVersion);
@@ -723,7 +724,7 @@ public class VersionMgr : MonoBehaviour
 
     private IEnumerator LoadObject(string path, Action<WWW, UnityEngine.Object> callAction)
     {
-        string hash = Access.ConvertToMd5(path);
+        string hash = Access.PathConvertToMd5(path);
         foreach (var cache in patchListCache.Values)
         {
             ResInfo resInfo = null;

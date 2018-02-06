@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+using System.Linq;
 
 public class TestBundle : MonoBehaviour
 {
@@ -28,8 +29,9 @@ public class TestBundle : MonoBehaviour
             assetBundle = www.assetBundle;
             www.Dispose();
 
-            string ex = "";
-            string real = GetPath(assetBundle, path, ref ex);
+            var main = assetBundle.GetAllAssetNames().First();
+            string ex = Path.GetExtension(main);
+            string real = main; //GetPath(assetBundle, path, ref ex);
             if (string.IsNullOrEmpty(ex))
             {
                 yield break;

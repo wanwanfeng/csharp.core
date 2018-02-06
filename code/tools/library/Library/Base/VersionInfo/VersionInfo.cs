@@ -5,17 +5,13 @@ namespace FileVersion
     public class FileDetailInfo
     {
         public string path;
+        public string path_md5;
         public string action;
         public string version;
         public string content_hash;
         public string content_size;
         public string encrypt_hash;
         public string encrypt_size;
-
-        public string path_md5
-        {
-            get { return Library.Encrypt.MD5.Encrypt(path); }
-        }
 
         public override string ToString()
         {

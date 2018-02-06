@@ -186,16 +186,17 @@ namespace FileVersion
                 string targetFullPath = targetMd5Dir + "/";
                 if (PathToMd5Depth == 0)
                 {
-                    targetFullPath += Library.Encrypt.MD5.Encrypt(s.Key + KeyMd5);
+                    s.Value.path_md5 = Library.Encrypt.MD5.Encrypt(s.Key + KeyMd5);
                 }
                 else
                 {
                     var dirD = Path.GetDirectoryName(s.Key);
                     var nameD = Path.GetFileName(s.Key);
-                    targetFullPath += Library.Encrypt.MD5.Encrypt(dirD + KeyMd5);
-                    targetFullPath += "/";
-                    targetFullPath += Library.Encrypt.MD5.Encrypt(nameD + KeyMd5);
+                    s.Value.path_md5 = Library.Encrypt.MD5.Encrypt(dirD + KeyMd5);
+                    s.Value.path_md5 += "/";
+                    s.Value.path_md5 += Library.Encrypt.MD5.Encrypt(nameD + KeyMd5);
                 }
+                targetFullPath += s.Value.path_md5;
                 if (!File.Exists(fullPath)) continue;
                 FileHelper.CreateDirectory(targetFullPath);
                 File.Copy(fullPath, targetFullPath, true);

@@ -97,12 +97,6 @@ public class VersionMgr : MonoBehaviour
             get { return PersistentDataPath + "Patch/"; }
         }
 
-        public static string StreamingAssetsTempPath
-        {
-            get { return StreamingAssetsPath + "Temp/"; }
-        }
-
-
         static Access()
         {
             DataPath = Application.dataPath;

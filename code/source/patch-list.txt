@@ -1,0 +1,1 @@
+{"softwareVersion":"1.9.7","pathInfos":[{"group":"f8af55aaebfbde59fb3954b42cedcf60","firstVersion":0,"lastVersion":74,"path":"f8af55aaebfbde59fb3954b42cedcf60-00000000-00000074-master","content_hash":"057a5651bf5a2ef8550117eaef22228d","content_size":"8457","zip_hash":"7bbe1f1c3e7b8167611fa61a0ad8f1f8","zip_size":"4590555"}]}

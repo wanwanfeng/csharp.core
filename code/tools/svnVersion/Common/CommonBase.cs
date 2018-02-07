@@ -28,13 +28,13 @@ namespace FileVersion
 
         static CommonBase()
         {
-            PathToMd5Depth = Config.IniReadValue("Config", "pathtomd5depth").Trim().AsInt();
+            PathToMd5Depth = Config.IniReadValue("Config", "pathtomd5depth", "1").Trim().AsInt();
             PathToMd5Depth = Math.Min(PathToMd5Depth, 2);
-            KeyMd5 = Config.IniReadValue("Config", "md5key").Trim();
-            AES.Key = Config.IniReadValue("Config", "aeskey").Trim();
-            AES.Head = Config.IniReadValue("Config", "aeshead").Trim();
-            Exclude = Config.IniReadValue("Config", "exclude").Trim();
-            Platform = Config.IniReadValue("Config", "platform").Trim();
+            KeyMd5 = Config.IniReadValue("Config", "md5key", "").Trim();
+            AES.Key = Config.IniReadValue("Config", "aeskey", "YmbEV0FVzZN/SvKCCoJje/jSpM").Trim();
+            AES.Head = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
+            Exclude = Config.IniReadValue("Config", "exclude", ".meta").Trim();
+            Platform = Config.IniReadValue("Config", "platform", "ios|android,ios,pc").Trim();
         }
 
         public CommonBase()

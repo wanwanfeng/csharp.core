@@ -1,3 +1,0 @@
-D:\Work\yuege\ygtools\trunk\code\tools\unity-bin\Library-U.dll
-D:\Work\yuege\ygtools\trunk\code\tools\library-u\obj\Release\library-u.csprojResolveAssemblyReference.cache
-D:\Work\yuege\ygtools\trunk\code\tools\library-u\obj\Release\Library-U.dll

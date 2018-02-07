@@ -1,3 +1,0 @@
-D:\Work\yuege\ygtools\trunk\code\tools\library\bin\Release\Library.dll
-D:\Work\yuege\ygtools\trunk\code\tools\library\bin\Release\ICSharpCode.SharpZipLib.dll
-D:\Work\yuege\ygtools\trunk\code\tools\library\obj\Release\Library.dll

@@ -1,9 +1,0 @@
-D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\FileVersion.csprojResolveAssemblyReference.cache
-D:\Git\pal3\MyPal3\config.ini
-D:\Git\pal3\MyPal3\fileVersion.exe
-D:\Git\pal3\MyPal3\fileVersion.pdb
-D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\fileVersion.exe
-D:\Work\yuege\ygtools\trunk\code\tools\svnVersion\obj\Debug\fileVersion.pdb
-D:\Work\yuege\ygtools\trunk\code\source\config.ini
-D:\Work\yuege\ygtools\trunk\code\source\fileVersion.exe
-D:\Work\yuege\ygtools\trunk\code\source\fileVersion.pdb

@@ -9,14 +9,14 @@ namespace UnityEditor
     public class ShowMenu : Editor
     {
         [MenuItem("Assets/将路径复制到剪帖板")]
-        private static void GetObjectPaths()
+        public static void GetObjectPaths()
         {
             var go = Selection.GetFiltered(typeof (Object), SelectionMode.TopLevel);
             TextEditorPaste(go.Select(item => AssetDatabase.GetAssetPath(item)).ToArray().JoinToString());
         }
 
         [MenuItem("GameObject/将路径复制到剪帖板", false, 0)]
-        private static void GetGameObjectPath()
+        public static void GetGameObjectPath()
         {
             var go = Selection.GetFiltered(typeof (GameObject), SelectionMode.Editable);
             TextEditorPaste(go.Select(item => GetPath(((GameObject) item).transform)).ToArray().JoinToString());

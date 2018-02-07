@@ -86,7 +86,7 @@ namespace Encrypt
                 progressBar1.Value = index*100/dic.Count;
                 res.Add(pair.Value);
 
-                res.Add(newname = Library.Encrypt.MD5.Encrypt(pair.Value + Define.DefineKey));
+                res.Add(newname = Library.Encrypt.MD5(pair.Value + Define.DefineKey));
                 FileHelper.CreateDirectory(newname = Define.DefineRoot.Replace("\\", "/") + "/" + newname);
                 File.Move(pair.Key, newname);
             }

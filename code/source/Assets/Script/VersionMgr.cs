@@ -46,8 +46,8 @@ public class VersionMgr : MonoBehaviour
     static VersionMgr()
     {
         KeyMd5 = "";
-        Library.Encrypt.AES.Key = Library.Encrypt.MD5.Encrypt("YmbEV0FVzZN/SvKCCoJje/jSpM");
-        Library.Encrypt.AES.Head = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl";
+        Library.AES.Key = Library.Encrypt.MD5("YmbEV0FVzZN/SvKCCoJje/jSpM");
+        Library.AES.Head = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl";
     }
 
     public class Access
@@ -103,9 +103,9 @@ public class VersionMgr : MonoBehaviour
             PersistentDataPath = Application.persistentDataPath + "/";
         }
 
-        private int retry = 0;
-        private static readonly int RetryCount = 5;
         private readonly Queue<string> urls = new Queue<string>();
+        private static readonly int RetryCount = 5;
+        private int retry = 0;
 
         public Access()
         {
@@ -185,6 +185,8 @@ public class VersionMgr : MonoBehaviour
             yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
         }
 
+        #region static
+
         /// <summary>
         /// PersistentDataPath
         /// </summary>
@@ -221,11 +223,13 @@ public class VersionMgr : MonoBehaviour
             //return Library.Encrypt.MD5.Encrypt(path + KeyMd5);
             var dirD = Path.GetDirectoryName(path);
             var nameD = Path.GetFileName(path);
-            string hash = Library.Encrypt.MD5.Encrypt(dirD + KeyMd5);
+            string hash = Library.Encrypt.MD5(dirD + KeyMd5);
             hash += "/";
-            hash += Library.Encrypt.MD5.Encrypt(nameD + KeyMd5);
+            hash += Library.Encrypt.MD5(nameD + KeyMd5);
             return hash;
         }
+
+        #endregion
     }
 
     public class PatchInfo
@@ -247,7 +251,11 @@ public class VersionMgr : MonoBehaviour
         /// </summary>
         public bool isNeedDownFile
         {
-            get { return !Library.Encrypt.MD5.ComparerFile(fileHash, fileLocal); }
+            get
+            {
+                if (!File.Exists(fileLocal)) return false;
+                return !Library.Encrypt.ComparerMD5(fileHash, File.ReadAllBytes(fileLocal));
+            }
         }
 
         public string zipHash; //压缩包hash
@@ -323,7 +331,7 @@ public class VersionMgr : MonoBehaviour
             {
                 if (!File.Exists(Access.PersistentDataTempPath + path))
                     return "";
-                var temp = Library.Encrypt.MD5.Encrypt(File.ReadAllBytes(Access.PersistentDataTempPath + path));
+                var temp = Library.Encrypt.MD5(File.ReadAllBytes(Access.PersistentDataTempPath + path));
                 return temp;
             }
         }
@@ -448,7 +456,7 @@ public class VersionMgr : MonoBehaviour
                 ActionState(State.DownPathList);
                 yield return StartCoroutine(new Access().FromRemote(this, info.fileUrl, res =>
                 {
-                    if (res == null || Library.Encrypt.MD5.Encrypt(res.bytes) != info.fileHash) return;
+                    if (res == null || Library.Encrypt.MD5(res.bytes) != info.fileHash) return;
                     File.WriteAllBytes(info.fileLocal, res.bytes);
                 }));
             }
@@ -458,7 +466,7 @@ public class VersionMgr : MonoBehaviour
             if (bytes.Length == 0) yield break;
 
             ActionState(State.ApplyPatchList);
-            var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(bytes));
+            var content = Library.Encrypt.AES(Encoding.UTF8.GetString(bytes));
             patchCache[info.fileUrl] =
                 LitJson.JsonMapper.ToObject<FileDetailInfo[]>(content)
                     .Select(p => new ResInfo(info, p))
@@ -532,7 +540,7 @@ public class VersionMgr : MonoBehaviour
                             StartCoroutine(new Access().FromRemote(this, keyValuePair.Key.name + "/" + resInfo.url,
                                 res =>
                                 {
-                                    if (res == null || Library.Encrypt.MD5.Encrypt(res.bytes) != resInfo.hash)
+                                    if (res == null || Library.Encrypt.MD5(res.bytes) != resInfo.hash)
                                         return;
                                     ActionState(State.ApplyResource);
                                     FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
@@ -554,7 +562,7 @@ public class VersionMgr : MonoBehaviour
             ActionState(State.DownPatchZip);
             yield return StartCoroutine(new Access().FromRemote(this, info.zipName, res =>
             {
-                if (res == null || Library.Encrypt.MD5.Encrypt(res.bytes) != info.zipHash) return;
+                if (res == null || Library.Encrypt.MD5(res.bytes) != info.zipHash) return;
                 var zipName = Access.PersistentDataPatchPath + info.zipName;
                 File.WriteAllBytes(zipName, res.bytes);
                 ActionState(State.UnMakePatchZip);
@@ -659,7 +667,7 @@ public class VersionMgr : MonoBehaviour
             FileHelper.CreateDirectory(Access.PersistentDataPatchPath + PatchInfo.PatchListName);
             File.WriteAllBytes(Access.PersistentDataPatchPath + PatchInfo.PatchListName, res.bytes);
 
-            var content = Library.Encrypt.AES.Decrypt(Encoding.UTF8.GetString(res.bytes));
+            var content = Library.Dencrypt.AES(Encoding.UTF8.GetString(res.bytes));
             var versionInfo = LitJson.JsonMapper.ToObject<FileVersion.VersionInfo>(content);
             SoftwareVersion = versionInfo.softwareVersion;
             patchListCache = versionInfo.pathInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)

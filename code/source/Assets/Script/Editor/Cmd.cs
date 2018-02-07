@@ -39,8 +39,8 @@ public class Cmd : Editor
                     string group = "";
                     if (index != -1)
                         group = p.Value.Substring(0, index);
-                    return Library.Encrypt.MD5.Encrypt("潘之琳") + "," + p.Value + "," +
-                           Library.Encrypt.MD5.Encrypt(p.Value);
+                    return Library.Encrypt.MD5("潘之琳") + "," + p.Value + "," +
+                           Library.Encrypt.MD5(p.Value);
                 })
                 .ToArray());
         AssetDatabase.Refresh();

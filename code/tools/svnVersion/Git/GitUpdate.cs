@@ -4,7 +4,7 @@
     {
         public override string Name
         {
-            get { return "patch-list"; }
+            get { return SaveDir + "patch-list"; }
         }
 
         public override void Run()

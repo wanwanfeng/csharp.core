@@ -48,9 +48,14 @@ namespace FileVersion
             Console.WriteLine("--------------------------------------");
         }
 
+        public string SaveDir
+        {
+            get { return "Version/"; }
+        }
+
         public virtual string Name
         {
-            get { return ""; }
+            get { return SaveDir; }
         }
 
         public string Extension
@@ -331,7 +336,7 @@ namespace FileVersion
         /// </summary>
         protected void UpdatePathList()
         {
-            var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory, "*-*-*-*");
+            var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory.Replace("\\","/") + "/" + SaveDir, "*-*-*-*");
             if (array.Length == 0) return;
             var dic = array.ToLookup(Path.GetFileNameWithoutExtension)
                 .ToDictionary(p => p.Key, q => new List<string>(q));

@@ -39,18 +39,26 @@ namespace FileVersion
                 }
             }
 
-            svnUrl = RunCmd("svn info --show-item url").Last();
-            svnUrl += "/" + folder;
-            Console.WriteLine("库地址：" + svnUrl);
 
-            Console.WriteLine("");
-            highVersion = RunCmd("svn info --show-item last-changed-revision " + folder).Last().AsInt();
-            Console.WriteLine("最高版本号：" + highVersion);
+            try
+            {
+                svnUrl = RunCmd("svn info --show-item url").Last();
+                svnUrl += "/" + folder;
+                Console.WriteLine("库地址：" + svnUrl);
 
-            var logs = RunCmd(string.Format("svn log -r 0:{0} \"{1}@{0}\" -q -l1 --stop-on-copy", highVersion, svnUrl));
-            lowVersion = logs.Skip(1).First().Split('|').First().Replace("r", "").Trim().AsInt();
-            Console.WriteLine("最低版本号：" + lowVersion);
+                Console.WriteLine("");
+                highVersion = RunCmd("svn info --show-item last-changed-revision " + folder).Last().AsInt();
+                Console.WriteLine("最高版本号：" + highVersion);
 
+                var logs =
+                    RunCmd(string.Format("svn log -r 0:{0} \"{1}@{0}\" -q -l1 --stop-on-copy", highVersion, svnUrl));
+                lowVersion = logs.Skip(1).First().Split('|').First().Replace("r", "").Trim().AsInt();
+                Console.WriteLine("最低版本号：" + lowVersion);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("请判断远程库连接是否正确！" + e.Message);
+            }
             Console.WriteLine("");
         }
     }

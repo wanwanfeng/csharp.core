@@ -12,7 +12,7 @@ namespace FileVersion
     {
         public override string Name
         {
-            get { return "{0}-{1:D8}-{2:D8}-patch"; }
+            get { return SaveDir + "{0}-{1:D8}-{2:D8}-patch"; }
         }
 
         public int startVersion { get; private set; }

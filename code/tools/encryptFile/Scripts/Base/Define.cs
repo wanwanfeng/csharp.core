@@ -20,25 +20,13 @@ namespace Encrypt
 
         public static string DefineRoot
         {
-            get
-            {
-                var path = Config.IniReadValue("Path", "defineRoot");
-                if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
-                    DefineRoot = path = Environment.CurrentDirectory + "\\Root";
-                return path;
-            }
+            get { return Config.IniReadValue("Path", "defineRoot", Environment.CurrentDirectory + "\\Root", 1000); }
             set { Config.IniWriteValue("Path", "defineRoot", value); }
         }
 
         public static string DefineSave
         {
-            get
-            {
-                var path = Config.IniReadValue("Path", "defineSave");
-                if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
-                    DefineSave = path = Environment.CurrentDirectory + "\\Save";
-                return path;
-            }
+            get { return Config.IniReadValue("Path", "defineSave", Environment.CurrentDirectory + "\\Save", 1000); }
             set { Config.IniWriteValue("Path", "defineSave", value); }
         }
     }

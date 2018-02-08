@@ -27,12 +27,13 @@ namespace Library
         /// <param name="section">配置段</param>
         /// <param name="key">键</param>
         /// <param name="defaultValue">值</param>
+        /// <param name="buffSize">缓冲区大小</param>
         /// <returns></returns>
-        public static string IniReadValue(string section, string key, string defaultValue)
+        public static string IniReadValue(string section, string key, string defaultValue = "",int buffSize = 500)
         {
-            StringBuilder temp = new StringBuilder(500);
-            var value = GetPrivateProfileString(section, key, "", temp, 500, inipath);
-            if (temp.Length != 0) return temp.ToString();
+            StringBuilder temp = new StringBuilder(buffSize);
+            var value = GetPrivateProfileString(section, key, "", temp, buffSize, inipath);
+            if (value != 0) return temp.ToString();
             IniWriteValue(section, key, defaultValue);
             return defaultValue;
         }

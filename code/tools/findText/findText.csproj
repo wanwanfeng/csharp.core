@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Library-U">
-      <HintPath>..\unity-bin\Library-U.dll</HintPath>
-    </Reference>
     <Reference Include="LitJson">
       <HintPath>..\unity-bin\LitJson.dll</HintPath>
     </Reference>

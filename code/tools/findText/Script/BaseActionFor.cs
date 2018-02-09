@@ -114,7 +114,7 @@ namespace findText
             progressBar1.Value = 0;
 
             string outpath = textBox1.Text + ".xlsx";
-            List<List<object>> vals = GetJsonDataArray(LitJsonHelper.ToJson(resJsonData));
+            List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
             OfficeWorkbooks.WriteToExcel(outpath, vals);
 
             label1.Text = "";
@@ -178,7 +178,7 @@ namespace findText
             resJsonData = new JsonData();
             resJsonData.SetJsonType(JsonType.Array);
             OpenRun();
-            WriteResult(textName, LitJsonHelper.ToJson(resJsonData), ".json");
+            WriteResult(textName, JsonMapper.ToJson(resJsonData), ".json");
             WriteExcel(textName, resJsonData);
         }
 

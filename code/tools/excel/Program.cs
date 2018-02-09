@@ -134,7 +134,7 @@ namespace excel
             return true;
         }
 
-        private static List<List<object>> GetJsonDataArray(string content)
+        public static List<List<object>> GetJsonDataArray(string content)
         {
             JsonData[] jsonDatas = JsonMapper.ToObject<JsonData[]>(content.Trim().Trim('\0'));
             //获取key集合
@@ -183,7 +183,7 @@ namespace excel
                 Console.WriteLine(" is now : " + file);
                 Dictionary<string, List<List<object>>> vals = OfficeWorkbooks.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
 
-                Dictionary<string, List<List<object>>> vals = EditorExcelTools.CacheDictionary.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
+                //Dictionary<string, List<List<object>>> vals = EditorExcelTools.CacheDictionary.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
                 foreach (KeyValuePair<string, List<List<object>>> keyValuePair in vals)
                 {
                     Console.WriteLine(" is now sheet: " + keyValuePair.Key);

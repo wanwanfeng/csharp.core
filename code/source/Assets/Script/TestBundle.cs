@@ -23,12 +23,15 @@ public class TestBundle : MonoBehaviour
     private IEnumerator Load(string url)
     {
         var path = assets[index];
-        using (WWW www = new WWW(url + path + ".unity3d"))
+        //using (WWW www = new WWW("file:///" + url + path + ".unity3d"))
         {
-            yield return www;
-            assetBundle = www.assetBundle;
-            www.Dispose();
+            //yield return www;
+            //assetBundle = www.assetBundle;
+            //www.Dispose();
 
+            assetBundle = AssetBundle.LoadFromFile(url + path + ".unity3d");
+            Debug.Log(assetBundle.name);
+            Debug.Log(string.Join(",", assetBundle.GetAllAssetNames()));
             var main = assetBundle.GetAllAssetNames().First();
             string ex = Path.GetExtension(main);
             string real = main; //GetPath(assetBundle, path, ref ex);

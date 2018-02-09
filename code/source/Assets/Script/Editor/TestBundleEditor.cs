@@ -32,7 +32,7 @@ public class TestBundleEditor : Editor
         {
             if (EditorApplication.isPlaying != true)
                 EditorApplication.isPlaying = true;
-            testBundle.Init("file:///" + BundleHelper.GetBundleRoot());
+            testBundle.Init(BundleHelper.GetBundleRoot());
         });
     }
 }

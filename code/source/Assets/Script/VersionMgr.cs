@@ -11,6 +11,7 @@ using System.Text;
 using FileVersion;
 using Library.Extensions;
 using Library.Helper;
+using UnityEngine.Library;
 using Debug = UnityEngine.Debug;
 
 //增量更新
@@ -38,7 +39,7 @@ using Debug = UnityEngine.Debug;
 //│      
 
 
-public class VersionMgr : MonoBehaviour
+public class VersionMgr : SingletonBehaviour<VersionMgr>
 {
     public static string SoftwareVersion { get; set; }
     protected static string KeyMd5 { get; private set; }
@@ -62,11 +63,11 @@ public class VersionMgr : MonoBehaviour
 #if UNITY_EDITOR
                 return "file:///" + DataPath + "/StreamingAssets/";
 #elif UNITY_STANDALONE_WIN
-                return "file:///" + dataPath + "/StreamingAssets/";
+                return "file:///" + DataPath + "/StreamingAssets/";
 #elif UNITY_ANDROID
-                return "jar:file://" + dataPath + "!/assets/";
+                return "jar:file://" + DataPath + "!/assets/";
 #elif UNITY_IPHONE || UNITY_IOS
-                return "file://" + dataPath + "/Raw/";  
+                return "file://" + DataPath + "/Raw/";  
 #endif
             }
         }
@@ -104,7 +105,7 @@ public class VersionMgr : MonoBehaviour
         }
 
         private readonly Queue<string> urls = new Queue<string>();
-        private static readonly int RetryCount = 5;
+        private const int retryCount = 5;
         private int retry = 0;
 
         public Access()
@@ -125,6 +126,7 @@ public class VersionMgr : MonoBehaviour
         /// <returns></returns>
         public IEnumerator FromRemote(MonoBehaviour mono, string path, Action<WWW> callAction)
         {
+
             using (WWW www = new WWW(urls.Peek() + path))
             {
 #if UNITY_EDITOR
@@ -140,7 +142,7 @@ public class VersionMgr : MonoBehaviour
                 }
                 else
                 {
-                    if (retry < RetryCount)
+                    if (retry < retryCount)
                     {
                         retry++;
                         urls.Enqueue(urls.Dequeue());
@@ -253,8 +255,9 @@ public class VersionMgr : MonoBehaviour
         {
             get
             {
-                if (!File.Exists(fileLocal)) return false;
-                return !Library.Encrypt.ComparerMD5(fileHash, File.ReadAllBytes(fileLocal));
+                if (File.Exists(fileLocal))
+                    return !Library.Encrypt.ComparerMD5(fileHash, File.ReadAllText(fileLocal));
+                return true;
             }
         }
 
@@ -289,7 +292,9 @@ public class VersionMgr : MonoBehaviour
 
         public override string ToString()
         {
-            return string.Format("Group: {0}, Name: {1}, FileHash: {2}, ZipHash: {3}, ZipSize: {4}, isNeedDownFile: {5}", @group, name, fileHash, zipHash, zipSize, isNeedDownFile);
+            return string.Format(
+                "Group: {0}, Name: {1}, FileHash: {2}, ZipHash: {3}, ZipSize: {4}, isNeedDownFile: {5}", @group, name,
+                fileHash, zipHash, zipSize, isNeedDownFile);
         }
     }
 
@@ -361,8 +366,8 @@ public class VersionMgr : MonoBehaviour
         {
             this.dataType = DataType.PersistentDataPath;
             patchInfo = info;
-            if (Enum.IsDefined(typeof(Action), fileInfo.action))
-                action = (Action)Enum.Parse(typeof(Action), fileInfo.action);
+            if (Enum.IsDefined(typeof (Action), fileInfo.action))
+                action = (Action) Enum.Parse(typeof (Action), fileInfo.action);
             else
                 action = Action.N;
             size = fileInfo.content_size.AsLong();
@@ -380,7 +385,8 @@ public class VersionMgr : MonoBehaviour
 
         public override string ToString()
         {
-            return string.Format("DataType: {0}, Action: {1}, path: {2}, version: {3}, hash: {4}, isNeedDownFile: {5}", dataType, action, path, version, hash, isNeedDownFile);
+            return string.Format("DataType: {0}, Action: {1}, path: {2}, version: {3}, hash: {4}, isNeedDownFile: {5}",
+                dataType, action, path, version, hash, isNeedDownFile);
         }
     }
 
@@ -462,17 +468,25 @@ public class VersionMgr : MonoBehaviour
             }
 
             ActionState(State.GetPatchList);
-            byte[] bytes = File.ReadAllBytes(info.fileLocal);
-            if (bytes.Length == 0) yield break;
-
-            ActionState(State.ApplyPatchList);
-            var content = Library.Encrypt.AES(Encoding.UTF8.GetString(bytes));
-            patchCache[info.fileUrl] =
-                LitJson.JsonMapper.ToObject<FileDetailInfo[]>(content)
-                    .Select(p => new ResInfo(info, p))
-                    .ToDictionary(p => p.path);
             MinVersion = Math.Min(MinVersion, info.first);
             MaxVersion = Math.Max(MaxVersion, info.last);
+
+            if (File.Exists(info.fileLocal))
+            {
+                byte[] bytes = File.ReadAllBytes(info.fileLocal);
+                if (bytes.Length == 0) yield break;
+
+                ActionState(State.ApplyPatchList);
+                var content = Library.Dencrypt.AES(bytes);
+                patchCache[info.fileUrl] =
+                    LitJson.JsonMapper.ToObject<FileDetailInfo[]>(content.Trim())
+                        .Select(p => new ResInfo(info, p))
+                        .ToDictionary(p => p.path);
+            }
+            else
+            {
+                Debug.LogError("file is not exist! " + info.fileLocal);
+            }
         }
 
         /// <summary>
@@ -667,7 +681,7 @@ public class VersionMgr : MonoBehaviour
             FileHelper.CreateDirectory(Access.PersistentDataPatchPath + PatchInfo.PatchListName);
             File.WriteAllBytes(Access.PersistentDataPatchPath + PatchInfo.PatchListName, res.bytes);
 
-            var content = Library.Dencrypt.AES(Encoding.UTF8.GetString(res.bytes));
+            var content = Library.Dencrypt.AES(res.bytes);
             var versionInfo = LitJson.JsonMapper.ToObject<FileVersion.VersionInfo>(content);
             SoftwareVersion = versionInfo.softwareVersion;
             patchListCache = versionInfo.pathInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
@@ -790,6 +804,14 @@ public class VersionMgr : MonoBehaviour
                 (www, obj) => { callAction.Invoke(www == null ? (obj as TextAsset).text : www.text); }));
     }
 
+    public IEnumerator Load(string path, Action<AssetBundle> callAction)
+    {
+        yield return StartCoroutine(LoadObject(path,
+            (www, obj) => { callAction.Invoke(www == null ? null : www.assetBundle); }));
+    }
+
+#if !(UNITY_ANDROID || UNITY_IPHONE)
+
     public IEnumerator Load(string path, Action<MovieTexture> callAction)
     {
         yield return
@@ -797,10 +819,7 @@ public class VersionMgr : MonoBehaviour
                 (www, obj) => { callAction.Invoke(www == null ? obj as MovieTexture : www.movie); }));
     }
 
-    public IEnumerator Load(string path, Action<AssetBundle> callAction)
-    {
-        yield return StartCoroutine(LoadObject(path, (www, obj) => { callAction.Invoke(www.assetBundle); }));
-    }
+#endif
 
     #endregion
 }

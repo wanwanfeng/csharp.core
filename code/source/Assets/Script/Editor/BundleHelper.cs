@@ -8,7 +8,27 @@ using UnityEditor;
 
 public class BundleHelper : Editor
 {
-    [MenuItem("Assets/SetAssetBundleName")]
+
+    //[MenuItem("AssetBundle/Clear All AssetBundle Name")]
+    //public static void ClearAllAssetBundleName()
+    //{
+    //    AssetDatabase.RemoveUnusedAssetBundleNames();
+    //}
+
+    [MenuItem("Assets/AssetBundleName/Del")]
+    public static void DelAssetBundleName()
+    {
+        string[] paths = Selection.instanceIDs.Select(p => AssetDatabase.GetAssetPath(p)).ToArray();
+        foreach (var path in paths)
+        {
+            AssetImporter importer = AssetImporter.GetAtPath(path);
+            importer.assetBundleName = "";
+            importer.SaveAndReimport();
+        }
+        AssetDatabase.Refresh();
+    }
+
+    [MenuItem("Assets/AssetBundleName/Set")]
     public static void SetAssetBundleName()
     {
         string[] paths = Selection.instanceIDs.Select(p => AssetDatabase.GetAssetPath(p)).ToArray();
@@ -17,15 +37,22 @@ public class BundleHelper : Editor
         {
             var extension = Path.GetExtension(path);
             if (extension == null) continue;
-            var index = path.IndexOf(flag, StringComparison.Ordinal);
-            var assetName = index != -1
-                ? path.Substring(index + flag.Length)
-                : Path.GetFileName(path);
-            assetName = assetName.Replace(extension, "");
-            AssetImporter importer = AssetImporter.GetAtPath(path);
-            importer.assetBundleName = assetName;
-            importer.SaveAndReimport();
-            Debug.Log(path + "\n" + assetName);
+            if (extension == ".prefab")
+            {
+
+            }
+            else
+            {
+                var index = path.IndexOf(flag, StringComparison.Ordinal);
+                var assetName = index != -1
+                    ? path.Substring(index + flag.Length)
+                    : Path.GetFileName(path);
+                assetName = assetName.Replace(extension, "");
+                AssetImporter importer = AssetImporter.GetAtPath(path);
+                importer.assetBundleName = assetName;
+                importer.SaveAndReimport();
+                Debug.Log(path + "\n" + assetName);
+            }
         }
         AssetDatabase.Refresh();
     }
@@ -65,26 +92,17 @@ public class BundleHelper : Editor
             assetBundleBuild.assetBundleVariant="";
             return assetBundleBuild;
         }).ToArray();
-        BuildPipeline.BuildAssetBundles(GetBundleRoot(), builds, GetBuildAssetBundleOptions(),
-            EditorUserBuildSettings.activeBuildTarget);
+        BuildPipeline.BuildAssetBundles(GetBundleRoot(), builds, GetBuildAssetBundleOptions(), EditorUserBuildSettings.activeBuildTarget);
         AssetDatabase.Refresh();
     }
 
-    [MenuItem("Tools/Build/AllAsset")]
+    [MenuItem("AssetBundle/Build All Asset")]
     public static void BuildAllAsset()
     {
         BuildAssetList(AssetDatabase.GetAllAssetBundleNames().ToList());
     }
 
-    [MenuItem("Tools/Build/SelectAsset")]
-    public static void BuildSelectAsset()
-    {
-        string[] paths = Selection.instanceIDs.Select(p => AssetDatabase.GetAssetPath(p)).ToArray();
-        List<string> assetsList = paths.Select(p => AssetImporter.GetAtPath(p).assetBundleName).ToList();
-        BuildAssetList(assetsList);
-    }
-
-    [MenuItem("Tools/Build/AllAssetIgnore")]
+    [MenuItem("AssetBundle/Build All Asset But Not Ignore")]
     public static void Asset()
     {
         var alls = AssetDatabase.GetAllAssetBundleNames().ToList();
@@ -111,5 +129,13 @@ public class BundleHelper : Editor
             }
         }
         BuildAssetList(alls);
+    }
+
+    [MenuItem("AssetBundle/Build Select Asset")]
+    public static void BuildSelectAsset()
+    {
+        string[] paths = Selection.instanceIDs.Select(p => AssetDatabase.GetAssetPath(p)).ToArray();
+        List<string> assetsList = paths.Select(p => AssetImporter.GetAtPath(p).assetBundleName).ToList();
+        BuildAssetList(assetsList);
     }
 }

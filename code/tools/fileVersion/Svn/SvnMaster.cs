@@ -87,7 +87,10 @@ namespace FileVersion
                     Console.WriteLine();
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
+
+                    //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
+                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", targetVersion, svnUrl, s.Key, fullPath));
+                    //RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
 
                     if (File.Exists(fullPath))
                     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using Library.Extensions;
 using Library.Helper;
@@ -41,7 +42,8 @@ namespace FileVersion
 
             diffList = RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl),
                 true);
-            diffList = diffList.Select(p => p.Replace(svnUrl + "/", "")).Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
+
+            diffList = diffList.Select(Uri.UnescapeDataString).Where(s => !s.EndsWith("/")).Select(p => p.Replace(svnUrl + "/", "")).ToArray(); //去除文件夹
 
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
             int index = 0;
@@ -75,6 +77,8 @@ namespace FileVersion
                 {
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);
+
+                    //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
                     RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
                     if (File.Exists(fullPath))
                     {

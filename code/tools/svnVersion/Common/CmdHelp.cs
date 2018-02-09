@@ -68,7 +68,7 @@ namespace FileVersion
             process.Close();
         }
 
-        public string[] RunCmd(string input,bool isFile = false)
+        public string[] RunCmd(string input, bool isFile = false)
         {
             Console.WriteLine(input);
             process.Start(); //启动程序
@@ -105,8 +105,14 @@ namespace FileVersion
                 {
                     res.Add(reader.ReadLine());
                 }
+                
                 Console.WriteLine("");
                 Console.WriteLine(res[3].Replace("&exit", ""));
+                if (res.Count == 4)
+                {
+                    res.Add("");
+                    return res.ToArray();
+                }
                 return res.Skip(4).ToArray();
             }
         }

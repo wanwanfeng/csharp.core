@@ -15,7 +15,7 @@ namespace FileVersion
             get { return SaveDir + "{0}-{1:D8}-{2:D8}-master"; }
         }
 
-        public int targetVersion { get; private set; }
+        public long targetVersion { get; private set; }
 
         public override void Run()
         {

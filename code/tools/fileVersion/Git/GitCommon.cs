@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 
 namespace FileVersion
 {
@@ -38,7 +39,7 @@ namespace FileVersion
                 }
             }
 
-            gitUrl = RunCmd("git remote -v").First().Replace("origin", "").Replace("(fetch)","").Trim();
+            gitUrl = RunCmd("git remote -v").First().Replace("origin", "").Replace("(fetch)", "").Trim();
             gitUrl += "/" + folder;
             Console.WriteLine("库地址：" + gitUrl);
 
@@ -46,15 +47,28 @@ namespace FileVersion
             //highVersion = RunCmd("git rev-parse HEAD " + folder).Last().AsInt();
             //Console.WriteLine("最高版本号：" + highVersion);
 
-            var logs = RunCmd("git log --pretty --oneline " + folder, true);
-            var highsha_1 = logs.First().Split(' ').First();
-            var lowsha_1 = logs.Last().Split(' ').First();
+            //var logs = RunCmd("git log --pretty --oneline " + folder, true);
+            //var highsha_1 = logs.First().Split(' ').First();
+            //var lowsha_1 = logs.Last().Split(' ').First();
 
+            //var logs = RunCmd("git rev-list --all " + folder, true);
+            //var highsha_1 = logs.First();
+            //var lowsha_1 = logs.Last();
 
+            //https://git-scm.com/book/zh/v1/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2
 
-            Console.WriteLine("最高版本号：" + highVersion);
-            Console.WriteLine("最低版本号：" + lowVersion);
-
+            var logs = RunCmd("git log --pretty=format:\"%ad,%H\" --date=format:\"%y%m%d%H%M%S\" " + folder, true);
+            highVersion = logs.First().Split(',').First().AsLong();
+            lowVersion = logs.Last().Split(',').First().AsLong();
+            Console.WriteLine("");
+            int index = 0;
+            foreach (var log in logs)
+            {
+                Console.WriteLine(++index + "\t" + log);
+            }
+            Console.WriteLine("");
+            Console.WriteLine("最高版本号：{0}", logs.First());
+            Console.WriteLine("最低版本号：{0}", logs.Last());
             Console.WriteLine("");
         }
     }

@@ -16,8 +16,8 @@ namespace FileVersion
             get { return SaveDir + "{0}-{1:D8}-{2:D8}-patch"; }
         }
 
-        public int startVersion { get; private set; }
-        public int endVersion { get; private set; }
+        public long startVersion { get; private set; }
+        public long endVersion { get; private set; }
         public string[] diffList { get; private set; }
 
         public override void Run()
@@ -25,12 +25,12 @@ namespace FileVersion
             base.Run();
 
             Console.Write("请输入起始版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            startVersion = Console.ReadLine().AsInt();
+            startVersion = Console.ReadLine().AsLong();
             startVersion = Math.Max(startVersion, lowVersion);
             Console.WriteLine("起始版本号：" + startVersion);
 
             Console.Write("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = Console.ReadLine().AsInt();
+            endVersion = Console.ReadLine().AsLong();
             endVersion = Math.Min(endVersion, highVersion);
             endVersion = Math.Max(endVersion, lowVersion);
             Console.WriteLine("结束版本号：" + endVersion);

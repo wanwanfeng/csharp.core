@@ -15,14 +15,14 @@ namespace FileVersion
             get { return SaveDir + "{0}-{1:D8}-{2:D8}-master"; }
         }
 
-        public int targetVersion { get; private set; }
+        public long targetVersion { get; private set; }
 
         public override void Run()
         {
             base.Run();
 
             Console.Write("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            targetVersion = Console.ReadLine().AsInt();
+            targetVersion = Console.ReadLine().AsLong();
             targetVersion = Math.Max(targetVersion, lowVersion);
             targetVersion = Math.Min(targetVersion, highVersion);
             Console.WriteLine("目标版本号：" + targetVersion);

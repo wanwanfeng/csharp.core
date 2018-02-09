@@ -69,8 +69,8 @@ namespace FileVersion
         }
 
         public string folder { get; protected set; }
-        public int highVersion { get; protected set; }
-        public int lowVersion { get; protected set; }
+        public long highVersion { get; protected set; }
+        public long lowVersion { get; protected set; }
 
         public virtual void Run()
         {

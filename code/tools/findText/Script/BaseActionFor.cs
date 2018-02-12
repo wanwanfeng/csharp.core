@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using excel;
 using findText.Script;
+using Library.Extensions;
 using Library.Helper;
 using LitJson;
 
@@ -75,6 +77,24 @@ namespace findText
             return Directory.GetFiles(path, "*", searchOption).Select(p => p.Replace("\\", "/")).ToArray();
         }
 
+        private JsonData SetJsonDataArray(List<List<object>> content)
+        {
+            JsonData jsonDatas = new JsonData();
+            jsonDatas.SetJsonType(JsonType.Array);
+            List<object> first = content.First();
+            content.Remove(first);
+            foreach (List<object> objects in content)
+            {
+                JsonData jsonData = new JsonData();
+                for (int j = 0; j < first.Count; j++)
+                {
+                    string val = objects[j].ToString();
+                    val = val.Replace("::", ":").Replace("\\n", "\n");
+                    jsonData[first[j].ToString()] = val;
+                }
+            }
+            return jsonDatas;
+        }
 
         private List<List<object>> GetJsonDataArray(string content)
         {
@@ -149,8 +169,9 @@ namespace findText
         }
 
         protected string path = "";
-        protected  List<string> all = new List<string>();
+        protected List<string> all = new List<string>();
         private JsonData resJsonData;
+
         protected virtual string textName
         {
             get { return "Find_Text"; }
@@ -186,10 +207,10 @@ namespace findText
 
         protected string[] GetShowInfo(int i)
         {
-            label1.Text = "搜索中...请稍后" + (float)i / all.Count;
-            progressBar1.Value = (int)((float)i / all.Count * 100);
+            label1.Text = "搜索中...请稍后" + (float) i/all.Count;
+            progressBar1.Value = (int) ((float) i/all.Count*100);
 
-            return File.ReadAllLines(all[i]);          
+            return File.ReadAllLines(all[i]);
         }
 
         protected void GetJsonValue(string val, int i, int k, string[] input)
@@ -205,7 +226,32 @@ namespace findText
 
         public virtual void Revert()
         {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "/log/";
+            openFileDialog.Filter = string.Format("文本文件(*{0})|*{0}|所有文件(*.*)|*.*", ".xlsx");
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.Multiselect = true;
+            openFileDialog.FilterIndex = 1;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                Dictionary<string, List<List<object>>> dic = OfficeWorkbooks.ReadFromExcel(openFileDialog.SafeFileName);
 
+                foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+                {
+                    JsonData jsonData = SetJsonDataArray(pair.Value);
+                    foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)
+                    {
+                        string temp = data.Value["文件名"].ToString();
+                        string[] content = File.ReadAllLines(temp);
+                        int line = data.Value["行号"].ToString().AsInt();
+                        string oldStr = data.Value["原文"].ToString();
+                        string newStr = data.Value["译文"].ToString();
+                        if (content[line] == oldStr)
+                            content[line] = content[line].Replace(oldStr, newStr);
+                        File.WriteAllLines(temp, content);
+                    }
+                }
+            }
         }
     }
 }

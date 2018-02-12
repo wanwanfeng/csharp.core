@@ -29,6 +29,8 @@ namespace FileVersion
             Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
+            return;
+
             var targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, gitUrl), true);
             targetList = targetList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
 
@@ -39,15 +41,15 @@ namespace FileVersion
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
                 var last = res.Skip(6).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
-                FileDetailInfo svnFileInfo = new FileDetailInfo()
+                FileDetailInfo fileDetailInfo = new FileDetailInfo()
                 {
                     action = "A",
                     version = res.First().Trim(),
                     content_size = res.Skip(2).First().Trim(),
                     path = last,
                 };
-                cache[svnFileInfo.path] = svnFileInfo;
-                Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
+                cache[fileDetailInfo.path] = fileDetailInfo;
+                Console.WriteLine("{0:D5}\t{1}", ++index, fileDetailInfo);
             }
             if (!ExcludeFile(cache)) return;
 
@@ -61,7 +63,9 @@ namespace FileVersion
             //    Console.WriteLine("正在导出中...");
             //    Console.WriteLine("根据项目大时间长短不定，请耐心等待...");
             //    FileHelper.CreateDirectory(Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir);
-            //    RunCmd(string.Format("svn export -r {0} {1}@{0} {2}", targetVersion, svnUrl, targetDir), true);
+            //    RunCmd(
+            //        string.Format("git archive --output=\"{2}.zip\" --format=zip --verbose {0} --",
+            //            CacheConvert.First(p => p.index == targetVersion).sha1, gitUrl, targetDir), true);
 
             //    index = 0;
             //    foreach (var s in cache)
@@ -82,7 +86,7 @@ namespace FileVersion
                     Console.Clear();
                     Console.WriteLine("\n正在导出文件...");
                     Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
-                    Console.WriteLine("正在导出中...{0}", ((float) (++index)/cache.Count).ToString("P"));
+                    Console.WriteLine("正在导出中...{0}", ((float)(++index) / cache.Count).ToString("P"));
                     Console.WriteLine("is now: {0}", s.Key);
                     Console.WriteLine();
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;

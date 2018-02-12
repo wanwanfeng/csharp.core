@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Library.Extensions;
 
 namespace FileVersion
 {
@@ -19,6 +19,21 @@ namespace FileVersion
             else
                 Console.WriteLine("未安装Git命令行工具，请先安装！");
         }
+
+
+        protected class ConvertStruct
+        {
+            public int index;
+            public string dateTime;
+            public string sha1;
+
+            public override string ToString()
+            {
+                return string.Format("{0}\t{1},{2}", index, dateTime, sha1);
+            }
+        }
+
+        protected List<ConvertStruct> CacheConvert = new List<ConvertStruct>();
 
         public override void Run()
         {
@@ -57,18 +72,33 @@ namespace FileVersion
 
             //https://git-scm.com/book/zh/v1/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2
 
-            var logs = RunCmd("git log --pretty=format:\"%ad,%H\" --date=format:\"%y%m%d%H%M%S\" " + folder, true);
-            highVersion = logs.First().Split(',').First().AsLong();
-            lowVersion = logs.Last().Split(',').First().AsLong();
+            var logs = RunCmd("git log --reverse --pretty=format:\"%ad,%H\" --date=format:\"%y-%m-%d-%H-%M-%S\" " + folder, true);
             Console.WriteLine("");
+
             int index = 0;
             foreach (var log in logs)
             {
-                Console.WriteLine(++index + "\t" + log);
+                CacheConvert.Add(new ConvertStruct()
+                {
+                    index = index,
+                    dateTime = log.Split(',').First(),
+                    sha1 = log.Split(',').Last()
+                });
+                ++index;
             }
+            CacheConvert.Reverse();
+
+            foreach (var convertStruct in CacheConvert)
+            {
+                Console.WriteLine(convertStruct);
+            }
+
+            highVersion = CacheConvert.First().index;
+            lowVersion = CacheConvert.Last().index;
+
             Console.WriteLine("");
-            Console.WriteLine("最高版本号：{0}", logs.First());
-            Console.WriteLine("最低版本号：{0}", logs.Last());
+            Console.WriteLine("最高版本号：{0}", highVersion);
+            Console.WriteLine("最低版本号：{0}", lowVersion);
             Console.WriteLine("");
         }
     }

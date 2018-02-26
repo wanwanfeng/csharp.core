@@ -37,8 +37,8 @@ namespace findText
             textBox1 = textBox;
             progressBar1 = progressBar;
 
-            label1.Text = "";
-            textBox1.Text = "";
+            //label1.Text = "";
+            //textBox1.Text = "";
             progressBar1.Value = 0;
         }
 
@@ -85,13 +85,14 @@ namespace findText
             content.Remove(first);
             foreach (List<object> objects in content)
             {
-                JsonData jsonData = new JsonData();
+                JsonData data = new JsonData();
                 for (int j = 0; j < first.Count; j++)
                 {
                     string val = objects[j].ToString();
                     val = val.Replace("::", ":").Replace("\\n", "\n");
-                    jsonData[first[j].ToString()] = val;
+                    data[first[j].ToString()] = val;
                 }
+                jsonDatas.Add(data);
             }
             return jsonDatas;
         }
@@ -234,22 +235,38 @@ namespace findText
             openFileDialog.FilterIndex = 1;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Dictionary<string, List<List<object>>> dic = OfficeWorkbooks.ReadFromExcel(openFileDialog.SafeFileName);
+                Dictionary<string, List<List<object>>> dic = OfficeWorkbooks.ReadFromExcel(openFileDialog.FileName);
 
                 foreach (KeyValuePair<string, List<List<object>>> pair in dic)
                 {
                     JsonData jsonData = SetJsonDataArray(pair.Value);
-                    foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)
+
+
+                    foreach (JsonData data in jsonData)
                     {
-                        string temp = data.Value["文件名"].ToString();
+                        string temp = data["文件名"].ToString();
                         string[] content = File.ReadAllLines(temp);
-                        int line = data.Value["行号"].ToString().AsInt();
-                        string oldStr = data.Value["原文"].ToString();
-                        string newStr = data.Value["译文"].ToString();
-                        if (content[line] == oldStr)
-                            content[line] = content[line].Replace(oldStr, newStr);
-                        File.WriteAllLines(temp, content);
+                        int line = data["行号"].ToString().AsInt();
+                        string oldStr = data["原文"].ToString();
+                        string oldStr2 = data["需翻译"].ToString();
+                        string newStr = data["译文"].ToString();
+                        //if (content[line] == oldStr)
+                            content[line] = content[line].Replace(oldStr2, newStr);
+                            File.WriteAllLines(temp, content);
                     }
+
+                    //foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)
+                    //{
+                    //    string temp = data.Value["文件名"].ToString();
+                    //    string[] content = File.ReadAllLines(temp);
+                    //    int line = data.Value["行号"].ToString().AsInt() + 1;
+                    //    string oldStr = data.Value["原文"].ToString();
+                    //    string oldStr2 = data.Value["需翻译"].ToString();
+                    //    string newStr = data.Value["译文"].ToString();
+                    //    if (content[line] == oldStr)
+                    //        content[line] = content[line].Replace(oldStr2, newStr);
+                    //    File.WriteAllLines(temp, content);
+                    //}
                 }
             }
         }

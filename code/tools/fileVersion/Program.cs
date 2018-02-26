@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace FileVersion
 {
@@ -8,6 +11,10 @@ namespace FileVersion
 
         private static void Main(string[] args)
         {
+            // 添加程序集解析事件
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, assembly) => LoadFromResource(assembly.Name);
+            
+
             while (isRuning)
             {
                 string mes =
@@ -51,6 +58,28 @@ namespace FileVersion
                 Console.WriteLine("按y键继续,按其余键退出......");
                 isRuning = Console.ReadLine() == "y";
                 Console.Clear();
+            }
+        }
+
+
+        /// <summary>
+        /// 根据要加载的资源项名，加载对应的程序集。
+        /// </summary>
+        /// <param name="argsName">要解析的项的名称。</param>
+        /// <returns>返回对应项的程序集。</returns>
+        private static Assembly LoadFromResource(string argsName)
+        {
+            string dllName = new AssemblyName(argsName).Name + ".dll";
+
+            var assem = Assembly.GetExecutingAssembly();
+            var resourceName = assem.GetManifestResourceNames().FirstOrDefault(rn => rn.EndsWith(dllName));
+            if (resourceName == null) return null; // 没找到程序集。
+
+            using (Stream stream = assem.GetManifestResourceStream(resourceName))
+            {
+                byte[] assemblyData = new byte[stream.Length];
+                stream.Read(assemblyData, 0, assemblyData.Length);
+                return Assembly.Load(assemblyData);
             }
         }
     }

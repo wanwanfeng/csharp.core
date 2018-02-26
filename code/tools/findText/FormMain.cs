@@ -41,7 +41,7 @@ namespace findText
 
         private void button_run_Click_1(object sender, EventArgs e)
         {
-            ConvertType convertType = (ConvertType)Enum.Parse(typeof(ConvertType), comboBox1.SelectedText);
+            ConvertType convertType = (ConvertType)Enum.Parse(typeof(ConvertType), comboBox1.SelectedItem.ToString());
             BaseActionFor baseActionFor = (BaseActionFor)Activator.CreateInstance(cache[convertType]);
             baseActionFor.Init(this.textBox1, this.progressBar1, this.label1);
             if (this.checkBox1.Checked)

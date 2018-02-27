@@ -185,14 +185,14 @@ namespace findText
 
         public void Open()
         {
-            all = GetFiles(out path, SearchOption.AllDirectories).ToList();
+            var res = GetFiles(out path, SearchOption.AllDirectories).ToList();
             foreach (var s in exName)
             {
-                all = all.Where(p =>
+                all.AddRange(res.Where(p =>
                 {
                     var xx = Path.GetExtension(p);
-                    return !string.IsNullOrEmpty(xx) && xx != s;
-                }).ToList();
+                    return !string.IsNullOrEmpty(xx) && xx == s;
+                }));
             }
             if (all.Count == 0) return;
             all.Sort();

@@ -29,7 +29,7 @@ namespace findText.Script
                 {
                     if (isTrue) continue;
                     var val = input[k];
-                    if (val.TrimStart().StartsWith("#")) continue;
+                    if (val.TrimStart().StartsWith("#") && !val.TrimStart().StartsWith("#define")) continue;
                     if (val.TrimStart().StartsWith("@brief ")) continue;
                     if (val.TrimStart().StartsWith("///")) continue;
                     if (val.TrimStart().StartsWith("//")) continue;

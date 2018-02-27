@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Library.dll</HintPath>
+    </Reference>
     <Reference Include="LitJson">
       <HintPath>..\bin\LitJson.dll</HintPath>
     </Reference>

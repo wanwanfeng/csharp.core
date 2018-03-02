@@ -181,7 +181,7 @@ namespace fileDownload
         public static bool HttpDownload(string revision, string hashname, string filename, string hashvalue, string encryptedhashvalue)
         {
             var houzhui = revision + "/" + hashname;
-            string newname = root + "app/" + houzhui;
+            string newname = root + "app2/" + houzhui;
             FileHelper.CreateDirectory(newname);
 
             string tempFile = newname + ".temp"; //临时文件

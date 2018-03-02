@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "findText", "findText\findTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fileDownload", "fileDownload\fileDownload.csproj", "{680B3F66-B9A6-4DB1-B1F9-E06B02BC6B4F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scenario_tools", "scenario_tools\scenario_tools.csproj", "{855D1F87-913D-4FE3-9D7F-3B9A1060E468}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{680B3F66-B9A6-4DB1-B1F9-E06B02BC6B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{680B3F66-B9A6-4DB1-B1F9-E06B02BC6B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{680B3F66-B9A6-4DB1-B1F9-E06B02BC6B4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{855D1F87-913D-4FE3-9D7F-3B9A1060E468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{855D1F87-913D-4FE3-9D7F-3B9A1060E468}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{855D1F87-913D-4FE3-9D7F-3B9A1060E468}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{855D1F87-913D-4FE3-9D7F-3B9A1060E468}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

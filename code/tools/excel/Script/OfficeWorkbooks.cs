@@ -442,6 +442,7 @@ namespace excel
             {
                 var workSheet = (Worksheet) workbook.ActiveSheet;
                 Console.WriteLine(workSheet.Name);
+                var f = Path.GetFileNameWithoutExtension(filename);
                 //第一种：Excel.Application的Cell by Cell
                 for (int j = 0; j < vals.Count; j++)
                 {
@@ -449,6 +450,7 @@ namespace excel
                     {
                         workSheet.Cells[j + 1, i + 1] = vals[j][i];
                     }
+                    Console.WriteLine(f + "/" + j + "/" + vals.Count);
                 }
                 workSheet = null;
             });

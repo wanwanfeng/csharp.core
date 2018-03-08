@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using UnityEditor.Library;
 
 namespace UnityEditor
 {
@@ -52,6 +56,58 @@ namespace UnityEditor
         {
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        #endregion
+
+        #region File
+
+        private static string GetFileName(string fileName)
+        {
+            var traceName = Path.GetFileNameWithoutExtension(new StackTrace(true).GetFrame(2).GetFileName());
+            if (!string.IsNullOrEmpty(traceName))
+                fileName = traceName + "/" + fileName;
+            return fileName;
+        }
+
+        /// <summary>
+        /// FileRoot
+        /// </summary>
+        private static string FileRoot = "/../log/";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static List<string> FileRead(string fileName)
+        {
+            fileName = GetFileName(fileName);
+            return EditorUtils.FileRead(FileRoot + fileName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName">包括文件后缀</param>
+        /// <param name="res"></param>
+        /// <param name="isPopup"></param>
+        public static void FileWrite(string fileName, string[] res, bool isPopup = true)
+        {
+            fileName = GetFileName(fileName);
+            EditorUtils.FileWrite(FileRoot + fileName, res, isPopup);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName">包括文件后缀</param>
+        /// <param name="res"></param>
+        /// <param name="isPopup"></param>
+        public static void FileWrite(string fileName, string res, bool isPopup = true)
+        {
+            fileName = GetFileName(fileName);
+            EditorUtils.FileWrite(FileRoot + fileName, res, isPopup);
         }
 
         #endregion

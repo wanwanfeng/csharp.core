@@ -53,7 +53,8 @@ namespace UnityEditor
             EditorGUILayout.EndHorizontal();
         }
 
-        public static void HorizontalAsToolBar(this ScriptableObject target, Action callAction, int spaceH = 10, int spaceV = 0)
+        public static void HorizontalAsToolBar(this ScriptableObject target, Action callAction, int spaceH = 10,
+            int spaceV = 0)
         {
             GUILayout.Space(spaceV);
             EditorGUILayout.BeginHorizontal("Toolbar", GUILayout.MinHeight(10));
@@ -80,12 +81,14 @@ namespace UnityEditor
             EditorGUILayout.EndHorizontal();
         }
 
-        public static void SetButton(this ScriptableObject target, string msg, Action action, int width, GUIStyle style = null)
+        public static void SetButton(this ScriptableObject target, string msg, Action action, int width,
+            GUIStyle style = null)
         {
             SetButton(target, msg, action, style, GUILayout.MaxWidth(width));
         }
 
-        public static void SetButton(this ScriptableObject target, string msg, Action action, params GUILayoutOption[] options)
+        public static void SetButton(this ScriptableObject target, string msg, Action action,
+            params GUILayoutOption[] options)
         {
             if (GUILayout.Button(msg, options))
                 SetButtonAction(target, action);
@@ -140,7 +143,8 @@ namespace UnityEditor
             return t;
         }
 
-        public static int SetPopup(this ScriptableObject target, string[] list, int t, Action<int> action, int width = 0, GUIStyle style = null)
+        public static int SetPopup(this ScriptableObject target, string[] list, int t, Action<int> action, int width = 0,
+            GUIStyle style = null)
         {
             int selected = t;
             if (style == null)
@@ -165,7 +169,8 @@ namespace UnityEditor
             return t;
         }
 
-        public static bool SetToggle(this ScriptableObject target, string msg, bool t, Action<bool> action, int width = 0)
+        public static bool SetToggle(this ScriptableObject target, string msg, bool t, Action<bool> action,
+            int width = 0)
         {
             bool toggle = width <= 0 ? GUILayout.Toggle(t, msg) : GUILayout.Toggle(t, msg, GUILayout.MaxWidth(width));
             if (toggle == t) return t;
@@ -177,7 +182,8 @@ namespace UnityEditor
             return t;
         }
 
-        public static int SetToolbar(this ScriptableObject target, string[] msg, int t, Action<int> action, int width = 0, int height = 20)
+        public static int SetToolbar(this ScriptableObject target, string[] msg, int t, Action<int> action,
+            int width = 0, int height = 20)
         {
             int selectId = t;
             if (width == 0)
@@ -242,7 +248,8 @@ namespace UnityEditor
             }
         }
 
-        public static void SetSelectableLabel(this BaseWindow target, string controlName, string msg, string path, params GUILayoutOption[] option)
+        public static void SetSelectableLabel(this BaseWindow target, string controlName, string msg, string path,
+            params GUILayoutOption[] option)
         {
             GUI.SetNextControlName(controlName);
             EditorGUILayout.SelectableLabel(msg, option);

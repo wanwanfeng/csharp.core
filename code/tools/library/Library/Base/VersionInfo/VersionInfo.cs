@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Library.Extensions;
 
 namespace FileVersion
 {
@@ -43,5 +44,26 @@ namespace FileVersion
     {
         public string softwareVersion;
         public List<FilePatchInfo> pathInfos;
+
+        /// <summary>
+        /// App版本比较
+        /// </summary>
+        /// <param name="oldV">0.0.0</param>
+        /// <param name="newV">1.1.1</param>
+        /// <param name="separator">,</param>
+        /// <returns></returns>
+        public static bool IsCanDownLoad(string oldV, string newV, params char[] separator)
+        {
+            var runArray = new Queue<int>(oldV.AsIntArray(separator));
+            var remoteArray = new Queue<int>(newV.AsIntArray(separator));
+            while (runArray.Count > 0 || remoteArray.Count > 0)
+            {
+                var run = runArray.Count == 0 ? 0 : runArray.Dequeue();
+                var remote = remoteArray.Count == 0 ? 0 : remoteArray.Dequeue();
+                if (run == remote) continue;
+                return run < remote;
+            }
+            return false;
+        }
     }
 }

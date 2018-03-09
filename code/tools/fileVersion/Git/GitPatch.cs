@@ -51,7 +51,7 @@ namespace FileVersion
                 string last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
                 FileDetailInfo svnFileInfo = new FileDetailInfo()
                 {
-                    action = res.First().Trim(),
+                    is_delete = res.First().Trim() == "D",
                     path = last,
                 };
                 cache[svnFileInfo.path] = svnFileInfo;
@@ -71,7 +71,7 @@ namespace FileVersion
                 Console.WriteLine("正在导出中...{0}", ((float)(++index) / cache.Count).ToString("P"));
                 Console.WriteLine("is now: {0}", s.Key);
                 Console.WriteLine();
-                if (s.Value.action != "D")
+                if (!s.Value.is_delete)
                 {
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);

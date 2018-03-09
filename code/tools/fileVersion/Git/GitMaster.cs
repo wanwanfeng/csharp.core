@@ -43,9 +43,9 @@ namespace FileVersion
                 var last = res.Skip(6).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
                 FileDetailInfo fileDetailInfo = new FileDetailInfo()
                 {
-                    action = "A",
+                    is_delete = false,
                     version = res.First().Trim(),
-                    content_size = res.Skip(2).First().Trim(),
+                    content_size = res.Skip(2).First().Trim().AsLong(),
                     path = last,
                 };
                 cache[fileDetailInfo.path] = fileDetailInfo;

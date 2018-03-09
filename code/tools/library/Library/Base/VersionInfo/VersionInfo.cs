@@ -1,54 +1,63 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Library.Extensions;
 
 namespace FileVersion
 {
-    public class FileDetailInfo
+    public abstract class BaseFileInfo
     {
         public string path;
-        public string path_hash;
-        public string action;
-
-        public string version;
         public string content_hash;
-        public string content_size;
+        public long content_size;
         public string encrypt_hash;
-        public string encrypt_size;
+        public long encrypt_size;
 
-        public bool isEncrypt
+        /// <summary>
+        /// 是否加密
+        /// </summary>
+        public bool IsEncrypt()
         {
-            get
-            {
-                if (string.IsNullOrEmpty(content_hash))
-                    return false;
-                if (string.IsNullOrEmpty(encrypt_hash))
-                    return false;
-                return content_hash != encrypt_hash;
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", path_hash, action, version, content_hash,
-                content_size,
-                encrypt_hash, encrypt_size, path);
+            if (string.IsNullOrEmpty(content_hash))
+                return false;
+            if (string.IsNullOrEmpty(encrypt_hash))
+                return false;
+            return content_hash != encrypt_hash;
         }
     }
 
-    public class FilePatchInfo
+    public class FileDetailInfo : BaseFileInfo
+    {
+        public string path_hash;
+        public bool is_delete;
+
+        public string version;
+
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", path_hash, is_delete, version, content_hash,
+                content_size, encrypt_hash, encrypt_size, path);
+        }
+    }
+
+    public class FilePatchInfo : BaseFileInfo
     {
         public string group;
         public int firstVersion;
         public int lastVersion;
-        public string path;
-        public string content_hash;
-        public string content_size;
         public string zip_hash;
-        public string zip_size;
+        public long zip_size;
+
+        //是否是压缩包
+        public bool IsZip()
+        {
+            return !string.IsNullOrEmpty(zip_hash);
+        }
+
         public override string ToString()
         {
-            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", group, firstVersion, lastVersion, path, content_hash,
-                content_size, zip_hash, zip_size);
+            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}", group, firstVersion, lastVersion, path,
+                content_hash,
+                content_size, encrypt_hash, encrypt_size, zip_hash, zip_size);
         }
     }
 

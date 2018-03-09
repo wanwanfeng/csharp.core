@@ -8,8 +8,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using FileVersion;
-using Library.Extensions;
 using Library.Helper;
 using UnityEngine.Library;
 using Debug = UnityEngine.Debug;
@@ -234,19 +232,12 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         #endregion
     }
 
-    public class PatchInfo
+    public class FilePatchInfo : FileVersion.FilePatchInfo
     {
         public static string PatchListName = "patch-list.txt";
 
-        public string group; //资源包所属
-        public string name; //资源包名称
-        public int first; //开始版本号
-        public int last; //结束版本号 
-
         public string fileUrl; //远程文本
         public string fileLocal; //本地对应远程全路径文本
-        public string fileHash; //对应的记录文本hash
-        public long fileSize; //对应的记录文本大小
 
         /// <summary>
         /// 记录文本是否需要下载
@@ -256,49 +247,35 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             get
             {
                 if (File.Exists(fileLocal))
-                    return !Library.Encrypt.ComparerMD5(fileHash, File.ReadAllText(fileLocal));
+                    return !Library.Encrypt.ComparerMD5(content_hash, File.ReadAllText(fileLocal));
                 return true;
             }
         }
 
-        public string zipHash; //压缩包hash
-        public long zipSize; //压缩包大小
-
-        //是否是压缩包
-        public bool isZip
+        public FilePatchInfo(FileVersion.FilePatchInfo info)
         {
-            get { return !string.IsNullOrEmpty(zipHash); }
-        }
-
-        public string zipName
-        {
-            get { return name + ".zip"; }
-        }
-
-        public PatchInfo(FilePatchInfo info)
-        {
-            name = info.path;
+            path = info.path;
             group = info.group;
-            first = info.firstVersion;
-            last = info.lastVersion;
-            fileSize = info.content_size.AsLong();
-            fileHash = info.content_hash;
-            zipSize = info.zip_size.AsLong();
-            zipHash = info.zip_hash;
+            firstVersion = info.firstVersion;
+            lastVersion = info.lastVersion;
+            content_size = info.content_size;
+            content_hash = info.content_hash;
+            zip_size = info.zip_size;
+            zip_hash = info.zip_hash;
 
-            fileUrl = Path.GetFileNameWithoutExtension(name) + ".txt";
+            fileUrl = Path.GetFileNameWithoutExtension(path) + ".txt";
             fileLocal = Access.PersistentDataPatchPath + fileUrl.Replace("/", "-");
         }
 
         public override string ToString()
         {
             return string.Format(
-                "Group: {0}, Name: {1}, FileHash: {2}, ZipHash: {3}, ZipSize: {4}, isNeedDownFile: {5}", @group, name,
-                fileHash, zipHash, zipSize, isNeedDownFile);
+                "Group: {0}, Name: {1}, FileHash: {2}, ZipHash: {3}, ZipSize: {4}, isNeedDownFile: {5}", @group, path,
+                content_hash, zip_hash, zip_size, isNeedDownFile);
         }
     }
 
-    public class ResInfo
+    public class FileDetailInfo : FileVersion.FileDetailInfo
     {
         public enum DataType
         {
@@ -308,27 +285,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         }
 
         public DataType dataType = DataType.PersistentDataPath;
-
-        public enum Action
-        {
-            N,
-            A, //add
-            M, //modified
-            D, //delete
-        }
-
-        /// <summary>
-        /// 相对于旧得版本的文件操作行为
-        /// </summary>
-        public Action action = Action.N;
-
-        public string path { get; private set; }
         public string name { get; private set; }
-        public int version { get; private set; }
-        public long size { get; private set; }
-        public string hash { get; private set; }
         public string url { get; private set; }
-        public PatchInfo patchInfo { get; private set; }
+        public bool is_ready { get; set; }
+        public FilePatchInfo patchInfo { get; private set; }
 
         public string localhash
         {
@@ -345,39 +305,35 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         {
             get
             {
-                if (action == Action.D)
-                    return false;
-                if (action == Action.A)
-                    return true;
-                if (action == Action.M)
-                    return true;
-                return hash != localhash;
+                if (is_delete) return false;
+                if (is_ready) return false;
+                if (IsEncrypt())
+                    return encrypt_hash != localhash;
+                return content_hash != localhash;
             }
         }
 
-        public ResInfo(string path, DataType dataType)
+        public FileDetailInfo(string path, DataType dataType)
         {
             this.path = path;
             this.dataType = dataType;
-            action = Action.N;
         }
 
-        public ResInfo(PatchInfo info, FileDetailInfo fileInfo)
+        public FileDetailInfo(FilePatchInfo info, FileVersion.FileDetailInfo fileInfo)
         {
             this.dataType = DataType.PersistentDataPath;
             patchInfo = info;
-            if (Enum.IsDefined(typeof (Action), fileInfo.action))
-                action = (Action) Enum.Parse(typeof (Action), fileInfo.action);
-            else
-                action = Action.N;
-            size = fileInfo.content_size.AsLong();
-            hash = fileInfo.content_hash;
-            path = fileInfo.path_md5;
-            version = fileInfo.version.AsInt();
-            if (patchInfo.isZip && action != Action.D)
-                action = Action.N;
-            if (hash == localhash)
-                action = Action.N;
+
+            path = fileInfo.path_hash;
+            version = fileInfo.version;
+            is_delete = fileInfo.is_delete;
+            content_size = fileInfo.content_size;
+            content_hash = fileInfo.content_hash;
+
+            if (patchInfo.IsEncrypt())
+                is_ready = false;
+            if (content_hash == localhash)
+                is_ready = true;
 
             name = Path.GetFileName(path);
             url = string.Format("{0}?v={1}", path, version);
@@ -385,8 +341,8 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
 
         public override string ToString()
         {
-            return string.Format("DataType: {0}, Action: {1}, path: {2}, version: {3}, hash: {4}, isNeedDownFile: {5}",
-                dataType, action, path, version, hash, isNeedDownFile);
+            return string.Format("DataType: {0}, is_delete: {1}, path: {2}, version: {3}, content_hash: {4}, isNeedDownFile: {5}",
+                dataType, is_delete, path, version, content_hash, isNeedDownFile);
         }
     }
 
@@ -406,17 +362,17 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         [SerializeField]
         public string GroupName { get; private set; }
 
-        public PatchInfo LastAccessInfo { get; set; }
-        private List<PatchInfo> patchList { get; set; }
-        public Dictionary<string, ResInfo> masterCache { get; set; }
-        private Dictionary<string, Dictionary<string, ResInfo>> patchCache { get; set; }
+        public FilePatchInfo LastAccessInfo { get; set; }
+        private List<FilePatchInfo> filePatchList { get; set; }
+        public Dictionary<string, FileDetailInfo> mainCache { get; set; }
+        private Dictionary<string, Dictionary<string, FileDetailInfo>> patchCache { get; set; }
 
-        public void Init(string group, List<PatchInfo> list)
+        public void Init(string group, List<FilePatchInfo> list)
         {
             GroupName = group;
-            masterCache = new Dictionary<string, ResInfo>();
-            patchCache = new Dictionary<string, Dictionary<string, ResInfo>>();
-            patchList = list;
+            mainCache = new Dictionary<string, FileDetailInfo>();
+            patchCache = new Dictionary<string, Dictionary<string, FileDetailInfo>>();
+            filePatchList = list;
         }
 
         public IEnumerator InitStart(List<string> resourcesCacheList, List<string> streamingAssetsCachelist)
@@ -424,26 +380,26 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             //Resources载入缓存
             foreach (var path in resourcesCacheList)
             {
-                masterCache[path] = new ResInfo(path, ResInfo.DataType.ResourcesDataPath);
+                mainCache[path] = new FileDetailInfo(path, FileDetailInfo.DataType.ResourcesDataPath);
             }
             //StreamingAssets载入缓存
             foreach (var path in streamingAssetsCachelist)
             {
-                masterCache[path] = new ResInfo(path, ResInfo.DataType.StreamingAssetsPath);
+                mainCache[path] = new FileDetailInfo(path, FileDetailInfo.DataType.StreamingAssetsPath);
             }
             //PersistentDataPath载入缓存
-            foreach (var info in patchList)
+            foreach (var info in filePatchList)
             {
-                if (LastAccessInfo != null && info.first != LastAccessInfo.last)
+                if (LastAccessInfo != null && info.firstVersion != LastAccessInfo.lastVersion)
                     yield break;
-                yield return StartCoroutine(GetPatchCache(info));
+                yield return StartCoroutine(GetFilePatchCache(info));
                 LastAccessInfo = info;
             }
             foreach (var pair in patchCache)
             {
                 foreach (var patch in pair.Value)
                 {
-                    masterCache[patch.Key] = patch.Value;
+                    mainCache[patch.Key] = patch.Value;
                 }
             }
             yield return StartCoroutine(ResourceDelete());
@@ -455,21 +411,31 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        private IEnumerator GetPatchCache(PatchInfo info)
+        private IEnumerator GetFilePatchCache(FilePatchInfo info)
         {
             if (info.isNeedDownFile)
             {
                 ActionState(State.DownPathList);
                 yield return StartCoroutine(new Access().FromRemote(this, info.fileUrl, res =>
                 {
-                    if (res == null || Library.Encrypt.MD5(res.bytes) != info.fileHash) return;
+                    if (res == null)
+                        return;
+                    var hash = Library.Encrypt.MD5(res.bytes);
+                    if (info.IsEncrypt())
+                    {
+                        if (hash != info.encrypt_hash) return;
+                    }
+                    else
+                    {
+                        if (hash != info.content_hash) return;
+                    }
                     File.WriteAllBytes(info.fileLocal, res.bytes);
                 }));
             }
 
             ActionState(State.GetPatchList);
-            MinVersion = Math.Min(MinVersion, info.first);
-            MaxVersion = Math.Max(MaxVersion, info.last);
+            MinVersion = Math.Min(MinVersion, info.firstVersion);
+            MaxVersion = Math.Max(MaxVersion, info.lastVersion);
 
             if (File.Exists(info.fileLocal))
             {
@@ -477,10 +443,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                 if (bytes.Length == 0) yield break;
 
                 ActionState(State.ApplyPatchList);
-                var content = Library.Dencrypt.AES(bytes);
+                string content = info.IsEncrypt() ? Library.Dencrypt.AES(bytes) : Encoding.UTF8.GetString(bytes);
                 patchCache[info.fileUrl] =
-                    LitJson.JsonMapper.ToObject<FileDetailInfo[]>(content.Trim())
-                        .Select(p => new ResInfo(info, p))
+                    LitJsonHelper.ToObject<FileVersion.FileDetailInfo[]>(content.Trim())
+                        .Select(p => new FileDetailInfo(info, p))
                         .ToDictionary(p => p.path);
             }
             else
@@ -495,9 +461,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         /// <returns></returns>
         private IEnumerator ResourceDelete()
         {
-            var delList =
-                masterCache.Values.Where(
-                    p => p.dataType == ResInfo.DataType.PersistentDataPath && p.action == ResInfo.Action.D).ToList();
+            var delList = mainCache.Values.Where(p => p.dataType == FileDetailInfo.DataType.PersistentDataPath && p.is_delete).ToList();
             Debug.Log(delList.Count + "\r\n" + string.Join("\n", delList.Select(p => p.ToString()).ToArray()));
 
             //yield break;
@@ -527,16 +491,14 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         /// <returns></returns>
         private IEnumerator ResourceDownLoad()
         {
-            var downList =
-                masterCache.Values.Where(
-                    p => p.dataType == ResInfo.DataType.PersistentDataPath && p.isNeedDownFile == true).ToList();
+            var downList = mainCache.Values.Where(p => p.dataType == FileDetailInfo.DataType.PersistentDataPath && p.isNeedDownFile).ToList();
             Debug.Log(downList.Count + "\r\n" + string.Join("\n", downList.Select(p => p.ToString()).ToArray()));
 
-            var dic = downList.ToLookup(p => p.patchInfo).ToDictionary(p => p.Key, q => new List<ResInfo>(q));
+            var dic = downList.ToLookup(p => p.patchInfo).ToDictionary(p => p.Key, q => new List<FileDetailInfo>(q));
 
-            foreach (KeyValuePair<PatchInfo, List<ResInfo>> keyValuePair in dic)
+            foreach (KeyValuePair<FilePatchInfo, List<FileDetailInfo>> keyValuePair in dic)
             {
-                if (keyValuePair.Key.isZip)
+                if (keyValuePair.Key.IsZip())
                 {
                     ActionState(State.DownResource);
                     yield return StartCoroutine(GetRemoteZip(keyValuePair.Key));
@@ -544,22 +506,34 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                 else
                 {
                     //yield break;
-                    var lastList = new Queue<ResInfo>(keyValuePair.Value);
+                    var lastList = new Queue<FileDetailInfo>(keyValuePair.Value);
                     while (lastList.Count != 0)
                     {
                         var resInfo = lastList.Dequeue();
                         ActionState(State.DownResource);
                         Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
                         yield return
-                            StartCoroutine(new Access().FromRemote(this, keyValuePair.Key.name + "/" + resInfo.url,
+                            StartCoroutine(new Access().FromRemote(this, keyValuePair.Key.path + "/" + resInfo.url,
                                 res =>
                                 {
-                                    if (res == null || Library.Encrypt.MD5(res.bytes) != resInfo.hash)
+                                    if (res == null)
                                         return;
+
+                                    var hash = Library.Encrypt.MD5(res.bytes);
+
+                                    if (resInfo.IsEncrypt())
+                                    {
+                                        if (hash != resInfo.encrypt_hash) return;
+                                    }
+                                    else
+                                    {
+                                        if (hash != resInfo.content_hash) return;
+                                    }
+
                                     ActionState(State.ApplyResource);
                                     FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
                                     File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res.bytes);
-                                    resInfo.action = ResInfo.Action.N;
+                                    resInfo.is_ready = true;
                                 }));
                     }
                 }
@@ -571,13 +545,13 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        public IEnumerator GetRemoteZip(PatchInfo info)
+        public IEnumerator GetRemoteZip(FilePatchInfo info)
         {
             ActionState(State.DownPatchZip);
-            yield return StartCoroutine(new Access().FromRemote(this, info.zipName, res =>
+            yield return StartCoroutine(new Access().FromRemote(this, info.path + ".zip", res =>
             {
-                if (res == null || Library.Encrypt.MD5(res.bytes) != info.zipHash) return;
-                var zipName = Access.PersistentDataPatchPath + info.zipName;
+                if (res == null || Library.Encrypt.MD5(res.bytes) != info.zip_hash) return;
+                var zipName = Access.PersistentDataPatchPath + info.path + ".zip";
                 File.WriteAllBytes(zipName, res.bytes);
                 ActionState(State.UnMakePatchZip);
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", true);
@@ -598,10 +572,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         /// </summary>
         /// <param name="info"></param>
         /// <param name="zipName"></param>
-        private void FileMoveTo(PatchInfo info, string zipName)
+        private void FileMoveTo(FilePatchInfo info, string zipName)
         {
             ActionState(State.ApplyPatchZip);
-            Dictionary<string, ResInfo> dic;
+            Dictionary<string, FileDetailInfo> dic;
             if (!patchCache.TryGetValue(info.fileUrl, out dic))
             {
                 Debug.LogError("不存在的补丁包！");
@@ -675,27 +649,28 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     /// <returns></returns>
     private IEnumerator GetPatchList()
     {
-        yield return StartCoroutine(new Access().FromRemote(this, PatchInfo.PatchListName, res =>
+        yield return StartCoroutine(new Access().FromRemote(this, FilePatchInfo.PatchListName, res =>
         {
             if (res == null) return;
-            FileHelper.CreateDirectory(Access.PersistentDataPatchPath + PatchInfo.PatchListName);
-            File.WriteAllBytes(Access.PersistentDataPatchPath + PatchInfo.PatchListName, res.bytes);
+            FileHelper.CreateDirectory(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName);
+            File.WriteAllBytes(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName, res.bytes);
 
             var content = Library.Dencrypt.AES(res.bytes);
-            var versionInfo = LitJson.JsonMapper.ToObject<FileVersion.VersionInfo>(content);
+            var versionInfo = LitJsonHelper.ToObject<FileVersion.VersionInfo>(content);
             SoftwareVersion = versionInfo.softwareVersion;
-            patchListCache = versionInfo.pathInfos.Select(p => new PatchInfo(p)).ToLookup(p => p.group)
+            patchListCache = versionInfo.pathInfos.Select(p => new FilePatchInfo(p)).ToLookup(p => p.group)
                 .ToDictionary(p => p.Key, q =>
                 {
                     var go = gameObject.AddComponent<VersionInfo>();
-                    go.Init(q.Key, new List<PatchInfo>(q).OrderBy(t => t.first).ToList());
+                    go.Init(q.Key, new List<FilePatchInfo>(q).OrderBy(t => t.firstVersion).ToList());
                     return go;
                 });
         }));
     }
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         patchListCache = new Dictionary<string, VersionInfo>();
         FileHelper.CreateDirectory(Access.PersistentDataTempPath);
     }
@@ -749,19 +724,24 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         string hash = Access.PathConvertToMd5(path);
         foreach (var cache in patchListCache.Values)
         {
-            ResInfo resInfo = null;
-            if (!cache.masterCache.TryGetValue(hash, out resInfo)) continue;
-            if (resInfo.action == ResInfo.Action.D)
+            FileDetailInfo resInfo = null;
+            if (!cache.mainCache.TryGetValue(hash, out resInfo)) continue;
+            if (resInfo.is_delete)
             {
-                Debug.LogError("访问已被删除资源!");
+                Debug.LogError("访问不在资源版本库中的资源!");
+                yield break;
+            }
+            if (!resInfo.is_ready)
+            {
+                Debug.LogError("访问未准备好的资源!");
                 yield break;
             }
             switch (resInfo.dataType)
             {
-                case ResInfo.DataType.ResourcesDataPath:
+                case FileDetailInfo.DataType.ResourcesDataPath:
                     callAction.Invoke(null, Resources.Load(path));
                     yield break;
-                case ResInfo.DataType.StreamingAssetsPath:
+                case FileDetailInfo.DataType.StreamingAssetsPath:
                     yield return StartCoroutine(new Access().FromStreamingAssetsPath(this, path,
                         www => { callAction.Invoke(www, null); }));
                     yield break;

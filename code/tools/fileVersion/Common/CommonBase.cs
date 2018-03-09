@@ -6,6 +6,7 @@ using System.Text;
 using Library;
 using Library.Extensions;
 using Library.Helper;
+using Library.LitJson;
 
 namespace FileVersion
 {
@@ -25,6 +26,8 @@ namespace FileVersion
         protected static string KeyMd5 { get; private set; }
         protected static string Exclude { get; private set; }
         protected static string Platform { get; private set; }
+        protected static string EncryptExclude { get; private set; }
+        protected static string EncryptRootDir { get; private set; }
 
         static CommonBase()
         {
@@ -35,6 +38,9 @@ namespace FileVersion
             AES.Head = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
             Exclude = Config.IniReadValue("Config", "exclude", ".meta").Trim();
             Platform = Config.IniReadValue("Config", "platform", "ios|android,ios,pc").Trim();
+
+            EncryptExclude = Config.IniReadValue("Encrypt", "excludeFile", ".meta,.acb").Trim();
+            EncryptRootDir = Config.IniReadValue("Encrypt", "excludeDir", "cri/").Trim();
         }
 
         public CommonBase()
@@ -45,6 +51,8 @@ namespace FileVersion
             Console.WriteLine("AES.Head:" + AES.Head);
             Console.WriteLine("Exclude:" + Exclude);
             Console.WriteLine("Platform:" + Platform);
+            Console.WriteLine("EncryptExclude:" + EncryptExclude);
+            Console.WriteLine("EncryptRootDir:" + EncryptRootDir);
             Console.WriteLine("--------------------------------------");
         }
 
@@ -79,7 +87,7 @@ namespace FileVersion
 
         public void Common(string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
-            Console.WriteLine("可更新文件总大小为{0}B！", cache.Values.Sum(p => p.content_size.AsInt()).ToString("N"));
+            Console.WriteLine("可更新文件总大小为{0}B！", cache.Values.Sum(p => p.content_size).ToString("N"));
             WriteToTxt(targetDir, cache);
             PathToMd5(folder, targetDir, cache);
             MakAESEncrypt(folder, targetDir, cache);
@@ -134,7 +142,7 @@ namespace FileVersion
                 }
             }
 
-            var count = cache.Values.Count(p => !p.action.Equals("D"));
+            var count = cache.Values.Count(p => !p.is_delete);
             if (count == 0)
             {
                 Console.WriteLine("可更新文件数目为零！");
@@ -154,12 +162,19 @@ namespace FileVersion
         /// 获取文件大小以及MD5
         /// </summary>
         /// <param name="fullPath"></param>
-        /// <param name="svnFileInfo"></param>
-        protected void SetContent(string fullPath, FileDetailInfo svnFileInfo)
+        /// <param name="fileDetailInfo"></param>
+        protected void SetContent(string fullPath, FileDetailInfo fileDetailInfo)
         {
             var bytes = File.ReadAllBytes(fullPath);
-            svnFileInfo.content_size = bytes.Length.ToString();
-            svnFileInfo.content_hash = Encrypt.MD5(bytes);
+            fileDetailInfo.content_size = bytes.Length;
+            fileDetailInfo.content_hash = Encrypt.MD5(bytes);
+        }
+
+        private static bool TargetMd5Dir(out string targetMd5Dir, string dir, string targetDir)
+        {
+            targetMd5Dir = targetDir.Replace(dir, Encrypt.MD5(dir + KeyMd5));
+            bool md5 = Directory.Exists(targetMd5Dir);
+            return md5;
         }
 
         /// <summary>
@@ -174,7 +189,8 @@ namespace FileVersion
             Console.Write("\n是否将路径MD5化（y/n）：");
             bool yes = Console.ReadLine() == "y";
 
-            var targetMd5Dir = targetDir.Replace(dir, Encrypt.MD5(dir + KeyMd5));
+            string targetMd5Dir;
+            var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
             DeleteInfo(targetMd5Dir);
 
             if (!yes) return;
@@ -191,17 +207,17 @@ namespace FileVersion
                 string targetFullPath = targetMd5Dir + "/";
                 if (PathToMd5Depth == 0)
                 {
-                    s.Value.path_md5 = Encrypt.MD5(s.Key + KeyMd5);
+                    s.Value.path_hash = Encrypt.MD5(s.Key + KeyMd5);
                 }
                 else
                 {
                     var dirD = Path.GetDirectoryName(s.Key);
                     var nameD = Path.GetFileName(s.Key);
-                    s.Value.path_md5 = Encrypt.MD5(dirD + KeyMd5);
-                    s.Value.path_md5 += "/";
-                    s.Value.path_md5 += Encrypt.MD5(nameD + KeyMd5);
+                    s.Value.path_hash = Encrypt.MD5(dirD + KeyMd5);
+                    s.Value.path_hash += "/";
+                    s.Value.path_hash += Encrypt.MD5(nameD + KeyMd5);
                 }
-                targetFullPath += s.Value.path_md5;
+                targetFullPath += s.Value.path_hash;
                 if (!File.Exists(fullPath)) continue;
                 FileHelper.CreateDirectory(targetFullPath);
                 File.Copy(fullPath, targetFullPath, true);
@@ -223,8 +239,9 @@ namespace FileVersion
             Console.Write("\n是否对文件夹内每个文件进行加密（y/n）：");
             bool yes = Console.ReadLine() == "y";
             if (!yes) return;
-            var targetMd5Dir = targetDir.Replace(dir, Encrypt.MD5(dir + KeyMd5));
-            bool md5 = Directory.Exists(targetMd5Dir);
+
+            string targetMd5Dir;
+            var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
 
             int index = 0;
             foreach (var s in cache)
@@ -237,17 +254,24 @@ namespace FileVersion
                 Console.WriteLine();
 
                 string fullPath = "";
-                if (!md5)
+                if (!isHaveMd5Dir)
                     fullPath = targetDir + "/" + s.Key;
                 else
-                    fullPath = targetMd5Dir + "/" + Encrypt.MD5(s.Key + KeyMd5);
+                    fullPath = targetMd5Dir + "/" + s.Value.path_hash;
                 if (!File.Exists(fullPath)) continue;
+
+                var array = EncryptExclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                if (array.Contains(Path.GetExtension(s.Key))) continue;
+
+                array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                if (array.Any(p => s.Key.StartsWith(p))) continue;
+
                 var content = Encrypt.AES(File.ReadAllText(fullPath));
                 s.Value.encrypt_hash = Encrypt.MD5(content);
-                s.Value.encrypt_size = new System.IO.FileInfo(fullPath).Length.ToString();
+                s.Value.encrypt_size = new System.IO.FileInfo(fullPath).Length;
                 File.WriteAllText(fullPath, content);
             }
-            WriteToTxt(targetMd5Dir, cache);
+            WriteToTxt(!isHaveMd5Dir ? targetDir : targetMd5Dir, cache);
         }
 
         /// <summary>
@@ -262,19 +286,11 @@ namespace FileVersion
             bool yes = Console.ReadLine() == "y";
             if (!yes) return;
 
-            var targetMd5Dir = targetDir.Replace(dir, Encrypt.MD5(dir + KeyMd5));
-            MakeZip(targetDir);
-            MakeZip(targetMd5Dir);
-        }
+            string targetMd5Dir;
+            var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
+            var dirZip = (!isHaveMd5Dir ? targetDir : targetMd5Dir);
 
-        /// <summary>
-        /// 文件夹压缩
-        /// </summary>
-        /// <param name="dir"></param>
-        private void MakeZip(string dir)
-        {
-            if (!Directory.Exists(dir)) return;
-            string message = Library.Compress.DecompressUtils.MakeZipFile(dir, 9);
+            string message = Library.Compress.DecompressUtils.MakeZipFile(dirZip, 9);
             if (string.IsNullOrEmpty(message))
                 Console.WriteLine("文件压缩成功！");
             else
@@ -287,13 +303,13 @@ namespace FileVersion
         protected void WriteToTxt(string fileName, Dictionary<string, FileDetailInfo> cache)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(cache.Values.ToArray()), TxTEncoding);
+            File.WriteAllText(fileName, LitJsonHelper.ToJson(cache.Values.ToArray()), TxTEncoding);
         }
 
-        protected void WriteToTxt(string fileName, VersionInfo svnInfo)
+        protected void WriteToTxt(string fileName, VersionInfo versionInfo)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, LitJson.JsonMapper.ToJson(svnInfo), TxTEncoding);
+            File.WriteAllText(fileName, LitJsonHelper.ToJson(versionInfo), TxTEncoding);
         }
 
         protected void EncryptFile(string fileName)
@@ -348,29 +364,31 @@ namespace FileVersion
 
             foreach (KeyValuePair<string, List<string>> pair in dic)
             {
-                FilePatchInfo svnPatchInfo = new FilePatchInfo();
-                svnPatchInfos.Add(svnPatchInfo);
-                svnPatchInfo.path = pair.Key;
+                FilePatchInfo filePatchInfo = new FilePatchInfo();
+                svnPatchInfos.Add(filePatchInfo);
+                filePatchInfo.path = pair.Key;
 
                 var txt = pair.Value.FirstOrDefault(p => p.EndsWith(".txt"));
                 var zip = pair.Value.FirstOrDefault(p => p.EndsWith(".zip"));
 
                 if (txt != null && File.Exists(txt))
                 {
+                    filePatchInfo.content_hash = Encrypt.MD5(File.ReadAllBytes(txt));
+                    filePatchInfo.content_size = new System.IO.FileInfo(txt).Length;
                     if (yes) EncryptFile(txt);
-                    svnPatchInfo.content_hash = Encrypt.MD5(File.ReadAllBytes(txt));
-                    svnPatchInfo.content_size = new System.IO.FileInfo(txt).Length.ToString();
+                    filePatchInfo.encrypt_hash = Encrypt.MD5(File.ReadAllBytes(txt));
+                    filePatchInfo.encrypt_size = new System.IO.FileInfo(txt).Length;
                 }
                 if (zip != null && File.Exists(zip))
                 {
-                    svnPatchInfo.zip_hash = Encrypt.MD5(File.ReadAllBytes(zip));
-                    svnPatchInfo.zip_size = new System.IO.FileInfo(zip).Length.ToString();
+                    filePatchInfo.zip_hash = Encrypt.MD5(File.ReadAllBytes(zip));
+                    filePatchInfo.zip_size = new System.IO.FileInfo(zip).Length;
                 }
 
                 var xx = pair.Key.Split('-');
-                svnPatchInfo.group = xx.First();
-                svnPatchInfo.firstVersion = xx.Skip(1).First().AsInt();
-                svnPatchInfo.lastVersion = xx.Skip(2).First().AsInt();
+                filePatchInfo.group = xx.First();
+                filePatchInfo.firstVersion = xx.Skip(1).First().AsInt();
+                filePatchInfo.lastVersion = xx.Skip(2).First().AsInt();
             }
 
             WriteToTxt(Name, new VersionInfo()

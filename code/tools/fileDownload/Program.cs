@@ -59,7 +59,7 @@ namespace fileDownload
                 File.Delete("log/overList.txt");
             if (File.Exists("log/errList.txt"))
                 File.Delete("log/errList.txt");
-
+            return;
             count = cache.Count;
             int max = 25;
             ThreadPool.SetMaxThreads(max, max);

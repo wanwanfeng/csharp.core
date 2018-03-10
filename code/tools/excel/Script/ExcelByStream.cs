@@ -4,36 +4,22 @@ using System.Data;
 using System.IO;
 using System.Text;
 
-namespace excel
+namespace excel.Script
 {
-    public class StreamExportExcel
+    public class ExcelByStream : ExcelByBase
     {
         /// <summary>
         /// https://www.cnblogs.com/Sandon/p/5175829.html
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="vals"></param>
-        public static void WriteToExcel(string filename, List<List<object>> vals)
+        public override void WriteToExcel(string filename, List<List<object>> vals)
         {
-            var dt = new System.Data.DataTable();
-            bool isInit = false;
-            foreach (List<object> objects in vals)
-            {
-                if (!isInit)
-                {
-                    isInit = true;
-                    foreach (object o in objects)
-                    {
-                        dt.Columns.Add(o.ToString(), typeof(String));
-                    }
-                    continue;
-                }
-                dt.Rows.Add(objects.ToArray());
-            }
+            var dt = ConvertToDataTable(vals);
             File.WriteAllBytes(filename, ExportExcelByMemoryStream(dt));
         }
 
-        public static byte[] ExportExcelByMemoryStream(DataTable dt)
+        private static byte[] ExportExcelByMemoryStream(DataTable dt)
         {
             //创建一个内存流
             MemoryStream ms = new MemoryStream();

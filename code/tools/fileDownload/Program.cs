@@ -145,7 +145,7 @@ namespace fileDownload
         private static Dictionary<string, JsonData> GetCacheValueFromExcel(string path)
         {
             Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
-            Dictionary<string, List<List<object>>> dic = OfficeWorkbooks.ReadFromExcel(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
+            Dictionary<string, List<List<object>>> dic = ExcelByOffice.ReadFromExcel(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
                 JsonData jsonData = SetJsonDataArray(pair.Value);

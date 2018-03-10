@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Excel;
 using Library.Helper;
 using LitJson;
+
+//using ExcelClass = excel.Script.ExcelByOleDb;
+using ExcelClass = excel.Script.ExcelByNpoi;
+//using ExcelClass = excel.Script.ExcelByOffice;
+//using ExcelClass = excel.Script.ExcelByStream;
 
 namespace excel
 {
@@ -91,8 +95,7 @@ namespace excel
             {
                 Console.WriteLine(" is now : " + file);
                 List<List<object>> vals = GetJsonDataArray(File.ReadAllText(file));
-                //StreamExportExcel.WriteToExcel(Path.ChangeExtension(file, ".xls"), vals);
-                OfficeWorkbooks.WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
+                new ExcelClass().WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
             }
         }
 
@@ -109,7 +112,7 @@ namespace excel
                 Console.WriteLine(" is now : " + file);
                 dic[file] = GetJsonDataArray(File.ReadAllText(file));
             }
-            OfficeWorkbooks.WriteToExcelOne(dic);
+            new ExcelClass().WriteToExcelOne(dic);
         }
 
         private static bool CheckPath(out List<string> files, string exce = ".json")
@@ -181,8 +184,8 @@ namespace excel
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                Dictionary<string, List<List<object>>> vals = OfficeWorkbooks.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
-
+                var vals = new ExcelClass().ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
+                
                 //Dictionary<string, List<List<object>>> vals = EditorExcelTools.CacheDictionary.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
                 foreach (KeyValuePair<string, List<List<object>>> keyValuePair in vals)
                 {

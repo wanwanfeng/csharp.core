@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -12,19 +11,34 @@ namespace excel.Script
 {
     public class ExcelByNpoi : ExcelByBase
     {
-        public override Dictionary<string, List<List<object>>> ReadFromExcel(string filename)
+        public override KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
         {
             var dt = ExcelToTable(filename);
-            return new Dictionary<string, List<List<object>>>()
-            {
-                {filename, ConvertToList(dt)}
-            };
+            return new KeyValuePair<string, List<List<object>>>(filename, ConvertToList(dt.Values.First()));
+        }
+
+        public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        {
+            Dictionary<string, DataTable> dt = ExcelToTable(filename);
+            return dt.ToDictionary(pair => pair.Key, pair => ConvertToList(pair.Value));
         }
 
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
             var dt = ConvertToDataTable(vals);
-            TableToExcel(dt, filename);
+            TableToExcel(filename, dt);
+        }
+
+        public override void WriteToExcelOne(string fileName, Dictionary<string, List<List<object>>> dic)
+        {
+            List<DataTable> dts = new List<DataTable>();
+            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            {
+                var dt = ConvertToDataTable(pair.Value);
+                dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
+                dts.Add(dt);
+            }
+            TableToExcel(fileName, dts.ToArray());
         }
 
         /// <summary>
@@ -32,83 +46,125 @@ namespace excel.Script
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <returns></returns>
-        private static DataTable ExcelToTable(string file)
+        private static Dictionary<string, DataTable> ExcelToTable(string file)
         {
-            DataTable dt = new DataTable();
             IWorkbook workbook;
             string fileExt = Path.GetExtension(file).ToLower();
             using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
             {
                 //XSSFWorkbook 适用XLSX格式，HSSFWorkbook 适用XLS格式
-                if (fileExt == ".xlsx") { workbook = new XSSFWorkbook(fs); } else if (fileExt == ".xls") { workbook = new HSSFWorkbook(fs); } else { workbook = null; }
-                if (workbook == null) { return null; }
-                ISheet sheet = workbook.GetSheetAt(0);
-
-                //表头  
-                IRow header = sheet.GetRow(sheet.FirstRowNum);
-                List<int> columns = new List<int>();
-                for (int i = 0; i < header.LastCellNum; i++)
+                switch (fileExt)
                 {
-                    object obj = GetValueType(header.GetCell(i));
-                    if (obj == null || obj.ToString() == string.Empty)
-                    {
-                        dt.Columns.Add(new DataColumn("Columns" + i.ToString()));
-                    }
-                    else
-                        dt.Columns.Add(new DataColumn(obj.ToString()));
-                    columns.Add(i);
+                    case ".xlsx":
+                        workbook = new XSSFWorkbook(fs);
+                        break;
+                    case ".xls":
+                        workbook = new HSSFWorkbook(fs);
+                        break;
+                    default:
+                        workbook = null;
+                        break;
                 }
-                //数据  
-                for (int i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
+                if (workbook == null)
                 {
-                    DataRow dr = dt.NewRow();
-                    bool hasValue = false;
-                    foreach (int j in columns)
+                    return null;
+                }
+
+                var cache = new Dictionary<string, DataTable>();
+                for (int index = 0; index < workbook.NumberOfSheets; index++)
+                {
+                    DataTable dt = new DataTable();
+                    ISheet sheet = workbook.GetSheetAt(index);
+
+                    //表头  
+                    IRow header = sheet.GetRow(sheet.FirstRowNum);
+                    List<int> columns = new List<int>();
+                    for (int i = 0; i < header.LastCellNum; i++)
                     {
-                        dr[j] = GetValueType(sheet.GetRow(i).GetCell(j));
-                        if (dr[j] != null && dr[j].ToString() != string.Empty)
+                        object obj = GetValueType(header.GetCell(i));
+                        if (obj == null || obj.ToString() == string.Empty)
                         {
-                            hasValue = true;
+                            dt.Columns.Add(new DataColumn("Columns" + i.ToString()));
+                        }
+                        else
+                            dt.Columns.Add(new DataColumn(obj.ToString()));
+                        columns.Add(i);
+                    }
+                    //数据  
+                    //for (int i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)//不包括第一行
+                    for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)//包括第一行
+                    {
+                        DataRow dr = dt.NewRow();
+                        bool hasValue = false;
+                        foreach (int j in columns)
+                        {
+                            dr[j] = GetValueType(sheet.GetRow(i).GetCell(j));
+                            if (dr[j] != null && dr[j].ToString() != string.Empty)
+                            {
+                                hasValue = true;
+                            }
+                        }
+                        if (hasValue)
+                        {
+                            dt.Rows.Add(dr);
                         }
                     }
-                    if (hasValue)
-                    {
-                        dt.Rows.Add(dr);
-                    }
+
+                    cache[sheet.SheetName] = dt;
                 }
+                return cache;
             }
-            return dt;
         }
 
         /// <summary>
         /// Datable导出成Excel
         /// </summary>
-        /// <param name="dt"></param>
         /// <param name="file">导出路径(包括文件名与扩展名)</param>
-        private static void TableToExcel(DataTable dt, string file)
+        /// <param name="dts"></param>
+        private static void TableToExcel(string file, params DataTable[] dts)
         {
             IWorkbook workbook;
             string fileExt = Path.GetExtension(file).ToLower();
-            if (fileExt == ".xlsx") { workbook = new XSSFWorkbook(); } else if (fileExt == ".xls") { workbook = new HSSFWorkbook(); } else { workbook = null; }
-            if (workbook == null) { return; }
-            ISheet sheet = string.IsNullOrEmpty(dt.TableName) ? workbook.CreateSheet("Sheet1") : workbook.CreateSheet(dt.TableName);
-
-            //表头  
-            IRow row = sheet.CreateRow(0);
-            for (int i = 0; i < dt.Columns.Count; i++)
+            switch (fileExt)
             {
-                ICell cell = row.CreateCell(i);
-                cell.SetCellValue(dt.Columns[i].ColumnName);
+                case ".xlsx":
+                    workbook = new XSSFWorkbook();
+                    break;
+                case ".xls":
+                    workbook = new HSSFWorkbook();
+                    break;
+                default:
+                    workbook = null;
+                    break;
+            }
+            if (workbook == null)
+            {
+                return;
             }
 
-            //数据  
-            for (int i = 0; i < dt.Rows.Count; i++)
+            foreach (DataTable dt in dts)
             {
-                IRow row1 = sheet.CreateRow(i + 1);
-                for (int j = 0; j < dt.Columns.Count; j++)
+                ISheet sheet = string.IsNullOrEmpty(dt.TableName)
+                    ? workbook.CreateSheet("Sheet1")
+                    : workbook.CreateSheet(dt.TableName);
+
+                //表头  
+                IRow row = sheet.CreateRow(0);
+                for (int i = 0; i < dt.Columns.Count; i++)
                 {
-                    ICell cell = row1.CreateCell(j);
-                    cell.SetCellValue(dt.Rows[i][j].ToString());
+                    ICell cell = row.CreateCell(i);
+                    cell.SetCellValue(dt.Columns[i].ColumnName);
+                }
+
+                //数据  
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    IRow row1 = sheet.CreateRow(i + 1);
+                    for (int j = 0; j < dt.Columns.Count; j++)
+                    {
+                        ICell cell = row1.CreateCell(j);
+                        cell.SetCellValue(dt.Rows[i][j].ToString());
+                    }
                 }
             }
 

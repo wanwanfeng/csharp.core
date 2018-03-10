@@ -7,19 +7,24 @@ namespace excel.Script
 {
     public abstract class ExcelByBase
     {
+        public virtual KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
+        {
+            return new KeyValuePair<string, List<List<object>>>();
+        }
+
+        public virtual Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        {
+            return null;
+        }
+
         public virtual void WriteToExcel(string filename, List<List<object>> vals)
         {
 
         }
 
-        public virtual void WriteToExcelOne(Dictionary<string, List<List<object>>> dic)
+        public virtual void WriteToExcelOne(string fileName, Dictionary<string, List<List<object>>> dic)
         {
             
-        }
-
-        public virtual Dictionary<string, List<List<object>>> ReadFromExcel(string filename)
-        {
-            return null;
         }
 
         public static System.Data.DataTable ConvertToDataTable(List<List<object>> vals)

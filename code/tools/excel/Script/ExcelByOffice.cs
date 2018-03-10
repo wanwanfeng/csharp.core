@@ -13,6 +13,51 @@ namespace excel.Script
     /// </summary>
     public class ExcelByOffice : ExcelByBase
     {
+        public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        {
+            Dictionary<string, List<List<object>>> cache = new Dictionary<string, List<List<object>>>();
+
+            ActionExcel(filename, workbook =>
+            {
+                foreach (var item in workbook.Sheets)
+                {
+                    var workSheet = (Worksheet)item;
+                    Console.WriteLine(workSheet.Name);
+
+                    var hangCount = workSheet.UsedRange.Cells.Rows.Count;
+                    var lieCount = workSheet.UsedRange.Cells.Columns.Count;
+
+                    if (hangCount == 0 || lieCount == 0)
+                        continue;
+                    List<object[,]> tempList = new List<object[,]>();
+                    for (int j = 0; j < lieCount; j++)
+                        tempList.Add((object[,])workSheet.Cells.Range[zimu[j] + "1", zimu[j] + hangCount].Value);
+
+
+                    Dictionary<object, List<object>> dic = new Dictionary<object, List<object>>();
+                    foreach (object[,] objectse in tempList)
+                    {
+                        if (objectse == null)
+                            continue;
+                        int index = 0;
+                        foreach (object o in objectse)
+                        {
+                            index++;
+                            List<object> res = null;
+                            if (dic.TryGetValue(index, out res))
+                                res.Add(o);
+                            else
+                                dic.Add(index, new List<object> { o });
+                        }
+                    }
+
+                    if (dic.Count == 0) continue;
+                    cache[workSheet.Name] = dic.Values.ToList();
+                }
+            }, false);
+            return cache;
+        }
+        
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
             //http://bbs.csdn.net/topics/390201171
@@ -33,8 +78,8 @@ namespace excel.Script
                 workSheet = null;
             });
         }
-
-        public override void WriteToExcelOne(Dictionary<string, List<List<object>>> dic)
+        
+        public override void WriteToExcelOne(string fileName, Dictionary<string, List<List<object>>> dic)
         {
             ActionExcelToOne(dic.Keys.First(), workbook =>
             {
@@ -56,52 +101,7 @@ namespace excel.Script
                 }
             });
         }
-
-        public override Dictionary<string, List<List<object>>> ReadFromExcel(string filename)
-        {
-            Dictionary<string, List<List<object>>> cache = new Dictionary<string, List<List<object>>>();
-
-            ActionExcel(filename, workbook =>
-            {
-                foreach (var item in workbook.Sheets)
-                {
-                    var workSheet = (Worksheet) item;
-                    Console.WriteLine(workSheet.Name);
-
-                    var hangCount = workSheet.UsedRange.Cells.Rows.Count;
-                    var lieCount = workSheet.UsedRange.Cells.Columns.Count;
-
-                    if (hangCount == 0 || lieCount == 0)
-                        continue;
-                    List<object[,]> tempList = new List<object[,]>();
-                    for (int j = 0; j < lieCount; j++)
-                        tempList.Add((object[,]) workSheet.Cells.Range[zimu[j] + "1", zimu[j] + hangCount].Value);
-
-
-                    Dictionary<object, List<object>> dic = new Dictionary<object, List<object>>();
-                    foreach (object[,] objectse in tempList)
-                    {
-                        if (objectse == null)
-                            continue;
-                        int index = 0;
-                        foreach (object o in objectse)
-                        {
-                            index++;
-                            List<object> res = null;
-                            if (dic.TryGetValue(index, out res))
-                                res.Add(o);
-                            else
-                                dic.Add(index, new List<object> {o});
-                        }
-                    }
-
-                    if (dic.Count == 0) continue;
-                    cache[workSheet.Name] = dic.Values.ToList();
-                }
-            }, false);
-            return cache;
-        }
-
+        
         private static void ActionExcel(string filename, Action<Workbook> action, bool isWrite = true)
         {
             //引用Excel对象

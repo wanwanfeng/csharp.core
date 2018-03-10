@@ -26,6 +26,41 @@ namespace excel
     {
         private static void Main(string[] args)
         {
+            /* var hh = new ExcelClass().ReadFromExcels("ff.xlsx");
+            foreach (KeyValuePair<string, List<List<object>>> pair in hh)
+            {
+                ListToJson(pair);
+            }
+            return;
+            Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>()
+            {
+                {
+                    "xx.xlsx", new List<List<object>>()
+                    {
+                        new List<object>() {"haha", "lala", "xx"},
+                        new List<object>() {"2", "3", "4"},
+                        new List<object>() {"p", "6", "2"},
+                    }
+                },
+                 {
+                    "yy.xlsx", new List<List<object>>()
+                    {
+                        new List<object>() {"haha", "lala", "xx"},
+                        new List<object>() {"2", "3", "4"},
+                        new List<object>() {"p", "6", "2"},
+                    }
+                }
+            };
+
+            new ExcelClass().WriteToExcelOne(Path.ChangeExtension("ff.x", ".xlsx"), dic);
+            return;
+            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            {
+                new ExcelClass().WriteToExcel(Path.ChangeExtension(pair.Key, ".xlsx"), pair.Value);
+            }
+            return;
+            */
+
             Console.WriteLine("----------命令索引----------");
             foreach (var value in Enum.GetValues(typeof(CaoType)))
             {
@@ -112,7 +147,7 @@ namespace excel
                 Console.WriteLine(" is now : " + file);
                 dic[file] = GetJsonDataArray(File.ReadAllText(file));
             }
-            new ExcelClass().WriteToExcelOne(dic);
+            new ExcelClass().WriteToExcelOne("", dic);
         }
 
         private static bool CheckPath(out List<string> files, string exce = ".json")
@@ -184,34 +219,40 @@ namespace excel
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                var vals = new ExcelClass().ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
-                
-                //Dictionary<string, List<List<object>>> vals = EditorExcelTools.CacheDictionary.ReadFromExcel(Path.ChangeExtension(file, ".xlsx"));
-                foreach (KeyValuePair<string, List<List<object>>> keyValuePair in vals)
+                var vals = new ExcelClass().ReadFromExcels(Path.ChangeExtension(file, ".xlsx"));
+                if (vals.Count == 1)
                 {
-                    Console.WriteLine(" is now sheet: " + keyValuePair.Key);
-                    Queue<List<object>> queue = new Queue<List<object>>(keyValuePair.Value);
-                    List<object> keyList = queue.Dequeue();
-                    JsonData resJsonDatas = new JsonData();
-                    resJsonDatas.SetJsonType(JsonType.Array);
-                    while (queue.Count != 0)
+                    ListToJson(vals.First(), file);
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, List<List<object>>> pair in vals)
                     {
-                        Queue<object> queueVal = new Queue<object>(queue.Dequeue());
-                        JsonData jsonData = new JsonData();
-                        foreach (object o in keyList)
-                            jsonData[o.ToString()] = queueVal.Dequeue().ToString();
-                        resJsonDatas.Add(jsonData);
-                    }
-                    string newPath = Path.ChangeExtension(file, ".json");
-                    if (vals.Count > 1)
-                    {
-                        newPath = Path.GetDirectoryName(file) + "\\" + Path.GetFileNameWithoutExtension(file) +
-                                         "\\" + keyValuePair.Key + ".json";
+                        string newPath = file + "\\" + pair.Key;
                         FileHelper.CreateDirectory(newPath);
+                        ListToJson(pair, newPath);
                     }
-                    File.WriteAllText(newPath, JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
                 }
             }
+        }
+
+        private static void ListToJson(KeyValuePair<string, List<List<object>>> keyValuePair, string file = null)
+        {
+            Console.WriteLine(" is now sheet: " + keyValuePair.Key);
+            Queue<List<object>> queue = new Queue<List<object>>(keyValuePair.Value);
+            List<object> keyList = queue.Dequeue();
+            JsonData resJsonDatas = new JsonData();
+            resJsonDatas.SetJsonType(JsonType.Array);
+            while (queue.Count != 0)
+            {
+                Queue<object> queueVal = new Queue<object>(queue.Dequeue());
+                JsonData jsonData = new JsonData();
+                foreach (object o in keyList)
+                    jsonData[o.ToString()] = queueVal.Dequeue().ToString();
+                resJsonDatas.Add(jsonData);
+            }
+            string newPath = Path.GetFileNameWithoutExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file);
+            File.WriteAllText(newPath + ".json", JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
         }
 
         #endregion

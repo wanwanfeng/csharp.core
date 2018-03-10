@@ -11,12 +11,6 @@ namespace excel.Script
 {
     public class ExcelByNpoi : ExcelByBase
     {
-        public override KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
-        {
-            var dt = ExcelToTable(filename);
-            return new KeyValuePair<string, List<List<object>>>(filename, ConvertToList(dt.Values.First()));
-        }
-
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
         {
             Dictionary<string, DataTable> dt = ExcelToTable(filename);
@@ -29,7 +23,7 @@ namespace excel.Script
             TableToExcel(filename, dt);
         }
 
-        public override void WriteToExcelOne(string fileName, Dictionary<string, List<List<object>>> dic)
+        public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
         {
             List<DataTable> dts = new List<DataTable>();
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)

@@ -7,9 +7,13 @@ namespace excel.Script
 {
     public abstract class ExcelByBase
     {
-        public virtual KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
+        public KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
         {
-            return new KeyValuePair<string, List<List<object>>>();
+            var dic = ReadFromExcels(filename);
+            return dic == null
+                ? new KeyValuePair<string, List<List<object>>>()
+                : new KeyValuePair<string, List<List<object>>>(filename,
+                    ReadFromExcels(filename).Values.FirstOrDefault());
         }
 
         public virtual Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
@@ -22,7 +26,7 @@ namespace excel.Script
 
         }
 
-        public virtual void WriteToExcelOne(string fileName, Dictionary<string, List<List<object>>> dic)
+        public virtual void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
         {
             
         }

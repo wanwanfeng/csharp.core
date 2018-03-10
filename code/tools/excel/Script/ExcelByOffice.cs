@@ -17,11 +17,11 @@ namespace excel.Script
         {
             Dictionary<string, List<List<object>>> cache = new Dictionary<string, List<List<object>>>();
 
-            ActionExcel(filename, workbook =>
+            ActionExcelRead(filename, workbook =>
             {
                 foreach (var item in workbook.Sheets)
                 {
-                    var workSheet = (Worksheet)item;
+                    var workSheet = (Worksheet) item;
                     Console.WriteLine(workSheet.Name);
 
                     var hangCount = workSheet.UsedRange.Cells.Rows.Count;
@@ -31,7 +31,7 @@ namespace excel.Script
                         continue;
                     List<object[,]> tempList = new List<object[,]>();
                     for (int j = 0; j < lieCount; j++)
-                        tempList.Add((object[,])workSheet.Cells.Range[zimu[j] + "1", zimu[j] + hangCount].Value);
+                        tempList.Add((object[,]) workSheet.Cells.Range[zimu[j] + "1", zimu[j] + hangCount].Value);
 
 
                     Dictionary<object, List<object>> dic = new Dictionary<object, List<object>>();
@@ -47,25 +47,25 @@ namespace excel.Script
                             if (dic.TryGetValue(index, out res))
                                 res.Add(o);
                             else
-                                dic.Add(index, new List<object> { o });
+                                dic.Add(index, new List<object> {o});
                         }
                     }
 
                     if (dic.Count == 0) continue;
                     cache[workSheet.Name] = dic.Values.ToList();
                 }
-            }, false);
+            });
             return cache;
         }
-        
+
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
             //http://bbs.csdn.net/topics/390201171
-            ActionExcel(filename, workbook =>
+            ActionExcelWrite(filename, workbook =>
             {
                 var workSheet = (Worksheet) workbook.ActiveSheet;
-                Console.WriteLine(workSheet.Name);
                 var f = Path.GetFileNameWithoutExtension(filename);
+                Console.WriteLine(workSheet.Name);
                 //第一种：Excel.Application的Cell by Cell
                 for (int j = 0; j < vals.Count; j++)
                 {
@@ -78,18 +78,18 @@ namespace excel.Script
                 workSheet = null;
             });
         }
-        
-        public override void WriteToExcelOne(string fileName, Dictionary<string, List<List<object>>> dic)
+
+        public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
         {
-            ActionExcelToOne(dic.Keys.First(), workbook =>
+            ActionExcelWrite(fileName, workbook =>
             {
-                foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+                var keys = dic.Keys.Reverse().ToList();
+                foreach (string filename in keys)
                 {
-                    var filename = pair.Key;
-                    var vals = pair.Value;
-                    workbook.Worksheets.Add();
-                    var workSheet = (Worksheet)workbook.ActiveSheet;
-                    workSheet.Name = Path.GetFileNameWithoutExtension(filename);
+                    var vals = dic[filename];
+                    var workSheet = (Worksheet) workbook.ActiveSheet;
+                    var f = Path.GetFileNameWithoutExtension(filename);
+                    workSheet.Name = f;
                     Console.WriteLine(workSheet.Name);
                     for (int j = 0; j < vals.Count; j++)
                     {
@@ -97,12 +97,16 @@ namespace excel.Script
                         {
                             workSheet.Cells[j + 1, i + 1] = vals[j][i];
                         }
+                        Console.WriteLine(f + "/" + j + "/" + vals.Count);
                     }
+                    if (filename != keys.LastOrDefault())
+                        workbook.Worksheets.Add();
+                    workSheet = null;
                 }
             });
         }
-        
-        private static void ActionExcel(string filename, Action<Workbook> action, bool isWrite = true)
+
+        private static void ActionExcelRead(string filename, Action<Workbook> action)
         {
             //引用Excel对象
             Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
@@ -125,38 +129,12 @@ namespace excel.Script
 
             Microsoft.Office.Interop.Excel.Workbook workbook = null;
 
-            if (isWrite)
-            {
-                if (File.Exists(filename))
-                    File.Delete(filename);
-                //新增加一个工作簿，Add（）方法也可以直接传入参数 true
-                workbook = workbooks.Add(Microsoft.Office.Interop.Excel.XlWBATemplate.xlWBATWorksheet);
-                //同样是新增一个工作簿，但是会弹出保存对话框
-                //Microsoft.Office.Interop.Excel.Workbook workbook = excel.Application.Workbooks.Add(true);
-                //新增加一个 Excel 表(sheet)
-                //Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet) workbook.Worksheets[1];
-            }
-            else
-            {
-                if (File.Exists(filename))
-                    workbook = workbooks.Open(filename, 0, false, 5, "", "", true, XlPlatform.xlWindows, "\t", false,
-                        false, 0, true, 1, 0);
-            }
-
+            if (File.Exists(filename))
+                workbook = workbooks.Open(filename, 0, false, 5, "", "", true, XlPlatform.xlWindows, "\t", false,
+                    false, 0, true, 1, 0);
             try
             {
                 action(workbook);
-                if (isWrite)
-                {
-                    //是否提示，如果想删除某个sheet页，首先要将此项设为fasle。
-                    excel.DisplayAlerts = false;
-
-                    //保存写入的数据，这里还没有保存到磁盘
-                    workbook.Saved = true;
-
-                    //workBook.SaveAs(filename, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Excel.XlSaveAsAccessMode.xlNoChange, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);  
-                    workbook.SaveCopyAs(filename.Replace("/", "\\"));
-                }
             }
             catch (Exception e)
             {
@@ -187,8 +165,7 @@ namespace excel.Script
             }
         }
 
-        private static void ActionExcelToOne(string filename, Action<Microsoft.Office.Interop.Excel.Workbook> action,
-            bool isWrite = true)
+        private static void ActionExcelWrite(string filename, Action<Workbook> action)
         {
             //引用Excel对象
             Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
@@ -216,22 +193,19 @@ namespace excel.Script
             //Microsoft.Office.Interop.Excel.Workbook workbook = excel.Application.Workbooks.Add(true);
 
             //新增加一个 Excel 表(sheet)
-            Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet) workbook.Worksheets[1];
+            //Microsoft.Office.Interop.Excel.Worksheet worksheet = (Microsoft.Office.Interop.Excel.Worksheet) workbook.Worksheets[1];
             try
             {
                 action(workbook);
-                if (isWrite)
-                {
-                    //是否提示，如果想删除某个sheet页，首先要将此项设为fasle。
-                    excel.DisplayAlerts = false;
-                    //保存写入的数据，这里还没有保存到磁盘
-                    workbook.Saved = true;
+                //是否提示，如果想删除某个sheet页，首先要将此项设为fasle。
+                excel.DisplayAlerts = false;
+                //保存写入的数据，这里还没有保存到磁盘
+                workbook.Saved = true;
 
-                    string outName = Path.GetDirectoryName(filename) + "\\One.xlsx";
-                    if (File.Exists(outName))
-                        File.Delete(outName);
-                    workbook.SaveAs(outName.Replace("/", "\\"));
-                }
+                //workBook.SaveAs(filename, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Excel.XlSaveAsAccessMode.xlNoChange, Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);  
+                if (File.Exists(filename))
+                    File.Delete(filename);
+                workbook.SaveAs(filename.Replace("/", "\\"));
             }
             catch (Exception e)
             {
@@ -248,12 +222,12 @@ namespace excel.Script
                 KillExcel.Kill(new IntPtr(excel.Hwnd));
 
                 //释放 COM 对象
-                Marshal.ReleaseComObject(worksheet);
+                //Marshal.ReleaseComObject(worksheet);
                 Marshal.ReleaseComObject(workbook);
                 Marshal.ReleaseComObject(workbooks);
                 Marshal.ReleaseComObject(excel);
 
-                worksheet = null;
+                //worksheet = null;
                 workbook = null;
                 workbooks = null;
                 excel = null;

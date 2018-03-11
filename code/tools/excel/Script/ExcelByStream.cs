@@ -18,7 +18,7 @@ namespace excel.Script
         public override void WriteToExcel(string fileName, List<List<object>> vals)
         {
             fileName = Path.ChangeExtension(fileName, ".xls");
-            var dt = ConvertToDataTable(vals);
+            var dt = ConvertListToDataTable(vals);
 
             var value = ExportExcelByMemoryStream(dt);
             System.IO.FileStream fs = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate);
@@ -35,7 +35,7 @@ namespace excel.Script
             System.IO.FileStream fs = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate);
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
-                var dt = ConvertToDataTable(pair.Value);
+                var dt = ConvertListToDataTable(pair.Value);
                 dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
                 var value = ExportExcelByMemoryStream(dt);
                 fs.Write(value, 0, value.Length);

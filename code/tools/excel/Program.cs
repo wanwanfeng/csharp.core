@@ -29,8 +29,11 @@ namespace excel
             /* var hh = new ExcelClass().ReadFromExcels("ff.xlsx");
             foreach (KeyValuePair<string, List<List<object>>> pair in hh)
             {
-                ListToJson(pair);
+                //ExcelClass.ConvertListToJson(pair);
+               // ExcelClass.ConvertDataTableToXml(ExcelClass.ConvertListToDataTable(pair.Value, pair.Key), pair.Key);
+                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(pair.Value, pair.Key), pair.Key);
             }
+            Console.ReadKey();
             return;
             Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>()
             {
@@ -52,15 +55,23 @@ namespace excel
                 }
             };
 
-            new ExcelClass().WriteToExcelOne(Path.ChangeExtension("ff.x", ".xlsx"), dic);
-            return;
+            new ExcelClass().WriteToOneExcel(
+                Environment.CurrentDirectory + "/" + Path.ChangeExtension("ff.x", ".xlsx"), dic);
+
+            Console.ReadKey();
+
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
-                new ExcelClass().WriteToExcel(Path.ChangeExtension(pair.Key, ".xlsx"), pair.Value);
+                new ExcelClass().WriteToExcel(
+                    Environment.CurrentDirectory + "/" + Path.ChangeExtension(pair.Key, ".xlsx"), pair.Value);
             }
+            Console.ReadKey();
+
             return;
             */
 
+            ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
+            return;
             Console.WriteLine("----------命令索引----------");
             foreach (var value in Enum.GetValues(typeof(CaoType)))
             {
@@ -103,19 +114,12 @@ namespace excel
         /// </summary>
         private static void ReadjsonToCsv()
         {
-            List<string> files;
-            if (!CheckPath(out files))
-                return;
+            List<string> files = CheckPath();
+            if (files.Count == 0) return;
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                List<List<object>> vals = GetJsonDataArray(File.ReadAllText(file));
-                List<string> res = new List<string>();
-                foreach (List<object> objects in vals)
-                {
-                    res.Add(string.Join(",", objects.Select(p => "\"" + p + "\"").ToArray()));
-                }
-                File.WriteAllLines(Path.ChangeExtension(file, ".csv"), res.ToArray(), Encoding.UTF8);
+                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToList(file)));
             }
         }
 
@@ -124,12 +128,12 @@ namespace excel
         /// </summary>
         private static void ReadJsonToExcel()
         {
-            List<string> files;
-            if (!CheckPath(out files)) return;
+            List<string> files = CheckPath();
+            if (files.Count == 0) return;
             foreach (string file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                List<List<object>> vals = GetJsonDataArray(File.ReadAllText(file));
+                List<List<object>> vals = ExcelClass.ConvertJsonToList(file);
                 new ExcelClass().WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
             }
         }
@@ -139,69 +143,15 @@ namespace excel
         /// </summary>
         private static void ReadJsonToOneExcel()
         {
-            List<string> files;
-            if (!CheckPath(out files)) return;
-            Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>();
+            List<string> files = CheckPath();
+            if (files.Count == 0) return;
+            var dic = new Dictionary<string, List<List<object>>>();
             foreach (string file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                dic[file] = GetJsonDataArray(File.ReadAllText(file));
+                dic[file] = ExcelClass.ConvertJsonToList(file);
             }
-            new ExcelClass().WriteToExcelOne("", dic);
-        }
-
-        private static bool CheckPath(out List<string> files, string exce = ".json")
-        {
-            //OpenFileDialog fd = new OpenFileDialog();
-            //fd.Filter = "EXCEL文件(*.xls)|*.xls|EXCEL文件(*.xlsx)|*.xlsx";
-
-            //if (fd.ShowDialog() == DialogResult.OK)
-            //{
-            //    //这里面就可以对选择的文件进行处理了
-            //}
-
-            string path = (Environment.CurrentDirectory + "/json/").Replace("\\", "/");
-            if (!Directory.Exists(path))
-            {
-                files = new List<string>();
-                Console.WriteLine(path + " is not exists !");
-                return false;
-            }
-            files = Directory.GetFiles(path).Where(p => p.EndsWith(exce)).ToList();
-            files.Sort();
-            return true;
-        }
-
-        public static List<List<object>> GetJsonDataArray(string content)
-        {
-            JsonData[] jsonDatas = JsonMapper.ToObject<JsonData[]>(content.Trim().Trim('\0'));
-            //获取key集合
-            List<string> keys = new List<string>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                foreach (var pair in jsonData.Inst_Object)
-                {
-                    if (keys.Contains(pair.Key))
-                        continue;
-                    keys.Add(pair.Key);
-                }
-            }
-            //获取key集合对应的值集合
-            var vals = new List<List<object>>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                List<object> val = new List<object>();
-                vals.Add(val);
-
-                foreach (var key in keys)
-                {
-                    JsonData value;
-                    var str = jsonData.Inst_Object.TryGetValue(key, out value) ? value.ToString() : "";
-                    val.Add(str.Replace(":", "::").Replace("\n", "\\n"));
-                }
-            }
-            vals.Insert(0, keys.Select(p => (object) p).ToList());
-            return vals;
+            new ExcelClass().WriteToOneExcel("OneExcel.xlsx", dic);
         }
 
         #endregion
@@ -213,48 +163,54 @@ namespace excel
         /// </summary>
         private static void ReadExcelToJson()
         {
-            List<string> files;
-            if (!CheckPath(out files, "xlsx"))
-                return;
+            List<string> files = CheckPath();
+            if (files.Count == 0) return;
+            ReadExcelToJson(files);
+        }
+
+        private static void ReadExcelToJson(List<string> files)
+        {
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
                 var vals = new ExcelClass().ReadFromExcels(Path.ChangeExtension(file, ".xlsx"));
                 if (vals.Count == 1)
                 {
-                    ListToJson(vals.First(), file);
+                    ExcelClass.ConvertListToJson(vals.First(), file);
                 }
                 else
                 {
                     foreach (KeyValuePair<string, List<List<object>>> pair in vals)
                     {
-                        string newPath = file + "\\" + pair.Key;
+                        if (file == null) continue;
+                        string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key);
                         FileHelper.CreateDirectory(newPath);
-                        ListToJson(pair, newPath);
+                        ExcelClass.ConvertListToJson(pair, newPath);
                     }
                 }
             }
         }
-
-        private static void ListToJson(KeyValuePair<string, List<List<object>>> keyValuePair, string file = null)
-        {
-            Console.WriteLine(" is now sheet: " + keyValuePair.Key);
-            Queue<List<object>> queue = new Queue<List<object>>(keyValuePair.Value);
-            List<object> keyList = queue.Dequeue();
-            JsonData resJsonDatas = new JsonData();
-            resJsonDatas.SetJsonType(JsonType.Array);
-            while (queue.Count != 0)
-            {
-                Queue<object> queueVal = new Queue<object>(queue.Dequeue());
-                JsonData jsonData = new JsonData();
-                foreach (object o in keyList)
-                    jsonData[o.ToString()] = queueVal.Dequeue().ToString();
-                resJsonDatas.Add(jsonData);
-            }
-            string newPath = Path.GetFileNameWithoutExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file);
-            File.WriteAllText(newPath + ".json", JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
-        }
-
         #endregion
+
+        private static List<string> CheckPath(string dir = "/json/", string exce = ".json")
+        {
+            //OpenFileDialog fd = new OpenFileDialog();
+            //fd.Filter = "EXCEL文件(*.xls)|*.xls|EXCEL文件(*.xlsx)|*.xlsx";
+
+            //if (fd.ShowDialog() == DialogResult.OK)
+            //{
+            //    //这里面就可以对选择的文件进行处理了
+            //}
+            List<string> files = new List<string>();
+            string path = (Environment.CurrentDirectory + dir).Replace("\\", "/");
+            if (!Directory.Exists(path))
+            {
+                Console.WriteLine(path + " is not exists !");
+                return files;
+            }
+            files = Directory.GetFiles(path).Where(p => p.EndsWith(exce)).ToList();
+            files.Sort();
+            return files;
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -13,13 +12,13 @@ namespace excel.Script
     {
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
         {
-            Dictionary<string, DataTable> dt = ExcelToTable(filename);
-            return dt.ToDictionary(pair => pair.Key, pair => ConvertToList(pair.Value));
+            var dt = ExcelToTable(filename);
+            return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
         }
 
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
-            var dt = ConvertToDataTable(vals);
+            var dt = ConvertListToDataTable(vals);
             TableToExcel(filename, dt);
         }
 
@@ -28,7 +27,7 @@ namespace excel.Script
             List<DataTable> dts = new List<DataTable>();
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
-                var dt = ConvertToDataTable(pair.Value);
+                var dt = ConvertListToDataTable(pair.Value);
                 dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
                 dts.Add(dt);
             }
@@ -40,7 +39,7 @@ namespace excel.Script
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <returns></returns>
-        private static Dictionary<string, DataTable> ExcelToTable(string file)
+        private static List<DataTable> ExcelToTable(string file)
         {
             IWorkbook workbook;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -64,11 +63,11 @@ namespace excel.Script
                     return null;
                 }
 
-                var cache = new Dictionary<string, DataTable>();
+                var list = new List<DataTable>();
                 for (int index = 0; index < workbook.NumberOfSheets; index++)
                 {
-                    DataTable dt = new DataTable();
                     ISheet sheet = workbook.GetSheetAt(index);
+                    DataTable dt = new DataTable(sheet.SheetName);
 
                     //表头  
                     IRow header = sheet.GetRow(sheet.FirstRowNum);
@@ -104,9 +103,9 @@ namespace excel.Script
                         }
                     }
 
-                    cache[sheet.SheetName] = dt;
+                    list.Add(dt);
                 }
-                return cache;
+                return list;
             }
         }
 
@@ -201,5 +200,6 @@ namespace excel.Script
                     return "=" + cell.CellFormula;
             }
         }
+
     }
 }

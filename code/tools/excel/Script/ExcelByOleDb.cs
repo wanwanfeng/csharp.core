@@ -10,13 +10,13 @@ namespace excel.Script
     {
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
         {
-            Dictionary<string, DataTable> dt = ExcelToTable(filename);
-            return dt.ToDictionary(pair => pair.Key, pair => ConvertToList(pair.Value));
+            var dt = ExcelToTable(filename);
+            return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
         }
 
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
-            var dt = ConvertToDataTable(vals);
+            var dt = ConvertListToDataTable(vals);
             TableToExcel(filename, dt);
         }
 
@@ -25,7 +25,7 @@ namespace excel.Script
             List<DataTable> dts = new List<DataTable>();
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
-                var dt = ConvertToDataTable(pair.Value);
+                var dt = ConvertListToDataTable(pair.Value);
                 dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
                 dts.Add(dt);
             }
@@ -38,7 +38,7 @@ namespace excel.Script
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static Dictionary<string, System.Data.DataTable> ExcelToTable(string path)
+        private static List<DataTable> ExcelToTable(string path)
         {
             var connectionString = ConnectionString(path, "HDR=NO;IMEX=1");
             if (string.IsNullOrEmpty(connectionString)) return null;
@@ -47,7 +47,7 @@ namespace excel.Script
             Console.WriteLine(path);
             connection.Open();
             var tables = connection.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, new object[] {});
-            Dictionary<string, DataTable> dts = new Dictionary<string, DataTable>();
+            List<DataTable> dts = new List<DataTable>();
 
             if (tables != null)
                 for (int i = 0; i < tables.Rows.Count; i++)
@@ -56,9 +56,9 @@ namespace excel.Script
                     System.Data.OleDb.OleDbCommand sql =
                         new System.Data.OleDb.OleDbCommand("select * from [" + firstTableName + "] ", connection);
                     System.Data.OleDb.OleDbDataAdapter adapter = new System.Data.OleDb.OleDbDataAdapter(sql);
-                    var dt = new DataTable();
+                    var dt = new DataTable(firstTableName);
                     adapter.Fill(dt);
-                    dts[firstTableName] = dt;
+                    dts.Add(dt);
                 }
 
             connection.Close();
@@ -103,15 +103,14 @@ namespace excel.Script
 
         private static void TableToExcel(string path, params DataTable[] dts)
         {
-            //path = Path.ChangeExtension(path, ".xls");
+            path = Path.ChangeExtension(path, ".xls");
 
             if (File.Exists(path))
             {
                 Console.WriteLine("文件已存在");
                 return;
             }
-
-            var connectionString = ConnectionString(path);
+            var connectionString = ConnectionString(path, "HDR=NO;IMEX=2");
             if (string.IsNullOrEmpty(connectionString)) return;
 
             //实例化一个Oledbconnection类(实现了IDisposable,要using)

@@ -17,22 +17,17 @@ namespace Library.Excel
             return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
         }
 
+        [Obsolete("此类本方法无效！", true)]
+
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
-            var dt = ConvertListToDataTable(vals);
-            TableToExcel(filename, dt);
+      
         }
 
+        [Obsolete("此类本方法无效！", true)]
         public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
         {
-            List<DataTable> dts = new List<DataTable>();
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-            {
-                var dt = ConvertListToDataTable(pair.Value);
-                dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
-                dts.Add(dt);
-            }
-            TableToExcel(fileName, dts.ToArray());
+            
         }
 
         /// <summary>
@@ -44,23 +39,45 @@ namespace Library.Excel
         private static List<DataTable> ExcelToTable(string path)
         {
             FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read);
-            IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-            DataSet dataSet = excelReader.AsDataSet();
+            IExcelDataReader excelReader = null;
             var dts = new List<DataTable>();
-            foreach (DataTable table in dataSet.Tables)
+            try
             {
-                dts.Add(table);
+                var extension = Path.GetExtension(path);
+                if (extension != null)
+                    switch (extension.ToLower())
+                    {
+                        case ".xls":
+                            excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
+                            break;
+                        case ".xlsx":
+                            excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                            break;
+                        default:
+                            Console.WriteLine("文件类型错误！！！");
+                            break;
+                    }
+
+                if (excelReader != null)
+                {
+                    DataSet dataSet = excelReader.AsDataSet();
+                    foreach (DataTable table in dataSet.Tables)
+                    {
+                        dts.Add(table);
+                    }
+                }
             }
-            stream.Dispose();
-            stream.Close();
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            finally
+            {
+                stream.Dispose();
+                stream.Close();
+            }
             return dts;
         }
-
-        private void TableToExcel(string fileName, params DataTable[] dataTable)
-        {
-            throw new Exception("此方法无法写入文件！");
-        }
-
     }
 }
 #endif

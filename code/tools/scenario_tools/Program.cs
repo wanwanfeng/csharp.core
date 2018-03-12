@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using excel;
-using excel.Script;
+using Library.Excel;
 using LitJson;
 
 namespace scenario_tools
@@ -20,20 +19,6 @@ namespace scenario_tools
             foreach (string file in files)
             {
                 Console.WriteLine(file);
-                //var contents = File.ReadAllLines(file).ToList();
-                //List<string> keys = contents.First().Split(',').ToList();
-                //List<List<string>> values = contents.Skip(1).Select(p => new List<string>(p.Split(','))).ToList();
-                //foreach (List<string> value in values)
-                //{
-                //    JsonData jsonData = new JsonData();
-                //    jsonData["file"] = Path.GetFileNameWithoutExtension(file);
-                //    for (int i = 0; i < value.Count; i++)
-                //    {
-                //        jsonData[keys[i]] = value[i];
-                //    }
-                //    res.Add(jsonData);
-                //}
-
 
                 var text = File.ReadAllText(file, Encoding.UTF8);
                 JsonData jsonData = ConvertCSVToTreeData(text);
@@ -52,46 +37,9 @@ namespace scenario_tools
             File.WriteAllText("scenario.txt", JsonMapper.ToJson(res));
 
             string outpath = Environment.CurrentDirectory + "/scenario.xlsx";
-            List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(res));
+            List<List<object>> vals = ExcelByNpoi.ConvertJsonToList(JsonMapper.ToJson(res));
             new ExcelByNpoi().WriteToExcel(outpath, vals);
-
-
-            Console.ReadKey();
         }
-
-        private static List<List<object>> GetJsonDataArray(string content)
-        {
-            JsonData[] jsonDatas = JsonMapper.ToObject<JsonData[]>(content.Trim().Trim('\0'));
-            //获取key集合
-            List<string> keys = new List<string>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                foreach (var pair in jsonData.Inst_Object)
-                {
-                    if (keys.Contains(pair.Key))
-                        continue;
-                    keys.Add(pair.Key);
-                }
-            }
-            //获取key集合对应的值集合
-            var vals = new List<List<object>>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                List<object> val = new List<object>();
-                vals.Add(val);
-
-                foreach (var key in keys)
-                {
-                    JsonData value;
-                    var str = jsonData.Inst_Object.TryGetValue(key, out value) ? value.ToString() : "";
-                    val.Add(str.Replace(":", "::").Replace("\n", "\\n"));
-                }
-            }
-            vals.Insert(0, keys.Select(p => (object)p).ToList());
-            return vals;
-        }
-
-
 
         /// <summary>
         /// CSV形式のデータを変換

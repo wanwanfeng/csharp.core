@@ -41,7 +41,7 @@ namespace Library.Excel
                 ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(pair.Value, pair.Key), pair.Key);
             }
             Console.ReadKey();
-            return;
+            return;*/
             Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>()
             {
                 {
@@ -65,20 +65,20 @@ namespace Library.Excel
             new ExcelClass().WriteToOneExcel(
                 Environment.CurrentDirectory + "/" + Path.ChangeExtension("ff.x", ".xlsx"), dic);
 
-            Console.ReadKey();
+            //Console.ReadKey();
 
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-            {
-                new ExcelClass().WriteToExcel(
-                    Environment.CurrentDirectory + "/" + Path.ChangeExtension(pair.Key, ".xlsx"), pair.Value);
-            }
-            Console.ReadKey();
+            //foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            //{
+            //    new ExcelClass().WriteToExcel(
+            //        Environment.CurrentDirectory + "/" + Path.ChangeExtension(pair.Key, ".xlsx"), pair.Value);
+            //}
+            //Console.ReadKey();
 
             return;
             
 
             ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
-            return;*/
+            return;
             Console.WriteLine("----------命令索引----------");
             foreach (var value in Enum.GetValues(typeof(CaoType)))
             {

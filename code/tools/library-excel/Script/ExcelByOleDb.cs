@@ -4,7 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 
-#if ExcelByOleDb
+#if true
 
 namespace Library.Excel
 {

@@ -2,10 +2,14 @@ D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\scenario_tools.e
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\scenario_tools.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\Library.dll
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\LitJson.dll
-D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\ICSharpCode.SharpZipLib.dll
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\Library.pdb
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.csprojResolveAssemblyReference.cache
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.exe
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.pdb
-D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\excel.exe
-D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\excel.pdb
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\Library-Excel.dll
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.dll
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OOXML.dll
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OpenXmlFormats.dll
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OpenXml4Net.dll
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.xml
+D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\ICSharpCode.SharpZipLib.dll

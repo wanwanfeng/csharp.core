@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -140,6 +141,10 @@ namespace Library.Excel
 
             foreach (DataTable dt in dts)
             {
+                if (fileExt == ".xls" && dt.Rows.Count>65536)
+                {
+                    throw new Exception("数据量过大，请保存为.xlsx");
+                }
                 ISheet sheet = string.IsNullOrEmpty(dt.TableName)
                     ? workbook.CreateSheet("Sheet1")
                     : workbook.CreateSheet(dt.TableName);

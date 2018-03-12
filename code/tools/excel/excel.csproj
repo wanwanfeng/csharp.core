@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ExcelByNpoi</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -62,18 +62,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Script\Base\ExcelByBase.cs" />
-    <Compile Include="Script\EditorExcelTools.cs" />
-    <Compile Include="Script\ExcelByNpoi.cs" />
-    <Compile Include="Script\ExcelByOleDb.cs" />
-    <Compile Include="Script\ExcelByStream.cs" />
-    <Compile Include="Script\ExcelByOffice.cs" />
-    <Compile Include="Script\Base\KillExcel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +98,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\library-excel\library-excel.csproj">
+      <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
+      <Name>library-excel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\library\library.csproj">
       <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
       <Name>library</Name>

@@ -2,16 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Library.Helper;
-using LitJson;
+//#define ExcelByOleDb
+//#define ExcelByNpoi
+//#define ExcelByOffice
+//#define ExcelByStream
 
-//using ExcelClass = excel.Script.ExcelByOleDb;
-using ExcelClass = excel.Script.ExcelByNpoi;
-//using ExcelClass = excel.Script.ExcelByOffice;
-//using ExcelClass = excel.Script.ExcelByStream;
+#if ExcelByOleDb
+using ExcelClass = Library.Excel.ExcelByOleDb;
+#elif ExcelByNpoi
+using ExcelClass = Library.Excel.ExcelByNpoi;
+#elif ExcelByOffice
+using ExcelClass = Library.Excel.ExcelByOffice;
+#elif ExcelByStream
+using ExcelClass = Library.Excel.ExcelByStream;
+#endif
 
-namespace excel
+namespace Library.Excel
 {
     public enum CaoType
     {
@@ -68,10 +75,10 @@ namespace excel
             Console.ReadKey();
 
             return;
-            */
+            
 
             ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
-            return;
+            return;*/
             Console.WriteLine("----------命令索引----------");
             foreach (var value in Enum.GetValues(typeof(CaoType)))
             {

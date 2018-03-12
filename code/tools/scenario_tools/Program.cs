@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using excel;
+using excel.Script;
 using LitJson;
 
 namespace scenario_tools
@@ -52,11 +53,10 @@ namespace scenario_tools
 
             string outpath = Environment.CurrentDirectory + "/scenario.xlsx";
             List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(res));
-            OfficeWorkbooks.WriteToExcel(outpath, vals);
+            new ExcelByNpoi().WriteToExcel(outpath, vals);
 
 
             Console.ReadKey();
-
         }
 
         private static List<List<object>> GetJsonDataArray(string content)

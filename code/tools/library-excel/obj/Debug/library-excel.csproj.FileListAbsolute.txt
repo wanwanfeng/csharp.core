@@ -1,0 +1,4 @@
+D:\Work\yuege\ygtools\trunk\code\tools\library-excel\obj\Debug\library-excel.csprojResolveAssemblyReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\library-excel\obj\Debug\library-excel.csproj.ResolveComReference.cache
+D:\Work\yuege\ygtools\trunk\code\tools\bin\library-excel.dll
+D:\Work\yuege\ygtools\trunk\code\tools\library-excel\obj\Debug\library-excel.dll

@@ -1,27 +1,24 @@
-﻿using Library.LitJson;
-using LitJson;
-using System;
+﻿using System;
 using System.Linq;
-using Library.Extensions;
+using LitJson;
 using UnityEngine;
 
 public class LitJsonHelper : Library.LitJson.LitJsonHelper
 {
     static LitJsonHelper()
     {
-        JsonMapper.RegisterImporter<string, Vector2>(input =>
-        {
-            var array = input.AsStringArray(',');
-            return new Vector2(array.Length > 0 ? array[0].AsFloat() : 0, array.Length > 1 ? array[1].AsFloat() : 0);
-        });
-        JsonMapper.RegisterImporter<string, Vector3>(input =>
-        {
-            var array = input.AsStringArray(',');
-            return new Vector3(array.Length > 0 ? array[0].AsFloat() : 0, array.Length > 1 ? array[1].AsFloat() : 0,
-                array.Length > 2 ? array[2].AsFloat() : 0);
-        });
+        JsonMapper.RegisterImporter<string, Vector3>(
+            input =>
+                input.Split(',')
+                    .Select(p => new Vector3(p.Length > 0 ? 0 : p[0], p.Length > 1 ? 0 : p[1], p.Length > 2 ? 0 : p[2]))
+                    .FirstOrDefault());
+        JsonMapper.RegisterImporter<string, Vector2>(
+            input =>
+                input.Split(',')
+                    .Select(p => new Vector2(p.Length > 0 ? 0 : p[0], p.Length > 1 ? 0 : p[1]))
+                    .FirstOrDefault());
 
-        JsonMapper.RegisterExporter<Vector2>(delegate(Vector2 v, JsonWriter w)
+        JsonMapper.RegisterExporter<Vector2>((v, w) =>
         {
             w.WriteObjectStart();
             w.WritePropertyName("x");
@@ -30,7 +27,7 @@ public class LitJsonHelper : Library.LitJson.LitJsonHelper
             w.Write(v.y);
             w.WriteObjectEnd();
         });
-        JsonMapper.RegisterExporter<Vector3>(delegate(Vector3 v, JsonWriter w)
+        JsonMapper.RegisterExporter<Vector3>((v, w) =>
         {
             w.WriteObjectStart();
             w.WritePropertyName("x");

@@ -1,4 +1,5 @@
-﻿using LitJson;
+﻿using System;
+using LitJson;
 
 namespace Library.LitJson
 {
@@ -6,10 +7,10 @@ namespace Library.LitJson
     {
         static LitJsonHelper()
         {
-            JsonMapper.RegisterImporter<double, float>((double input) => (float)input);
-            JsonMapper.RegisterExporter<float>(delegate(float v, JsonWriter w)
+            JsonMapper.RegisterImporter<double, float>(input => (float) input);
+            JsonMapper.RegisterExporter<float>((v, w) =>
             {
-                w.Write((double)v);
+                w.Write(v);
             });
         }
 

@@ -41,7 +41,7 @@ namespace Library.Excel
                 ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(pair.Value, pair.Key), pair.Key);
             }
             Console.ReadKey();
-            return;*/
+            return;
             Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>()
             {
                 {
@@ -78,7 +78,7 @@ namespace Library.Excel
             
 
             ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
-            return;
+            return;*/
             Console.WriteLine("----------命令索引----------");
             foreach (var value in Enum.GetValues(typeof(CaoType)))
             {
@@ -126,7 +126,7 @@ namespace Library.Excel
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToList(file)));
+                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToListByPath(file)));
             }
         }
 
@@ -140,8 +140,8 @@ namespace Library.Excel
             foreach (string file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                List<List<object>> vals = ExcelClass.ConvertJsonToList(file);
-                new ExcelClass().WriteToExcel(Path.ChangeExtension(file, ".xlsx"), vals);
+                List<List<object>> vals = ExcelClass.ConvertJsonToListByPath(file);
+                new ExcelClass().WriteToExcel(Path.ChangeExtension(file, ".xls"), vals);
             }
         }
 
@@ -152,13 +152,22 @@ namespace Library.Excel
         {
             List<string> files = CheckPath();
             if (files.Count == 0) return;
+
+            var outName = "OneExcel";
+            Console.WriteLine("----------------------------");
+            Console.Write("请输入输出文件名，然后回车：");
+            string s = Console.ReadLine();
+            if (string.IsNullOrEmpty(s))
+            {
+                s = outName;
+            }
             var dic = new Dictionary<string, List<List<object>>>();
             foreach (string file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                dic[file] = ExcelClass.ConvertJsonToList(file);
+                dic[file] = ExcelClass.ConvertJsonToListByPath(file);
             }
-            new ExcelClass().WriteToOneExcel("OneExcel.xlsx", dic);
+            new ExcelClass().WriteToOneExcel(s + ".xlsx", dic);
         }
 
         #endregion

@@ -13,3 +13,5 @@ D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OpenXmlForm
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OpenXml4Net.dll
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.xml
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.exe
+E:\Git\yg\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.pdb

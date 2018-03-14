@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Library.Extensions;
 using Library.Helper;
 
@@ -10,15 +9,6 @@ namespace FileVersion
 {
     public class GitPatch : GitCommon
     {
-        public override string Name
-        {
-            get { return SaveDir + "{0}-{1:D8}-{2:D8}-patch"; }
-        }
-
-        public long startVersion { get; private set; }
-        public long endVersion { get; private set; }
-        public string[] diffList { get; private set; }
-
         public override void Run()
         {
             base.Run();
@@ -39,13 +29,13 @@ namespace FileVersion
 
             Console.WriteLine("\n正在获取版本差异信息...");
 
-            diffList = RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, gitUrl),
-                true);
-            diffList = diffList.Select(p => p.Replace(gitUrl + "/", "")).Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
+            var targetList =
+                RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, gitUrl),
+                    true).Select(p => p.Replace(gitUrl + "/", "")).Where(s => !s.EndsWith("/")).ToArray();//去除文件夹
 
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
             int index = 0;
-            foreach (string s in diffList)
+            foreach (string s in targetList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
                 string last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
@@ -57,8 +47,7 @@ namespace FileVersion
                 cache[svnFileInfo.path] = svnFileInfo;
                 Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
             }
-
-            ExcludeFile(cache);
+            if (!ExcludeFile(cache)) return;
 
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             List<string> del = new List<string>();

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
 using Library.Extensions;
 using Library.Helper;
 
@@ -11,15 +9,6 @@ namespace FileVersion
 {
     public class SvnPatch : SvnCommon
     {
-        public override string Name
-        {
-            get { return SaveDir + "{0}-{1:D8}-{2:D8}-patch"; }
-        }
-
-        public long startVersion { get; private set; }
-        public long endVersion { get; private set; }
-        public string[] diffList { get; private set; }
-
         public override void Run()
         {
             base.Run();
@@ -40,17 +29,19 @@ namespace FileVersion
 
             Console.WriteLine("\n正在获取版本差异信息...");
 
-            diffList = RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl),
-                true);
-
-            diffList = diffList.Select(Uri.UnescapeDataString).Where(s => !s.EndsWith("/")).Select(p => p.Replace(svnUrl + "/", "")).ToArray(); //去除文件夹
+            var targetList =
+                RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl), true)
+                    .Select(Uri.UnescapeDataString)
+                    .Where(s => !s.EndsWith("/"))
+                    .Select(p => p.Replace(svnUrl + "/", ""))
+                    .ToArray(); //去除文件夹
 
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
             int index = 0;
-            foreach (string s in diffList)
+            foreach (string s in targetList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
-                string last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
+                var last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
                 FileDetailInfo svnFileInfo = new FileDetailInfo()
                 {
                     is_delete = res.First().Trim() == "D",
@@ -59,8 +50,7 @@ namespace FileVersion
                 cache[svnFileInfo.path] = svnFileInfo;
                 Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
             }
-
-            ExcludeFile(cache);
+            if (!ExcludeFile(cache)) return;
 
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             List<string> del = new List<string>();

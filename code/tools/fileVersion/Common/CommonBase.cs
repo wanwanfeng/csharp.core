@@ -79,13 +79,14 @@ namespace FileVersion
         public string folder { get; protected set; }
         public long highVersion { get; protected set; }
         public long lowVersion { get; protected set; }
-
+        public long startVersion { get; protected set; }
+        public long endVersion { get; protected set; }
         public virtual void Run()
         {
 
         }
 
-        public void Common(string targetDir, Dictionary<string, FileDetailInfo> cache)
+        public virtual void Common(string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
             Console.WriteLine("可更新文件总大小为{0}B！", cache.Values.Sum(p => p.content_size).ToString("N"));
             WriteToTxt(targetDir, cache);
@@ -170,7 +171,7 @@ namespace FileVersion
             fileDetailInfo.content_hash = Encrypt.MD5(bytes);
         }
 
-        private static bool TargetMd5Dir(out string targetMd5Dir, string dir, string targetDir)
+        protected static bool TargetMd5Dir(out string targetMd5Dir, string dir, string targetDir)
         {
             targetMd5Dir = targetDir.Replace(dir, Encrypt.MD5(dir + KeyMd5));
             bool md5 = Directory.Exists(targetMd5Dir);

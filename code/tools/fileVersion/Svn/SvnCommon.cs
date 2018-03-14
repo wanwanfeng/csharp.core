@@ -7,6 +7,11 @@ namespace FileVersion
 {
     public class SvnCommon : CommonBase
     {
+        public override string Name
+        {
+            get { return SaveDir + "{0}-{1:D8}-{2:D8}"; }
+        }
+
         public string svnUrl { get; protected set; }
 
         public SvnCommon()

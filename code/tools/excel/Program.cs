@@ -25,7 +25,7 @@ namespace Library.Excel
         JsonToCsv = 1,
         JsonToExcel = 2,
         JsonToOneExcel = 3,
-        XlsxToJson = 4,
+        ExcelToJson = 4,
     }
 
 
@@ -101,7 +101,7 @@ namespace Library.Excel
                     case CaoType.JsonToOneExcel:
                         ReadJsonToOneExcel();
                         break;
-                    case CaoType.XlsxToJson:
+                    case CaoType.ExcelToJson:
                         ReadExcelToJson();
                         break;
                     default:

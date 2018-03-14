@@ -10,33 +10,28 @@ namespace FileVersion
 {
     public class GitMaster : GitCommon
     {
-        public override string Name
-        {
-            get { return SaveDir + "{0}-{1:D8}-{2:D8}-master"; }
-        }
-
-        public long targetVersion { get; private set; }
-
         public override void Run()
         {
             base.Run();
 
             Console.Write("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            targetVersion = Console.ReadLine().AsLong();
-            targetVersion = Math.Max(targetVersion, lowVersion);
-            targetVersion = Math.Min(targetVersion, highVersion);
-            Console.WriteLine("目标版本号：" + targetVersion);
+            endVersion = Console.ReadLine().AsLong();
+            endVersion = Math.Max(endVersion, lowVersion);
+            endVersion = Math.Min(endVersion, highVersion);
+            Console.WriteLine("目标版本号：" + endVersion);
             Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
             return;
 
-            var targetList = RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", targetVersion, gitUrl), true);
-            targetList = targetList.Where(s => !s.EndsWith("/")).ToArray(); //去除文件夹
+            var targetList =
+                RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", endVersion, gitUrl), true)
+                    .Where(s => !s.EndsWith("/"))
+                    .ToArray(); //去除文件夹
 
-            int index = 0;
 
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
+            int index = 0;
             foreach (string s in targetList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
@@ -55,7 +50,7 @@ namespace FileVersion
 
             Console.Write("\n是否导出目标版本号文件（y/n）：");
             var yes = Console.ReadLine() == "y";
-            string targetDir = string.Format(Name, folder, 0, targetVersion);
+            string targetDir = string.Format(Name, folder, 0, endVersion);
             DeleteInfo(targetDir);
 
             //if (yes)

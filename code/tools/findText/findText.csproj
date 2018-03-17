@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitJson">
-      <HintPath>..\unity-bin\LitJson.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -82,9 +79,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\excel\excel.csproj">
-      <Project>{576fd8f1-075a-49d0-ac86-47596b1b88b2}</Project>
-      <Name>excel</Name>
+    <ProjectReference Include="..\library-excel\library-excel.csproj">
+      <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
+      <Name>library-excel</Name>
     </ProjectReference>
     <ProjectReference Include="..\library\library.csproj">
       <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>

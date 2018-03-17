@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Library.Helper;
+using Library.LitJson;
 using LitJson;
 
 namespace Library.Excel
@@ -150,28 +151,23 @@ namespace Library.Excel
 
         #region  Convert Json and DataTable
 
-        public static DataTable ConvertJsonToDataTableByPath(string path, string dtName = "")
+        public static DataTable ConvertJsonToDataTableByPath(string path, string dtName = "Sheet1")
         {
-            var list = ConvertJsonToListByPath(path);
-            dtName = string.IsNullOrEmpty(dtName) ? Path.GetFileNameWithoutExtension(path) : dtName;
-            return ConvertListToDataTable(list, dtName);
+            return ConvertListToDataTable(ConvertJsonToListByPath(path), dtName);
         }
 
-        public static DataTable ConvertJsonToDataTable(string path, string dtName = "")
+        public static DataTable ConvertJsonToDataTable(string content, string dtName = "Sheet1")
         {
-            var list = ConvertJsonToList(path);
-            dtName = string.IsNullOrEmpty(dtName) ? Path.GetFileNameWithoutExtension(path) : dtName;
-            return ConvertListToDataTable(list, dtName);
+            return ConvertListToDataTable(ConvertJsonToList(content), dtName);
         }
 
-        public static void ConvertDataTableToJson(DataTable dt, string file = null)
+        public static void ConvertDataTableToJson(DataTable dt)
         {
-            var dtName = string.IsNullOrEmpty(dt.TableName) ? Path.GetFileNameWithoutExtension(file) : dt.TableName;
-            var kv = new KeyValuePair<string, List<List<object>>>(dtName, ConvertDataTableToList(dt));
-            ConvertListToJson(kv, file);
+            var kv = new KeyValuePair<string, List<List<object>>>(dt.TableName, ConvertDataTableToList(dt));
+            ConvertListToJson(kv);
         }
 
-        public static void ConvertDataTableToJsonFile(DataTable dt, string file = null)
+        public static void ConvertDataTableToJsonByPath(DataTable dt, string file)
         {
             var dtName = string.IsNullOrEmpty(dt.TableName) ? Path.GetFileNameWithoutExtension(file) : dt.TableName;
             var kv = new KeyValuePair<string, List<List<object>>>(dtName, ConvertDataTableToList(dt));
@@ -193,38 +189,10 @@ namespace Library.Excel
 
         public static List<List<object>> ConvertJsonToList(string content)
         {
-            JsonData[] jsonDatas = JsonMapper.ToObject<JsonData[]>(content.Trim().Trim('\0'));
-            //获取key集合
-            List<string> keys = new List<string>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                foreach (var pair in jsonData.Inst_Object)
-                {
-                    if (keys.Contains(pair.Key))
-                        continue;
-                    keys.Add(pair.Key);
-                }
-            }
-            //获取key集合对应的值集合
-            var vals = new List<List<object>>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                List<object> val = new List<object>();
-                vals.Add(val);
-
-                foreach (var key in keys)
-                {
-                    JsonData value;
-                    var str = jsonData.Inst_Object.TryGetValue(key, out value) ? value.ToString() : "";
-                    val.Add(str);
-                    //val.Add(str.Replace(":", "::").Replace("\n", "\\n"));
-                }
-            }
-            vals.Insert(0, keys.Select(p => (object) p).ToList());
-            return vals;
+            return LitJsonHelper.ConvertJsonToList(content);
         }
 
-        public static JsonData ConvertListToJson(KeyValuePair<string, List<List<object>>> keyValuePair, string file = null)
+        public static JsonData ConvertListToJson(KeyValuePair<string, List<List<object>>> keyValuePair)
         {
             Console.WriteLine(" is now sheet: " + keyValuePair.Key);
             Queue<List<object>> queue = new Queue<List<object>>(keyValuePair.Value);
@@ -242,9 +210,9 @@ namespace Library.Excel
             return resJsonDatas;
         }
 
-        public static void ConvertListToJsonFile(KeyValuePair<string, List<List<object>>> keyValuePair, string file = null)
+        public static void ConvertListToJsonFile(KeyValuePair<string, List<List<object>>> keyValuePair, string file)
         {
-            JsonData resJsonDatas = ConvertListToJson(keyValuePair, file);
+            JsonData resJsonDatas = ConvertListToJson(keyValuePair);
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file, ".json");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllText(newPath, JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));

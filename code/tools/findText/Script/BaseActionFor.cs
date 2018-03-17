@@ -5,10 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using excel;
 using findText.Script;
+using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
+using Library.LitJson;
 using LitJson;
 
 namespace findText
@@ -99,34 +100,10 @@ namespace findText
 
         private List<List<object>> GetJsonDataArray(string content)
         {
-            JsonData[] jsonDatas = JsonMapper.ToObject<JsonData[]>(content.Trim().Trim('\0'));
-            //获取key集合
-            List<string> keys = new List<string>();
-            foreach (JsonData jsonData in jsonDatas)
+            return LitJsonHelper.ConvertJsonToList(content, str =>
             {
-                foreach (var pair in jsonData.Inst_Object)
-                {
-                    if (keys.Contains(pair.Key))
-                        continue;
-                    keys.Add(pair.Key);
-                }
-            }
-            //获取key集合对应的值集合
-            var vals = new List<List<object>>();
-            foreach (JsonData jsonData in jsonDatas)
-            {
-                List<object> val = new List<object>();
-                vals.Add(val);
-
-                foreach (var key in keys)
-                {
-                    JsonData value;
-                    var str = jsonData.Inst_Object.TryGetValue(key, out value) ? value.ToString() : "";
-                    val.Add(str.Replace(":", "::").Replace("\n", "\\n"));
-                }
-            }
-            vals.Insert(0, keys.Select(p => (object) p).ToList());
-            return vals;
+                return str.Replace(":", "::").Replace("\n", "\\n");
+            });
         }
 
         private void WriteExcel(string fileName, JsonData resJsonData)
@@ -136,7 +113,7 @@ namespace findText
 
             string outpath = textBox1.Text + ".xlsx";
             List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
-            OfficeWorkbooks.WriteToExcel(outpath, vals);
+            new ExcelByNpoi().WriteToExcel(outpath, vals);
 
             label1.Text = "";
             if (MessageBox.Show("是否打开文件查看信息？", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
@@ -235,7 +212,7 @@ namespace findText
             openFileDialog.FilterIndex = 1;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Dictionary<string, List<List<object>>> dic = OfficeWorkbooks.ReadFromExcel(openFileDialog.FileName);
+                Dictionary<string, List<List<object>>> dic = new ExcelByReader().ReadFromExcels(openFileDialog.FileName);
 
                 foreach (KeyValuePair<string, List<List<object>>> pair in dic)
                 {

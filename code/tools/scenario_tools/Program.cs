@@ -26,10 +26,10 @@ namespace scenario_tools
                 {
                     var xx = new JsonData();
                     xx["file"] = Path.GetFileNameWithoutExtension(file);
-                    foreach (KeyValuePair<string, JsonData> keyValuePair in data.Inst_Object)
+                    foreach (var key in data.Keys)
                     {
-                        if (keyValuePair.Key != "")
-                            xx[keyValuePair.Key] = keyValuePair.Value;
+                        if (key != "")
+                            xx[key] = data[key];
                     }
                     res.Add(xx);
                 }

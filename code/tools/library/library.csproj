@@ -41,10 +41,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="LitJson, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\LitJson.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
@@ -58,6 +54,16 @@
     <Compile Include="Library\Base\Helper\FileHelper.cs" />
     <Compile Include="Library\Base\LitJson\LitJsonHelper.cs" />
     <Compile Include="Library\Base\Helper\XmlHelper.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\IJsonWrapper.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\JsonData.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\JsonException.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\JsonMapper.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\JsonMockWrapper.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\JsonReader.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\JsonWriter.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\Lexer.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\Netstandard15Polyfill.cs" />
+    <Compile Include="Library\Base\LitJson\LitJson\ParserToken.cs" />
     <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
     <Compile Include="Library\Debug.cs" />

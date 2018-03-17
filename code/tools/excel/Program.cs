@@ -192,7 +192,7 @@ namespace Library.Excel
                 var vals = new ExcelClass().ReadFromExcels(Path.ChangeExtension(file, ".xlsx"));
                 if (vals.Count == 1)
                 {
-                    ExcelClass.ConvertListToJson(vals.First(), file);
+                    ExcelClass.ConvertListToJsonFile(vals.First(), file);
                 }
                 else
                 {
@@ -201,7 +201,7 @@ namespace Library.Excel
                         if (file == null) continue;
                         string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key);
                         FileHelper.CreateDirectory(newPath);
-                        ExcelClass.ConvertListToJson(pair, newPath);
+                        ExcelClass.ConvertListToJsonFile(pair, newPath);
                     }
                 }
             }

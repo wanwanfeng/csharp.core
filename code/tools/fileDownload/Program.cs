@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using excel;
+using Library.Excel;
 using Library.Helper;
 using LitJson;
 
@@ -137,7 +138,9 @@ namespace fileDownload
             {
                 var path = Environment.CurrentDirectory + "/json/" + jsonName + ".json";
                 var json = JsonMapper.ToObject(File.ReadAllText(path).Trim().Trim('\0'));
-                dic = json.Inst_Object.ToDictionary(p => p.Key, q => q.Value);
+                //dic = json.Inst_Object.ToDictionary(p => p.Key, q => q.Value);
+                foreach (var key in json.Keys)
+                    dic[key] = json[key];
             }
             return dic;
         }
@@ -145,7 +148,7 @@ namespace fileDownload
         private static Dictionary<string, JsonData> GetCacheValueFromExcel(string path)
         {
             Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
-            Dictionary<string, List<List<object>>> dic = ExcelByOffice.ReadFromExcel(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
+            var dic = new ExcelByOleDb().ReadFromExcels(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
                 JsonData jsonData = SetJsonDataArray(pair.Value);

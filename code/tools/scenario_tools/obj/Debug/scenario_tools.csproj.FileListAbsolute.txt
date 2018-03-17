@@ -15,3 +15,16 @@ D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\NPOI.xml
 D:\Work\yuege\ygtools\trunk\code\tools\scenario_tools\bin\Debug\ICSharpCode.SharpZipLib.dll
 E:\Git\yg\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.exe
 E:\Git\yg\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.pdb
+E:\Git\yg\trunk\code\tools\scenario_tools\obj\Debug\scenario_tools.csprojResolveAssemblyReference.cache
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\scenario_tools.exe
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\scenario_tools.pdb
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\Library-Excel.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\Library.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\NPOI.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OOXML.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\Excel.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OpenXmlFormats.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\NPOI.OpenXml4Net.dll
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\Library.pdb
+E:\Git\yg\trunk\code\tools\scenario_tools\bin\Debug\NPOI.xml

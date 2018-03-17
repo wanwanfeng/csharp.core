@@ -195,23 +195,12 @@ namespace Library.Excel
         public static JsonData ConvertListToJson(KeyValuePair<string, List<List<object>>> keyValuePair)
         {
             Console.WriteLine(" is now sheet: " + keyValuePair.Key);
-            Queue<List<object>> queue = new Queue<List<object>>(keyValuePair.Value);
-            List<object> keyList = queue.Dequeue();
-            JsonData resJsonDatas = new JsonData();
-            resJsonDatas.SetJsonType(JsonType.Array);
-            while (queue.Count != 0)
-            {
-                Queue<object> queueVal = new Queue<object>(queue.Dequeue());
-                JsonData jsonData = new JsonData();
-                foreach (object o in keyList)
-                    jsonData[o.ToString()] = queueVal.Dequeue().ToString();
-                resJsonDatas.Add(jsonData);
-            }
-            return resJsonDatas;
+            return LitJsonHelper.ConvertListToJson(keyValuePair.Value);
         }
 
         public static void ConvertListToJsonFile(KeyValuePair<string, List<List<object>>> keyValuePair, string file)
         {
+            Console.WriteLine(" is now sheet: " + keyValuePair.Key);
             JsonData resJsonDatas = ConvertListToJson(keyValuePair);
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file, ".json");
             FileHelper.CreateDirectory(newPath);

@@ -55,5 +55,22 @@ namespace Library.LitJson
             }
             return vals;
         }
+
+        public static JsonData ConvertListToJson(List<List<object>> vals)
+        {
+            Queue<List<object>> queue = new Queue<List<object>>(vals);
+            List<object> keyList = queue.Dequeue();
+            JsonData resJsonDatas = new JsonData();
+            resJsonDatas.SetJsonType(JsonType.Array);
+            while (queue.Count != 0)
+            {
+                Queue<object> queueVal = new Queue<object>(queue.Dequeue());
+                JsonData jsonData = new JsonData();
+                foreach (object o in keyList)
+                    jsonData[o.ToString()] = queueVal.Dequeue().ToString();
+                resJsonDatas.Add(jsonData);
+            }
+            return resJsonDatas;
+        }
     }
 }

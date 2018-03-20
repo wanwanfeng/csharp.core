@@ -47,9 +47,6 @@
     <Compile Include="UtilSecurity.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\library-excel\library-excel.csproj">
       <Project>{6C94196A-13A2-4016-9F59-9E426353E92F}</Project>
       <Name>library-excel</Name>

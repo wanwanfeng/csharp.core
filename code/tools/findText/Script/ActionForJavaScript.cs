@@ -5,7 +5,7 @@ using LitJson;
 
 namespace findText.Script
 {
-    public class ActionForJava : BaseActionFor
+    public class ActionForJavaScript : BaseActionFor
     {
         protected override string textName
         {
@@ -14,7 +14,7 @@ namespace findText.Script
 
         protected override string[] exName
         {
-            get { return new[] {".java"}; }
+            get { return new[] {".js"}; }
         }
 
         protected override void OpenRun()

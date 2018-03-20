@@ -20,7 +20,7 @@ namespace findText
         [TypeValue(typeof (ActionForCSharp))] csharp,
         [TypeValue(typeof (ActionForPhp))] php,
         [TypeValue(typeof (ActionForJava))] java,
-        [TypeValue(typeof (ActionForJava))] javascript,
+        [TypeValue(typeof (ActionForJavaScript))] javascript,
         [TypeValue(typeof (ActionForHtml))] html,
     }
 
@@ -111,7 +111,7 @@ namespace findText
             label1.Text = "正在写入Excel...";
             progressBar1.Value = 0;
 
-            string outpath = textBox1.Text + ".xlsx";
+            string outpath = textBox1.Text + ".xls";
             List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
             new ExcelByNpoi().WriteToExcel(outpath, vals);
 
@@ -218,18 +218,22 @@ namespace findText
                 {
                     JsonData jsonData = SetJsonDataArray(pair.Value);
 
-
+                    var index = 0;
                     foreach (JsonData data in jsonData)
                     {
+                        progressBar1.Value = index * 100 / jsonData.Count;
+
                         string temp = data["文件名"].ToString();
                         string[] content = File.ReadAllLines(temp);
                         int line = data["行号"].ToString().AsInt();
                         string oldStr = data["原文"].ToString();
-                        string oldStr2 = data["需翻译"].ToString();
+                        //string oldStr2 = data["需翻译"].ToString();
                         string newStr = data["译文"].ToString();
                         //if (content[line] == oldStr)
-                            content[line] = content[line].Replace(oldStr2, newStr);
-                            File.WriteAllLines(temp, content);
+
+                        var linec = content[line - 1];
+                        content[line - 1] = linec.Replace(oldStr, newStr);
+                        File.WriteAllLines(temp, content);
                     }
 
                     //foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)

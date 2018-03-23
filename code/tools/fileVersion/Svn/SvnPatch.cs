@@ -21,7 +21,7 @@ namespace FileVersion
             Console.Write("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
             endVersion = Console.ReadLine().AsLong();
             endVersion = Math.Min(endVersion, highVersion);
-            endVersion = Math.Max(endVersion, lowVersion);
+            endVersion = Math.Max(endVersion, startVersion);
             Console.WriteLine("结束版本号：" + endVersion);
 
             if (startVersion == endVersion)
@@ -33,6 +33,7 @@ namespace FileVersion
                 RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl), true)
                     .Select(Uri.UnescapeDataString)
                     .Where(s => !s.EndsWith("/"))
+                    //.Where(s => !string.IsNullOrEmpty(s))
                     .Select(p => p.Replace(svnUrl + "/", ""))
                     .ToArray(); //去除文件夹
 
@@ -53,6 +54,7 @@ namespace FileVersion
             if (!ExcludeFile(cache)) return;
 
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
+            WriteToTxt(targetDir, cache);
             List<string> del = new List<string>();
             index = 0;
             foreach (var s in cache)

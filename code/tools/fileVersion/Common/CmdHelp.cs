@@ -68,7 +68,7 @@ namespace FileVersion
             process.Close();
         }
 
-        public string[] RunCmd(string input, bool isFile = false)
+        public virtual string[] RunCmd(string input, bool isFile = false)
         {
             List<string> res = new List<string>();
             Console.WriteLine(input);

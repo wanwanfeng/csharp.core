@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Library;
 using Library.Extensions;
 
 namespace FileVersion
@@ -13,9 +14,27 @@ namespace FileVersion
         }
 
         public string svnUrl { get; protected set; }
+        public string svnUserName { get; protected set; }
+        public string svnPassword { get; protected set; }
+
+        public override string[] RunCmd(string input, bool isFile = false)
+        {
+            if (string.IsNullOrEmpty(svnUserName) || string.IsNullOrEmpty(svnPassword))
+                return base.RunCmd(input, isFile);
+            string newInput = string.Format("{0} --username {1} --password {2}", input, svnUserName, svnPassword);
+            return base.RunCmd(newInput, isFile);
+        }
 
         public SvnCommon()
         {
+            svnUrl = Config.IniReadValue("Svn", "url", "").Trim();
+            svnUserName = Config.IniReadValue("Svn", "username", "").Trim();
+            svnPassword = Config.IniReadValue("Svn", "password", "").Trim();
+            Console.WriteLine("url:" + svnUrl);
+            Console.WriteLine("username:" + svnUserName);
+            Console.WriteLine("password:" + svnPassword);
+            Console.WriteLine("--------------------------------------");
+
             StartCmd();
             softwareVersion = RunCmd("svn --version --quiet").Last();
             isInstall = softwareVersion.Replace(".", "").AsInt() != 0;
@@ -27,32 +46,39 @@ namespace FileVersion
 
         public override void Run()
         {
-            bool yes = false;
-            while (yes == false)
+            try
             {
-                Console.Write("请输入目标目录，然后回车：");
-                folder = Console.ReadLine();
-                if (folder != null && !Directory.Exists(folder))
+                //应用在某版本库实例中
+                if (string.IsNullOrEmpty(svnUrl))
                 {
-                    Console.WriteLine("未输入目录或不存在!");
-                    //Console.Write("\n是否将本目录作为目标目录（y/n）：");
-                    //yes = Console.ReadLine() == "y";
+                    bool yes = false;
+                    while (yes == false)
+                    {
+                        Console.Write("请输入目标目录，然后回车：");
+                        folder = Console.ReadLine();
+                        if (folder != null && !Directory.Exists(folder))
+                        {
+                            Console.WriteLine("未输入目录或不存在!");
+                            //Console.Write("\n是否将本目录作为目标目录（y/n）：");
+                            //yes = Console.ReadLine() == "y";
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    svnUrl = RunCmd("svn info --show-item url").Last();
+                    svnUrl += "/" + folder;
                 }
                 else
                 {
-                    break;
+                    folder = Path.GetFileNameWithoutExtension(svnUrl);
                 }
-            }
 
-
-            try
-            {
-                svnUrl = RunCmd("svn info --show-item url").Last();
-                svnUrl += "/" + folder;
                 Console.WriteLine("库地址：" + svnUrl);
 
                 Console.WriteLine("");
-                highVersion = RunCmd("svn info --show-item last-changed-revision " + folder).Last().AsInt();
+                highVersion = RunCmd("svn info --show-item last-changed-revision " + svnUrl).Last().AsInt();
                 Console.WriteLine("最高版本号：" + highVersion);
 
                 var logs =

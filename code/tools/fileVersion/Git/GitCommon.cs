@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library;
 
 namespace FileVersion
 {
@@ -13,9 +14,27 @@ namespace FileVersion
         }
 
         public string gitUrl { get; protected set; }
+        public string gitUserName { get; protected set; }
+        public string gitPassword { get; protected set; }
+
+        public override string[] RunCmd(string input, bool isFile = false)
+        {
+            if (string.IsNullOrEmpty(gitUserName) || string.IsNullOrEmpty(gitPassword))
+                return base.RunCmd(input, isFile);
+            string newInput = string.Format("{0} --username {1} --password {2}", input, gitUserName, gitPassword);
+            return base.RunCmd(newInput, isFile);
+        }
 
         public GitCommon()
         {
+            gitUrl = Config.IniReadValue("Git", "url", "").Trim();
+            gitUserName = Config.IniReadValue("Git", "username", "").Trim();
+            gitPassword = Config.IniReadValue("Git", "password", "").Trim();
+            Console.WriteLine("url:" + gitUrl);
+            Console.WriteLine("username:" + gitUserName);
+            Console.WriteLine("password:" + gitPassword);
+            Console.WriteLine("--------------------------------------");
+
             StartCmd();
             softwareVersion = RunCmd("git --version").Last();
             isInstall = softwareVersion.StartsWith("git");
@@ -42,25 +61,33 @@ namespace FileVersion
 
         public override void Run()
         {
-            bool yes = false;
-            while (yes == false)
+            if (string.IsNullOrEmpty(gitUrl))
             {
-                Console.Write("请输入目标目录，然后回车：");
-                folder = Console.ReadLine();
-                if (folder != null && !Directory.Exists(folder))
+                bool yes = false;
+                while (yes == false)
                 {
-                    Console.WriteLine("未输入目录或不存在!");
-                    //Console.Write("\n是否将本目录作为目标目录（y/n）：");
-                    //yes = Console.ReadLine() == "y";
+                    Console.Write("请输入目标目录，然后回车：");
+                    folder = Console.ReadLine();
+                    if (folder != null && !Directory.Exists(folder))
+                    {
+                        Console.WriteLine("未输入目录或不存在!");
+                        //Console.Write("\n是否将本目录作为目标目录（y/n）：");
+                        //yes = Console.ReadLine() == "y";
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    break;
-                }
+
+                gitUrl = RunCmd("git remote -v").First().Replace("origin", "").Replace("(fetch)", "").Trim();
+                gitUrl += "/" + folder;
+            }
+            else
+            {
+                folder = Path.GetFileNameWithoutExtension(gitUrl);
             }
 
-            gitUrl = RunCmd("git remote -v").First().Replace("origin", "").Replace("(fetch)", "").Trim();
-            gitUrl += "/" + folder;
             Console.WriteLine("库地址：" + gitUrl);
 
             Console.WriteLine("");
@@ -77,7 +104,7 @@ namespace FileVersion
 
             //https://git-scm.com/book/zh/v1/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2
 
-            var logs = RunCmd("git log --reverse --pretty=format:\"%ad,%H\" --date=format:\"%y-%m-%d-%H-%M-%S\" " + folder, true);
+            var logs = RunCmd("git log --reverse --pretty=format:\"%ad,%H\" --date=format:\"%y-%m-%d-%H-%M-%S\" " + gitUrl, true);
             Console.WriteLine("");
 
             int index = 0;

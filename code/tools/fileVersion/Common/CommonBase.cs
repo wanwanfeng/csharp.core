@@ -296,7 +296,7 @@ namespace FileVersion
                 Console.WriteLine("文件压缩成功！");
             else
                 Console.WriteLine("文件压缩失败！" + message);
-            DeleteInfo(dir, true);
+            DeleteInfo(dirZip, true);
         }
 
         #region
@@ -304,12 +304,14 @@ namespace FileVersion
         protected void WriteToTxt(string fileName, Dictionary<string, FileDetailInfo> cache)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
+            FileHelper.CreateDirectory(fileName);
             File.WriteAllText(fileName, LitJsonHelper.ToJson(cache.Values.ToArray()), TxTEncoding);
         }
 
         protected void WriteToTxt(string fileName, VersionInfo versionInfo)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
+            FileHelper.CreateDirectory(fileName);
             File.WriteAllText(fileName, LitJsonHelper.ToJson(versionInfo), TxTEncoding);
         }
 

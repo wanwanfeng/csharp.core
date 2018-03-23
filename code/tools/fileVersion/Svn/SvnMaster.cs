@@ -48,6 +48,7 @@ namespace FileVersion
             var yes = Console.ReadLine() == "y";
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             DeleteInfo(targetDir);
+            WriteToTxt(targetDir, cache);
 
             //if (yes)
             //{

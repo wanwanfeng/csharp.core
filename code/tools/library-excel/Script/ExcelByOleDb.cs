@@ -8,6 +8,10 @@ using System.Linq;
 
 namespace Library.Excel
 {
+    /// <summary>
+    /// 引用 ICSharpCode.SharpZipLib.dll
+    /// 引用 System.Data.dll
+    /// </summary>
     public class ExcelByOleDb : ExcelByBase
     {
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)

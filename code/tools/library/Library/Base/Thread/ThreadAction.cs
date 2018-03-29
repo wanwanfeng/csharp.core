@@ -8,22 +8,23 @@ namespace Library.Thread
     {
         private float _progress = 0;
         private bool _isDone = false;
-        public bool isSuccess = false;
+        public bool IsSuccess = false;
 
         public ThreadAction()
         {
             _progress = 0;
-            _isDone = isSuccess = false;
+            _isDone = IsSuccess = false;
         }
 
         #region
 
-        public ThreadAction(Func<bool> func) : this()
+        public ThreadAction(Func<bool> func,int workerThreads, int completionPortThreads) : this()
         {
+            ThreadPool.SetMaxThreads(workerThreads, completionPortThreads);
             ThreadPool.QueueUserWorkItem((obj) =>
             {
                 if (func != null)
-                    isSuccess = func();
+                    IsSuccess = func();
                 _isDone = true;
             });
         }
@@ -38,12 +39,13 @@ namespace Library.Thread
 
         #region
 
-        public ThreadAction(Func<Action<float>, bool> func) : this()
+        public ThreadAction(Func<Action<float>, bool> func, int workerThreads, int completionPortThreads): this()
         {
+            ThreadPool.SetMaxThreads(workerThreads, completionPortThreads);
             ThreadPool.QueueUserWorkItem((obj) =>
             {
                 if (func != null)
-                    isSuccess = func((val) =>
+                    IsSuccess = func((val) =>
                     {
                         _progress = val;
                     });

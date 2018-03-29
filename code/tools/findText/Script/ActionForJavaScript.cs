@@ -9,7 +9,7 @@ namespace findText.Script
     {
         protected override string textName
         {
-            get { return "Find_Java_Text"; }
+            get { return "Find_JavaScript_Text"; }
         }
 
         protected override string[] exName

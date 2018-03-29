@@ -18,9 +18,14 @@ namespace FileVersion
             while (isRuning)
             {
                 string mes =
-                    @"1,SvnMaster [输入sm]
-2,SvnPatch [输入sp]
-3,SvnUpdate [输入sl]
+                    @"
+------------第一种----------
+步骤1,SvnMaster [输入sm]
+步骤2,SvnPatch [输入sp]
+步骤3,SvnUpdate [输入su]
+
+------------第二种----------
+SvnList [输入sl]
 ";
 //1,GitMaster [输入gm]
 //2,GitPatch [输入gp]
@@ -38,8 +43,11 @@ namespace FileVersion
                     case "sp":
                         commonBase = new SvnPatch();
                         break;
-                    case "sl":
+                    case "su":
                         commonBase = new SvnUpdate();
+                        break;
+                    case "sl":
+                        commonBase = new SvnList();
                         break;
                     case "gm":
                         commonBase = new GitMaster();
@@ -47,7 +55,7 @@ namespace FileVersion
                     case "gp":
                         commonBase = new GitPatch();
                         break;
-                    case "gl":
+                    case "gu":
                         commonBase = new GitUpdate();
                         break;
                 }

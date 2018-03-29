@@ -704,7 +704,7 @@ namespace LitJson
                                    obj.GetType ()));
 
             if (obj == null) {
-                writer.Write (null);
+                writer.Write(null);
                 return;
             }
 

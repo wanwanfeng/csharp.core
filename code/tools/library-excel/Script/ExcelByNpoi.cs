@@ -12,6 +12,14 @@ using NPOI.XSSF.UserModel;
 
 namespace Library.Excel
 {
+    /// <summary>
+    /// 引用 ICSharpCode.SharpZipLib.dll
+    /// 引用 System.Data.dll
+    /// 引用 NPOI
+    /// 引用 NPOI.OOXML
+    /// 引用 NPOI.OpenXml4Net
+    /// 引用 NPOI.OpenXmlFormats
+    /// </summary>
     public class ExcelByNpoi : ExcelByBase
     {
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)

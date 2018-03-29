@@ -48,6 +48,7 @@
 	
 	
 	
+	
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="E:\WorkSpace\VS\CSharp\MyTestServerForCSharp\trunk\ExcelExport\ExcelExport\ExcelExport\Scripts\Plugins\Excel\Excel.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\Work\yuege\ygtools\trunk\code\tools\unity-bin\LitJson.dll" /&gt;&#xD;

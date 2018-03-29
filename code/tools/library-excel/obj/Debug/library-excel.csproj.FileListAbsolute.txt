@@ -4,3 +4,6 @@ D:\Work\yuege\ygtools\trunk\code\tools\library-excel\obj\Debug\library-excel.dll
 E:\Git\yg\trunk\code\tools\library-excel\obj\Debug\library-excel.csprojResolveAssemblyReference.cache
 E:\Git\yg\trunk\code\tools\library-excel\obj\Debug\Library-Excel.dll
 E:\Git\yg\trunk\code\tools\bin\Library-Excel.dll
+D:\Git\ygtools\trunk\code\tools\bin\Library-Excel.dll
+D:\Git\ygtools\trunk\code\tools\library-excel\obj\Debug\library-excel.csprojResolveAssemblyReference.cache
+D:\Git\ygtools\trunk\code\tools\library-excel\obj\Debug\Library-Excel.dll

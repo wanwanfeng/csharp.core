@@ -64,6 +64,7 @@
     <Compile Include="Library\Base\LitJson\LitJson\Lexer.cs" />
     <Compile Include="Library\Base\LitJson\LitJson\Netstandard15Polyfill.cs" />
     <Compile Include="Library\Base\LitJson\LitJson\ParserToken.cs" />
+    <Compile Include="Library\Base\Helper\EnumHelper.cs" />
     <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
     <Compile Include="Library\Debug.cs" />

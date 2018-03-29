@@ -12,94 +12,132 @@ namespace Library.Extensions
         /// 转为byte型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static byte AsByte(this string value)
+        public static byte AsByte(this string value, byte def = 0)
         {
             byte v = 0;
-            if (byte.TryParse(value, out v))
-                return v;
-            return 0;
+            return byte.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
-        /// 转为byte型
+        /// 转为short型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static short AsShort(this string value)
+        public static short AsShort(this string value, short def = 0)
         {
             short v = 0;
-            if (short.TryParse(value, out v))
-                return v;
-            return 0;
+            return short.TryParse(value, out v) ? v : def;
+        }
+
+        /// <summary>
+        /// 转为ushort型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="def">默认值</param>
+        /// <returns></returns>
+        public static ushort AsuShort(this string value, ushort def = 0)
+        {
+            ushort v = 0;
+            return ushort.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
         /// 转为Int型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static int AsInt(this string value)
+        public static int AsInt(this string value, int def = 0)
         {
-            var v = 0;
-            return int.TryParse(value, out v) ? v : 0;
+            int v = 0;
+            return int.TryParse(value, out v) ? v : def;
+        }
+
+        /// <summary>
+        /// 转为uInt型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="def">默认值</param>
+        /// <returns></returns>
+        public static uint AsuInt(this string value, uint def = 0)
+        {
+            uint v = 0;
+            return uint.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
         /// 转为Long型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static long AsLong(this string value)
+        public static long AsLong(this string value, long def = 0)
         {
             long v = 0;
-            return long.TryParse(value, out v) ? v : 0;
+            return long.TryParse(value, out v) ? v : def;
+        }
+
+        /// <summary>
+        /// 转为uLong型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="def">默认值</param>
+        /// <returns></returns>
+        public static ulong AsuLong(this string value, ulong def = 0)
+        {
+            ulong v = 0;
+            return ulong.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
         /// 转为Float型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static float AsFloat(this string value)
+        public static float AsFloat(this string value, float def = 0)
         {
-            var v = 0.0f;
-            return float.TryParse(value, out v) ? v : 0.0f;
+            float v = 0;
+            return float.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
         /// 转为Double型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static double AsDouble(this string value)
+        public static double AsDouble(this string value, double def = 0)
         {
-            var v = 0.0;
-            return double.TryParse(value, out v) ? v : 0.0;
+            double v = 0.0;
+            return double.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
         /// 转为Decimal型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static decimal AsDecimal(this string value)
+        public static decimal AsDecimal(this string value, decimal def = 0)
         {
             decimal v = 0;
-            return decimal.TryParse(value, out v) ? v : 0;
+            return decimal.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>
         /// 转为Bool型
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static bool AsBool(this string value)
+        public static bool AsBool(this string value, bool def = false)
         {
             var v = false;
-            if (bool.TryParse(value, out v))
-                return v;
-            return !string.IsNullOrEmpty(value);
+            return bool.TryParse(value, out v) ? v : def;
         }
 
         /// <summary>

@@ -224,7 +224,8 @@ namespace findText
                         progressBar1.Value = index * 100 / jsonData.Count;
 
                         string temp = data["文件名"].ToString();
-                        string[] content = File.ReadAllLines(temp);
+                        string path = (this.textBox1.Text + temp).Replace("\\", "/");
+                        string[] content = File.ReadAllLines(path);
                         int line = data["行号"].ToString().AsInt();
                         string oldStr = data["原文"].ToString();
                         //string oldStr2 = data["需翻译"].ToString();
@@ -233,7 +234,7 @@ namespace findText
 
                         var linec = content[line - 1];
                         content[line - 1] = linec.Replace(oldStr, newStr);
-                        File.WriteAllLines(temp, content);
+                        File.WriteAllLines(path, content);
                     }
 
                     //foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)

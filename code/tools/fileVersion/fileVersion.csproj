@@ -69,6 +69,7 @@
     <Compile Include="Git\GitPatch.cs" />
     <Compile Include="Git\GitUpdate.cs" />
     <Compile Include="Svn\SvnCommon.cs" />
+    <Compile Include="Svn\SvnList.cs" />
     <Compile Include="Svn\SvnUpdate.cs" />
     <Compile Include="Svn\SvnPatch.cs" />
     <Compile Include="Svn\SvnMaster.cs" />

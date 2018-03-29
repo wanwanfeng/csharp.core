@@ -6,10 +6,14 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-#if ExcelByStream
+#if true
 
 namespace Library.Excel
 {
+    /// <summary>
+    /// 引用 ICSharpCode.SharpZipLib.dll
+    /// 引用 System.Data.dll
+    /// </summary>
     public class ExcelByStream : ExcelByBase
     {
         /// <summary>

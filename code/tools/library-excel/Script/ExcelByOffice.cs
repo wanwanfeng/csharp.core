@@ -13,6 +13,9 @@ namespace Library.Excel
     /// <summary>
     /// 使用 Microsoft.Office.Interop.Excel.dll
     /// 首先需要安装 office 的 excel，然后再找到 Microsoft.Office.Interop.Excel.dll 组件，添加到引用。
+    /// 
+    /// 引用 ICSharpCode.SharpZipLib.dll
+    /// 引用 System.Data.dll
     /// </summary>
     public class ExcelByOffice : ExcelByBase
     {

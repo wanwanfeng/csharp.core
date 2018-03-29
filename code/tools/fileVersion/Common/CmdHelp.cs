@@ -81,7 +81,7 @@ namespace FileVersion
                 process.StandardInput.AutoFlush = true;
                 process.WaitForExit();
                 res = File.ReadAllLines(temp).ToList();
-                File.Delete(temp);
+                //File.Delete(temp);
                 if (res.Count == 0)
                     res.Add("");
                 return res.ToArray();

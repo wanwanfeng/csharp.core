@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 
 namespace Library.Helper
 {
@@ -60,12 +61,19 @@ namespace Library.Helper
         public static IDictionary<T, TA> GetCache<T, TA>() where TA : Attribute
         {
             IDictionary<T, TA> cache = new Dictionary<T, TA>();
-            foreach (var value in Enum.GetValues(typeof (T)))
+            if (typeof (T).IsEnum)
             {
-                cache[(T) value] = typeof (T).GetField(value.ToString())
-                    .GetCustomAttributes(false)
-                    .OfType<TA>()
-                    .FirstOrDefault();
+                foreach (var value in Enum.GetValues(typeof (T)))
+                {
+                    cache[(T) value] = typeof (T).GetField(value.ToString())
+                        .GetCustomAttributes(false)
+                        .OfType<TA>()
+                        .FirstOrDefault();
+                }
+            }
+            else
+            {
+                throw new Exception(string.Format("{0} type is not Enum !", typeof (T).Name));
             }
             return cache;
         }

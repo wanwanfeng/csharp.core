@@ -52,15 +52,16 @@ namespace UnityEngine.Library
     /// <typeparam name="T"></typeparam>
     public abstract partial class SingletonBehaviour<T> : BaseMonoBehaviour where T : MonoBehaviour
     {
-        private static T _instance;
-
-        public static T Instance
+        public static T Instance { get; private set; }
+        public override void Awake()
         {
-            get { return _instance ?? (_instance = FindObjectOfType<T>()); }
-            set { _instance = value; }
+            if (Instance != null) return;
+            Instance = this as T;
+            DontDestroyOnLoad(gameObject);
         }
 
-        public virtual void OnDestroy()
+
+        public override void OnDestroy()
         {
             Instance = null;
         }

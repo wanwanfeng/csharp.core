@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace Library
 {
-    public interface ISingleton
-    {
-        
-    }
 
     #region 单例
 
@@ -14,7 +10,7 @@ namespace Library
     /// 普通单例
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBase<T> : ISingleton where T : class, new()
+    public abstract partial class SingletonBase<T> where T : class, new()
     {
         private static T _instance;
 

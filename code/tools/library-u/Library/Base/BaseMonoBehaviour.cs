@@ -6,7 +6,7 @@ namespace UnityEngine.Library
 
     #region MonoBehaviour基类
 
-    public partial class BaseMonoBehaviour : MonoBehaviour, ILoad
+    public abstract partial class BaseMonoBehaviour : MonoBehaviour, ILoad
     {
         #region 资源加载
 

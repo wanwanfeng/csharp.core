@@ -1,46 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityEngine.Library
+namespace Library
 {
-
     #region 单例
 
     /// <summary>
     /// 普通单例
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class SingletonBase<T> : BaseLoad where T : class, new()
+    public abstract partial class SingletonBase<T> : UnityEngine.Library.BaseLoad where T : class, new()
     {
-        private static T _instance;
-
-        public static T Instance
-        {
-            get { return _instance ?? (_instance = new T()); }
-            set { _instance = value; }
-        }
-
-        public static void Reset()
-        {
-            Instance = null;
-        }
-
-        protected SingletonBase()
-        {
-            Init();
-        }
-
-        public virtual void Init()
-        {
-
-        }
+        
     }
+}
 
+namespace UnityEngine.Library
+{
     /// <summary>
     /// 场景单例(自动生成物体并挂载)
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class SingletonBehaviourAuto<T> : BaseMonoBehaviour where T : MonoBehaviour
+    public abstract partial class SingletonBehaviourAuto<T> : BaseMonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 
@@ -69,7 +50,7 @@ namespace UnityEngine.Library
     /// base.Awake();
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class SingletonBehaviour<T> : BaseMonoBehaviour where T : BaseMonoBehaviour
+    public abstract partial class SingletonBehaviour<T> : BaseMonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 
@@ -79,9 +60,8 @@ namespace UnityEngine.Library
             set { _instance = value; }
         }
 
-        public override void OnDestroy()
+        public virtual void OnDestroy()
         {
-            base.Awake();
             Instance = null;
         }
     }

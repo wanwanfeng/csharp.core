@@ -6,7 +6,7 @@ namespace Library.Extensions
     /// <summary>
     /// 值类型扩展
     /// </summary>
-    public static class ExtensionsForValue
+    public static class ValueExtensions
     {
         /// <summary>
         /// 转为byte型

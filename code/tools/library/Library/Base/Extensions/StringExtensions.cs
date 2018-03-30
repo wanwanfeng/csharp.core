@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Library.Extensions
 {
-    public static class StringExtensionsFor
+    public static class StringExtensions
     {
         #region 裁剪字符串并追加
 

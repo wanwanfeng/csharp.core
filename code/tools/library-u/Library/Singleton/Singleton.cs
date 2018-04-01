@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Library
+namespace UnityEngine.Library
 {
     #region 单例
 
@@ -9,14 +9,32 @@ namespace Library
     /// 普通单例
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBase<T> : UnityEngine.Library.BaseLoad where T : class, new()
+    public abstract partial class SingletonBase<T> : BaseLoad where T : class, new()
     {
-        
-    }
-}
+        private static T _instance;
 
-namespace UnityEngine.Library
-{
+        public static T Instance
+        {
+            get { return _instance ?? (_instance = new T()); }
+            set { _instance = value; }
+        }
+
+        public static void Reset()
+        {
+            Instance = null;
+        }
+
+        protected SingletonBase()
+        {
+            Init();
+        }
+
+        public virtual void Init()
+        {
+
+        }
+    }
+
     /// <summary>
     /// 场景单例(自动生成物体并挂载)
     /// </summary>

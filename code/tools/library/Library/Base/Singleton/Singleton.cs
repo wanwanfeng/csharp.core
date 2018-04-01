@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Library
 {
-
     #region 单例
 
     /// <summary>

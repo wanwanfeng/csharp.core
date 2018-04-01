@@ -35,6 +35,10 @@ namespace UnityEngine.Library
             return BaseLoad.Load(filePath, instance, callAction);
         }
 
+        #endregion
+
+        #region prefab克隆
+
         public GameObject CreateObject(string path, Transform parent = null)
         {
             return BaseLoad.CreateObject(path, parent);

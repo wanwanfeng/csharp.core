@@ -8,6 +8,8 @@ namespace UnityEngine.Library
 
     public class BaseLoad : ILoad
     {
+        #region prefab克隆
+
         /// <summary>
         /// 判断资源委托注入
         /// </summary>
@@ -47,13 +49,22 @@ namespace UnityEngine.Library
             return t;
         }
 
-        public virtual GameObject CreateObject(string path, Transform parent = null)
+        #endregion
+
+        #region prefab克隆
+
+        /// <summary>
+        /// 预制体资源根目录
+        /// </summary>
+        public static string PrefabRoot = "";
+
+        public GameObject CreateObject(string path, Transform parent = null)
         {
-            var obj = Load<GameObject>(path);
+            var obj = Load<GameObject>(PrefabRoot + path);
             return CreateObject(obj, parent);
         }
 
-        public virtual GameObject CreateObject(GameObject obj, Transform parent = null)
+        public GameObject CreateObject(GameObject obj, Transform parent = null)
         {
             var go = Object.Instantiate(obj) as GameObject;
             if (parent != null)
@@ -71,11 +82,24 @@ namespace UnityEngine.Library
             Object.DestroyImmediate(obj);
         }
 
-        public virtual Sprite LoadSprite(string path)
+        /// <summary>
+        /// 加载UGUI Sprite图集注入
+        /// </summary>
+        public static Func<string, Sprite> OnLoadSprite { private get; set; }
+
+        /// <summary>
+        /// Sprite资源根目录
+        /// </summary>
+        public static string SpriteRoot = "";
+        
+        public Sprite LoadSprite(string path)
         {
-            return Load<Sprite>(path);
+            path = SpriteRoot + path;
+            return OnLoadSprite != null ? OnLoadSprite.Invoke(path) : Load<Sprite>(path);
         }
     }
 
     #endregion
 }
+
+#endregion

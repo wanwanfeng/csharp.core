@@ -18,7 +18,7 @@ namespace Library.Thread
 
         #region
 
-        public ThreadAction(Func<bool> func,int workerThreads, int completionPortThreads) : this()
+        public ThreadAction(Func<bool> func,int workerThreads = 1, int completionPortThreads = 5) : this()
         {
             ThreadPool.SetMaxThreads(workerThreads, completionPortThreads);
             ThreadPool.QueueUserWorkItem((obj) =>
@@ -39,7 +39,7 @@ namespace Library.Thread
 
         #region
 
-        public ThreadAction(Func<Action<float>, bool> func, int workerThreads, int completionPortThreads): this()
+        public ThreadAction(Func<Action<float>, bool> func, int workerThreads = 1, int completionPortThreads = 5): this()
         {
             ThreadPool.SetMaxThreads(workerThreads, completionPortThreads);
             ThreadPool.QueueUserWorkItem((obj) =>

@@ -8,3 +8,7 @@ D:\Work\yuege\ygtools\trunk\code\tools\test\bin\Debug\TextFile
 D:\Git\ygtools\trunk\code\tools\test\bin\Debug\test.exe.config
 D:\Git\ygtools\trunk\code\tools\test\obj\Debug\test.exe
 D:\Git\ygtools\trunk\code\tools\test\obj\Debug\test.pdb
+D:\Git\ygtools\trunk\code\tools\test\bin\Debug\TextFile
+D:\Git\ygtools\trunk\code\tools\test\bin\Debug\test.exe
+D:\Git\ygtools\trunk\code\tools\test\bin\Debug\test.pdb
+D:\Git\ygtools\trunk\code\tools\test\obj\Debug\test.csprojResolveAssemblyReference.cache

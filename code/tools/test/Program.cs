@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using test.hh;
 
 namespace test
 {
@@ -19,6 +20,8 @@ namespace test
 
         private static void Main(string[] args)
         {
+            new Distance();
+            return;
 
             //FileInfo fileInfo = new FileInfo("TextFile");
             //Console.WriteLine("ex:{0}", fileInfo.Extension);

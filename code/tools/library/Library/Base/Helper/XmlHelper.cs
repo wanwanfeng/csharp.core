@@ -73,5 +73,16 @@ namespace Library.Helper
         }
 
         #endregion
+
+
+        public static string ToXml<T>(T obj)
+        {
+            return Serialize(obj);
+        }
+
+        public static T ToObject<T>(string str)
+        {
+            return Deserialize<T>(str);
+        }
     }
 }

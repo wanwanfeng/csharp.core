@@ -22,10 +22,10 @@ namespace test
         {
             //new ImageFind();
             //return;
-            new CopyToOneFolder();
-            return;
-            //new CreateExcelCell();
+            //new CopyToOneFolder();
             //return;
+            new CreateExcelCell();
+            return;
             //new CreatePhotoDir();
             //return;
             new SpliteAtlas();

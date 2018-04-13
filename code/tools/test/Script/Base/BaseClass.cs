@@ -8,6 +8,20 @@ namespace Script
 {
     public class BaseClass
     {
+        public BaseClass()
+        {
+            Console.WriteLine("操作类：" + GetType().Name);
+            Console.Write("是否继续操作（y/n）:");
+            var y = Console.ReadLine();
+            Console.WriteLine();
+            if (y != "y")
+            {
+                Environment.Exit(0);
+            }
+        }
+
+
+
         private string _root;
 
         public string root
@@ -17,7 +31,6 @@ namespace Script
                 if (!string.IsNullOrEmpty(_root)) return _root;
                 Console.Write("请拖入选定文件夹:");
                 _root = Console.ReadLine();
-                Console.WriteLine();
                 Console.WriteLine("您选择的文件夹：" + _root);
                 if (!string.IsNullOrEmpty(_root)) _root = _root.Replace("\\", "/");
                 return _root;

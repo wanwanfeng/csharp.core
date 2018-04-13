@@ -14,6 +14,11 @@ namespace Library.Helper
         /// <param name="path"></param>
         public static void CreateDirectory(string path)
         {
+            if (path.EndsWith("/"))
+            {
+                Directory.CreateDirectory(path);
+                return;
+            }
             var dir = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);

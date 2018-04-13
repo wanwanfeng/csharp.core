@@ -110,62 +110,16 @@ namespace Library.Extensions
 
         #region 将阿拉伯数字转为罗马数字
 
-
-        private static Dictionary<string, string> _loumaNumberCache = new Dictionary<string, string>()
-        {
-            {"1000", "M"},
-            {"900", "CM"},
-            {"500", "D"},
-            {"400", "CD"},
-            {"100", "C"},
-            {"90", "XC"},
-            {"50", "L"},
-            {"40", "XL"},
-            {"10", "X"},
-            {"9", "IX"},
-            {" 5", "V"},
-            {" 4", "IV"},
-            {" 1", "I"},
-        };
-
         /// <summary>
         /// 将阿拉伯数字转为罗马数字
         /// </summary>
         /// <param name="value">阿拉伯数字</param>
-        public static string ToLoumaNumber(this int value)
+        public static string ToRoman(this int value)
         {
-            int[] arabic = new int[13];
-            string[] roman = new string[13];
+            int[] arabic = new int[13] {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+            string[] roman = new string[13] {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
             int i = 0;
             string result = "";
-
-            arabic[0] = 1000;
-            arabic[1] = 900;
-            arabic[2] = 500;
-            arabic[3] = 400;
-            arabic[4] = 100;
-            arabic[5] = 90;
-            arabic[6] = 50;
-            arabic[7] = 40;
-            arabic[8] = 10;
-            arabic[9] = 9;
-            arabic[10] = 5;
-            arabic[11] = 4;
-            arabic[12] = 1;
-
-            roman[0] = "M";
-            roman[1] = "CM";
-            roman[2] = "D";
-            roman[3] = "CD";
-            roman[4] = "C";
-            roman[5] = "XC";
-            roman[6] = "L";
-            roman[7] = "XL";
-            roman[8] = "X";
-            roman[9] = "IX";
-            roman[10] = "V";
-            roman[11] = "IV";
-            roman[12] = "I";
 
             while (value > 0)
             {

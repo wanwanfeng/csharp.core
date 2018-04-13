@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AipSdk">
+      <HintPath>net35\AipSdk.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>net35\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -42,19 +48,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="hh\Distance.cs" />
+    <Compile Include="Script\Base\BaseClass.cs" />
+    <Compile Include="Script\CreatePhotoDir.cs" />
+    <Compile Include="Script\SpliteAtlas\Info\TextureInfo.cs" />
+    <Compile Include="Script\SpliteAtlas\PList.cs" />
+    <Compile Include="Script\SpliteAtlas\SpliteAtlas.cs" />
+    <Compile Include="Script\CopyToOneFolder.cs" />
+    <Compile Include="Script\ImageFind.cs" />
+    <Compile Include="Script\CreateExcelCell.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <ProjectReference Include="..\library\library.csproj">
+      <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
+      <Name>library</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="TextFile">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

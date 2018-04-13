@@ -100,7 +100,7 @@ namespace FileVersion
         /// 排除预定义
         /// </summary>
         /// <param name="cache"></param>
-        protected bool ExcludeFile(Dictionary<string, FileDetailInfo> cache)
+        protected void ExcludeFile(Dictionary<string, FileDetailInfo> cache)
         {
             Console.WriteLine("");
 
@@ -148,14 +148,14 @@ namespace FileVersion
             {
                 Console.WriteLine("可更新文件数目为零！");
                 Console.WriteLine("按任意键退出！");
-                return false;
+                Console.ReadKey();
+                Environment.Exit(0);
             }
             else
             {
                 Console.WriteLine("可更新文件数目为{0}！", count);
                 Console.WriteLine("按任意键继续！");
                 Console.ReadKey();
-                return true;
             }
         }
 

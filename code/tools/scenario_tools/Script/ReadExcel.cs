@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Library.Excel;
 using Library.Helper;
 using Library.LitJson;
@@ -10,9 +11,11 @@ namespace scenario_tools
 {
     public class ReadExcel
     {
+        private string path = "";
+
         public ReadExcel()
         {
-            var path = Console.ReadLine() ?? @"D:\Work\yuege\www\assets\res\scenario.xls";
+            path = Console.ReadLine() ?? @"D:\Work\yuege\www\assets\res\scenario.xls";
             var dic = new ExcelByReader().ReadFromExcels(path);
 
             Dictionary<string, List<JsonData>> dicT = new Dictionary<string, List<JsonData>>();
@@ -44,14 +47,19 @@ namespace scenario_tools
                 foreach (JsonData jsonData in keyValuePair.Value)
                 {
                     var xx = new JsonData();
-                    foreach (var key in jsonData.Keys)
+                    var keys = jsonData.Keys.Where(p => !p.Contains("_zh_cn"));
+                    foreach (var key in keys)
                     {
-                        if (key != "")
+                        if (key == "" || key == "file") continue;
+                        if (jsonData.Keys.Contains(key + "_zh_cn"))
+                            xx[key] = jsonData[key + "_zh_cn"];
+                        else
                             xx[key] = jsonData[key];
                     }
                     res.Add(xx);
                 }
-                var fileName = @"\res\scenario\" + keyValuePair.Key;
+                var fileName = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "/" +
+                               keyValuePair.Key + ".json";
                 FileHelper.CreateDirectory(fileName);
                 File.WriteAllText(fileName, LitJsonHelper.ToJson(res));
             }

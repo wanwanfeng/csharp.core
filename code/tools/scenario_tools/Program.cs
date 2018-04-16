@@ -12,8 +12,8 @@ namespace scenario_tools
     {
         private static void Main(string[] args)
         {
-            new ReadCsv();
-            //new ReadExcel();
+            //new ReadCsv();
+            new ReadExcel();
         }
     }
 }

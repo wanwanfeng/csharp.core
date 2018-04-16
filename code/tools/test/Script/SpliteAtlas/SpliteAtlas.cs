@@ -13,17 +13,17 @@ namespace Script
         /// true 分解图片
         /// false 还原图片
         /// </summary>
-        private bool isSplite = true;
+        private bool isSplite = false;
 
         /// <summary>
         /// 筛选过滤已存在图片
         /// </summary>
         public SpliteAtlas()
         {
-            root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
+            //root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
             var res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
                 //.Where(p => p.Contains("cocos_Data"))
-                .Where(p => p.Contains("Resources"))
+                //.Where(p => p.Contains("Resources"))
                 .Where(p => p.EndsWith(".plist"))
                 //.Where(p => Directory.Exists(Path.ChangeExtension(p, ".plist").Replace(".plist","")))
                 .Select(p => p.Replace("\\", "/"))
@@ -118,7 +118,7 @@ namespace Script
                     var bm = new Bitmap(splite.width, splite.height, PixelFormat.Format32bppArgb);
                     bm.SetResolution((int)textureInfo.resolution.X, (int)textureInfo.resolution.Y);
                     graphic.DrawImage(bm, splite.x, splite.y, new Rectangle(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
-                    bitmap.Dispose();
+                    bm.Dispose();
                 }
             }
 

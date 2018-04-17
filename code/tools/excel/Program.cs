@@ -31,6 +31,12 @@ namespace Library.Excel
 
     class Program
     {
+        static Program()
+        {
+            Ldebug.OnActionLog += Console.WriteLine;
+        }
+
+
         private static void Main(string[] args)
         {
             /* var hh = new ExcelClass().ReadFromExcels("ff.xlsx");

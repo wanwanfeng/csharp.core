@@ -144,80 +144,88 @@ namespace Library.Extensions
         /// 转为int[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static int[] AsIntArray(this string[] value)
+        public static int[] AsIntArray(this string[] value, int def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsInt());
+            return Array.ConvertAll(value, p => p.AsInt(def));
         }
 
         /// <summary>
         /// 转为float[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static float[] AsFloatArray(this string[] value)
+        public static float[] AsFloatArray(this string[] value, float def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsFloat());
+            return Array.ConvertAll(value, p => p.AsFloat(def));
         }
 
         /// <summary>
         /// 转为double[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static double[] AsDoubleArray(this string[] value)
+        public static double[] AsDoubleArray(this string[] value, double def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsDouble());
+            return Array.ConvertAll(value, p => p.AsDouble(def));
         }
 
         /// <summary>
         /// 转为long[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static long[] AsLongArray(this string[] value)
+        public static long[] AsLongArray(this string[] value, long def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsLong());
+            return Array.ConvertAll(value, p => p.AsLong(def));
         }
 
         /// <summary>
         /// 转为decimal[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static decimal[] AsDecimalArray(this string[] value)
+        public static decimal[] AsDecimalArray(this string[] value, decimal def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsDecimal());
+            return Array.ConvertAll(value, p => p.AsDecimal(def));
         }
 
         /// <summary>
         /// 转为decimal[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static byte[] AsByteArray(this string[] value)
+        public static byte[] AsByteArray(this string[] value, byte def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsByte());
+            return Array.ConvertAll(value, p => p.AsByte(def));
         }
 
         /// <summary>
         /// 转为decimal[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static short[] AsShortArray(this string[] value)
+        public static short[] AsShortArray(this string[] value, short def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsShort());
+            return Array.ConvertAll(value, p => p.AsShort(def));
         }
 
         /// <summary>
         /// 转为bool[]型数组
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static bool[] AsBoolArray(this string[] value)
+        public static bool[] AsBoolArray(this string[] value, bool def = false)
         {
-            return Array.ConvertAll(value, p => p.AsBool());
+            return Array.ConvertAll(value, p => p.AsBool(def));
         }
 
         /// <summary>
@@ -278,7 +286,7 @@ namespace Library.Extensions
         {
             try
             {
-                var result = value.Split(separator.Length == 0 ? separator = new char[] {','} : separator);
+                var result = value.Split(separator.Length == 0 ? new [] {','} : separator);
                 return result;
             }
             catch (Exception)

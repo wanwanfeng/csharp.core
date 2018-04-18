@@ -59,7 +59,7 @@ namespace Library.Excel
                             excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                             break;
                         default:
-                            Console.WriteLine("文件类型错误！！！");
+                            Ldebug.LogError("文件类型错误！！！");
                             break;
                     }
 

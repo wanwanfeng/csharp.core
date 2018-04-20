@@ -29,13 +29,14 @@ namespace Script
             var last2 = Directory.GetFiles(dir2, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir2, ""));
             var last = last1.Except(last2).Select(p => dir1 + p).ToList();
             RunList(last);
+            new CreateExcelCell(dir1 + "res");
         }
 
         public override void RunListOne(string re)
         {
             var newName = re.Replace(dir1, dir1 + "res");
             FileHelper.CreateDirectory(newName);
-            File.Copy(re, newName);
+            File.Copy(re, newName, true);
         }
     }
 }

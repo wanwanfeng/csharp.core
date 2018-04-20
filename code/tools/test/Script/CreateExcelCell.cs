@@ -31,14 +31,28 @@ namespace Script
             WriteAllLines(dic);
         }
 
+        public CreateExcelCell(string root)
+        {
+            this.root = root;
+            var res =
+                Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .Select(p => p.Replace("\\","/"))
+                    .ToList();
+            res.Sort();
+            RunList(res);
+            WriteAllLines(dic);
+        }
+
+
         public override void RunListOne(string re)
         {
             try
             {
                 dic[re.Replace(root, "")] = GetExcelCell(re);
-                var newName = @"D:\Work\mfxy\资料\小圆\xy\mfxy\res" + re.Replace(root, "");
-                FileHelper.CreateDirectory(newName);
-                File.Copy(re, newName);
+                //var newName = @"D:\Work\mfxy\资料\小圆\xy\mfxy\res" + re.Replace(root, "");
+                //FileHelper.CreateDirectory(newName);
+                //File.Copy(re, newName);
             }
             catch (Exception e)
             {

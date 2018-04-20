@@ -11,11 +11,13 @@ namespace Script
     /// </summary>
     public class CopyToOneFolder : BaseClass
     {
+        public override string root { get; set; }
+
         /// <summary>
         /// true 归一到一个文件夹下
         /// false 还原
         /// </summary>
-        private bool guiyi = true;
+        private bool guiyi = false;
 
         public CopyToOneFolder()
         {
@@ -32,31 +34,36 @@ namespace Script
                         .Where(p => p.EndsWith("png") || p.EndsWith("jpg"))
                         .Select(p => p.Replace("\\", "/"))
                         .ToList();
-                }
+                }*/
 
                 {
                     //res = res.Take(200).ToList();
                     // res = new[] {"D:/Work/mfxy/ron_mfsn2/cocostudio/演出/ADV/cocos_Data/3001_fog/Resources/adv_フェリシア.png"};
 
                     root = @"D:\婚纱照\结果 - 副本\".Replace("\\", "/");
+                    root = @"D:\Work\yuege\client\source2\pallete-front\Assets\".Replace("\\", "/");
                     res =
                         Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
+                            .Where(
+                                p =>
+                                    p.EndsWith(".png") || p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".psd") ||
+                                    p.EndsWith(".bmp") || p.EndsWith(".psd"))
                             .Select(p => p.Replace("\\", "/"))
                             .ToList();
-                }*/
-
-                {
-                    root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
-                    res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
-                        //.Where(p => p.Contains("cocos_Data"))
-                        .Where(p => p.Contains("Resources"))
-                        .Where(p => p.EndsWith(".plist"))
-                        .Select(p => p.Replace(".plist", ""))
-                        .Where(p=>Directory.Exists(p))
-                        .SelectMany(p => FileHelper.GetFiles(p, SearchOption.TopDirectoryOnly))
-                        .Select(p => p.Replace("\\", "/"))
-                        .ToList();
                 }
+
+                //{
+                //    root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
+                //    res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
+                //        //.Where(p => p.Contains("cocos_Data"))
+                //        .Where(p => p.Contains("Resources"))
+                //        .Where(p => p.EndsWith(".plist"))
+                //        .Select(p => p.Replace(".plist", ""))
+                //        .Where(p=>Directory.Exists(p))
+                //        .SelectMany(p => FileHelper.GetFiles(p, SearchOption.TopDirectoryOnly))
+                //        .Select(p => p.Replace("\\", "/"))
+                //        .ToList();
+                //}
             }
             else
             {

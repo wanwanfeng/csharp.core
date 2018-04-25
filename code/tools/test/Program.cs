@@ -9,19 +9,10 @@ namespace test
 {
     internal class Program
     {
-        [Flags]
-        public enum Branch
-        {
-            None = 1 << 0,
-            Bs = 1 << 1,
-            Cb1 = 1 << 2,
-            Cb2 = 1 << 4,
-        }
-
         private static void Main(string[] args)
         {
             string cmd;
-            Console.WriteLine("-------命令列表-------");
+            Console.WriteLine("-------cmd list-------");
             Console.WriteLine("1:CompareFolder");
             Console.WriteLine("2:ImageFind");
             Console.WriteLine("3:CopyToOneFolder");
@@ -30,7 +21,7 @@ namespace test
             Console.WriteLine("6:SpliteAtlas");
             Console.WriteLine("----------------------");
             Console.WriteLine("e:exit");
-            Console.Write("请输入命令编号：");
+            Console.Write("input：");
             cmd = Console.ReadLine() ?? "e";
 
             switch (cmd)
@@ -55,9 +46,9 @@ namespace test
                     break;
                 case "e":
                 default:
-                    Environment.Exit(0);
                     break;
             }
+            Console.ReadKey();
             return;
 
             //FileInfo fileInfo = new FileInfo("TextFile");
@@ -67,18 +58,27 @@ namespace test
             //Console.WriteLine("ex:{0}", fileInfo.Extension);
             //Console.WriteLine("ex:{0}", fileInfo.);
 
-            Console.ReadKey();
+            //Console.ReadKey();
 
-            Branch myEnum;
+            //Branch myEnum;
 
-            myEnum = (Branch) (~(0 << -1));
+            //myEnum = (Branch) (~(0 << -1));
 
-            Console.WriteLine(myEnum);
-            Console.WriteLine(!IsClose(Branch.None, Branch.None));
+            //Console.WriteLine(myEnum);
+            //Console.WriteLine(!IsClose(Branch.None, Branch.None));
 
 
-            new hahab();
-            Console.ReadKey();
+            //new hahab();
+            //Console.ReadKey();
+        }
+
+        [Flags]
+        public enum Branch
+        {
+            None = 1 << 0,
+            Bs = 1 << 1,
+            Cb1 = 1 << 2,
+            Cb2 = 1 << 4,
         }
 
         /// <summary>

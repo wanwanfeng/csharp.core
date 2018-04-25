@@ -58,7 +58,6 @@ namespace test
                     Environment.Exit(0);
                     break;
             }
-            new SpliteAtlas();
             return;
 
             //FileInfo fileInfo = new FileInfo("TextFile");

@@ -1,21 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
+using Library.Extensions;
+using Library.Helper;
 
 namespace findText
 {
-    static class Program
+    internal static class Program
     {
-        /// <summary>
-        /// 应用程序的主入口点。
-        /// </summary>
-        [STAThread]
-        private static void Main()
+        private static void Main(string[] args)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+            string cmd;
+            Console.WriteLine("-------语言列表-------");
+            foreach (var value in Enum.GetValues(typeof (ConvertType)))
+            {
+                Console.WriteLine(" " + (int) value + ":" + value);
+            }
+            Console.WriteLine("\n e:退出");
+            Console.WriteLine("----------------------");
+            Console.Write("input:");
+            cmd = Console.ReadLine() ?? "e";
+            if (cmd == "e") Environment.Exit(0);
+
+            var cache = AttributeHelper.GetCacheTypeValue<ConvertType>();
+            ConvertType convertType = (ConvertType)cmd.AsInt();
+            BaseActionFor baseActionFor = (BaseActionFor) Activator.CreateInstance(cache[convertType]);
+            Console.WriteLine("-------操作列表-------");
+            Console.WriteLine("1:搜索");
+            Console.WriteLine("2:还原");
+            Console.WriteLine("e:退出");
+            Console.Write("input:");
+            cmd = Console.ReadLine() ?? "e";
+            switch (cmd)
+            {
+                case "1":
+                {
+                    Console.Write("input dir path;");
+                    string path = Console.ReadLine() ?? "";
+                    baseActionFor.Open(path);
+                }
+                    break;
+                case "2":
+                {
+                    Console.Write("input file path (*.xlsx);");
+                    string path = Console.ReadLine() ?? "";
+                    baseActionFor.Revert(path);
+                }
+                    break;
+                default:
+                    Environment.Exit(0);
+                    break;
+            }
+            Console.ReadKey();
         }
     }
 }

@@ -27,56 +27,11 @@ namespace findText
     public abstract class BaseActionFor
     {
 
-        private TextBox textBox1;
-        private Label label1;
-        private ProgressBar progressBar1;
-
-
-        public void Init(TextBox textBox, ProgressBar progressBar, Label label)
-        {
-            label1 = label;
-            textBox1 = textBox;
-            progressBar1 = progressBar;
-
-            //label1.Text = "";
-            //textBox1.Text = "";
-            progressBar1.Value = 0;
-        }
-
         protected static Regex regex = new Regex(
             //"\"([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.*\")|(\".*[\u30A0-\u30FF]+)|([\u30A0-\u30FF])\""
             "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])"
             //regexStr = "/u0800-/u4e00"
             );
-
-        private string[] GetFiles(out string path, SearchOption searchOption = SearchOption.TopDirectoryOnly)
-        {
-            label1.Text = "";
-            progressBar1.Value = 0;
-
-            if (string.IsNullOrEmpty(textBox1.Text))
-            {
-                var dialog = new FolderBrowserDialog();
-                dialog.Description = "请选择文件夹路径";
-                dialog.ShowNewFolderButton = true;
-                path = dialog.ShowDialog() == DialogResult.OK ? dialog.SelectedPath : string.Empty;
-            }
-            else
-            {
-                path = textBox1.Text;
-            }
-
-            if (string.IsNullOrEmpty(path))
-                return new string[0];
-
-            if (!Directory.Exists(path))
-            {
-                MessageBox.Show("文件夹路径不存在!");
-                return new string[0];
-            }
-
-            return Directory.GetFiles(path, "*", searchOption).Select(p => p.Replace("\\", "/")).ToArray();
-        }
 
         private JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
         {
@@ -110,47 +65,17 @@ namespace findText
 
         private void WriteExcel(string fileName, JsonData resJsonData)
         {
-            label1.Text = "正在写入Excel...";
-            progressBar1.Value = 0;
-
-            string outpath = textBox1.Text + ".xls";
+            Console.WriteLine("正在写入Excel...");
+            string outpath = inputPath + ".xls";
             List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
             new ExcelByNpoi().WriteToExcel(outpath, vals);
-
-            label1.Text = "";
-            if (MessageBox.Show("是否打开文件查看信息？", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
-            {
-                System.Diagnostics.Process.Start(outpath);
-            }
+            Console.WriteLine("写入完成，正在启动...");
+            System.Diagnostics.Process.Start(outpath);
         }
 
-        private void WriteResult(string fileName, string res, string ex = ".txt")
-        {
-            return;
-            string outpath = Environment.CurrentDirectory + "/log/" + fileName + ex;
-            FileHelper.CreateDirectory(outpath);
-            File.WriteAllText(outpath, res);
-            if (MessageBox.Show("是否打开文件查看信息？", "", MessageBoxButtons.OKCancel) == DialogResult.OK)
-            {
-                System.Diagnostics.Process.Start(outpath);
-            }
-
-            return;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "/log/";
-            openFileDialog.Filter = string.Format("文本文件(*{0})|*{0}|所有文件(*.*)|*.*", ex);
-            openFileDialog.RestoreDirectory = true;
-            openFileDialog.Multiselect = true;
-            openFileDialog.FilterIndex = 1;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-
-            }
-        }
-
-        protected string path = "";
+        protected string inputPath = "";
         protected List<string> all = new List<string>();
-        private JsonData resJsonData;
+        private JsonData resJsonData = new JsonData();
 
         protected virtual string textName
         {
@@ -162,34 +87,40 @@ namespace findText
             get { return new string[0]; }
         }
 
-        public void Open()
+        public void Open(string input)
         {
-            var res = GetFiles(out path, SearchOption.AllDirectories).ToList();
-            foreach (var s in exName)
-            {
-                all.AddRange(res.Where(p =>
-                {
-                    var xx = Path.GetExtension(p);
-                    return !string.IsNullOrEmpty(xx) && xx == s;
-                }));
-            }
-            if (all.Count == 0) return;
-            all.Sort();
+            inputPath = input;
 
-            resJsonData = new JsonData();
-            resJsonData.SetJsonType(JsonType.Array);
-            OpenRun();
-            WriteResult(textName, JsonMapper.ToJson(resJsonData), ".json");
-            WriteExcel(textName, resJsonData);
+            if (!Directory.Exists(inputPath))
+            {
+                Console.WriteLine("文件夹路径不存在!");
+            }
+            else
+            {
+                var res =
+                    Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories)
+                        .Select(p => p.Replace("\\", "/"))
+                        .ToArray();
+                foreach (var s in exName)
+                {
+                    all.AddRange(res.Where(p =>
+                    {
+                        var xx = Path.GetExtension(p);
+                        return !string.IsNullOrEmpty(xx) && xx == s;
+                    }));
+                }
+                if (all.Count == 0) return;
+                all.Sort();
+                OpenRun();
+                WriteExcel(textName, resJsonData);
+            }
         }
 
         protected abstract void OpenRun();
 
         protected string[] GetShowInfo(int i)
         {
-            label1.Text = "搜索中...请稍后" + (float) i/all.Count;
-            progressBar1.Value = (int) ((float) i/all.Count*100);
-
+            Console.WriteLine("搜索中...请稍后" + ((float) i/all.Count).ToString("f") + "\t" + all[i]);
             return File.ReadAllLines(all[i]);
         }
 
@@ -204,29 +135,27 @@ namespace findText
             resJsonData.Add(jsonData);
         }
 
-        public virtual void Revert()
+        public virtual void Revert(string inputPath)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "/log/";
-            openFileDialog.Filter = string.Format("文本文件(*{0})|*{0}|所有文件(*.*)|*.*", ".xlsx");
-            openFileDialog.RestoreDirectory = true;
-            openFileDialog.Multiselect = true;
-            openFileDialog.FilterIndex = 1;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (!File.Exists(inputPath))
             {
-                Dictionary<string, List<List<object>>> dic = new ExcelByReader().ReadFromExcels(openFileDialog.FileName);
+                Console.WriteLine("file is not exist!");
+            }
+            else
+            {
+                Dictionary<string, List<List<object>>> dic = new ExcelByReader().ReadFromExcels(inputPath);
 
                 foreach (KeyValuePair<string, List<List<object>>> pair in dic)
                 {
                     JsonData jsonData = SetJsonDataArray(pair.Value, true);
 
-                    var index = 0;
+                    var i = 0;
                     foreach (JsonData data in jsonData)
                     {
-                        progressBar1.Value = index * 100 / jsonData.Count;
-
                         string temp = data["文件名"].ToString();
-                        string path = (this.textBox1.Text + temp).Replace("\\", "/");
+                        Console.WriteLine("还原中...请稍后" + ((float)i / all.Count).ToString("f") + "\t" + temp);
+
+                        string path = (inputPath + temp).Replace("\\", "/");
                         string[] content = File.ReadAllLines(path);
                         int line = data["行号"].ToString().AsInt();
                         string oldStr = data["原文"].ToString();

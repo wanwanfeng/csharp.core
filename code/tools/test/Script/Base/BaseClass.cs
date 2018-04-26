@@ -24,7 +24,7 @@ namespace Script
 
         private string _root;
 
-        public string root
+        public virtual string root
         {
             get
             {

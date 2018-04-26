@@ -10,6 +10,24 @@ namespace UnityEngine.Library
     public static class ExtensionsForUnity
     {
         /// <summary>
+        /// 获取相对于根节点的路径
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="haveRoot"></param>
+        /// <returns></returns>
+        public static string GetFullPath(this Component target, bool haveRoot = true)
+        {
+            var path = target.name;
+            while (target.transform.parent != null)
+            {
+                path = target.transform.parent.name + "/" + path;
+                target = target.transform.parent;
+            }
+            return haveRoot ? path : path.Replace(target.transform.root.name + "/", "");
+        }
+
+
+        /// <summary>
         /// 转为Vector3型
         /// </summary>
         /// <param name="value"></param>

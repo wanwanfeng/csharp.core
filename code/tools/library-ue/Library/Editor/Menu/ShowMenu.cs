@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Linq;
 using Library.Extensions;
 using UnityEditor.Library;
+using UnityEngine.Library;
 using Object = UnityEngine.Object;
 
 namespace UnityEditor
@@ -20,18 +21,7 @@ namespace UnityEditor
         public static void GetGameObjectsPath()
         {
             var go = Selection.GetFiltered(typeof (GameObject), SelectionMode.Editable);
-            EditorUtils.CopyToClipboard(go.Select(item => GetPath(((GameObject)item).transform)).ToArray().JoinToString());
-        }
-
-        public static string GetPath(Transform target, bool haveRoot = true)
-        {
-            var path = target.name;
-            while (target.parent != null)
-            {
-                path = target.parent.name + "/" + path;
-                target = target.parent;
-            }
-            return haveRoot ? path : path.Replace(target.root.name + "/", "");
+            EditorUtils.CopyToClipboard(go.Select(item => ((GameObject)item).transform.GetFullPath()).ToArray().JoinToString());
         }
 
         [MenuItem("CONTEXT/Transform/Copy LocalPosition")]

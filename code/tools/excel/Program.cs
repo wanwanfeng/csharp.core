@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Library.Helper;
+using Library.LitJson;
 //#define ExcelByOleDb
 //#define ExcelByNpoi
 //#define ExcelByOffice
@@ -11,7 +12,7 @@ using Library.Helper;
 #if ExcelByOleDb
 using ExcelClass = Library.Excel.ExcelByOleDb;
 #elif ExcelByNpoi
-using ExcelClass = Library.Excel.ExcelByOleDb;
+using ExcelClass = Library.Excel.ExcelByNpoi;
 #elif ExcelByOffice
 using ExcelClass = Library.Excel.ExcelByOffice;
 #elif ExcelByStream
@@ -26,6 +27,7 @@ namespace Library.Excel
         JsonToExcel = 2,
         JsonToOneExcel = 3,
         ExcelToJson = 4,
+        ExcelToOneExcel = 5,
     }
 
 
@@ -37,6 +39,7 @@ namespace Library.Excel
             Ldebug.OnActionLogError += Console.WriteLine;
         }
 
+        public static string InputPath { get; set; }
 
         private static void Main(string[] args)
         {
@@ -100,7 +103,7 @@ namespace Library.Excel
                 switch (caoType)
                 {
                     case CaoType.JsonToCsv:
-                        ReadjsonToCsv();
+                        ReadJsonToCsv();
                         break;
                     case CaoType.JsonToExcel:
                         ReadJsonToExcel();
@@ -110,6 +113,9 @@ namespace Library.Excel
                         break;
                     case CaoType.ExcelToJson:
                         ReadExcelToJson();
+                        break;
+                    case CaoType.ExcelToOneExcel:
+                        ReadExcelToOneExcel();
                         break;
                     default:
                         Console.Write("不存在的命令！");
@@ -126,10 +132,11 @@ namespace Library.Excel
         /// <summary>
         /// json->csv
         /// </summary>
-        private static void ReadjsonToCsv()
+        private static void ReadJsonToCsv()
         {
             List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
+
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
@@ -144,6 +151,7 @@ namespace Library.Excel
         {
             List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
+
             foreach (string file in files)
             {
                 Console.WriteLine(" is now : " + file);
@@ -157,24 +165,16 @@ namespace Library.Excel
         /// </summary>
         private static void ReadJsonToOneExcel()
         {
-            List<string> files = CheckPath(".json");
+            List<string> files = CheckPath(".json", true);
             if (files.Count == 0) return;
 
-            var outName = "OneExcel";
-            Console.WriteLine("----------------------------");
-            Console.Write("请输入输出文件名，然后回车：");
-            string s = Console.ReadLine();
-            if (string.IsNullOrEmpty(s))
-            {
-                s = outName;
-            }
             var dic = new Dictionary<string, List<List<object>>>();
             foreach (string file in files)
             {
                 Console.WriteLine(" is now : " + file);
                 dic[file] = ExcelClass.ConvertJsonToListByPath(file);
             }
-            new ExcelClass().WriteToOneExcel(s + ".xlsx", dic);
+            new ExcelClass().WriteToOneExcel(InputPath + ".xlsx", dic);
         }
 
         #endregion
@@ -193,10 +193,14 @@ namespace Library.Excel
 
         private static void ReadExcelToJson(List<string> files)
         {
+            ExcelClass excel = new ExcelClass();
+
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                var vals = new ExcelClass().ReadFromExcels(Path.ChangeExtension(file, ".xlsx"));
+
+                var vals = excel.ReadFromExcels(file);
+
                 if (vals.Count == 1)
                 {
                     ExcelClass.ConvertListToJsonFile(vals.First(), file);
@@ -206,7 +210,7 @@ namespace Library.Excel
                     foreach (KeyValuePair<string, List<List<object>>> pair in vals)
                     {
                         if (file == null) continue;
-                        string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key);
+                        string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key.Replace("$", ""));
                         FileHelper.CreateDirectory(newPath);
                         ExcelClass.ConvertListToJsonFile(pair, newPath);
                     }
@@ -214,23 +218,66 @@ namespace Library.Excel
             }
         }
 
+        /// <summary>
+        /// / json->xlsx
+        /// </summary>
+        private static void ReadExcelToOneExcel()
+        {
+            List<string> files = CheckPath(".xlsx", true);
+            if (files.Count == 0) return;
+
+            var dic = new Dictionary<string, List<List<object>>>();
+            foreach (string file in files)
+            {
+                Console.WriteLine(" is now : " + file);
+                var vals = new ExcelClass().ReadFromExcels(file);
+
+                if (vals.Count == 1)
+                {
+                    dic[file] =
+                        ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(vals.First())));
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, List<List<object>>> pair in vals)
+                    {
+                        if (file == null) continue;
+                        dic[file + ".." + pair.Key] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
+                    }
+                }
+
+            }
+            new ExcelClass().WriteToOneExcel(InputPath + ".xlsx", dic);
+        }
+
+
         #endregion
 
-        private static List<string> CheckPath(string exce)
+        private static List<string> CheckPath(string exce, bool isOnlydir = false)
         {
             List<string> files = new List<string>();
 
-            string dir = Console.ReadLine();
-            if (string.IsNullOrEmpty(dir))
+            Console.Write(isOnlydir ? "请拖入文件夹：" : "请拖入文件夹或文件：");
+            string path = Console.ReadLine() ?? "";
+            if (string.IsNullOrEmpty(path))
                 return files;
 
-            string path = dir.Replace("\\", "/");
-            if (!Directory.Exists(path))
+            if (Directory.Exists(path))
             {
-                Console.WriteLine(path + " is not exists !");
+                files = Directory.GetFiles(path).ToList();
+            }
+            else if (File.Exists(path))
+            {
+                files.Add(path);
+            }
+            else
+            {
+                Console.WriteLine("path is not valid!");
                 return files;
             }
-            files = Directory.GetFiles(path).Where(p => p.EndsWith(exce)).ToList();
+
+            InputPath = path;
+            files = files.Where(p => p.EndsWith(exce)).ToList();
             files.Sort();
             return files;
         }

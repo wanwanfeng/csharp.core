@@ -9,17 +9,16 @@ namespace Script
 {
     public class SpliteAtlas : BaseClass
     {
-        /// <summary>
-        /// true 分解图片
-        /// false 还原图片
-        /// </summary>
-        private bool isSplite = false;
+        private string cmd;
 
         /// <summary>
         /// 筛选过滤已存在图片
         /// </summary>
         public SpliteAtlas()
         {
+            Console.Write("图集拆解(y)，图集合并(n)，文件夹删除(d):");
+            cmd =  Console.ReadLine() ?? "e";
+
             //root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
             var res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
                 //.Where(p => p.Contains("cocos_Data"))
@@ -50,16 +49,32 @@ namespace Script
             if (!textureInfo.voild) return;
 
             var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
-            if (File.Exists(imagePath))
+
+            switch (cmd)
             {
-                if (isSplite)
+                case "y":
                 {
-                    HaveImageAndRead(imagePath, textureInfo);
+                    if (File.Exists(imagePath))
+                        HaveImageAndRead(imagePath, textureInfo);
+                    break;
                 }
-                else
+                case "n":
                 {
-                    HaveImageAndWrite(imagePath, textureInfo);
+                    if (File.Exists(imagePath))
+                        HaveImageAndWrite(imagePath, textureInfo);
+                    break;
                 }
+   
+                case "d": 
+                {
+                    string dir = Path.GetDirectoryName(imagePath) + "/" + Path.GetFileNameWithoutExtension(imagePath);
+                    if (Directory.Exists(dir))
+                        Directory.Delete(dir, true);
+                    break;
+                }
+                default:
+                    Environment.Exit(0);
+                    break;
             }
         }
 

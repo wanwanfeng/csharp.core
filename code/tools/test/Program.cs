@@ -20,17 +20,44 @@ namespace test
 
         private static void Main(string[] args)
         {
-            new CompareFolder();
-            return;
+            string cmd;
+            Console.WriteLine("-------命令列表-------");
+            Console.WriteLine("1:CompareFolder");
+            Console.WriteLine("2:ImageFind");
+            Console.WriteLine("3:CopyToOneFolder");
+            Console.WriteLine("4:CreatePhotoDir");
+            Console.WriteLine("5:CreateExcelCell");
+            Console.WriteLine("6:SpliteAtlas");
+            Console.WriteLine("----------------------");
+            Console.WriteLine("e:exit");
+            Console.Write("请输入命令编号：");
+            cmd = Console.ReadLine() ?? "e";
 
-            //new ImageFind();
-            //return;
-            new CopyToOneFolder();
-            return;
-            //new CreateExcelCell();
-            //return;
-            //new CreatePhotoDir();
-            //return;
+            switch (cmd)
+            {
+                case "1":
+                    new CompareFolder();
+                    break;
+                case "2":
+                    new ImageFind();
+                    break;
+                case "3":
+                    new CopyToOneFolder();
+                    break;
+                case "4":
+                    new CreatePhotoDir();
+                    break;
+                case "5":
+                    new CreateExcelCell();
+                    break;
+                case "6":
+                    new SpliteAtlas();
+                    break;
+                case "e":
+                default:
+                    Environment.Exit(0);
+                    break;
+            }
             new SpliteAtlas();
             return;
 
@@ -41,19 +68,11 @@ namespace test
             //Console.WriteLine("ex:{0}", fileInfo.Extension);
             //Console.WriteLine("ex:{0}", fileInfo.);
 
-
-
-
-
-
-
-
-
             Console.ReadKey();
 
             Branch myEnum;
 
-            myEnum = (Branch)(~(0 << -1));
+            myEnum = (Branch) (~(0 << -1));
 
             Console.WriteLine(myEnum);
             Console.WriteLine(!IsClose(Branch.None, Branch.None));

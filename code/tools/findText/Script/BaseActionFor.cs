@@ -78,12 +78,14 @@ namespace findText
             return Directory.GetFiles(path, "*", searchOption).Select(p => p.Replace("\\", "/")).ToArray();
         }
 
-        private JsonData SetJsonDataArray(List<List<object>> content)
+        private JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
         {
             JsonData jsonDatas = new JsonData();
             jsonDatas.SetJsonType(JsonType.Array);
             List<object> first = content.First();
             content.Remove(first);
+            if (isReverse)
+                content.Reverse();
             foreach (List<object> objects in content)
             {
                 JsonData data = new JsonData();
@@ -216,7 +218,7 @@ namespace findText
 
                 foreach (KeyValuePair<string, List<List<object>>> pair in dic)
                 {
-                    JsonData jsonData = SetJsonDataArray(pair.Value);
+                    JsonData jsonData = SetJsonDataArray(pair.Value, true);
 
                     var index = 0;
                     foreach (JsonData data in jsonData)

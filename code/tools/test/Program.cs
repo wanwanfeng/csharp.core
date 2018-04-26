@@ -20,12 +20,15 @@ namespace test
 
         private static void Main(string[] args)
         {
+            //new CompareFolder();
+            //return;
+
             //new ImageFind();
             //return;
             //new CopyToOneFolder();
             //return;
-            new CreateExcelCell();
-            return;
+            //new CreateExcelCell();
+            //return;
             //new CreatePhotoDir();
             //return;
             new SpliteAtlas();

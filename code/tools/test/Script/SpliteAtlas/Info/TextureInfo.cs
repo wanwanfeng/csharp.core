@@ -25,6 +25,8 @@ namespace Script
 
         public string name;
         public int width, height;
+        public PointF resolution = new PointF(96, 96);
+
         public List<Splite> list;
         public string fullPath;
 
@@ -81,6 +83,7 @@ namespace Script
                     Image image = Image.FromStream(fs);
                     width = image.Width;
                     height = image.Height;
+                    resolution = new PointF(image.HorizontalResolution, image.VerticalResolution);
                 }
             }
             else

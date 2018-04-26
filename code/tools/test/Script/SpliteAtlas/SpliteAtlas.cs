@@ -61,10 +61,6 @@ namespace Script
                     HaveImageAndWrite(imagePath, textureInfo);
                 }
             }
-            else
-            {
-
-            }
         }
 
         private static void HaveImageAndRead(string re, TextureInfo textureInfo)
@@ -87,8 +83,8 @@ namespace Script
                     bitmap.Save(newName, ImageFormat.Png);
 
                     /*Image saveImage = Image.FromHbitmap(bitmap.GetHbitmap());
-                        //saveImage.Save(newName, image.RawFormat);
-                        saveImage.Save(newName, ImageFormat.Png);
+                    //saveImage.Save(newName, image.RawFormat);
+                    saveImage.Save(newName, ImageFormat.Png);
 
                         saveImage.Dispose();*/
                     graphic.Dispose();
@@ -102,8 +98,8 @@ namespace Script
         {
             var bitmap = new Bitmap(textureInfo.width, textureInfo.height, PixelFormat.Format32bppArgb);
             Graphics graphic = Graphics.FromImage(bitmap);
+            bitmap.SetResolution((int)textureInfo.resolution.X, (int)textureInfo.resolution.Y);
 
-            bool isOver = false;
             foreach (var splite in textureInfo.list)
             {
                 var newName = Path.GetDirectoryName(re) + "/" +
@@ -113,14 +109,16 @@ namespace Script
                     using (FileStream fsT = new FileStream(newName, FileMode.Open, FileAccess.Read))
                     {
                         Image temp = Image.FromStream(fsT);
-                        if (!isOver)
-                        {
-                            bitmap.SetResolution((int)temp.HorizontalResolution, (int)temp.VerticalResolution);
-                            isOver = true;
-                        }
-                        graphic.DrawImage(temp, splite.x, splite.y,
-                            new Rectangle(0,0, splite.width, splite.height), GraphicsUnit.Pixel);
+                        graphic.DrawImage(temp, splite.x, splite.y, new Rectangle(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
                     }
+                }
+                else
+                {
+                    //特殊要求，绘制透明图片
+                    var bm = new Bitmap(splite.width, splite.height, PixelFormat.Format32bppArgb);
+                    bm.SetResolution((int)textureInfo.resolution.X, (int)textureInfo.resolution.Y);
+                    graphic.DrawImage(bm, splite.x, splite.y, new Rectangle(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
+                    bitmap.Dispose();
                 }
             }
 

@@ -51,7 +51,7 @@ namespace FileVersion
                 cache[svnFileInfo.path] = svnFileInfo;
                 Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
             }
-            if (!ExcludeFile(cache)) return;
+            ExcludeFile(cache);
 
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             WriteToTxt(targetDir, cache);

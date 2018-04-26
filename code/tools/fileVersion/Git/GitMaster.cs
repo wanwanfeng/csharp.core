@@ -46,7 +46,7 @@ namespace FileVersion
                 cache[fileDetailInfo.path] = fileDetailInfo;
                 Console.WriteLine("{0:D5}\t{1}", ++index, fileDetailInfo);
             }
-            if (!ExcludeFile(cache)) return;
+            ExcludeFile(cache);
 
             Console.Write("\n是否导出目标版本号文件（y/n）：");
             var yes = Console.ReadLine() == "y";

@@ -229,7 +229,6 @@ namespace Library.Excel
             var dic = new Dictionary<string, List<List<object>>>();
             foreach (string file in files)
             {
-                Console.WriteLine(" is now : " + file);
                 var vals = new ExcelClass().ReadFromExcels(file);
 
                 if (vals.Count == 1)
@@ -242,7 +241,7 @@ namespace Library.Excel
                     foreach (KeyValuePair<string, List<List<object>>> pair in vals)
                     {
                         if (file == null) continue;
-                        dic[file + ".." + pair.Key] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
+                        dic[file + "/" + pair.Key] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
                     }
                 }
 

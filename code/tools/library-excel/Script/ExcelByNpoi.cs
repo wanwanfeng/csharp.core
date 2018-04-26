@@ -25,7 +25,7 @@ namespace Library.Excel
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
         {
             var dt = ExcelToTable(filename);
-            return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
+            return dt.ToDictionary(p => p.TableName, q=>ConvertDataTableToList(q));
         }
 
         public override void WriteToExcel(string filename, List<List<object>> vals)
@@ -53,7 +53,7 @@ namespace Library.Excel
         /// <returns></returns>
         private static List<DataTable> ExcelToTable(string file)
         {
-            IWorkbook workbook;
+            IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
             using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
             {
@@ -79,6 +79,8 @@ namespace Library.Excel
                 for (int index = 0; index < workbook.NumberOfSheets; index++)
                 {
                     ISheet sheet = workbook.GetSheetAt(index);
+                    if (sheet.LastRowNum == 0) continue;
+
                     DataTable dt = new DataTable(sheet.SheetName);
 
                     //表头  

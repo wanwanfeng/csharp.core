@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -9,6 +10,8 @@ namespace Script
 {
     public class SpliteAtlas : BaseClass
     {
+        public override string root { get; set; }
+
         private string cmd;
 
         /// <summary>
@@ -17,26 +20,32 @@ namespace Script
         public SpliteAtlas()
         {
             Console.Write("图集拆解(y)，图集合并(n)，文件夹删除(d):");
-            cmd =  Console.ReadLine() ?? "e";
-
-            //root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
-            var res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
-                //.Where(p => p.Contains("cocos_Data"))
-                //.Where(p => p.Contains("Resources"))
-                .Where(p => p.EndsWith(".plist"))
-                //.Where(p => Directory.Exists(Path.ChangeExtension(p, ".plist").Replace(".plist","")))
-                .Select(p => p.Replace("\\", "/"))
-                .ToList();
-
-            //res = new List<string>()
-            //{
-            //    //@"\download\loading_data.plist".Replace("\\", "/"),
-            //    //@"\download\data_download0.plist".Replace("\\", "/"),
-            //    //@"\download\loading_resource0.plist".Replace("\\", "/"),
-            //   // @"\quest\qb_help\qb_help.plist".Replace("\\", "/"),
-            //    @"\web\web_ef_magia_lvup\web_ef_magia_lvup0.plist".Replace("\\", "/"),
-            //};
-
+            cmd = Console.ReadLine() ?? "e";
+            if (cmd=="e")
+            {
+                Environment.Exit(0);
+            }
+            Console.Write("请拖入选定（文件夹或文件）:");
+            root = Console.ReadLine();
+            if (string.IsNullOrEmpty(root)) return;
+            List<string> res = new List<string>();
+            if (Directory.Exists(root))
+            {
+                res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
+                    //.Where(p => p.Contains("cocos_Data"))
+                    //.Where(p => p.Contains("Resources"))
+                    .Where(p => p.EndsWith(".plist"))
+                    //.Where(p => Directory.Exists(Path.ChangeExtension(p, ".plist").Replace(".plist","")))
+                    .Select(p => p.Replace("\\", "/"))
+                    .ToList();
+            }
+            else
+            {
+                //文件路径
+                if (File.Exists(root) && Path.GetExtension(root) == ".plist")
+                    res.Add(root);
+            }
+            if (res.Count == 0) return;
             res.Sort();
             RunList(res);
         }

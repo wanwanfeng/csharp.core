@@ -28,18 +28,14 @@ namespace Script
 
         public ImageFind()
         {
-            root = "D:/Work/mfxy/ron_mfsn2/";
-            var res = Directory.GetFiles(root + "cocostudio/演出/", "*", SearchOption.AllDirectories)
-                .Where(p => p.Contains("cocos_Data"))
-                .Where(p => p.Contains("Resources"))
+            var res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
+                //.Where(p => p.Contains("cocos_Data"))
+                //.Where(p => p.Contains("Resources"))
                 .Where(p => p.EndsWith("png") || p.EndsWith("jpg"))
                 .Select(p => p.Replace("\\", "/"))
                 .ToList();
             res.Sort();
-
-            //res = res.Take(200).ToList();
-            // res = new[] {"D:/Work/mfxy/ron_mfsn2/cocostudio/演出/ADV/cocos_Data/3001_fog/Resources/adv_フェリシア.png"};
-
+            if (res.Count == 0) return;
             RunList(res);
             WriteAllLines(dic);
         }

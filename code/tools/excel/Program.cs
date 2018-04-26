@@ -11,7 +11,7 @@ using Library.Helper;
 #if ExcelByOleDb
 using ExcelClass = Library.Excel.ExcelByOleDb;
 #elif ExcelByNpoi
-using ExcelClass = Library.Excel.ExcelByNpoi;
+using ExcelClass = Library.Excel.ExcelByOleDb;
 #elif ExcelByOffice
 using ExcelClass = Library.Excel.ExcelByOffice;
 #elif ExcelByStream
@@ -29,11 +29,12 @@ namespace Library.Excel
     }
 
 
-    class Program
+    internal class Program
     {
         static Program()
         {
             Ldebug.OnActionLog += Console.WriteLine;
+            Ldebug.OnActionLogError += Console.WriteLine;
         }
 
 
@@ -86,7 +87,7 @@ namespace Library.Excel
             ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
             return;*/
             Console.WriteLine("----------命令索引----------");
-            foreach (var value in Enum.GetValues(typeof(CaoType)))
+            foreach (var value in Enum.GetValues(typeof (CaoType)))
             {
                 Console.WriteLine("\t" + (int) value + "：" + value);
             }
@@ -127,7 +128,7 @@ namespace Library.Excel
         /// </summary>
         private static void ReadjsonToCsv()
         {
-            List<string> files = CheckPath();
+            List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
             foreach (var file in files)
             {
@@ -141,7 +142,7 @@ namespace Library.Excel
         /// </summary>
         private static void ReadJsonToExcel()
         {
-            List<string> files = CheckPath();
+            List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
             foreach (string file in files)
             {
@@ -156,7 +157,7 @@ namespace Library.Excel
         /// </summary>
         private static void ReadJsonToOneExcel()
         {
-            List<string> files = CheckPath();
+            List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
 
             var outName = "OneExcel";
@@ -185,7 +186,7 @@ namespace Library.Excel
         /// </summary>
         private static void ReadExcelToJson()
         {
-            List<string> files = CheckPath();
+            List<string> files = CheckPath(".xlsx");
             if (files.Count == 0) return;
             ReadExcelToJson(files);
         }
@@ -212,19 +213,18 @@ namespace Library.Excel
                 }
             }
         }
+
         #endregion
 
-        private static List<string> CheckPath(string dir = "/json/", string exce = ".json")
+        private static List<string> CheckPath(string exce)
         {
-            //OpenFileDialog fd = new OpenFileDialog();
-            //fd.Filter = "EXCEL文件(*.xls)|*.xls|EXCEL文件(*.xlsx)|*.xlsx";
-
-            //if (fd.ShowDialog() == DialogResult.OK)
-            //{
-            //    //这里面就可以对选择的文件进行处理了
-            //}
             List<string> files = new List<string>();
-            string path = (Environment.CurrentDirectory + dir).Replace("\\", "/");
+
+            string dir = Console.ReadLine();
+            if (string.IsNullOrEmpty(dir))
+                return files;
+
+            string path = dir.Replace("\\", "/");
             if (!Directory.Exists(path))
             {
                 Console.WriteLine(path + " is not exists !");

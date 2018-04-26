@@ -118,11 +118,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         /// 远程加载
         /// 失败后重试，最大重试5次，每次url取队列最新值
         /// </summary>
-        /// <param name="mono"></param>
         /// <param name="path"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
-        public IEnumerator FromRemote(MonoBehaviour mono, string path, Action<WWW> callAction)
+        public IEnumerator FromRemote(string path, Action<WWW> callAction)
         {
 
             using (WWW www = new WWW(urls.Peek() + path))
@@ -144,7 +143,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     {
                         retry++;
                         urls.Enqueue(urls.Dequeue());
-                        yield return mono.StartCoroutine(FromRemote(mono, path, callAction));
+                        yield return FromRemote(path, callAction);
                     }
                     else
                     {
@@ -158,31 +157,31 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             }
         }
 
-        private IEnumerator FromQueue(MonoBehaviour mono, string path, Action<WWW> callAction)
+        private IEnumerator FromQueue(string path, Action<WWW> callAction)
         {
             int length = urls.Count;
             for (int i = 0; i < length - 1; i++)
                 urls.Enqueue(urls.Dequeue());
-            yield return mono.StartCoroutine(FromRemote(mono, path, callAction));
+            yield return FromRemote(path, callAction);
         }
 
-        public IEnumerator FromPersistentDataPath(MonoBehaviour mono, string path, Action<WWW> callAction)
+        public IEnumerator FromPersistentDataPath(string path, Action<WWW> callAction)
         {
             urls.Enqueue(Proto + PersistentDataPath);
-            yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
+            yield return FromQueue(path, callAction);
         }
 
-        public IEnumerator FromPersistentDataTempPath(MonoBehaviour mono, string path, Action<WWW> callAction)
+        public IEnumerator FromPersistentDataTempPath(string path, Action<WWW> callAction)
         {
             urls.Clear();
             urls.Enqueue(Proto + PersistentDataTempPath);
-            yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
+            yield return FromQueue(path, callAction);
         }
 
-        public IEnumerator FromStreamingAssetsPath(MonoBehaviour mono, string path, Action<WWW> callAction)
+        public IEnumerator FromStreamingAssetsPath(string path, Action<WWW> callAction)
         {
             urls.Enqueue(StreamingAssetsPath);
-            yield return mono.StartCoroutine(FromQueue(mono, path, callAction));
+            yield return FromQueue(path, callAction);
         }
 
         #region static
@@ -416,7 +415,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             if (info.isNeedDownFile)
             {
                 ActionState(State.DownPathList);
-                yield return StartCoroutine(new Access().FromRemote(this, info.fileUrl, res =>
+                yield return new Access().FromRemote(info.fileUrl, res =>
                 {
                     if (res == null)
                         return;
@@ -430,7 +429,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                         if (hash != info.content_hash) return;
                     }
                     File.WriteAllBytes(info.fileLocal, res.bytes);
-                }));
+                });
             }
 
             ActionState(State.GetPatchList);
@@ -512,8 +511,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                         var resInfo = lastList.Dequeue();
                         ActionState(State.DownResource);
                         Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
-                        yield return
-                            StartCoroutine(new Access().FromRemote(this, keyValuePair.Key.path + "/" + resInfo.url,
+                        yield return new Access().FromRemote(keyValuePair.Key.path + "/" + resInfo.url,
                                 res =>
                                 {
                                     if (res == null)
@@ -534,7 +532,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                                     FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
                                     File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res.bytes);
                                     resInfo.is_ready = true;
-                                }));
+                                });
                     }
                 }
             }
@@ -548,7 +546,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         public IEnumerator GetRemoteZip(FilePatchInfo info)
         {
             ActionState(State.DownPatchZip);
-            yield return StartCoroutine(new Access().FromRemote(this, info.path + ".zip", res =>
+            yield return new Access().FromRemote(info.path + ".zip", res =>
             {
                 if (res == null || Library.Encrypt.MD5(res.bytes) != info.zip_hash) return;
                 var zipName = Access.PersistentDataPatchPath + info.path + ".zip";
@@ -564,7 +562,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                 {
                     Debug.LogError("解压文件失败！" + msg);
                 }
-            }));
+            });
         }
 
         /// <summary>
@@ -628,10 +626,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     private IEnumerator GetResourcesAndStreamingAssetsData()
     {
         resourcesCache = GetCache(Resources.Load<TextAsset>("resources").bytes);
-        yield return StartCoroutine(new Access().FromStreamingAssetsPath(this, "streamingAssets.txt", res =>
+        yield return new Access().FromStreamingAssetsPath("streamingAssets.txt", res =>
         {
             streamingAssetsCache = GetCache(res.bytes);
-        }));
+        });
     }
 
     private Dictionary<string, List<string>> GetCache(byte[] bytes)
@@ -649,7 +647,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     /// <returns></returns>
     private IEnumerator GetPatchList()
     {
-        yield return StartCoroutine(new Access().FromRemote(this, FilePatchInfo.PatchListName, res =>
+        yield return new Access().FromRemote(FilePatchInfo.PatchListName, res =>
         {
             if (res == null) return;
             FileHelper.CreateDirectory(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName);
@@ -665,7 +663,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     go.Init(q.Key, new List<FilePatchInfo>(q).OrderBy(t => t.firstVersion).ToList());
                     return go;
                 });
-        }));
+        });
     }
 
     public override void Awake()
@@ -742,12 +740,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     callAction.Invoke(null, Resources.Load(path));
                     yield break;
                 case FileDetailInfo.DataType.StreamingAssetsPath:
-                    yield return StartCoroutine(new Access().FromStreamingAssetsPath(this, path,
-                        www => { callAction.Invoke(www, null); }));
+                    yield return new Access().FromStreamingAssetsPath(path, www => { callAction.Invoke(www, null); });
                     yield break;
                 default:
-                    yield return StartCoroutine(new Access().FromPersistentDataTempPath(this, resInfo.path,
-                        www => { callAction.Invoke(www, null); }));
+                    yield return new Access().FromPersistentDataTempPath(resInfo.path, www => { callAction.Invoke(www, null); });
                     yield break;
             }
         }

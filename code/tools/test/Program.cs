@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using test.hh;
+using Script;
 
 namespace test
 {
@@ -20,7 +20,15 @@ namespace test
 
         private static void Main(string[] args)
         {
-            new Distance();
+            //new ImageFind();
+            //return;
+            new CopyToOneFolder();
+            return;
+            //new CreateExcelCell();
+            //return;
+            //new CreatePhotoDir();
+            //return;
+            new SpliteAtlas();
             return;
 
             //FileInfo fileInfo = new FileInfo("TextFile");

@@ -28,7 +28,7 @@ namespace Library.Excel
                 foreach (var item in workbook.Sheets)
                 {
                     var workSheet = (Worksheet) item;
-                    Console.WriteLine(workSheet.Name);
+                    Ldebug.Log(workSheet.Name);
 
                     var hangCount = workSheet.UsedRange.Cells.Rows.Count;
                     var lieCount = workSheet.UsedRange.Cells.Columns.Count;
@@ -71,7 +71,7 @@ namespace Library.Excel
             {
                 var workSheet = (Worksheet) workbook.ActiveSheet;
                 var f = Path.GetFileNameWithoutExtension(filename);
-                Console.WriteLine(workSheet.Name);
+                Ldebug.Log(workSheet.Name);
                 //第一种：Excel.Application的Cell by Cell
                 for (int j = 0; j < vals.Count; j++)
                 {

@@ -13,8 +13,7 @@ using LitJson;
 namespace Library.Excel
 {
     public abstract class ExcelByBase
-    { 
-        
+    {         
         #region virtual
 
         public KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
@@ -51,9 +50,7 @@ namespace Library.Excel
         {
             path = Path.ChangeExtension(path, ".csv");
             if (!File.Exists(path))
-            {
-                Console.WriteLine("文件不存在!");
-            }
+                Ldebug.Log("文件不存在!");
             if (path == null) return null;
             string[] content = File.ReadAllLines(path);
             var list = content.Select(p => p.Split(',').Cast<object>().ToList()).ToList();
@@ -119,9 +116,7 @@ namespace Library.Excel
         {
             path = Path.ChangeExtension(path, ".xml");
             if (!File.Exists(path))
-            {
-                Console.WriteLine("文件不存在!");
-            }
+               Ldebug.Log("文件不存在!");
             if (path == null) return null;
             string content = File.ReadAllText(path);
 
@@ -180,9 +175,7 @@ namespace Library.Excel
         public static List<List<object>> ConvertJsonToListByPath(string file)
         {
             if (!File.Exists(file))
-            {
-                Console.WriteLine("文件不存在!");
-            }
+                Ldebug.Log("文件不存在!");
             string content = File.ReadAllText(file);
             return ConvertJsonToList(content);
         }
@@ -194,13 +187,13 @@ namespace Library.Excel
 
         public static JsonData ConvertListToJson(KeyValuePair<string, List<List<object>>> keyValuePair)
         {
-            Console.WriteLine(" is now sheet: " + keyValuePair.Key);
+            Ldebug.Log(" is now sheet: " + keyValuePair.Key);
             return LitJsonHelper.ConvertListToJson(keyValuePair.Value);
         }
 
         public static void ConvertListToJsonFile(KeyValuePair<string, List<List<object>>> keyValuePair, string file)
         {
-            Console.WriteLine(" is now sheet: " + keyValuePair.Key);
+            Ldebug.Log(" is now sheet: " + keyValuePair.Key);
             JsonData resJsonDatas = ConvertListToJson(keyValuePair);
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file, ".json");
             FileHelper.CreateDirectory(newPath);

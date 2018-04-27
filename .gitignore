@@ -12,3 +12,8 @@ obj
 /code/tools/scenario_tools/obj
 /code/tools/test/obj
 /code/tools/test/bin
+/code/source/Library
+/code/source/Temp
+/code/source/*.sln
+/code/source/*.csproj
+/code/source/*.suo

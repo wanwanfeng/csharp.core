@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using Library.Excel;
+using Library.Extensions;
 using Library.Helper;
 using LitJson;
 
@@ -36,12 +37,10 @@ namespace fileDownload
 
         private static void Main(string[] args)
         {
-            Console.WriteLine("1,来自excel [输入1]\n2,来自json[输入2]");
-            var haha = Console.ReadLine();
-            isFromExcel = haha == "1";
-            Console.WriteLine("1,down [输入1]\n2,md5还原与解密 [输入2]");
-            haha = Console.ReadLine();
-            selectId = haha == "1" ? SelectId.Down : SelectId.Move;
+            isFromExcel = SystemExtensions.GetInputStr("1,来自excel [输入1]\n2,来自json[输入2]") == "1";
+            selectId = SystemExtensions.GetInputStr("1,down [输入1]\n2,md5还原与解密 [输入2]") == "1"
+                ? SelectId.Down
+                : SelectId.Move;
 
             Dictionary<string, JsonData> cacheMaster = CacheJson("c_master").ToDictionary(p => "master/" + p.Key, q => q.Value);
 

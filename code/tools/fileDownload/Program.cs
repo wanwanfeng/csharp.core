@@ -14,51 +14,52 @@ namespace fileDownload
 {
     internal class Program
     {
+
+        private static readonly Object thisLock = new Object();
+        private static readonly Object thisLockIndex = new Object();
+
+
         //public static string root = Environment.CurrentDirectory + "/www/assets/";
         public static string root = "D:/Work/yuege/www/assets/";
 
         /// <summary>
-        ///  file_name	hash_name	dl_point	file_type	bind_priority	hash_value	encrypted_hash_value	revision	is_deleted	created_at	updated_at
+        /// file_name	
+        /// hash_name	
+        /// dl_point	
+        /// file_type	
+        /// bind_priority	
+        /// hash_value	
+        /// encrypted_hash_value	
+        /// revision	
+        /// is_deleted	
+        /// created_at	
+        /// updated_at
         /// </summary>
         public static string url
         {
             get { return "https://tkpres.global.ssl.fastly.net/assets/app/"; }
         }
 
-        public enum  SelectId
-        {
-            Down, Move
-        }
-
-        public static SelectId selectId = SelectId.Down;
-        public static bool isFromExcel = true;
-        public static int index = 0;
-        public static int count = 0;
+        public static string Cmd1 = "e", FromExcel = "e";
+        public static int index = 0, count = 0;
 
         private static void Main(string[] args)
         {
-            isFromExcel = SystemExtensions.GetInputStr("1,来自excel [输入1]\n2,来自json[输入2]") == "1";
-            selectId = SystemExtensions.GetInputStr("1,down [输入1]\n2,md5还原与解密 [输入2]") == "1"
-                ? SelectId.Down
-                : SelectId.Move;
+            Cmd1 = SystemExtensions.GetInputStr("1:down\n2:md5还原与解密\nInput:");
+            FromExcel = SystemExtensions.GetInputStr("1:down\n2:md5还原与解密\nInput:");
 
             Dictionary<string, JsonData> cacheMaster = CacheJson("c_master").ToDictionary(p => "master/" + p.Key, q => q.Value);
-
             Dictionary<string, JsonData> cacheRresource = CacheJson("c_resource");//.Where(p => p.Key.Contains("unity")).ToDictionary(p => p.Key, q => q.Value);
 
-            Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
-
-            foreach (KeyValuePair<string, JsonData> pair in cacheMaster)
-                cache[pair.Key] = pair.Value;
-            foreach (KeyValuePair<string, JsonData> pair in cacheRresource)
-                cache[pair.Key] = pair.Value;
+            var cache = cacheRresource.Concat(cacheMaster).ToDictionary(p => p.Key, q => q.Value);
 
             FileHelper.CreateDirectory("log/");
             if (File.Exists("log/overList.txt"))
                 File.Delete("log/overList.txt");
             if (File.Exists("log/errList.txt"))
                 File.Delete("log/errList.txt");
-            return;
+
+            //return;
             count = cache.Count;
             int max = 25;
             ThreadPool.SetMaxThreads(max, max);
@@ -73,80 +74,95 @@ namespace fileDownload
 
         private static void RunSingle(object obj)
         {
-            object[] objs = (object[])obj;
-            KeyValuePair<string, JsonData> pair = (KeyValuePair<string, JsonData>)objs[0];
+            object[] objs = (object[]) obj;
+            KeyValuePair<string, JsonData> pair = (KeyValuePair<string, JsonData>) objs[0];
             var filename = pair.Key;
             var hashname = pair.Value["hash_name"].ToString();
             var hashvalue = pair.Value["hash_value"].ToString();
             var encryptedhashvalue = pair.Value["encrypted_hash_value"].ToString();
             var revision = pair.Value["revision"].ToString();
 
-            Console.WriteLine("is Now :{2} \n{0}/{1}", 0, count, pair.Key);
-            //Console.WriteLine("is Now :{2} \n{0}/{1}", (++index), count, pair.Key);
-
-            if (selectId == SelectId.Down)
+            lock (thisLockIndex)
             {
-                if (HttpDownload(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue))
-                {
-                    WriteLog("log/overList", filename);
-                }
-                else
-                {
-                    WriteLog("log/errList", filename);
-                }
-                Console.WriteLine("下载完毕");
+                Console.WriteLine("is Now :{2} \n{0}/{1}", (++index), count, pair.Key);
             }
-            else if (selectId == SelectId.Move)
+
+            switch (Cmd1)
             {
-                if (Move(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue))
+                case "1":
                 {
-                    WriteLog("log/overList", filename);
+                    if (HttpDownload(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue))
+                    {
+                        WriteLog("log/overList", filename);
+                    }
+                    else
+                    {
+                        WriteLog("log/errList", filename);
+                    }
+                    Console.WriteLine("下载完毕");
+                    break;
                 }
-                else
+                case "2":
                 {
-                    WriteLog("log/errList", filename);
+                    if (Move(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue))
+                    {
+                        WriteLog("log/overList", filename);
+                    }
+                    else
+                    {
+                        WriteLog("log/errList", filename);
+                    }
+                    Console.WriteLine("还原完毕");
+                    break;
                 }
-                Console.WriteLine("还原完毕");
             }
         }
 
         private static void WriteLog(string name, string content)
         {
-            return;
-            using (StreamWriter streamWriter = File.AppendText(name + ".txt"))
+            lock (thisLock)
             {
-                streamWriter.WriteLine(content);
-                streamWriter.Close();
+                using (StreamWriter streamWriter = File.AppendText(name + ".txt"))
+                {
+                    streamWriter.WriteLine(content);
+                    streamWriter.Close();
+                }
             }
         }
 
         private static Dictionary<string, JsonData> CacheJson(string jsonName)
         {
             Dictionary<string, JsonData> dic = new Dictionary<string, JsonData>();
-            if (isFromExcel)
+            switch (FromExcel)
             {
-                dic = GetCacheValueFromExcel(jsonName);
-                JsonData jsonData = new JsonData();
-                foreach (KeyValuePair<string, JsonData> keyValuePair in dic)
-                    jsonData[keyValuePair.Key] = keyValuePair.Value;
-                var path = root + "res/master/" + jsonName + ".json";
-                File.WriteAllText(path, JsonMapper.ToJson(jsonData));
-            }
-            else
-            {
-                var path = Environment.CurrentDirectory + "/json/" + jsonName + ".json";
-                var json = JsonMapper.ToObject(File.ReadAllText(path).Trim().Trim('\0'));
-                //dic = json.Inst_Object.ToDictionary(p => p.Key, q => q.Value);
-                foreach (var key in json.Keys)
-                    dic[key] = json[key];
+                case "1":
+                {
+                    dic = GetCacheValueFromExcel(jsonName);
+                    JsonData jsonData = new JsonData();
+                    foreach (KeyValuePair<string, JsonData> keyValuePair in dic)
+                        jsonData[keyValuePair.Key] = keyValuePair.Value;
+                    var path = root + "res/master/" + jsonName + ".json";
+                    File.WriteAllText(path, JsonMapper.ToJson(jsonData));
+                }
+                    break;
+                case "2":
+                {
+                    var path = Environment.CurrentDirectory + "/json/" + jsonName + ".json";
+                    var json = JsonMapper.ToObject(File.ReadAllText(path).Trim().Trim('\0'));
+                    //dic = json.Inst_Object.ToDictionary(p => p.Key, q => q.Value);
+                    foreach (var key in json.Keys)
+                        dic[key] = json[key];
+                }
+                    break;
             }
             return dic;
         }
 
         private static Dictionary<string, JsonData> GetCacheValueFromExcel(string path)
         {
+            var dic = new ExcelByNpoi().ReadFromExcels(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
+
             Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
-            var dic = new ExcelByOleDb().ReadFromExcels(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
             {
                 JsonData jsonData = SetJsonDataArray(pair.Value);
@@ -191,9 +207,9 @@ namespace fileDownload
 
             if (File.Exists(newname))
             {
-                //var hash = UtilSecurity.GetMD5Value(File.ReadAllText(newname));
-                //if (hashvalue == hash)
-                return true;
+                var hash = UtilSecurity.GetMD5Value(File.ReadAllText(newname));
+                if (hashvalue == hash)
+                    return true;
             }
 
 

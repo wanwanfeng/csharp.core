@@ -242,6 +242,11 @@ namespace fileDownload
             }
         }
 
+        public static List<string> extensionList = new List<string>()
+        {
+            ".acb"
+        };
+
         public static bool Move(string revision, string hashname, string filename, string hashvalue,
             string encryptedhashvalue)
         {
@@ -263,7 +268,7 @@ namespace fileDownload
                     {
                         //return false;
                         File.Copy(source, newname);
-                        if (!newname.Contains("cri/"))
+                        if (!extensionList.Contains(Path.GetExtension(newname)))
                             UnMakeDecryptor(newname);
                         return true;
                     }
@@ -287,7 +292,22 @@ namespace fileDownload
             try
             {
                 bytes = UtilSecurity.DecryptionBytes(bytes, UtilSecurity.MakeDecryptorTransform(Path.GetFileName(path)));
-                Util.MakeDirectory(path);
+                FileHelper.CreateDirectory(path);
+                File.WriteAllBytes(path, bytes);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public static void MakeDecryptor(string path)
+        {
+            var bytes = File.ReadAllBytes(path);
+            try
+            {
+                bytes = UtilSecurity.EncryptionBytes(bytes, UtilSecurity.MakeEncryptorTransform(Path.GetFileName(path)));
+                FileHelper.CreateDirectory(path);
                 File.WriteAllBytes(path, bytes);
             }
             catch (Exception)

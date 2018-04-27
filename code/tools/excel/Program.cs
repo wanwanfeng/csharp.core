@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 using Library.LitJson;
+using Script;
 //#define ExcelByOleDb
 //#define ExcelByNpoi
 //#define ExcelByOffice
@@ -23,6 +25,7 @@ namespace Library.Excel
 {
     public enum CaoType
     {
+        CompareExcel = 0,
         JsonToCsv = 1,
         JsonToExcel = 2,
         JsonToOneExcel = 3,
@@ -102,6 +105,9 @@ namespace Library.Excel
                 CaoType caoType = (CaoType) Enum.Parse(typeof (CaoType), s);
                 switch (caoType)
                 {
+                    case CaoType.CompareExcel:
+                        new CompareExcel();
+                        break;
                     case CaoType.JsonToCsv:
                         ReadJsonToCsv();
                         break;
@@ -140,7 +146,8 @@ namespace Library.Excel
             foreach (var file in files)
             {
                 Console.WriteLine(" is now : " + file);
-                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToListByPath(file)));
+                ExcelClass.ConvertDataTableToCsv(
+                    ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToListByPath(file)));
             }
         }
 
@@ -241,7 +248,8 @@ namespace Library.Excel
                     foreach (KeyValuePair<string, List<List<object>>> pair in vals)
                     {
                         if (file == null) continue;
-                        dic[file + "/" + pair.Key] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
+                        dic[file + "/" + pair.Key] =
+                            ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
                     }
                 }
 
@@ -256,8 +264,7 @@ namespace Library.Excel
         {
             List<string> files = new List<string>();
 
-            Console.Write(isOnlydir ? "请拖入文件夹：" : "请拖入文件夹或文件：");
-            string path = Console.ReadLine() ?? "";
+            string path = SystemExtensions.GetInputStr(isOnlydir ? "请拖入文件夹：" : "请拖入文件夹或文件：", "您选择的文件夹或文件：");
             if (string.IsNullOrEmpty(path))
                 return files;
 

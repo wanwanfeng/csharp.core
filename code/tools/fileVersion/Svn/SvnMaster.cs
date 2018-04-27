@@ -13,10 +13,10 @@ namespace FileVersion
         {
             base.Run();
 
-            Console.Write("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = Console.ReadLine().AsInt();
+            var beforeTip = string.Format("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
+            endVersion = SystemExtensions.GetInputStr(beforeTip).AsInt();
             endVersion = Math.Max(endVersion, lowVersion);
-            endVersion = Math.Min(endVersion, highVersion);
+            endVersion = Math.Max(endVersion, lowVersion);
             Console.WriteLine("目标版本号：" + endVersion);
             Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
@@ -44,8 +44,7 @@ namespace FileVersion
             }
             ExcludeFile(cache);
 
-            Console.Write("\n是否导出目标版本号文件（y/n）：");
-            var yes = Console.ReadLine() == "y";
+            var yes = SystemExtensions.GetInputStr("\n是否导出目标版本号文件（y/n）：", "", "y") == "y";
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             DeleteInfo(targetDir);
             WriteToTxt(targetDir, cache);

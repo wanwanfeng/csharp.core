@@ -54,8 +54,7 @@ namespace FileVersion
                     bool yes = false;
                     while (yes == false)
                     {
-                        Console.Write("请输入目标目录，然后回车：");
-                        folder = Console.ReadLine();
+                        folder = SystemExtensions.GetInputStr("请输入目标目录，然后回车：");
                         if (folder != null && !Directory.Exists(folder))
                         {
                             Console.WriteLine("未输入目录或不存在!");

@@ -4,30 +4,25 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Script
 {
     public class SpliteAtlas : BaseClass
     {
+        private string cmd;
         public override string root { get; set; }
 
-        private string cmd;
 
         /// <summary>
         /// 筛选过滤已存在图片
         /// </summary>
         public SpliteAtlas()
         {
-            Console.Write("图集拆解(y)，图集合并(n)，文件夹删除(d):");
-            cmd = Console.ReadLine() ?? "e";
-            if (cmd=="e")
-            {
-                Environment.Exit(0);
-            }
-            Console.Write("请拖入选定（文件夹或文件）:");
-            root = Console.ReadLine();
-            if (string.IsNullOrEmpty(root)) return;
+            cmd = SystemExtensions.GetInputStr("图集拆解(y)，图集合并(n)，文件夹删除(d):");
+            root = SystemExtensions.GetInputStr("请拖入选定（文件夹或文件）:");
+
             List<string> res = new List<string>();
             if (Directory.Exists(root))
             {

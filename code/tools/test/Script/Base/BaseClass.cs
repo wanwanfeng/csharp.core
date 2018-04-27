@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Script
@@ -11,16 +12,8 @@ namespace Script
         public BaseClass()
         {
             Console.WriteLine("操作类：" + GetType().Name);
-            Console.Write("是否继续操作（y/n）:");
-            var y = Console.ReadLine();
-            Console.WriteLine();
-            if (y != "y")
-            {
-                Environment.Exit(0);
-            }
+            SystemExtensions.GetInputStr("是否继续操作（y/e）:");
         }
-
-
 
         private string _root;
 
@@ -29,9 +22,7 @@ namespace Script
             get
             {
                 if (!string.IsNullOrEmpty(_root)) return _root;
-                Console.Write("请拖入选定文件夹:");
-                _root = Console.ReadLine();
-                Console.WriteLine("您选择的文件夹：" + _root);
+                _root = SystemExtensions.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
                 if (!string.IsNullOrEmpty(_root)) _root = _root.Replace("\\", "/");
                 return _root;
             }

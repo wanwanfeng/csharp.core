@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Script
@@ -16,15 +17,8 @@ namespace Script
 
         public CompareFolder()
         {
-            Console.Write("请拖入选定文件夹:");
-            dir1 = Console.ReadLine() ?? "";
-            Console.WriteLine("您选择的文件夹：" + dir1);
-
-            Console.Write("请拖入选定文件夹:");
-            dir2 = Console.ReadLine() ?? "";
-            Console.WriteLine("您选择的文件夹：" + dir2);
-
-
+            dir1 = SystemExtensions.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
+            dir2 = SystemExtensions.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
             var last1 = Directory.GetFiles(dir1, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir1, ""));
             var last2 = Directory.GetFiles(dir2, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir2, ""));
             var last = last1.Except(last2).Select(p => dir1 + p).ToList();

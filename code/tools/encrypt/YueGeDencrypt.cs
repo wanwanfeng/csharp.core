@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace encrypt
@@ -24,15 +25,8 @@ namespace encrypt
 
             Console.WriteLine("-----------------------------");
             Console.WriteLine("");
-            Console.WriteLine("");
 
-            Console.Write("输入加密的目标目录:");
-
-            cmd = Console.ReadLine() ?? "e";
-            if (cmd == "e")
-                Environment.Exit(0);
-
-            string root = cmd;
+            string root = SystemExtensions.GetInputStr("输入加密的目标目录:");
             if (Directory.Exists(root))
             {
                 var folder = Path.GetFileName(root);
@@ -81,13 +75,7 @@ namespace encrypt
         {
             Dictionary<string, string> cache = new Dictionary<string, string>();
 
-            Console.Write("输入原始目录获取md5对应关系:");
-            cmd = Console.ReadLine() ?? "e";
-            if (cmd == "e")
-                Environment.Exit(0);
-
-            string root = cmd;
-            if (!Directory.Exists(root)) return cache;
+            string root = SystemExtensions.GetInputStr("输入原始目录获取md5对应关系:");
 
             var folder = Path.GetFileName(root);
             if (folder != "app")

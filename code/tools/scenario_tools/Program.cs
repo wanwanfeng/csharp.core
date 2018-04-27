@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Library.Excel;
+using Library.Extensions;
 using LitJson;
 
 namespace scenario_tools
@@ -12,8 +13,15 @@ namespace scenario_tools
     {
         private static void Main(string[] args)
         {
-            //new ReadCsv();
-            new ReadExcel();
+            switch (SystemExtensions.GetInputStr("1:读取csv写入excel\n2:读取excel写入json\ninput:"))
+            {
+                case "1":
+                    new ReadCsv();
+                    break;
+                case "2":
+                    new ReadExcel();
+                    break;
+            }
         }
     }
 }

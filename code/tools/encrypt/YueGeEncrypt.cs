@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace encrypt
@@ -19,13 +20,7 @@ namespace encrypt
         {
             var md5Key = "kEfGhnNmeu4YYuhv";
 
-            Library.AES.Key = "";
-            Console.Write("输入目录:");
-            cmd = Console.ReadLine() ?? "e";
-            if (cmd == "e")
-                Environment.Exit(0);
-
-            var root = cmd;
+            var root = SystemExtensions.GetInputStr("输入目录:");
             if (Directory.Exists(root))
             {
                 var folder = Path.GetFileName(root);

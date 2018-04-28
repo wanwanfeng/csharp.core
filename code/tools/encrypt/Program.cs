@@ -15,21 +15,28 @@ namespace encrypt
                 return;
             }
 
-            Console.WriteLine("---------------------------");
-            Console.WriteLine("1;加密");
-            Console.WriteLine("2;解密");
-            Console.WriteLine("---------------------------");
-
-            var cmd = SystemExtensions.GetInputStr("输入指令：");
-            switch (cmd)
+            do
             {
-                case "1":
-                    new YueGeEncrypt();
-                    break;
-                case "2":
-                    new YueGeDencrypt();
-                    break;
-            }
+                Console.WriteLine("---------------------------");
+                Console.WriteLine("1;加密");
+                Console.WriteLine("2;解密");
+                Console.WriteLine("---------------------------");
+
+                var cmd = SystemExtensions.GetInputStr("输入指令：");
+                do
+                {
+                    switch (cmd)
+                    {
+                        case "1":
+                            new YueGeEncrypt();
+                            break;
+                        case "2":
+                            new YueGeDencrypt();
+                            break;
+                    }
+                } while (SystemExtensions.Continue());
+            } while (SystemExtensions.Continue());
+
             return;
 
             var list = new[,]

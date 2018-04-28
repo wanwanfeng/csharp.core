@@ -14,14 +14,13 @@ namespace FileVersion
             base.Run();
 
             var msg = string.Format("请输入起始版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            startVersion = SystemExtensions.GetInputStr(msg).AsLong();
-            startVersion = Math.Max(startVersion, lowVersion);
+            startVersion = SystemExtensions.GetInputStr(msg, "", lowVersion.ToString()).AsLong();
+            //startVersion = Math.Max(startVersion, lowVersion);
             Console.WriteLine("起始版本号：" + startVersion);
 
             msg = string.Format("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = SystemExtensions.GetInputStr(msg).AsLong();
-            endVersion = Math.Min(endVersion, highVersion);
-            endVersion = Math.Max(endVersion, startVersion);
+            endVersion = SystemExtensions.GetInputStr(msg, "", startVersion.ToString()).AsLong();
+            endVersion = Math.Max(endVersion, highVersion);
             Console.WriteLine("结束版本号：" + endVersion);
 
             if (startVersion == endVersion)
@@ -32,6 +31,7 @@ namespace FileVersion
             var targetList =
                 RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl), true)
                     .Select(Uri.UnescapeDataString)
+                    .Where(s => !string.IsNullOrEmpty(s))
                     .Where(s => !s.EndsWith("/"))
                     //.Where(s => !string.IsNullOrEmpty(s))
                     .Select(p => p.Replace(svnUrl + "/", ""))

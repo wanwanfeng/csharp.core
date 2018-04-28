@@ -133,9 +133,9 @@ namespace Library.Excel
                                 break;
                         }
                         GC.Collect();
-                    } while (SystemExtensions.Continue());
+                    } while (SystemExtensions.ContinueY());
                 }
-            } while (SystemExtensions.Continue());
+            } while (SystemExtensions.ContinueY());
         }
 
         #region Json->

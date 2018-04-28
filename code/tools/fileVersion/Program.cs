@@ -15,11 +15,8 @@ namespace FileVersion
             // 添加程序集解析事件
             AppDomain.CurrentDomain.AssemblyResolve += (sender, assembly) => LoadFromResource(assembly.Name);
 
-
-            while (isRuning)
-            {
-                string mes =
-                    @"
+            string msg =
+                @"
 ------------第一种----------
 步骤1,SvnMaster [输入sm]
 步骤2,SvnPatch [输入sp]
@@ -32,7 +29,9 @@ SvnList [输入sl]
 //2,GitPatch [输入gp]
 //3,GitUpdate [输入gl]
 //";
-                Console.WriteLine(mes);
+            do
+            {
+                Console.WriteLine(msg);
                 CommonBase commonBase = null;
                 switch (SystemExtensions.GetInputStr("请输入选择，然后回车："))
                 {
@@ -63,9 +62,8 @@ SvnList [输入sl]
                 if (commonBase.isInstall)
                     commonBase.Run();
 
-                isRuning = SystemExtensions.GetInputStr("\n按y键继续,按其余键退出......", "", "y") == "y";
                 Console.Clear();
-            }
+            } while (SystemExtensions.Continue("按y键继续,按其余键退出......"));
         }
 
 

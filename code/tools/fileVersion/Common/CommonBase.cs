@@ -148,15 +148,12 @@ namespace FileVersion
             if (count == 0)
             {
                 Console.WriteLine("可更新文件数目为零！");
-                Console.WriteLine("按任意键退出！");
-                Console.ReadKey();
-                Environment.Exit(0);
+                SystemExtensions.QuitReadKey();
             }
             else
             {
                 Console.WriteLine("可更新文件数目为{0}！", count);
-                Console.WriteLine("按任意键继续！");
-                Console.ReadKey();
+                SystemExtensions.ContinueReadKey();
             }
         }
 

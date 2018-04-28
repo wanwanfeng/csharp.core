@@ -9,11 +9,11 @@ namespace Script
 {
     public class BaseClass
     {
-        public BaseClass()
-        {
-            Console.WriteLine("操作类：" + GetType().Name);
-            SystemExtensions.GetInputStr("是否继续操作（y/e）:");
-        }
+        //public BaseClass()
+        //{
+        //    Console.WriteLine("操作类：" + GetType().Name);
+        //    SystemExtensions.GetInputStr("是否继续操作（y/e）:");
+        //}
 
         private string _root;
 

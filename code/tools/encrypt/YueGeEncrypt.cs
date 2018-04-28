@@ -54,8 +54,6 @@ namespace encrypt
                     }
                 }
             }
-            Console.WriteLine("按任意键结束!");
-            Console.ReadKey();
         }
     }
 }

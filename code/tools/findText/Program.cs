@@ -39,7 +39,7 @@ namespace findText
                         break;
                 }
                 Console.ReadKey();
-            } while (SystemExtensions.Continue());
+            } while (SystemExtensions.ContinueY());
         }
     }
 }

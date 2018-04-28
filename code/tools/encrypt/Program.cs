@@ -34,8 +34,8 @@ namespace encrypt
                             new YueGeDencrypt();
                             break;
                     }
-                } while (SystemExtensions.Continue());
-            } while (SystemExtensions.Continue());
+                } while (SystemExtensions.ContinueY());
+            } while (SystemExtensions.ContinueY());
 
             return;
 

@@ -21,15 +21,14 @@ namespace Library.Extensions
         }
 
         /// <summary>
-        /// 用于控制台是否继续
+        /// 用于控制台是否继续，"按'y'键继续，按其余键退出， 
         /// </summary>
         /// <param name="beforeTip"> "press 'y' to continue : "; //"按'y'键继续！"</param>
-        /// <param name="def"></param>
         /// <returns></returns>
-        public static bool Continue(string beforeTip = "按'y'键继续： ", string def = "y")
+        public static bool ContinueY(string beforeTip = "按'y'键继续： ")
         {
             Console.Write(Environment.NewLine);
-            var x = GetInputStr(beforeTip, "", def) == "y";
+            var x = GetInputStr(beforeTip, "", "y") == "y";
             Console.Write(Environment.NewLine);
             return x;
         }

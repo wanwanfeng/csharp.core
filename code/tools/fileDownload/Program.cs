@@ -37,7 +37,11 @@ namespace fileDownload
         /// </summary>
         public static string url
         {
-            get { return "https://tkpres.global.ssl.fastly.net/assets/app/"; }
+            get
+            {
+                //return "http://10.23.114.149:9999/assets/app-bs/";
+                return "https://tkpres.global.ssl.fastly.net/assets/app/";
+            }
         }
 
         public static string Cmd1 = "e", FromExcel = "e";
@@ -46,8 +50,9 @@ namespace fileDownload
         private static void Main(string[] args)
         {
             Cmd1 = SystemExtensions.GetInputStr("1:down\n2:md5还原与解密\nInput:");
-            FromExcel = SystemExtensions.GetInputStr("1:down\n2:md5还原与解密\nInput:");
+            FromExcel = SystemExtensions.GetInputStr("1:来自excel\n2:来自json\nInput:");
 
+            root = SystemExtensions.GetInputStr("输入文件目录:");
             Dictionary<string, JsonData> cacheMaster = CacheJson("c_master").ToDictionary(p => "master/" + p.Key, q => q.Value);
             Dictionary<string, JsonData> cacheRresource = CacheJson("c_resource");//.Where(p => p.Key.Contains("unity")).ToDictionary(p => p.Key, q => q.Value);
 
@@ -65,8 +70,13 @@ namespace fileDownload
             ThreadPool.SetMaxThreads(max, max);
             foreach (KeyValuePair<string, JsonData> pair in cache)
             {
-                ThreadPool.QueueUserWorkItem(new WaitCallback(RunSingle), new object[] {pair});
+                ThreadPool.QueueUserWorkItem(new WaitCallback(RunSingle), new object[] { pair });
             }
+
+            //foreach (KeyValuePair<string, JsonData> pair in cache)
+            //{
+            //    RunSingle(new object[] { pair });
+            //}
 
             GC.Collect();
             Console.ReadKey();
@@ -147,7 +157,7 @@ namespace fileDownload
                     break;
                 case "2":
                 {
-                    var path = Environment.CurrentDirectory + "/json/" + jsonName + ".json";
+                    var path = string.Format("{0}/{1}.json", root, jsonName);
                     var json = JsonMapper.ToObject(File.ReadAllText(path).Trim().Trim('\0'));
                     //dic = json.Inst_Object.ToDictionary(p => p.Key, q => q.Value);
                     foreach (var key in json.Keys)
@@ -158,9 +168,10 @@ namespace fileDownload
             return dic;
         }
 
-        private static Dictionary<string, JsonData> GetCacheValueFromExcel(string path)
+        private static Dictionary<string, JsonData> GetCacheValueFromExcel(string jsonName)
         {
-            var dic = new ExcelByNpoi().ReadFromExcels(Environment.CurrentDirectory + "/excel/" + path + ".xlsx");
+            var path = string.Format("{0}/{1}.xlsx", root, jsonName);
+            var dic = new ExcelByNpoi().ReadFromExcels(path);
 
             Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
             foreach (KeyValuePair<string, List<List<object>>> pair in dic)
@@ -198,17 +209,17 @@ namespace fileDownload
         public static bool HttpDownload(string revision, string hashname, string filename, string hashvalue, string encryptedhashvalue)
         {
             var houzhui = revision + "/" + hashname;
-            string newname = root + "app2/" + houzhui;
-            FileHelper.CreateDirectory(newname);
+            string newname = root + "/app/" + houzhui;
 
             string tempFile = newname + ".temp"; //临时文件
+            FileHelper.CreateDirectory(tempFile);
             if (File.Exists(tempFile))
                 File.Delete(tempFile); //存在则删除
 
             if (File.Exists(newname))
             {
-                var hash = UtilSecurity.GetMD5Value(File.ReadAllText(newname));
-                if (hashvalue == hash)
+                //var hash = UtilSecurity.GetMD5Value(File.ReadAllText(newname));
+                //if (hashvalue == hash)
                     return true;
             }
 
@@ -221,6 +232,7 @@ namespace fileDownload
             {
                 // 设置参数
 
+                Console.WriteLine(url + houzhui);
                 HttpWebRequest request = WebRequest.Create(url + houzhui) as HttpWebRequest;
 
                 //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";

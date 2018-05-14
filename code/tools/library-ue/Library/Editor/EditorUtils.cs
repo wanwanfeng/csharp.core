@@ -85,9 +85,14 @@ namespace UnityEditor.Library
                 EditorUtility.OpenWithDefaultApp(outpath);
         }
 
-        public static string[] GetFiles(out string path, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        public static string[] OpenFolderGetFiles(out string path, SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
             path = EditorUtility.OpenFolderPanel("", "", "");
+            return GetFiles(path, searchOption);
+        }
+
+        public static string[] GetFiles(string path, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        {
             if (string.IsNullOrEmpty(path))
                 return new string[0];
             return Directory.GetFiles(path, "*", searchOption).Select(p => p.Replace("\\", "/")).ToArray();

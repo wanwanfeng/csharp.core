@@ -27,11 +27,11 @@ namespace encrypt
                 var files =
                     Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
                         .Select(p => p.Replace(root, "").Replace("\\", "/"))
-                        .ToArray();
+                        .ToList();
 
                 var index = 0;
                 var dirRoot = root.Replace(folder, "");
-                foreach (string file in files)
+                files.ForEach(file =>
                 {
                     var path = folder + file;
                     var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
@@ -40,7 +40,7 @@ namespace encrypt
                                   new Library.MD5().Encrypt(fileName + md5Key);
 
                     var outPath = dirRoot + "md5/" + newPath;
-                    var p = ((float) (index++)/files.Length).ToString("P") + "\t" + path;
+                    var p = ((float) (index++)/files.Count).ToString("P") + "\t" + path;
                     FileHelper.CreateDirectory(outPath);
                     if (extensionList.Contains(Path.GetExtension(path)))
                     {
@@ -52,7 +52,7 @@ namespace encrypt
                         Console.WriteLine("路径编码并文件加密中..." + p);
                         File.WriteAllBytes(outPath, UtilSecurity.EncryptionBytes(File.ReadAllBytes(root + file)));
                     }
-                }
+                });
             }
         }
     }

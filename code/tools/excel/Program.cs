@@ -147,13 +147,11 @@ namespace Library.Excel
         {
             List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
-
-            foreach (var file in files)
+            files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                ExcelClass.ConvertDataTableToCsv(
-                    ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToListByPath(file)));
-            }
+                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToListByPath(file)));
+            });
         }
 
         /// <summary>
@@ -163,13 +161,12 @@ namespace Library.Excel
         {
             List<string> files = CheckPath(".json");
             if (files.Count == 0) return;
-
-            foreach (string file in files)
+            files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 List<List<object>> vals = ExcelClass.ConvertJsonToListByPath(file);
                 new ExcelClass().WriteToExcel(Path.ChangeExtension(file, ".xls"), vals);
-            }
+            });
         }
 
         /// <summary>
@@ -181,11 +178,11 @@ namespace Library.Excel
             if (files.Count == 0) return;
 
             var dic = new Dictionary<string, List<List<object>>>();
-            foreach (string file in files)
+            files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 dic[file] = ExcelClass.ConvertJsonToListByPath(file);
-            }
+            });
             new ExcelClass().WriteToOneExcel(InputPath + ".xlsx", dic);
         }
 
@@ -206,28 +203,24 @@ namespace Library.Excel
         private static void ReadExcelToJson(List<string> files)
         {
             ExcelClass excel = new ExcelClass();
-
-            foreach (var file in files)
+            files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-
                 var vals = excel.ReadFromExcels(file);
 
                 if (vals.Count == 1)
                 {
                     ExcelClass.ConvertListToJsonFile(vals.First(), file);
+                    return;
                 }
-                else
+
+                foreach (KeyValuePair<string, List<List<object>>> pair in vals)
                 {
-                    foreach (KeyValuePair<string, List<List<object>>> pair in vals)
-                    {
-                        if (file == null) continue;
-                        string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key.Replace("$", ""));
-                        FileHelper.CreateDirectory(newPath);
-                        ExcelClass.ConvertListToJsonFile(pair, newPath);
-                    }
+                    string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key.Replace("$", ""));
+                    FileHelper.CreateDirectory(newPath);
+                    ExcelClass.ConvertListToJsonFile(pair, newPath);
                 }
-            }
+            });
         }
 
         /// <summary>
@@ -239,26 +232,22 @@ namespace Library.Excel
             if (files.Count == 0) return;
 
             var dic = new Dictionary<string, List<List<object>>>();
-            foreach (string file in files)
+            files.ForEach(file =>
             {
                 var vals = new ExcelClass().ReadFromExcels(file);
 
                 if (vals.Count == 1)
                 {
-                    dic[file] =
-                        ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(vals.First())));
-                }
-                else
-                {
-                    foreach (KeyValuePair<string, List<List<object>>> pair in vals)
-                    {
-                        if (file == null) continue;
-                        dic[file + "/" + pair.Key] =
-                            ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
-                    }
+                    dic[file] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(vals.First())));
+                    return;
                 }
 
-            }
+                foreach (KeyValuePair<string, List<List<object>>> pair in vals)
+                {
+                    dic[file + "/" + pair.Key] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
+                }
+
+            });
             new ExcelClass().WriteToOneExcel(InputPath + ".xlsx", dic);
         }
 

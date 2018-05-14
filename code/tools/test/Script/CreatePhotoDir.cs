@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace Script
 {
@@ -6,7 +7,7 @@ namespace Script
     {
         public CreatePhotoDir()
         {
-            var haha = new string[]
+            new[]
             {
                 "A_18c1礼盒雅韵三件套",
                 "B_12c1圣经册水晶面板",
@@ -26,12 +27,7 @@ namespace Script
                 "P_10c1精美摆台一副",
                 "Q_12c1水晶摆台一副",
                 "赠送_60x160精美海报一副"
-            };
-
-            for (int i = 0; i < haha.Length; i++)
-            {
-                CreateDirectory(haha[i] + "/");
-            }
+            }.ToList().ForEach(p => CreateDirectory(p + "/"));
         }
     }
 }

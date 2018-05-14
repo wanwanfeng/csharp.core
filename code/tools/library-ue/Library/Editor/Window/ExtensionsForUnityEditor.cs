@@ -5,6 +5,16 @@ namespace UnityEditor
 {
     public static class ExtensionsForUnityEditor
     {
+        public static bool DisplayDialog(this ScriptableObject target, string msg = "是否要执行选择？", bool ignoreDialog = false)
+        {
+            if (ignoreDialog)
+            {
+                return true;
+            }
+            return EditorUtility.DisplayDialog("操作提示", msg, "确定", "取消");
+        }
+
+
         #region 基本控件封装
 
         public static void SplitSeparator(this ScriptableObject target, int count = 1)

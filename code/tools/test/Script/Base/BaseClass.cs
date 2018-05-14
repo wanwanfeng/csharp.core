@@ -102,13 +102,11 @@ namespace Script
         protected void RunList(List<string> res)
         {
             var index = 0;
-            foreach (string re in res)
+            res.ForEach(p =>
             {
-                Console.WriteLine((((float)index++) / res.Count).ToString("p") + "\t" + re);
-                if (!File.Exists(re)) continue;
-
-                RunListOne(re);
-            }
+                Console.WriteLine((((float) index++)/res.Count).ToString("p") + "\t" + p);
+                if (File.Exists(p)) RunListOne(p);
+            });
         }
 
 

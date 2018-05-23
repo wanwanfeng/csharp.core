@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Library.Extensions;
 
-namespace FileVersion
+namespace SvnVersion
 {
     public abstract class BaseFileInfo
     {
@@ -27,14 +27,16 @@ namespace FileVersion
 
     public class FileDetailInfo : BaseFileInfo
     {
-        public string path_hash;
         public bool is_delete;
 
-        public string version;
+        //实际版本号
+        public long version;
+        //修订版本号
+        public long revision;
 
         public override string ToString()
         {
-            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", path_hash, is_delete, version, content_hash,
+            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", is_delete, version, revision, content_hash,
                 content_size, encrypt_hash, encrypt_size, path);
         }
     }

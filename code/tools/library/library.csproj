@@ -54,6 +54,7 @@
     <Compile Include="Library\Base\Extensions\SystemExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ValueExtensions.cs" />
     <Compile Include="Library\Base\Helper\FileHelper.cs" />
+    <Compile Include="Library\Base\Extensions\LitJsonExtensions.cs" />
     <Compile Include="Library\Base\LitJson\LitJsonHelper.cs" />
     <Compile Include="Library\Base\Helper\XmlHelper.cs" />
     <Compile Include="Library\Base\LitJson\LitJson\IJsonWrapper.cs" />

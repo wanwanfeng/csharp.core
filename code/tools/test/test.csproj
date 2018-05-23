@@ -48,9 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Script\GetLineCount.cs" />
     <Compile Include="Script\Base\BaseClass.cs" />
     <Compile Include="Script\CreatePhotoDir.cs" />
     <Compile Include="Script\CompareFolder.cs" />
+    <Compile Include="Script\ImageFindOrc.cs" />
     <Compile Include="Script\SpliteAtlas\Info\TextureInfo.cs" />
     <Compile Include="Script\SpliteAtlas\PList.cs" />
     <Compile Include="Script\SpliteAtlas\SpliteAtlas.cs" />

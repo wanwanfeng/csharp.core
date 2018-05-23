@@ -93,48 +93,46 @@ namespace Library.Excel
             ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
             return;*/
 
+
             do
             {
+                Console.Clear();
                 Console.WriteLine("----------命令索引----------");
                 foreach (var value in Enum.GetValues(typeof (CaoType)))
                 {
                     Console.WriteLine("\t" + (int) value + "：" + value);
                 }
                 Console.WriteLine("----------------------------");
-                Console.Write("请选择，然后回车：");
-                string s = Console.ReadLine();
-                if (s != null)
+
+                var s = SystemExtensions.GetInputStr("请选择，然后回车：");
+                if (s == null) continue;
+
+                CaoType caoType = (CaoType) Enum.Parse(typeof (CaoType), s);
+                switch (caoType)
                 {
-                    do
-                    {
-                        CaoType caoType = (CaoType) Enum.Parse(typeof (CaoType), s);
-                        switch (caoType)
-                        {
-                            case CaoType.CompareExcel:
-                                new CompareExcel();
-                                break;
-                            case CaoType.JsonToCsv:
-                                ReadJsonToCsv();
-                                break;
-                            case CaoType.JsonToExcel:
-                                ReadJsonToExcel();
-                                break;
-                            case CaoType.JsonToOneExcel:
-                                ReadJsonToOneExcel();
-                                break;
-                            case CaoType.ExcelToJson:
-                                ReadExcelToJson();
-                                break;
-                            case CaoType.ExcelToOneExcel:
-                                ReadExcelToOneExcel();
-                                break;
-                            default:
-                                Console.Write("不存在的命令！");
-                                break;
-                        }
-                        GC.Collect();
-                    } while (SystemExtensions.ContinueY());
+                    case CaoType.CompareExcel:
+                        new CompareExcel();
+                        break;
+                    case CaoType.JsonToCsv:
+                        ReadJsonToCsv();
+                        break;
+                    case CaoType.JsonToExcel:
+                        ReadJsonToExcel();
+                        break;
+                    case CaoType.JsonToOneExcel:
+                        ReadJsonToOneExcel();
+                        break;
+                    case CaoType.ExcelToJson:
+                        ReadExcelToJson();
+                        break;
+                    case CaoType.ExcelToOneExcel:
+                        ReadExcelToOneExcel();
+                        break;
+                    default:
+                        Console.Write("不存在的命令！");
+                        break;
                 }
+                GC.Collect();
             } while (SystemExtensions.ContinueY());
         }
 

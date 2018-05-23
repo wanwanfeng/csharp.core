@@ -17,6 +17,7 @@ namespace encrypt
 
             do
             {
+                Console.Clear();
                 Console.WriteLine("---------------------------");
                 Console.WriteLine("1;加密");
                 Console.WriteLine("2;解密");

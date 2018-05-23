@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
+using Library.LitJson;
+using LitJson;
 
 namespace Script
 {
@@ -18,7 +21,7 @@ namespace Script
         private static string SECRET_KEY = "1suG7480xKHWft3dmROtgbrraNMg5YU3";
         public static Baidu.Aip.Ocr.Ocr client;
 
-        static FindPng()
+        static ImageFind()
         {
             client = new Baidu.Aip.Ocr.Ocr(API_KEY, SECRET_KEY);
         }
@@ -43,20 +46,20 @@ namespace Script
         public override void RunListOne(string re)
         {
 #if imageOrc
-                var imageOrc = File.ReadAllBytes(re);
-                // 调用通用文字识别, 图片参数为本地图片，可能会抛出网络等异常，请使用try/catch捕获
-                var str = client.GeneralBasic(imageOrc).ToString();
-                Console.WriteLine(str);
-                var result = JsonMapper.ToObject(str);
-                if (result.Keys.Contains("error_code"))
-                {
-                    Console.ReadKey();
-                    return;
-                }
-                if (result["words_result_num"].ToString().AsInt() <= 0)
-                    continue;
+            var imageOrc = File.ReadAllBytes(re);
+            // 调用通用文字识别, 图片参数为本地图片，可能会抛出网络等异常，请使用try/catch捕获
+            var str = client.GeneralBasic(imageOrc).ToString();
+            Console.WriteLine(str);
+            var result = JsonMapper.ToObject(str);
+            if (result.Keys.Contains("error_code"))
+            {
+                Console.ReadKey();
+                return;
+            }
+            if (result["words_result_num"].AsInt() <= 0)
+                return;
 #endif
-            dic[re.Replace(root,"")] = GetExcelCell(re);
+            dic[re.Replace(root, "")] = GetExcelCell(re);
         }
 
 

@@ -4,51 +4,50 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Library.Extensions;
+using Library.Helper;
 using Script;
 
 namespace test
 {
     internal class Program
     {
+        private enum MyEnum
+        {
+            [StringValue("CompareFolder"), TypeValue(typeof(CompareFolder))]
+            CompareFolder = 1,
+            [StringValue("ImageFind"), TypeValue(typeof(ImageFind))]
+            ImageFind,
+            [StringValue("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))]
+            ImageFindOrc,
+            [StringValue("CopyToOneFolder"), TypeValue(typeof(CopyToOneFolder))]
+            CopyToOneFolder,
+            [StringValue("CreatePhotoDir"), TypeValue(typeof(CreatePhotoDir))]
+            CreatePhotoDir,
+            [StringValue("CreateExcelCell"), TypeValue(typeof(CreateExcelCell))]
+            CreateExcelCell,
+            [StringValue("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))]
+            SpliteAtlas,
+            [StringValue("GetLineCount"), TypeValue(typeof(GetLineCount))]
+            GetLineCount,
+        }
+
         private static void Main(string[] args)
         {
             do
             {
+                Console.Clear();
                 Console.WriteLine("-------cmd list-------");
-                Console.WriteLine("1:CompareFolder");
-                Console.WriteLine("2:ImageFind");
-                Console.WriteLine("3:CopyToOneFolder");
-                Console.WriteLine("4:CreatePhotoDir");
-                Console.WriteLine("5:CreateExcelCell");
-                Console.WriteLine("6:SpliteAtlas");
+                foreach (var value in Enum.GetValues(typeof(MyEnum)))
+                {
+                    Console.WriteLine("  " + (int)value + ":" + value);
+                }
                 Console.WriteLine("----------------------");
 
                 var cmd = SystemExtensions.GetInputStr();
-                do
-                {
-                    switch (cmd)
-                    {
-                        case "1":
-                            new CompareFolder();
-                            break;
-                        case "2":
-                            new ImageFind();
-                            break;
-                        case "3":
-                            new CopyToOneFolder();
-                            break;
-                        case "4":
-                            new CreatePhotoDir();
-                            break;
-                        case "5":
-                            new CreateExcelCell();
-                            break;
-                        case "6":
-                            new SpliteAtlas();
-                            break;
-                    }
-
-                } while (SystemExtensions.ContinueY());
+                var dic = AttributeHelper.GetCacheTypeValue<MyEnum>();
+                var en = (MyEnum) cmd.AsInt();
+                if (dic.ContainsKey(en))
+                    Activator.CreateInstance(dic[en]);
             } while (SystemExtensions.ContinueY());
 
 

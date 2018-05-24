@@ -49,188 +49,6 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         Library.AES.Head = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl";
     }
 
-    public class Access
-    {
-        public static string DataPath { get; private set; }
-        public static string PersistentDataPath { get; private set; }
-
-        public static string StreamingAssetsPath
-        {
-            get
-            {
-#if UNITY_EDITOR
-                return "file:///" + DataPath + "/StreamingAssets/";
-#elif UNITY_STANDALONE_WIN
-                return "file:///" + DataPath + "/StreamingAssets/";
-#elif UNITY_ANDROID
-                return "jar:file://" + DataPath + "!/assets/";
-#elif UNITY_IPHONE || UNITY_IOS
-                return "file://" + DataPath + "/Raw/";  
-#endif
-            }
-        }
-
-        public static string Proto
-        {
-            get
-            {
-#if UNITY_EDITOR
-                return "file:///";
-#elif UNITY_STANDALONE_WIN
-                return "file:///" ;
-#elif UNITY_ANDROID
-                return "jar:file://" ;
-#elif UNITY_IPHONE || UNITY_IOS
-                return "file://";  
-#endif
-            }
-        }
-
-        public static string PersistentDataTempPath
-        {
-            get { return PersistentDataPath + "Temp/"; }
-        }
-
-        public static string PersistentDataPatchPath
-        {
-            get { return PersistentDataPath + "Patch/"; }
-        }
-
-        static Access()
-        {
-            DataPath = Application.dataPath;
-            PersistentDataPath = Application.persistentDataPath + "/";
-        }
-
-        private readonly Queue<string> urls = new Queue<string>();
-        private const int retryCount = 5;
-        private int retry = 0;
-
-        public Access()
-        {
-            retry = 0;
-            urls.Enqueue("http://127.0.0.1:8080/test/master/");
-            urls.Enqueue("http://127.0.0.1:8080/test/master/");
-            urls.Enqueue("http://127.0.0.1:8080/test/master/");
-        }
-
-        /// <summary>
-        /// 远程加载
-        /// 失败后重试，最大重试5次，每次url取队列最新值
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="callAction"></param>
-        /// <returns></returns>
-        public IEnumerator FromRemote(string path, Action<WWW> callAction)
-        {
-
-            using (WWW www = new WWW(urls.Peek() + path))
-            {
-#if UNITY_EDITOR
-                Debug.Log(www.url);
-#endif
-                yield return www;
-                if (string.IsNullOrEmpty(www.error))
-                {
-#if UNITY_EDITOR
-                    Debug.Log(Encoding.UTF8.GetString(www.bytes) ?? "");
-#endif
-                    callAction.Invoke(www);
-                }
-                else
-                {
-                    if (retry < retryCount)
-                    {
-                        retry++;
-                        urls.Enqueue(urls.Dequeue());
-                        yield return FromRemote(path, callAction);
-                    }
-                    else
-                    {
-#if UNITY_EDITOR
-                        Debug.LogError("is faild ! " + www.url);
-#endif
-                        callAction.Invoke(null);
-                    }
-                }
-                www.Dispose();
-            }
-        }
-
-        private IEnumerator FromQueue(string path, Action<WWW> callAction)
-        {
-            int length = urls.Count;
-            for (int i = 0; i < length - 1; i++)
-                urls.Enqueue(urls.Dequeue());
-            yield return FromRemote(path, callAction);
-        }
-
-        public IEnumerator FromPersistentDataPath(string path, Action<WWW> callAction)
-        {
-            urls.Enqueue(Proto + PersistentDataPath);
-            yield return FromQueue(path, callAction);
-        }
-
-        public IEnumerator FromPersistentDataTempPath(string path, Action<WWW> callAction)
-        {
-            urls.Clear();
-            urls.Enqueue(Proto + PersistentDataTempPath);
-            yield return FromQueue(path, callAction);
-        }
-
-        public IEnumerator FromStreamingAssetsPath(string path, Action<WWW> callAction)
-        {
-            urls.Enqueue(StreamingAssetsPath);
-            yield return FromQueue(path, callAction);
-        }
-
-        #region static
-
-        /// <summary>
-        /// PersistentDataPath
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static byte[] FromPersistentDataPath(string path)
-        {
-            path = PersistentDataPath + path;
-            return File.Exists(path) ? File.ReadAllBytes(path) : null;
-        }
-
-        /// <summary>
-        /// PersistentDataTempPath
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static byte[] FromPersistentDataTempPath(string path)
-        {
-            path = PersistentDataTempPath + path;
-            return File.Exists(path) ? File.ReadAllBytes(path) : null;
-        }
-
-        public static Texture2D FileToTexture2D(string path)
-        {
-            byte[] bytes = FromPersistentDataTempPath(path);
-            if (bytes == null) return null;
-            Texture2D texture = new Texture2D(0, 0);
-            texture.LoadImage(bytes);
-            return texture;
-        }
-
-        internal static string PathConvertToMd5(string path)
-        {
-            //return Library.Encrypt.MD5.Encrypt(path + KeyMd5);
-            var dirD = Path.GetDirectoryName(path);
-            var nameD = Path.GetFileName(path);
-            string hash = Library.Encrypt.MD5(dirD + KeyMd5);
-            hash += "/";
-            hash += Library.Encrypt.MD5(nameD + KeyMd5);
-            return hash;
-        }
-
-        #endregion
-    }
-
     public class FilePatchInfo : FileVersion.FilePatchInfo
     {
         public static string PatchListName = "patch-list.txt";
@@ -391,7 +209,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             {
                 if (LastAccessInfo != null && info.firstVersion != LastAccessInfo.lastVersion)
                     yield break;
-                yield return StartCoroutine(GetFilePatchCache(info));
+                yield return GetFilePatchCache(info);
                 LastAccessInfo = info;
             }
             foreach (var pair in patchCache)
@@ -401,8 +219,8 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     mainCache[patch.Key] = patch.Value;
                 }
             }
-            yield return StartCoroutine(ResourceDelete());
-            yield return StartCoroutine(ResourceDownLoad());
+            yield return ResourceDelete();
+            yield return ResourceDownLoad();
         }
 
         /// <summary>
@@ -415,11 +233,11 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             if (info.isNeedDownFile)
             {
                 ActionState(State.DownPathList);
-                yield return new Access().FromRemote(info.fileUrl, res =>
+                yield return Access.FromRemote(info.fileUrl, res =>
                 {
                     if (res == null)
                         return;
-                    var hash = Library.Encrypt.MD5(res.bytes);
+                    var hash = Library.Encrypt.MD5(res);
                     if (info.IsEncrypt())
                     {
                         if (hash != info.encrypt_hash) return;
@@ -428,7 +246,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     {
                         if (hash != info.content_hash) return;
                     }
-                    File.WriteAllBytes(info.fileLocal, res.bytes);
+                    File.WriteAllBytes(info.fileLocal, res);
                 });
             }
 
@@ -500,7 +318,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                 if (keyValuePair.Key.IsZip())
                 {
                     ActionState(State.DownResource);
-                    yield return StartCoroutine(GetRemoteZip(keyValuePair.Key));
+                    yield return GetRemoteZip(keyValuePair.Key);
                 }
                 else
                 {
@@ -511,28 +329,28 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                         var resInfo = lastList.Dequeue();
                         ActionState(State.DownResource);
                         Debug.Log(string.Format("down...{0}...{1}", (float) lastList.Count/downList.Count, resInfo.url));
-                        yield return new Access().FromRemote(keyValuePair.Key.path + "/" + resInfo.url,
-                                res =>
+                        yield return Access.FromRemote(keyValuePair.Key.path + "/" + resInfo.url,
+                            res =>
+                            {
+                                if (res == null)
+                                    return;
+
+                                var hash = Library.Encrypt.MD5(res);
+
+                                if (resInfo.IsEncrypt())
                                 {
-                                    if (res == null)
-                                        return;
+                                    if (hash != resInfo.encrypt_hash) return;
+                                }
+                                else
+                                {
+                                    if (hash != resInfo.content_hash) return;
+                                }
 
-                                    var hash = Library.Encrypt.MD5(res.bytes);
-
-                                    if (resInfo.IsEncrypt())
-                                    {
-                                        if (hash != resInfo.encrypt_hash) return;
-                                    }
-                                    else
-                                    {
-                                        if (hash != resInfo.content_hash) return;
-                                    }
-
-                                    ActionState(State.ApplyResource);
-                                    FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
-                                    File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res.bytes);
-                                    resInfo.is_ready = true;
-                                });
+                                ActionState(State.ApplyResource);
+                                FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
+                                File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res);
+                                resInfo.is_ready = true;
+                            });
                     }
                 }
             }
@@ -546,11 +364,11 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
         public IEnumerator GetRemoteZip(FilePatchInfo info)
         {
             ActionState(State.DownPatchZip);
-            yield return new Access().FromRemote(info.path + ".zip", res =>
+            yield return Access.FromRemote(info.path + ".zip", res =>
             {
-                if (res == null || Library.Encrypt.MD5(res.bytes) != info.zip_hash) return;
+                if (res == null || Library.Encrypt.MD5(res) != info.zip_hash) return;
                 var zipName = Access.PersistentDataPatchPath + info.path + ".zip";
-                File.WriteAllBytes(zipName, res.bytes);
+                File.WriteAllBytes(zipName, res);
                 ActionState(State.UnMakePatchZip);
                 string msg = Library.Compress.DecompressUtils.UnMakeZipFile(zipName, "", true);
                 if (string.IsNullOrEmpty(msg))
@@ -626,9 +444,9 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     private IEnumerator GetResourcesAndStreamingAssetsData()
     {
         resourcesCache = GetCache(Resources.Load<TextAsset>("resources").bytes);
-        yield return new Access().FromStreamingAssetsPath("streamingAssets.txt", res =>
+        yield return Access.FromStreamingAssetsPath("streamingAssets.txt", res =>
         {
-            streamingAssetsCache = GetCache(res.bytes);
+            streamingAssetsCache = GetCache(res);
         });
     }
 
@@ -647,13 +465,13 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     /// <returns></returns>
     private IEnumerator GetPatchList()
     {
-        yield return new Access().FromRemote(FilePatchInfo.PatchListName, res =>
+        yield return Access.FromRemote(FilePatchInfo.PatchListName, res =>
         {
             if (res == null) return;
             FileHelper.CreateDirectory(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName);
-            File.WriteAllBytes(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName, res.bytes);
+            File.WriteAllBytes(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName, res);
 
-            var content = Library.Dencrypt.AES(res.bytes);
+            var content = Library.Dencrypt.AES(res);
             var versionInfo = LitJsonHelper.ToObject<FileVersion.VersionInfo>(content);
             SoftwareVersion = versionInfo.softwareVersion;
             patchListCache = versionInfo.pathInfos.Select(p => new FilePatchInfo(p)).ToLookup(p => p.group)
@@ -675,8 +493,8 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
 
     private IEnumerator Start()
     {
-        yield return StartCoroutine(GetResourcesAndStreamingAssetsData());
-        yield return StartCoroutine(GetPatchList());
+        yield return GetResourcesAndStreamingAssetsData();
+        yield return GetPatchList();
         foreach (var info in patchListCache.Values)
         {
             var resourcesCacheList = resourcesCache.ContainsKey(info.GroupName)
@@ -685,14 +503,13 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             var streamingAssetsCachelist = streamingAssetsCache.ContainsKey(info.GroupName)
                 ? streamingAssetsCache[info.GroupName]
                 : new List<string>();
-            yield return StartCoroutine(info.InitStart(resourcesCacheList, streamingAssetsCachelist));
+            yield return info.InitStart(resourcesCacheList, streamingAssetsCachelist);
         }
 
-
-        StartCoroutine(Load("image/10253318_640x640_0.jpg", tex =>
+        yield return Load("image/10253318_640x640_0.jpg", tex =>
         {
             texture2D = tex;
-        }));
+        });
     }
 
     private Texture2D texture2D = null;
@@ -700,9 +517,9 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     private void OnGUI()
     {
         if (texture2D == null)
-            texture2D = Access.FileToTexture2D("image/10253312_640x640_0.jpg");
+            texture2D = ImageAccess.FileToTexture2D("image/10253312_640x640_0.jpg");
         if (texture2D == null)
-            texture2D = Access.FileToTexture2D(Access.PathConvertToMd5("image/10253312_640x640_0.jpg"));
+            texture2D = ImageAccess.FileToTexture2D(Access.PathConvertToMd5("image/10253312_640x640_0.jpg", KeyMd5));
         if (texture2D != null)
             GUI.DrawTexture(new Rect(0, 0, texture2D.width, texture2D.height), texture2D);
         GUILayout.Label("SvnVersion:" + SoftwareVersion);
@@ -717,9 +534,9 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
 
     #region Load
 
-    private IEnumerator LoadObject(string path, Action<WWW, UnityEngine.Object> callAction)
+    private IEnumerator LoadObject(string path, Action<byte[], UnityEngine.Object> callAction)
     {
-        string hash = Access.PathConvertToMd5(path);
+        string hash = Access.PathConvertToMd5(path, KeyMd5);
         foreach (var cache in patchListCache.Values)
         {
             FileDetailInfo resInfo = null;
@@ -740,10 +557,10 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     callAction.Invoke(null, Resources.Load(path));
                     yield break;
                 case FileDetailInfo.DataType.StreamingAssetsPath:
-                    yield return new Access().FromStreamingAssetsPath(path, www => { callAction.Invoke(www, null); });
+                    yield return Access.FromStreamingAssetsPath(path, www => { callAction.Invoke(www, null); });
                     yield break;
                 default:
-                    yield return new Access().FromPersistentDataTempPath(resInfo.path, www => { callAction.Invoke(www, null); });
+                    yield return Access.FromPersistentDataTempPath(resInfo.path, www => { callAction.Invoke(www, null); });
                     yield break;
             }
         }
@@ -754,48 +571,55 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
 
     public IEnumerator Load(string path, Action<Texture2D> callAction)
     {
-        yield return
-            StartCoroutine(LoadObject(path,
-                (www, obj) => { callAction.Invoke(www == null ? obj as Texture2D : www.texture); }));
+        yield return LoadObject(path,(b, obj) =>
+        {
+            callAction.Invoke(b == null ? obj as Texture2D : ImageAccess.BytesToTexture2D(b));
+        });
     }
 
     public IEnumerator Load(string path, Action<AudioClip> callAction)
     {
-        yield return
-            StartCoroutine(LoadObject(path,
-                (www, obj) => { callAction.Invoke(www == null ? obj as AudioClip : www.audioClip); }));
+        yield return LoadObject(path, (b, obj) =>
+        {
+            callAction.Invoke(b == null ? obj as AudioClip : AudioAccess.BytesToAudioClip(path));
+        });
     }
 
     public IEnumerator Load(string path, Action<byte[]> callAction)
     {
-        yield return
-            StartCoroutine(LoadObject(path,
-                (www, obj) => { callAction.Invoke(www == null ? (obj as TextAsset).bytes : www.bytes); }));
+        yield return LoadObject(path, (b, obj) =>
+        {
+            callAction.Invoke(b == null ? (obj as TextAsset).bytes : b);
+        });
     }
 
     public IEnumerator Load(string path, Action<string> callAction)
     {
-        yield return
-            StartCoroutine(LoadObject(path,
-                (www, obj) => { callAction.Invoke(www == null ? (obj as TextAsset).text : www.text); }));
+        yield return LoadObject(path, (b, obj) =>
+        {
+            callAction.Invoke(b == null ? (obj as TextAsset).text : Encoding.UTF8.GetString(b));
+        });
     }
 
     public IEnumerator Load(string path, Action<AssetBundle> callAction)
     {
-        yield return StartCoroutine(LoadObject(path,
-            (www, obj) => { callAction.Invoke(www == null ? null : www.assetBundle); }));
+        yield return LoadObject(path, (b, obj) =>
+        {
+            callAction.Invoke(b == null ? null : AssetBundle.LoadFromMemory(b));
+        });
     }
 
-#if !(UNITY_ANDROID || UNITY_IPHONE)
+//#if !(UNITY_ANDROID || UNITY_IPHONE)
 
-    public IEnumerator Load(string path, Action<MovieTexture> callAction)
-    {
-        yield return
-            StartCoroutine(LoadObject(path,
-                (www, obj) => { callAction.Invoke(www == null ? obj as MovieTexture : www.movie); }));
-    }
+//    public IEnumerator Load(string path, Action<MovieTexture> callAction)
+//    {
+//        yield return LoadObject(path, (b, obj) =>
+//        {
+//            callAction.Invoke(b == null ? obj as MovieTexture : b.movie);
+//        });
+//    }
 
-#endif
+//#endif
 
     #endregion
 }

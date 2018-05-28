@@ -35,21 +35,20 @@ namespace encrypt
                     Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
                         .Select(p => p.Replace(root, "").Replace("\\", "/"))
                         .Where(p => Path.GetFileNameWithoutExtension(p).Length == 32)
-                        .ToArray();
+                        .ToList();
 
                 var index = 0;
 
                 var dirRoot = root.Replace(folder, "");
-                foreach (string file in files)
+                files.ForEach(file =>
                 {
                     var path = folder + "/" + file;
-
                     var newPath = "";
                     if (cache.TryGetValue(path, out newPath))
                     {
                         var outPath = dirRoot + newPath;
                         FileHelper.CreateDirectory(outPath);
-                        var p = ((float) (index++)/files.Length).ToString("P") + "\t" + path;
+                        var p = ((float) (index++)/files.Count).ToString("P") + "\t" + path;
                         if (extensionList.Contains(Path.GetExtension(path)))
                         {
                             Console.WriteLine("路径解码中..." + p);
@@ -65,7 +64,7 @@ namespace encrypt
                     {
                         Console.WriteLine("不存在的资源文件！");
                     }
-                }
+                });
             }
         }
 
@@ -87,20 +86,20 @@ namespace encrypt
                 Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
                     .Select(p => p.Replace(root, "").Replace("\\", "/"))
                     .Where(p => Path.GetFileNameWithoutExtension(p).Length != 32)
-                    .ToArray();
+                    .ToList();
 
 
             var index = 0;
-            foreach (string file in files)
+            files.ForEach(file =>
             {
-                Console.WriteLine("路径关系获取中..." + ((float) (index++)/files.Length).ToString("P") + "\t" + file);
+                Console.WriteLine("路径关系获取中..." + ((float)(index++) / files.Count).ToString("P") + "\t" + file);
                 var path = file;
                 var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
                 var fileName = Path.GetFileName(path);
                 var newPath = new Library.MD5().Encrypt(dirName + md5Key) + "/" +
                               new Library.MD5().Encrypt(fileName + md5Key);
                 cache[newPath] = file;
-            }
+            });
 
             return cache;
         }

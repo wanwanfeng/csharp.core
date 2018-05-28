@@ -97,19 +97,11 @@ namespace findText
             }
             else
             {
-                var res =
+                all =
                     Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories)
+                        .Where(p => exName.Contains(Path.GetExtension(p)))
                         .Select(p => p.Replace("\\", "/"))
-                        .ToArray();
-                foreach (var s in exName)
-                {
-                    all.AddRange(res.Where(p =>
-                    {
-                        var xx = Path.GetExtension(p);
-                        return !string.IsNullOrEmpty(xx) && xx == s;
-                    }));
-                }
-                if (all.Count == 0) return;
+                        .ToList();
                 all.Sort();
                 OpenRun();
                 WriteExcel(textName, resJsonData);

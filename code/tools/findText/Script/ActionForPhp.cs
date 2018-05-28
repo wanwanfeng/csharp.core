@@ -78,6 +78,18 @@ namespace findText.Script
                     {
                         val = val.Substring(index + 1);
                     }
+                    //去除最后一个单引号后的
+                    index = val.LastIndexOf("'", StringComparison.Ordinal);
+                    if (index >= 0)
+                    {
+                        val = val.Substring(0, index);
+                    }
+                    //去除第一个单引号前的
+                    index = val.IndexOf("'", StringComparison.Ordinal);
+                    if (index >= 0)
+                    {
+                        val = val.Substring(index + 1);
+                    }
                     GetJsonValue(val, i, k, input);
                 }
             }

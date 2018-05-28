@@ -37,7 +37,7 @@ namespace FileVersion
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");
 
             var targetList =
-                RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", endVersion, svnUrl), true)
+                CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", endVersion, svnUrl))
                     .Where(s => !s.EndsWith("/"))
                     .ToArray();//去除文件夹
 
@@ -50,7 +50,7 @@ namespace FileVersion
                 FileDetailInfo svnFileInfo = new FileDetailInfo()
                 {
                     is_delete = false,
-                    version = res.First().Trim(),
+                    version = res.First().Trim().AsLong(),
                     content_size = res.Skip(2).First().Trim().AsLong(),
                     path = last,
                 };
@@ -81,7 +81,7 @@ namespace FileVersion
                     FileHelper.CreateDirectory(fullPath);
 
                     //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
+                    CmdReadAll(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
                     //RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
 
                     if (File.Exists(fullPath))

@@ -26,16 +26,14 @@ namespace Script
             Console.WriteLine("2:还原");
             Console.WriteLine("----------------------");
             var y = Console.ReadLine();
+
             switch (y)
             {
                 case "1":
                 {
                     guiyi = true;
                     res = Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
-                        .Where(
-                            p =>
-                                p.EndsWith(".png") || p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".psd") ||
-                                p.EndsWith(".bmp") || p.EndsWith(".psd"))
+                        .Where(p => ".png|.jpg|.bmp|.psd|.tga|.tif|.dds".Contains(Path.GetExtension(p)))
                         .Select(p => p.Replace("\\", "/"))
                         .ToList();
                     break;
@@ -74,7 +72,7 @@ namespace Script
                 haha = haha.Replace(root, "");
 
             //唯一文件夹路径
-            string newPath = root + "_merge" + haha.Replace("/", "..");
+            string newPath = root + "_merge/" + haha.Replace("/", "..");
             FileHelper.CreateDirectory(newPath);
             File.Copy(root + haha, newPath, true);
         }

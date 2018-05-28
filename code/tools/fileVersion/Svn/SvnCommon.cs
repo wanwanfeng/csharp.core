@@ -17,12 +17,12 @@ namespace FileVersion
         public string svnUserName { get; protected set; }
         public string svnPassword { get; protected set; }
 
-        public override string[] RunCmd(string input, bool isFile = false)
+        public override string[] CmdReadAll(string input)
         {
             if (string.IsNullOrEmpty(svnUserName) || string.IsNullOrEmpty(svnPassword))
-                return base.RunCmd(input, isFile);
+                return base.CmdReadAll(input);
             string newInput = string.Format("{0} --username {1} --password {2}", input, svnUserName, svnPassword);
-            return base.RunCmd(newInput, isFile);
+            return base.CmdReadAll(newInput);
         }
 
         public SvnCommon()
@@ -36,7 +36,7 @@ namespace FileVersion
             Console.WriteLine("--------------------------------------");
 
             StartCmd();
-            softwareVersion = RunCmd("svn --version --quiet").Last();
+            softwareVersion = CmdReadAll("svn --version --quiet").Last();
             isInstall = softwareVersion.Replace(".", "").AsInt() != 0;
             if (isInstall)
                 Console.WriteLine("SVN版本：" + softwareVersion);
@@ -66,7 +66,7 @@ namespace FileVersion
                             break;
                         }
                     }
-                    svnUrl = RunCmd("svn info --show-item url").Last();
+                    svnUrl = CmdReadAll("svn info --show-item url").Last();
                     svnUrl += "/" + folder;
                 }
                 else
@@ -77,11 +77,11 @@ namespace FileVersion
                 Console.WriteLine("库地址：" + svnUrl);
 
                 Console.WriteLine("");
-                highVersion = RunCmd("svn info --show-item last-changed-revision " + svnUrl).Last().AsInt();
+                highVersion = CmdReadAll("svn info --show-item last-changed-revision " + svnUrl).Last().AsInt();
                 Console.WriteLine("最高版本号：" + highVersion);
 
                 var logs =
-                    RunCmd(string.Format("svn log -r 0:{0} \"{1}@{0}\" -q -l1 --stop-on-copy", highVersion, svnUrl));
+                    CmdReadAll(string.Format("svn log -r 0:{0} \"{1}@{0}\" -q -l1 --stop-on-copy", highVersion, svnUrl));
                 lowVersion = logs.Skip(1).First().Split('|').First().Replace("r", "").Trim().AsInt();
                 Console.WriteLine("最低版本号：" + lowVersion);
             }

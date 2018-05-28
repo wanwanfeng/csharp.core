@@ -24,7 +24,7 @@ namespace FileVersion
             return;
 
             var targetList =
-                RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", endVersion, gitUrl), true)
+                CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", endVersion, gitUrl))
                     .Where(s => !s.EndsWith("/"))
                     .ToArray(); //去除文件夹
 
@@ -38,7 +38,7 @@ namespace FileVersion
                 FileDetailInfo fileDetailInfo = new FileDetailInfo()
                 {
                     is_delete = false,
-                    version = res.First().Trim(),
+                    version = res.First().Trim().AsLong(),
                     content_size = res.Skip(2).First().Trim().AsLong(),
                     path = last,
                 };
@@ -85,7 +85,7 @@ namespace FileVersion
                     Console.WriteLine();
                     string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + targetDir + "/" + s.Key;
                     FileHelper.CreateDirectory(fullPath);
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, gitUrl, s.Key, fullPath));
+                    CmdReadAll(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, gitUrl, s.Key, fullPath));
 
                     if (File.Exists(fullPath))
                     {

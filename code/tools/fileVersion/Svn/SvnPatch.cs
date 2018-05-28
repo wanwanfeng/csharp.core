@@ -29,7 +29,7 @@ namespace FileVersion
             Console.WriteLine("\n正在获取版本差异信息...");
 
             var targetList =
-                RunCmd(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl), true)
+                CmdReadAll(string.Format("svn diff -r {0}:{1} {2} --summarize", startVersion, endVersion, svnUrl))
                     .Select(Uri.UnescapeDataString)
                     .Where(s => !string.IsNullOrEmpty(s))
                     .Where(s => !s.EndsWith("/"))
@@ -71,13 +71,13 @@ namespace FileVersion
                     FileHelper.CreateDirectory(fullPath);
 
                     //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
-                    RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
+                    CmdReadAll(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
                     if (File.Exists(fullPath))
                     {
                         var array =
-                            RunCmd(string.Format("svn log -r {0}:{3} \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
+                            CmdReadAll(string.Format("svn log -r {0}:{3} \"{1}/{2}@{0}\" -q -l1 --stop-on-copy", endVersion,
                                 svnUrl, s.Key, lowVersion));
-                        s.Value.version = array.Skip(1).First().Split(' ').First().Replace("r", "").Trim();
+                        s.Value.version = array.Skip(1).First().Split(' ').First().Replace("r", "").Trim().AsLong();
                         SetContent(fullPath, s.Value);
                         Console.WriteLine();
                     }

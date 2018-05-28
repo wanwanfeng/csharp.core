@@ -18,12 +18,12 @@ namespace FileVersion
         public string gitUserName { get; protected set; }
         public string gitPassword { get; protected set; }
 
-        public override string[] RunCmd(string input, bool isFile = false)
+        public override string[] CmdReadAll(string input)
         {
             if (string.IsNullOrEmpty(gitUserName) || string.IsNullOrEmpty(gitPassword))
-                return base.RunCmd(input, isFile);
+                return base.CmdReadAll(input);
             string newInput = string.Format("{0} --username {1} --password {2}", input, gitUserName, gitPassword);
-            return base.RunCmd(newInput, isFile);
+            return base.CmdReadAll(newInput);
         }
 
         public GitCommon()
@@ -37,7 +37,7 @@ namespace FileVersion
             Console.WriteLine("--------------------------------------");
 
             StartCmd();
-            softwareVersion = RunCmd("git --version").Last();
+            softwareVersion = CmdReadAll("git --version").Last();
             isInstall = softwareVersion.StartsWith("git");
             if (isInstall)
                 Console.WriteLine("Git版本：" + softwareVersion);
@@ -80,7 +80,7 @@ namespace FileVersion
                     }
                 }
 
-                gitUrl = RunCmd("git remote -v").First().Replace("origin", "").Replace("(fetch)", "").Trim();
+                gitUrl = CmdReadAll("git remote -v").First().Replace("origin", "").Replace("(fetch)", "").Trim();
                 gitUrl += "/" + folder;
             }
             else
@@ -104,7 +104,7 @@ namespace FileVersion
 
             //https://git-scm.com/book/zh/v1/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2
 
-            var logs = RunCmd("git log --reverse --pretty=format:\"%ad,%H\" --date=format:\"%y-%m-%d-%H-%M-%S\" " + gitUrl, true);
+            var logs = CmdReadAll("git log --reverse --pretty=format:\"%ad,%H\" --date=format:\"%y-%m-%d-%H-%M-%S\" " + gitUrl);
             Console.WriteLine("");
 
             int index = 0;

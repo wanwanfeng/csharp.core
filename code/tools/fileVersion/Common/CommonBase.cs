@@ -22,7 +22,6 @@ namespace FileVersion
         /// </summary>
         public string softwareVersion { get; protected set; }
 
-        protected static int PathToMd5Depth { get; private set; }
         protected static string KeyMd5 { get; private set; }
         protected static string Exclude { get; private set; }
         protected static string Platform { get; private set; }
@@ -31,8 +30,6 @@ namespace FileVersion
 
         static CommonBase()
         {
-            PathToMd5Depth = Config.IniReadValue("Config", "pathtomd5depth", "1").Trim().AsInt();
-            PathToMd5Depth = Math.Min(PathToMd5Depth, 2);
             KeyMd5 = Config.IniReadValue("Config", "md5key", "").Trim();
             AES.Key = Config.IniReadValue("Config", "aeskey", "YmbEV0FVzZN/SvKCCoJje/jSpM").Trim();
             AES.Head = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
@@ -91,9 +88,12 @@ namespace FileVersion
         {
             Console.WriteLine("可更新文件总大小为{0}B！", cache.Values.Sum(p => p.content_size).ToString("N"));
             WriteToTxt(targetDir, cache);
+            MakAESEncrypt(targetDir, cache);
+            WriteToTxt(targetDir, cache);
             PathToMd5(folder, targetDir, cache);
-            MakAESEncrypt(folder, targetDir, cache);
+            WriteToTxt(targetDir, cache);
             MakeFolder(folder, targetDir);
+            WriteToTxt(targetDir, cache);
             EndCmd();
         }
 
@@ -144,6 +144,11 @@ namespace FileVersion
                 }
             }
 
+            OutUpdate(cache);
+        }
+
+        protected void OutUpdate(Dictionary<string, FileDetailInfo> cache)
+        {
             var count = cache.Values.Count(p => !p.is_delete);
             if (count == 0)
             {
@@ -176,6 +181,12 @@ namespace FileVersion
             return md5;
         }
 
+        protected string GetPathHash(string path)
+        {
+            return Encrypt.MD5(Path.GetDirectoryName(path) + KeyMd5) + "/" +
+                   Encrypt.MD5(Path.GetFileName(path) + KeyMd5);
+        }
+
         /// <summary>
         /// 路径MD5化
         /// </summary>
@@ -184,92 +195,67 @@ namespace FileVersion
         /// <param name="cache"></param>
         protected void PathToMd5(string dir, string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
-            if (dir == null) return;
-
-            bool yes = SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y";
-
-            string targetMd5Dir;
-            var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
-            DeleteInfo(targetMd5Dir);
-
-            if (!yes) return;
-
-            int index = 0;
-            foreach (var s in cache)
+            if (SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
             {
-                Console.WriteLine();
-                Console.WriteLine("正在转化中...{0}", ((float) (++index)/cache.Count).ToString("P"));
-                Console.WriteLine("is now: {0}", s.Key);
-                Console.WriteLine();
+                if (dir == null) return;
+                string targetMd5Dir;
+                var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
+                DeleteInfo(targetMd5Dir);
 
-                string fullPath = targetDir + "/" + s.Key;
-                string targetFullPath = targetMd5Dir + "/";
-                if (PathToMd5Depth == 0)
+                int index = 0;
+                foreach (var s in cache)
                 {
-                    s.Value.path_hash = Encrypt.MD5(s.Key + KeyMd5);
+                    Console.WriteLine();
+                    Console.WriteLine("正在转化中...{0}", ((float) (++index)/cache.Count).ToString("P"));
+                    Console.WriteLine("is now: {0}", s.Key);
+                    Console.WriteLine();
+
+                    string fullPath = targetDir + "/" + s.Key;
+                    string targetFullPath = targetMd5Dir + "/" + GetPathHash(s.Key);
+                    if (!File.Exists(fullPath)) continue;
+                    FileHelper.CreateDirectory(targetFullPath);
+                    File.Copy(fullPath, targetFullPath, true);
                 }
-                else
-                {
-                    var dirD = Path.GetDirectoryName(s.Key);
-                    var nameD = Path.GetFileName(s.Key);
-                    s.Value.path_hash = Encrypt.MD5(dirD + KeyMd5);
-                    s.Value.path_hash += "/";
-                    s.Value.path_hash += Encrypt.MD5(nameD + KeyMd5);
-                }
-                targetFullPath += s.Value.path_hash;
-                if (!File.Exists(fullPath)) continue;
-                FileHelper.CreateDirectory(targetFullPath);
-                File.Copy(fullPath, targetFullPath, true);
+
+                DeleteInfo(targetDir);
+                WriteToTxt(targetMd5Dir, cache);
             }
-
-            DeleteInfo(targetDir);
-            WriteToTxt(targetMd5Dir, cache);
         }
 
         /// <summary>
         /// 每一个文件进行加密
         /// </summary>
-        /// <param name="dir"></param>
         /// <param name="targetDir"></param>
         /// <param name="cache"></param>
-        protected void MakAESEncrypt(string dir, string targetDir, Dictionary<string, FileDetailInfo> cache)
+        protected void MakAESEncrypt(string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
-            if (dir == null) return;
-            bool yes = SystemExtensions.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y";
-            if (!yes) return;
-
-            string targetMd5Dir;
-            var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
-
-            int index = 0;
-            foreach (var s in cache)
+            if (SystemExtensions.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y")
             {
-                Console.Clear();
-                Console.WriteLine("\n正在加密文件...");
-                Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
-                Console.WriteLine("正在加密中...{0}", ((float) (++index)/cache.Count).ToString("P"));
-                Console.WriteLine("is now: {0}", s.Key);
-                Console.WriteLine();
+                int index = 0;
+                foreach (var s in cache)
+                {
+                    Console.Clear();
+                    Console.WriteLine("\n正在加密文件...");
+                    Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
+                    Console.WriteLine("正在加密中...{0}", ((float) (++index)/cache.Count).ToString("P"));
+                    Console.WriteLine("is now: {0}", s.Key);
+                    Console.WriteLine();
 
-                string fullPath = "";
-                if (!isHaveMd5Dir)
-                    fullPath = targetDir + "/" + s.Key;
-                else
-                    fullPath = targetMd5Dir + "/" + s.Value.path_hash;
-                if (!File.Exists(fullPath)) continue;
+                    string fullPath = targetDir + "/" + s.Key;
+                    if (!File.Exists(fullPath)) continue;
 
-                var array = EncryptExclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-                if (array.Contains(Path.GetExtension(s.Key))) continue;
+                    var array = EncryptExclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                    if (array.Contains(Path.GetExtension(s.Key))) continue;
 
-                array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-                if (array.Any(p => s.Key.StartsWith(p))) continue;
+                    array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                    if (array.Any(p => s.Key.StartsWith(p))) continue;
 
-                var content = Encrypt.AES(File.ReadAllText(fullPath));
-                s.Value.encrypt_hash = Encrypt.MD5(content);
-                s.Value.encrypt_size = new System.IO.FileInfo(fullPath).Length;
-                File.WriteAllText(fullPath, content);
+                    var content = Encrypt.AES(File.ReadAllText(fullPath));
+                    s.Value.encrypt_hash = Encrypt.MD5(content);
+                    s.Value.encrypt_size = content.Length;
+                    File.WriteAllText(fullPath, content);
+                }
             }
-            WriteToTxt(!isHaveMd5Dir ? targetDir : targetMd5Dir, cache);
         }
 
         /// <summary>

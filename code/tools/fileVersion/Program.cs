@@ -63,7 +63,7 @@ SvnList [输入sl]
                     commonBase.Run();
 
                 Console.Clear();
-            } while (SystemExtensions.Continue("按y键继续,按其余键退出......"));
+            } while (SystemExtensions.ContinueY("按y键继续,按其余键退出......"));
         }
 
 

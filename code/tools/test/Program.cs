@@ -48,8 +48,8 @@ namespace test
                             break;
                     }
 
-                } while (SystemExtensions.Continue());
-            } while (SystemExtensions.Continue());
+                } while (SystemExtensions.ContinueY());
+            } while (SystemExtensions.ContinueY());
 
 
             //FileInfo fileInfo = new FileInfo("TextFile");

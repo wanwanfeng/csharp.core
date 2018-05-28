@@ -14,9 +14,8 @@ namespace FileVersion
             base.Run();
 
             var beforeTip = string.Format("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = SystemExtensions.GetInputStr(beforeTip).AsInt();
-            endVersion = Math.Max(endVersion, lowVersion);
-            endVersion = Math.Max(endVersion, lowVersion);
+            endVersion = SystemExtensions.GetInputStr(beforeTip,"",lowVersion.ToString()).AsInt();
+            endVersion = Math.Min(endVersion, highVersion);
             Console.WriteLine("目标版本号：" + endVersion);
             Console.WriteLine();
             Console.WriteLine("\n正在获取目标版本号文件详细信息...");

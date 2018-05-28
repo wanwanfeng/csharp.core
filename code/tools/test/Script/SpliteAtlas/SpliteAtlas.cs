@@ -20,7 +20,7 @@ namespace Script
         /// </summary>
         public SpliteAtlas()
         {
-            cmd = SystemExtensions.GetInputStr("图集拆解(y)，图集合并(n)，文件夹删除(d):");
+            cmd = SystemExtensions.GetInputStr("图集拆解(y)，图集合并(n)，文件夹删除(d):", "","y");
             root = SystemExtensions.GetInputStr("请拖入选定（文件夹或文件）:");
 
             List<string> res = new List<string>();
@@ -76,9 +76,6 @@ namespace Script
                         Directory.Delete(dir, true);
                     break;
                 }
-                default:
-                    Environment.Exit(0);
-                    break;
             }
         }
 

@@ -67,8 +67,6 @@ namespace encrypt
                     }
                 }
             }
-            Console.WriteLine("按任意键结束!");
-            Console.ReadKey();
         }
 
         private Dictionary<string, string> GetCache(string md5Key)

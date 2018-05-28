@@ -12,39 +12,45 @@ namespace test
     {
         private static void Main(string[] args)
         {
-            
-            Console.WriteLine("-------cmd list-------");
-            Console.WriteLine("1:CompareFolder");
-            Console.WriteLine("2:ImageFind");
-            Console.WriteLine("3:CopyToOneFolder");
-            Console.WriteLine("4:CreatePhotoDir");
-            Console.WriteLine("5:CreateExcelCell");
-            Console.WriteLine("6:SpliteAtlas");
-            Console.WriteLine("----------------------");
-
-            switch (SystemExtensions.GetInputStr())
+            do
             {
-                case "1":
-                    new CompareFolder();
-                    break;
-                case "2":
-                    new ImageFind();
-                    break;
-                case "3":
-                    new CopyToOneFolder();
-                    break;
-                case "4":
-                    new CreatePhotoDir();
-                    break;
-                case "5":
-                    new CreateExcelCell();
-                    break;
-                case "6":
-                    new SpliteAtlas();
-                    break;
-            }
-            Console.ReadKey();
-            return;
+                Console.WriteLine("-------cmd list-------");
+                Console.WriteLine("1:CompareFolder");
+                Console.WriteLine("2:ImageFind");
+                Console.WriteLine("3:CopyToOneFolder");
+                Console.WriteLine("4:CreatePhotoDir");
+                Console.WriteLine("5:CreateExcelCell");
+                Console.WriteLine("6:SpliteAtlas");
+                Console.WriteLine("----------------------");
+
+                var cmd = SystemExtensions.GetInputStr();
+                do
+                {
+                    switch (cmd)
+                    {
+                        case "1":
+                            new CompareFolder();
+                            break;
+                        case "2":
+                            new ImageFind();
+                            break;
+                        case "3":
+                            new CopyToOneFolder();
+                            break;
+                        case "4":
+                            new CreatePhotoDir();
+                            break;
+                        case "5":
+                            new CreateExcelCell();
+                            break;
+                        case "6":
+                            new SpliteAtlas();
+                            break;
+                    }
+
+                } while (SystemExtensions.Continue());
+            } while (SystemExtensions.Continue());
+
 
             //FileInfo fileInfo = new FileInfo("TextFile");
             //Console.WriteLine("ex:{0}", fileInfo.Extension);

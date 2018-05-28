@@ -26,16 +26,20 @@ namespace findText
             Console.WriteLine("e:退出");
             Console.WriteLine("----------------------");
 
-            switch (SystemExtensions.GetInputStr())
+            var cmd = SystemExtensions.GetInputStr();
+            do
             {
-                case "1":
-                    baseActionFor.Open(SystemExtensions.GetInputStr("input dir path:"));
-                    break;
-                case "2":
-                    baseActionFor.Revert(SystemExtensions.GetInputStr("iinput file path (*.xlsx):"));
-                    break;
-            }
-            Console.ReadKey();
+                switch (cmd)
+                {
+                    case "1":
+                        baseActionFor.Open(SystemExtensions.GetInputStr("input dir path:"));
+                        break;
+                    case "2":
+                        baseActionFor.Revert(SystemExtensions.GetInputStr("iinput file path (*.xlsx):"));
+                        break;
+                }
+                Console.ReadKey();
+            } while (SystemExtensions.Continue());
         }
     }
 }

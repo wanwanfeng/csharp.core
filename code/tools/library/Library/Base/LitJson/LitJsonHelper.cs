@@ -38,6 +38,11 @@ namespace Library.LitJson
 
         public static List<List<object>> ConvertJsonToList(string content, Func<string, string> func = null)
         {
+            if (string.IsNullOrEmpty(content))
+            {
+                return new List<List<object>>();
+            }
+
             JsonData[] jsonDatas = JsonMapper.ToObject<JsonData[]>(content.Trim().Trim('\0'));
 
             //获取key集合

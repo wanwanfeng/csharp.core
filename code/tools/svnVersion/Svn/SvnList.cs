@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FileVersion;
 using Library;
 using Library.Extensions;
 using Library.Helper;
@@ -20,12 +21,12 @@ namespace SvnVersion
             get { return SaveDir + highRevision + "/c_resource.json"; }
         }
 
-        public override string[] RunCmd(string input, bool isFile = false)
+        public override string[] CmdReadAll(string input)
         {
             if (string.IsNullOrEmpty(svnUserName) || string.IsNullOrEmpty(svnPassword))
-                return base.RunCmd(input, isFile);
+                return base.CmdReadAll(input);
             string newInput = string.Format("{0} --username {1} --password {2}", input, svnUserName, svnPassword);
-            return base.RunCmd(newInput, isFile);
+            return base.CmdReadAll(newInput);
         }
 
         public SvnList()
@@ -39,7 +40,7 @@ namespace SvnVersion
             Console.WriteLine("--------------------------------------");
 
             StartCmd();
-            softwareVersion = RunCmd("svn --version --quiet").Last();
+            softwareVersion = CmdReadAll("svn --version --quiet").Last();
             isInstall = softwareVersion.Replace(".", "").AsInt() != 0;
             if (isInstall)
                 Console.WriteLine("SVN版本：" + softwareVersion);
@@ -54,11 +55,13 @@ namespace SvnVersion
                 svnUrl += svnUrl.EndsWith("/") ? "" : "/";
                 Console.WriteLine("库地址：" + svnUrl);
 
+                SaveDir = Path.GetDirectoryName(svnUrl).AsStringArray('\\').Last() + "/";
+
                 Console.WriteLine("");
-                highVersion = RunCmd("svn info --show-item last-changed-revision " + svnUrl).Last().AsInt();
+                highVersion = CmdReadAll("svn info --show-item last-changed-revision " + svnUrl).Last().AsInt();
                 Console.WriteLine("最高版本号：" + highVersion);
 
-                var logs = RunCmd(string.Format("svn log -r 0:{0} \"{1}@{0}\" -q -l2 --stop-on-copy", highVersion, svnUrl));
+                var logs = CmdReadAll(string.Format("svn log -r 0:{0} \"{1}@{0}\" -q -l2 --stop-on-copy", highVersion, svnUrl));
                 lowVersion = logs.Skip(1).First().Split('|').First().Replace("r", "").Trim().AsInt();
                 Console.WriteLine("最低版本号：" + lowVersion);
                 Console.WriteLine("");
@@ -142,7 +145,7 @@ namespace SvnVersion
                     FileHelper.CreateDirectory(fullPath);
 
                     //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
-                    RunCmd(string.Format("svn cat -r {0} \"{1}{2}@{0}\">\"{3}\"", highRevision, svnUrl, pair.Key,
+                    CmdReadAll(string.Format("svn cat -r {0} \"{1}{2}@{0}\">\"{3}\"", highRevision, svnUrl, pair.Key,
                         fullPath));
                     //RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
 
@@ -168,7 +171,7 @@ namespace SvnVersion
             Console.WriteLine("\n正在获取目标版本号{0}文件详细信息...", version);
 
             var targetList =
-                RunCmd(string.Format("svn list -r {0} {1}@{0} -R -v", version, svnUrl), true)
+                CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", version, svnUrl))
                     .Where(s => !s.EndsWith("/"))
                     .ToArray(); //去除文件夹
 

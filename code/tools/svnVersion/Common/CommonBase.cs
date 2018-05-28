@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FileVersion;
 using Library;
 using Library.Extensions;
 using Library.Helper;
@@ -53,10 +54,7 @@ namespace SvnVersion
             Console.WriteLine("--------------------------------------");
         }
 
-        public string SaveDir
-        {
-            get { return "Version/"; }
-        }
+        public string SaveDir { get; set; }
 
         public virtual string SaveName
         {
@@ -142,35 +140,6 @@ namespace SvnVersion
         }
 
         /// <summary>
-        /// 路径MD5化
-        /// </summary>
-        /// <param name="cache"></param>
-        protected void PathToMd5(Dictionary<string, FileDetailInfo> cache)
-        {
-            if (SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
-            {
-                int index = 0;
-                foreach (var s in cache)
-                {
-                    Console.Clear();
-                    Console.WriteLine();
-                    Console.WriteLine("正在转化中...{0}", ((float) (++index)/cache.Count).ToString("P"));
-                    Console.WriteLine("is now: {0}", s.Key);
-                    Console.WriteLine();
-
-                    string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
-                                       s.Value.revision;
-                    string fullPath = targetDir + "/" + s.Key;
-                    string targetFullPath = targetDir + "/" + GetPathHash(s.Key);
-
-                    if (!File.Exists(fullPath)) continue;
-                    FileHelper.CreateDirectory(targetFullPath);
-                    File.Copy(fullPath, targetFullPath, true);
-                }
-            }
-        }
-
-        /// <summary>
         /// 每一个文件进行加密
         /// </summary>
         /// <param name="cache"></param>
@@ -205,6 +174,35 @@ namespace SvnVersion
                     pair.Value.encrypt_hash = Encrypt.MD5(content);
                     pair.Value.encrypt_size = content.Length;
                     File.WriteAllText(fullPath, content);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 路径MD5化
+        /// </summary>
+        /// <param name="cache"></param>
+        protected void PathToMd5(Dictionary<string, FileDetailInfo> cache)
+        {
+            if (SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
+            {
+                int index = 0;
+                foreach (var s in cache)
+                {
+                    Console.Clear();
+                    Console.WriteLine();
+                    Console.WriteLine("正在转化中...{0}", ((float)(++index) / cache.Count).ToString("P"));
+                    Console.WriteLine("is now: {0}", s.Key);
+                    Console.WriteLine();
+
+                    string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
+                                       s.Value.revision;
+                    string fullPath = targetDir + "/" + s.Key;
+                    string targetFullPath = targetDir + "/" + GetPathHash(s.Key);
+
+                    if (!File.Exists(fullPath)) continue;
+                    FileHelper.CreateDirectory(targetFullPath);
+                    File.Copy(fullPath, targetFullPath, true);
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace SvnVersion
                 if (commonBase.isInstall)
                     commonBase.Run();
 
-            } while (SystemExtensions.ContinueY("按y键继续,按其余键退出......"));
+            } while (SystemExtensions.ContinueY("按任意键继续，e键退出......"));
         }
     }
 }

@@ -137,7 +137,7 @@ namespace Library.Extensions
         public static bool AsBool(this string value, bool def = false)
         {
             var v = false;
-            return bool.TryParse(value, out v) ? v : def;
+            return bool.TryParse(value.ToLower(), out v) ? v : def;
         }
 
         /// <summary>

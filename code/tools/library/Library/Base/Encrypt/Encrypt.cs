@@ -204,8 +204,13 @@ namespace Library
         public override string Encrypt(string toE)
         {
             if (string.IsNullOrEmpty(toE)) return toE;
-            if (!string.IsNullOrEmpty(Head) && toE.Substring(toE.Length - Head.Length, Head.Length) == Head)
-                return toE;
+            if (!string.IsNullOrEmpty(Head))
+                if (toE.Length > Head.Length)
+                    //已经加密
+                    if (toE.Substring(toE.Length - Head.Length, Head.Length) == Head)
+                        return toE;
+
+
             byte[] toEncryptArray = DefaultEncoding.GetBytes(toE);
 
             //加密和解密采用相同的key,具体自己填，但是必须为32位//
@@ -232,7 +237,10 @@ namespace Library
         public string Dencrypt(string toD)
         {
             if (string.IsNullOrEmpty(toD)) return toD;
-            if (!string.IsNullOrEmpty(Head) && toD.Substring(toD.Length - Head.Length, Head.Length) != Head)
+            if (!string.IsNullOrEmpty(Head))
+                if (toD.Length > Head.Length)
+                    //已经解密
+                    if (toD.Substring(toD.Length - Head.Length, Head.Length) != Head)
                 return toD;
             toD = toD.Substring(0, toD.Length - Head.Length);
             byte[] toEncryptArray = Convert.FromBase64String(toD);

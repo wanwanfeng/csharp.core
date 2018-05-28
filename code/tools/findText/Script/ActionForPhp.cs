@@ -7,16 +7,20 @@ namespace findText.Script
 {
     public class ActionForPhp : BaseActionFor
     {
-        //public override string regexStr
-        //{
-        //    get
-        //    {
-        //        return
-        //            //"[\u2E80-\u9FFF]"
-        //            "^[\u4e00-\u9fa5]"
-        //            ;
-        //    }
-        //}
+        public override string regexStr
+        {
+            get
+            {
+                return
+                    //"\"([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.*\")|(\".*[\u30A0-\u30FF]+)|([\u30A0-\u30FF])\""
+                    //"([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])"
+                    //"/u0800-/u4e00"
+                    //"[\u{2E80}-\u{9FFF}]+/u"
+                    "[\u2E80-\u9FFF]+"
+                    ;
+            }
+        }
+
 
         protected override string textName
         {

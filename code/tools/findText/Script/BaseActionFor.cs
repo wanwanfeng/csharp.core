@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using findText.Script;
 using Library.Excel;
 using Library.Extensions;
-using Library.Helper;
 using Library.LitJson;
 using LitJson;
 

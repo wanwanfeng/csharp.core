@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Library.Extensions;
 
 namespace FileVersion
 {
@@ -13,7 +14,7 @@ namespace FileVersion
         {
             // 添加程序集解析事件
             AppDomain.CurrentDomain.AssemblyResolve += (sender, assembly) => LoadFromResource(assembly.Name);
-            
+
 
             while (isRuning)
             {
@@ -32,10 +33,8 @@ SvnList [输入sl]
 //3,GitUpdate [输入gl]
 //";
                 Console.WriteLine(mes);
-                Console.Write("请输入选择，然后回车：");
                 CommonBase commonBase = null;
-                var haha = Console.ReadLine();
-                switch (haha)
+                switch (SystemExtensions.GetInputStr("请输入选择，然后回车："))
                 {
                     case "sm":
                         commonBase = new SvnMaster();
@@ -63,8 +62,8 @@ SvnList [输入sl]
                 if (commonBase == null) return;
                 if (commonBase.isInstall)
                     commonBase.Run();
-                Console.WriteLine("按y键继续,按其余键退出......");
-                isRuning = Console.ReadLine() == "y";
+
+                isRuning = SystemExtensions.GetInputStr("\n按y键继续,按其余键退出......", "", "y") == "y";
                 Console.Clear();
             }
         }

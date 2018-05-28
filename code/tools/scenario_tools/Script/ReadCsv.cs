@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Library.Excel;
+using Library.Extensions;
 using LitJson;
 
 namespace scenario_tools
@@ -12,7 +13,7 @@ namespace scenario_tools
     {
         public ReadCsv()
         {
-            var path = Console.ReadLine() ?? @"D:\Work\yuege\www\assets\res\scenario";
+            var path = SystemExtensions.GetInputStr("请输入剧情CSV目录：", "", @"D:\Work\yuege\www\assets\res\scenario");
             var files = Directory.GetFiles(path, "*.txt").ToList();
             files.Sort();
 

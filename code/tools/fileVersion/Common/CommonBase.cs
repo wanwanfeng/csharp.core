@@ -81,6 +81,7 @@ namespace FileVersion
         public long lowVersion { get; protected set; }
         public long startVersion { get; protected set; }
         public long endVersion { get; protected set; }
+
         public virtual void Run()
         {
 
@@ -187,8 +188,8 @@ namespace FileVersion
         protected void PathToMd5(string dir, string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
             if (dir == null) return;
-            Console.Write("\n是否将路径MD5化（y/n）：");
-            bool yes = Console.ReadLine() == "y";
+
+            bool yes = SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y";
 
             string targetMd5Dir;
             var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
@@ -237,8 +238,7 @@ namespace FileVersion
         protected void MakAESEncrypt(string dir, string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
             if (dir == null) return;
-            Console.Write("\n是否对文件夹内每个文件进行加密（y/n）：");
-            bool yes = Console.ReadLine() == "y";
+            bool yes = SystemExtensions.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y";
             if (!yes) return;
 
             string targetMd5Dir;
@@ -283,8 +283,7 @@ namespace FileVersion
         protected void MakeFolder(string dir, string targetDir)
         {
             if (dir == null) return;
-            Console.Write("\n是否将文件夹压缩（y/n）：");
-            bool yes = Console.ReadLine() == "y";
+            bool yes = SystemExtensions.GetInputStr("\n是否将文件夹压缩（y/n）：", "", "y") == "y";
             if (!yes) return;
 
             string targetMd5Dir;
@@ -355,15 +354,15 @@ namespace FileVersion
         /// </summary>
         protected void UpdatePathList()
         {
-            var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory.Replace("\\","/") + "/" + SaveDir, "*-*-*-*");
+            var array = Directory.GetFileSystemEntries(Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir,
+                "*-*-*-*");
             if (array.Length == 0) return;
             var dic = array.ToLookup(Path.GetFileNameWithoutExtension)
                 .ToDictionary(p => p.Key, q => new List<string>(q));
             if (dic.Count == 0) return;
             List<FilePatchInfo> svnPatchInfos = new List<FilePatchInfo>();
 
-            Console.Write("\n是否对文件进行加密（y/n），然后回车：");
-            bool yes = Console.ReadLine() == "y";
+            bool yes = SystemExtensions.GetInputStr("\n是否对文件进行加密（y/n），然后回车：", "", "y") == "y";
 
             foreach (KeyValuePair<string, List<string>> pair in dic)
             {

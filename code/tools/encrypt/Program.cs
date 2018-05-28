@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Library.Extensions;
 
 namespace encrypt
 {
@@ -19,8 +20,7 @@ namespace encrypt
             Console.WriteLine("2;解密");
             Console.WriteLine("---------------------------");
 
-            Console.Write("输入指令：");
-            var cmd = Console.ReadLine() ?? "e";
+            var cmd = SystemExtensions.GetInputStr("输入指令：");
             switch (cmd)
             {
                 case "1":
@@ -30,7 +30,6 @@ namespace encrypt
                     new YueGeDencrypt();
                     break;
             }
-            Environment.Exit(0);
             return;
 
             var list = new[,]

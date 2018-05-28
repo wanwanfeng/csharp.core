@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Library.Extensions;
 using Script;
 
 namespace test
@@ -11,7 +12,7 @@ namespace test
     {
         private static void Main(string[] args)
         {
-            string cmd;
+            
             Console.WriteLine("-------cmd list-------");
             Console.WriteLine("1:CompareFolder");
             Console.WriteLine("2:ImageFind");
@@ -20,11 +21,8 @@ namespace test
             Console.WriteLine("5:CreateExcelCell");
             Console.WriteLine("6:SpliteAtlas");
             Console.WriteLine("----------------------");
-            Console.WriteLine("e:exit");
-            Console.Write("input：");
-            cmd = Console.ReadLine() ?? "e";
 
-            switch (cmd)
+            switch (SystemExtensions.GetInputStr())
             {
                 case "1":
                     new CompareFolder();
@@ -43,9 +41,6 @@ namespace test
                     break;
                 case "6":
                     new SpliteAtlas();
-                    break;
-                case "e":
-                default:
                     break;
             }
             Console.ReadKey();

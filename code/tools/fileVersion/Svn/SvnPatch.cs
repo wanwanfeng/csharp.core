@@ -13,13 +13,13 @@ namespace FileVersion
         {
             base.Run();
 
-            Console.Write("请输入起始版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            startVersion = Console.ReadLine().AsLong();
+            var msg = string.Format("请输入起始版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
+            startVersion = SystemExtensions.GetInputStr(msg).AsLong();
             startVersion = Math.Max(startVersion, lowVersion);
             Console.WriteLine("起始版本号：" + startVersion);
 
-            Console.Write("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = Console.ReadLine().AsLong();
+            msg = string.Format("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
+            endVersion = SystemExtensions.GetInputStr(msg).AsLong();
             endVersion = Math.Min(endVersion, highVersion);
             endVersion = Math.Max(endVersion, startVersion);
             Console.WriteLine("结束版本号：" + endVersion);

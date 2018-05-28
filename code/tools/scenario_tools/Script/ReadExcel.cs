@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Library.Excel;
+using Library.Extensions;
 using Library.Helper;
 using Library.LitJson;
 using LitJson;
@@ -15,7 +16,7 @@ namespace scenario_tools
 
         public ReadExcel()
         {
-            path = Console.ReadLine() ?? @"D:\Work\yuege\www\assets\res\scenario.xls";
+            path = SystemExtensions.GetInputStr("请输入剧情目录（.xls）：", "", @"D:\Work\yuege\www\assets\res\scenario.xls");
             var dic = new ExcelByReader().ReadFromExcels(path);
 
             Dictionary<string, List<JsonData>> dicT = new Dictionary<string, List<JsonData>>();

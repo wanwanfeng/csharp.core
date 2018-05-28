@@ -14,24 +14,21 @@ using LitJson;
 
 namespace findText
 {
-    public enum ConvertType
-    {
-        [TypeValue(typeof (ActionForCpp))] cpp,
-        [TypeValue(typeof (ActionForCSharp))] csharp,
-        [TypeValue(typeof (ActionForPhp))] php,
-        [TypeValue(typeof (ActionForJava))] java,
-        [TypeValue(typeof (ActionForJavaScript))] javascript,
-        [TypeValue(typeof (ActionForHtml))] html,
-    }
-
     public abstract class BaseActionFor
     {
 
-        protected static Regex regex = new Regex(
-            //"\"([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.*\")|(\".*[\u30A0-\u30FF]+)|([\u30A0-\u30FF])\""
-            "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])"
-            //regexStr = "/u0800-/u4e00"
-            );
+        protected Regex regex { get; set; }
+
+        public virtual string regexStr
+        {
+            get
+            {
+                return //"\"([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.*\")|(\".*[\u30A0-\u30FF]+)|([\u30A0-\u30FF])\""
+                    "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])"
+                    //regexStr = "/u0800-/u4e00"
+                    ;
+            }
+        }
 
         private JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
         {
@@ -63,11 +60,16 @@ namespace findText
             });
         }
 
-        private void WriteExcel(string fileName, JsonData resJsonData)
+        private void WriteExcel(JsonData resJsonData)
         {
+            List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
+            if (vals.Count == 0)
+            {
+                Console.WriteLine("未搜索到结果！");
+                return;
+            }
             Console.WriteLine("正在写入Excel...");
             string outpath = inputPath + ".xls";
-            List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
             new ExcelByNpoi().WriteToExcel(outpath, vals);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);
@@ -103,8 +105,9 @@ namespace findText
                         .Select(p => p.Replace("\\", "/"))
                         .ToList();
                 all.Sort();
+                regex = new Regex(regexStr);
                 OpenRun();
-                WriteExcel(textName, resJsonData);
+                WriteExcel(resJsonData);
             }
         }
 

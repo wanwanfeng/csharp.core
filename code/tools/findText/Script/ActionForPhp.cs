@@ -7,6 +7,17 @@ namespace findText.Script
 {
     public class ActionForPhp : BaseActionFor
     {
+        //public override string regexStr
+        //{
+        //    get
+        //    {
+        //        return
+        //            //"[\u2E80-\u9FFF]"
+        //            "^[\u4e00-\u9fa5]"
+        //            ;
+        //    }
+        //}
+
         protected override string textName
         {
             get { return "Find_Php_Text"; }
@@ -23,29 +34,30 @@ namespace findText.Script
             {
                 string[] input = GetShowInfo(i);
 
-                bool isTrue = false;
+                bool isNewLine = false;
 
                 for (int k = 0; k < input.Length; k++)
                 {
-                    if (isTrue) continue;
                     var val = input[k];
+                    if (val.TrimStart().EndsWith("*/"))
+                    {
+                        if (val.Contains("/*") == false)
+                            isNewLine = false;
+                        continue;
+                    }
+                    //跨行注释
+                    if (val.TrimStart().StartsWith("/*"))
+                    {
+                        if (val.Contains("*/") == false)
+                            isNewLine = true;
+                        continue;
+                    }
+                    if (isNewLine) continue;
+
                     if (val.TrimStart().StartsWith("#")) continue;
                     if (val.TrimStart().StartsWith("@brief ")) continue;
                     if (val.TrimStart().StartsWith("///")) continue;
                     if (val.TrimStart().StartsWith("//")) continue;
-                    //跨行注释
-                    if (val.TrimStart().StartsWith("/*"))
-                    {
-                        if (!val.Contains("*/"))
-                            isTrue = true;
-                        continue;
-                    }
-                    if (val.TrimStart().EndsWith("*/"))
-                    {
-                        if (!val.Contains("/*"))
-                            isTrue = false;
-                        continue;
-                    }
                     if (val.TrimStart().StartsWith("*")) continue;
 
                     MatchCollection mc = regex.Matches(val);

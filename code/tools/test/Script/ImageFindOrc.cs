@@ -31,10 +31,11 @@ namespace Script
 
         public ImageFindOrc()
         {
+            var eList = ".png|.jpg|.bmp|.psd|.tga|.tif|.dds".AsStringArray('|').ToList();
             var res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
                 //.Where(p => p.Contains("cocos_Data"))
                 //.Where(p => p.Contains("Resources"))
-                .Where(p => p.EndsWith("png") || p.EndsWith("jpg"))
+                .Where(p => eList.Contains(Path.GetExtension(p)))
                 .Select(p => p.Replace("\\", "/"))
                 .ToList();
             res.Sort();

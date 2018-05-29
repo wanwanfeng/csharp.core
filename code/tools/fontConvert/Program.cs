@@ -11,8 +11,8 @@ namespace fontConvert
         [TypeValue(typeof (ActionByDLL.ToSimplified))] ToSimplified_Dll,
         [TypeValue(typeof (ActionByArray.ToTraditional))] ToTraditional_Array,
         [TypeValue(typeof (ActionByArray.ToSimplified))] ToSimplified_Array,
-        [TypeValue(typeof (ActionByVB.ToTraditional))] ToTraditional_VB,
-        [TypeValue(typeof (ActionByVB.ToSimplified))] ToSimplified_VB,
+        //[TypeValue(typeof (ActionByVB.ToTraditional))] ToTraditional_VB,
+        //[TypeValue(typeof (ActionByVB.ToSimplified))] ToSimplified_VB,
     }
 
     internal class Program

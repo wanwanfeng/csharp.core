@@ -24,14 +24,14 @@ namespace Library.Excel
     {
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
         {
-            var dt = ExcelToTable(filename);
+            var dt = ExcelToDataTable(filename);
             return dt.ToDictionary(p => p.TableName, q=>ConvertDataTableToList(q));
         }
 
         public override void WriteToExcel(string filename, List<List<object>> vals)
         {
             var dt = ConvertListToDataTable(vals);
-            TableToExcel(filename, dt);
+            DataTableToExcel(filename, dt);
         }
 
         public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
@@ -43,7 +43,7 @@ namespace Library.Excel
                 dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
                 dts.Add(dt);
             }
-            TableToExcel(fileName, dts.ToArray());
+            DataTableToExcel(fileName, dts.ToArray());
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <returns></returns>
-        private static List<DataTable> ExcelToTable(string file)
+        public static List<DataTable> ExcelToDataTable(string file)
         {
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -128,7 +128,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="file">导出路径(包括文件名与扩展名)</param>
         /// <param name="dts"></param>
-        private static void TableToExcel(string file, params DataTable[] dts)
+        public static void DataTableToExcel(string file, params DataTable[] dts)
         {
             IWorkbook workbook;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -197,7 +197,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        private static object GetValueType(ICell cell)
+        protected static object GetValueType(ICell cell)
         {
             if (cell == null)
                 return null;
@@ -218,7 +218,6 @@ namespace Library.Excel
                     return "=" + cell.CellFormula;
             }
         }
-
     }
 }
 

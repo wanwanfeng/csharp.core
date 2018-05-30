@@ -26,11 +26,17 @@ namespace Library.Excel
     public enum CaoType
     {
         CompareExcel = 0,
-        JsonToCsv = 1,
-        JsonToExcel = 2,
-        JsonToOneExcel = 3,
-        ExcelToJson = 4,
-        ExcelToOneExcel = 5,
+        [TypeValue(typeof (ActionJson.ToCsv))] JsonToCsv,
+        [TypeValue(typeof (ActionJson.ToExcel))] JsonToExcel,
+        [TypeValue(typeof (ActionJson.ToOneExcel))] JsonToOneExcel,
+
+        [TypeValue(typeof (ActionExcel.ToCsv))] ExcelToCsv,
+        [TypeValue(typeof (ActionExcel.ToJson))] ExcelToJson,
+        [TypeValue(typeof (ActionExcel.ToOneExcel))] ExcelToOneExcel,
+
+        [TypeValue(typeof (ActionCSV.ToJson))] CsvToJson,
+        [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
+        [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
     }
 
 
@@ -104,180 +110,19 @@ namespace Library.Excel
                 }
                 Console.WriteLine("----------------------------");
 
-                var s = SystemExtensions.GetInputStr("请选择，然后回车：");
-                if (s == null) continue;
-
-                CaoType caoType = (CaoType) Enum.Parse(typeof (CaoType), s);
-                switch (caoType)
+                try
                 {
-                    case CaoType.CompareExcel:
-                        new CompareExcel();
-                        break;
-                    case CaoType.JsonToCsv:
-                        ReadJsonToCsv();
-                        break;
-                    case CaoType.JsonToExcel:
-                        ReadJsonToExcel();
-                        break;
-                    case CaoType.JsonToOneExcel:
-                        ReadJsonToOneExcel();
-                        break;
-                    case CaoType.ExcelToJson:
-                        ReadExcelToJson();
-                        break;
-                    case CaoType.ExcelToOneExcel:
-                        ReadExcelToOneExcel();
-                        break;
-                    default:
-                        Console.Write("不存在的命令！");
-                        break;
+                    var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
+                    CaoType caoType = (CaoType)SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
+                    ActionBase actionBase = (ActionBase)Activator.CreateInstance(cache[caoType]);
                 }
-                GC.Collect();
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                //GC.Collect();
             } while (SystemExtensions.ContinueY());
-        }
-
-        #region Json->
-
-        /// <summary>
-        /// json->csv
-        /// </summary>
-        private static void ReadJsonToCsv()
-        {
-            List<string> files = CheckPath(".json");
-            if (files.Count == 0) return;
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(ExcelClass.ConvertJsonToListByPath(file)));
-            });
-        }
-
-        /// <summary>
-        /// json->xlsx
-        /// </summary>
-        private static void ReadJsonToExcel()
-        {
-            List<string> files = CheckPath(".json");
-            if (files.Count == 0) return;
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                List<List<object>> vals = ExcelClass.ConvertJsonToListByPath(file);
-                new ExcelClass().WriteToExcel(Path.ChangeExtension(file, ".xls"), vals);
-            });
-        }
-
-        /// <summary>
-        /// / json->xlsx
-        /// </summary>
-        private static void ReadJsonToOneExcel()
-        {
-            List<string> files = CheckPath(".json", true);
-            if (files.Count == 0) return;
-
-            var dic = new Dictionary<string, List<List<object>>>();
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                dic[file] = ExcelClass.ConvertJsonToListByPath(file);
-            });
-            new ExcelClass().WriteToOneExcel(InputPath + ".xlsx", dic);
-        }
-
-        #endregion
-
-        #region Excel->
-
-        /// <summary>
-        /// xlsx->json
-        /// </summary>
-        private static void ReadExcelToJson()
-        {
-            List<string> files = CheckPath(".xlsx");
-            if (files.Count == 0) return;
-            ReadExcelToJson(files);
-        }
-
-        private static void ReadExcelToJson(List<string> files)
-        {
-            ExcelClass excel = new ExcelClass();
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                var vals = excel.ReadFromExcels(file);
-
-                if (vals.Count == 1)
-                {
-                    ExcelClass.ConvertListToJsonFile(vals.First(), file);
-                    return;
-                }
-
-                foreach (KeyValuePair<string, List<List<object>>> pair in vals)
-                {
-                    string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key.Replace("$", ""));
-                    FileHelper.CreateDirectory(newPath);
-                    ExcelClass.ConvertListToJsonFile(pair, newPath);
-                }
-            });
-        }
-
-        /// <summary>
-        /// / json->xlsx
-        /// </summary>
-        private static void ReadExcelToOneExcel()
-        {
-            List<string> files = CheckPath(".xlsx", true);
-            if (files.Count == 0) return;
-
-            var dic = new Dictionary<string, List<List<object>>>();
-            files.ForEach(file =>
-            {
-                var vals = new ExcelClass().ReadFromExcels(file);
-
-                if (vals.Count == 1)
-                {
-                    dic[file] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(vals.First())));
-                    return;
-                }
-
-                foreach (KeyValuePair<string, List<List<object>>> pair in vals)
-                {
-                    dic[file + "/" + pair.Key] = ExcelClass.ConvertJsonToList(LitJsonHelper.ToJson(ExcelClass.ConvertListToJson(pair)));
-                }
-
-            });
-            new ExcelClass().WriteToOneExcel(InputPath + ".xlsx", dic);
-        }
-
-
-        #endregion
-
-        private static List<string> CheckPath(string exce, bool isOnlydir = false)
-        {
-            List<string> files = new List<string>();
-
-            string path = SystemExtensions.GetInputStr(isOnlydir ? "请拖入文件夹：" : "请拖入文件夹或文件：", "您选择的文件夹或文件：");
-            if (string.IsNullOrEmpty(path))
-                return files;
-
-            if (Directory.Exists(path))
-            {
-                files = Directory.GetFiles(path).ToList();
-            }
-            else if (File.Exists(path))
-            {
-                files.Add(path);
-            }
-            else
-            {
-                Console.WriteLine("path is not valid!");
-                return files;
-            }
-
-            InputPath = path;
-            files = files.Where(p => p.EndsWith(exce)).ToList();
-            files.Sort();
-            return files;
         }
     }
 }

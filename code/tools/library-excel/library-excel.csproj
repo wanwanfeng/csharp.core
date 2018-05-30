@@ -61,6 +61,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\Base\ExcelByBase.cs" />
+    <Compile Include="Script\Base\ExcelForList.cs" />
+    <Compile Include="Script\Base\ExcelForXml.cs" />
+    <Compile Include="Script\Base\ExcelForCsv.cs" />
+    <Compile Include="Script\Base\ExcelForJson.cs" />
+    <Compile Include="Script\Base\ExcelByBaseCommon.cs" />
     <Compile Include="Script\Base\KillExcel.cs" />
     <Compile Include="Script\ExcelByNpoi.cs" />
     <Compile Include="Script\Extensions\ExcelByNpoiExtensions.cs" />

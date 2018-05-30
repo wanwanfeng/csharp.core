@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using LitJson;
 
@@ -34,6 +35,14 @@ namespace Library.LitJson
         public static string ToJson<T>(T t)
         {
             return JsonMapper.ToJson(t);
+        }
+
+        public static List<List<object>> ConvertJsonToListByPath(string file, Func<string, string> func = null)
+        {
+            if (!File.Exists(file))
+                Ldebug.Log("文件不存在!");
+            string content = File.ReadAllText(file);
+            return ConvertJsonToList(content, func);
         }
 
         public static List<List<object>> ConvertJsonToList(string content, Func<string, string> func = null)

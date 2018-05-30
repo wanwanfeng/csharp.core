@@ -21,7 +21,7 @@ namespace Script
 
             if (Directory.Exists(path))
             {
-                files = Directory.GetFiles(path).ToList();
+                files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
             }
             else if (File.Exists(path))
             {

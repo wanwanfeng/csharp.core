@@ -37,6 +37,7 @@ namespace Library.Excel
         [TypeValue(typeof (ActionCSV.ToJson))] CsvToJson,
         [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
         [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
+        [TypeValue(typeof (ActionCSV.ToKvExcel))] CsvToKvExcel,
     }
 
 
@@ -110,18 +111,19 @@ namespace Library.Excel
                 }
                 Console.WriteLine("----------------------------");
 
-                try
-                {
-                    var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
-                    CaoType caoType = (CaoType)SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
-                    ActionBase actionBase = (ActionBase)Activator.CreateInstance(cache[caoType]);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
+                //try
+                //{
+                var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
+                CaoType caoType = (CaoType) SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
+                //new ActionCSV.ToKvExcel();
+                ActionBase actionBase = (ActionBase) Activator.CreateInstance(cache[caoType]);
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine(e.Message);
+                //}
 
-                //GC.Collect();
+                GC.Collect();
             } while (SystemExtensions.ContinueY());
         }
     }

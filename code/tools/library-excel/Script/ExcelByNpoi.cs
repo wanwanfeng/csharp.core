@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-
+using System.Text.RegularExpressions;
 #if ExcelByNpoi
 
 using NPOI.HSSF.UserModel;
@@ -123,6 +123,8 @@ namespace Library.Excel
             }
         }
 
+        public static Func<ISheet, DataTable, DataTable> OnSheetAction;
+
         /// <summary>
         /// Datable导出成Excel
         /// </summary>
@@ -151,7 +153,7 @@ namespace Library.Excel
 
             foreach (DataTable dt in dts)
             {
-                if (fileExt == ".xls" && dt.Rows.Count>65536)
+                if (fileExt == ".xls" && dt.Rows.Count > 65536)
                 {
                     throw new Exception("数据量过大，请保存为.xlsx");
                 }
@@ -177,7 +179,25 @@ namespace Library.Excel
                         cell.SetCellValue(dt.Rows[i][j].ToString());
                     }
                 }
+                if (OnSheetAction != null)
+                {
+                    if (OnSheetAction.Invoke(sheet, dt) == null)
+                    {
+                        workbook.RemoveSheetAt(workbook.GetSheetIndex(sheet));
+                    }
+                }
+
+                //string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+                //var list = ConvertDataTableToRowsList(dt).Select(p => string.Join("|", p.Cast<string>().ToArray())).Select(p => Regex.IsMatch(p, regex)).ToList();
+                //for (int i = 0; i < list.Count; i++)
+                //{
+                //    var show = list[i];
+                //    sheet.SetColumnHidden(i, !show);
+                //    //if (show)
+                //    //    sheet.SetColumnWidth(0, 200*256 + 200);
+                //}
             }
+
 
             //转为字节数组  
             MemoryStream stream = new MemoryStream();

@@ -3,12 +3,39 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Library.Excel;
 
 namespace Script
 {
     public class ActionCSV : ActionBase
     {
+        public ActionCSV()
+        {
+            ExcelByNpoi.OnSheetAction = (sheet, dt) =>
+            {
+                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+                var list =
+                    ExcelByNpoi.ConvertDataTableToRowsList(dt)
+                        .Select(p => string.Join("|", p.Cast<string>().ToArray()))
+                        .Select(p => Regex.IsMatch(p, regex))
+                        .ToList();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var show = list[i];
+                    sheet.SetColumnHidden(i, !show);
+                    //if (show)
+                    //    sheet.SetColumnWidth(0, 200*256 + 200);
+                }
+
+                if (list.All(p => p == false))
+                {
+                    return null;
+                }
+                return dt;
+            };
+        }
+
         public class ToExcel : ActionCSV
         {
             public ToExcel()
@@ -22,6 +49,7 @@ namespace Script
                     var dt = ExcelByBase.ConvertCsvToDataTable(file);
                     ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(file, ".xls"), dt);
                 });
+                ExcelByNpoi.OnSheetAction = null;
             }
         }
 

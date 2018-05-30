@@ -22,8 +22,7 @@ namespace Library.Excel
             var dic = ReadFromExcels(filename);
             return dic == null
                 ? new KeyValuePair<string, List<List<object>>>()
-                : new KeyValuePair<string, List<List<object>>>(filename,
-                    ReadFromExcels(filename).Values.FirstOrDefault());
+                : new KeyValuePair<string, List<List<object>>>(filename, dic.Values.FirstOrDefault());
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -27,12 +28,8 @@ namespace Script
                     //if (show)
                     //    sheet.SetColumnWidth(0, 200*256 + 200);
                 }
-
-                if (list.All(p => p == false))
-                {
-                    return null;
-                }
-                return dt;
+                //忽略掉不匹配正则的
+                return list.All(p => p == false) ? null : dt;
             };
         }
 
@@ -64,6 +61,7 @@ namespace Script
                     Console.WriteLine(" is now : " + file);
                     //var dt = OpenCSV(file);
                     var dt = ExcelByBase.ConvertCsvToDataTable(file);
+                    //var dt = OpenCSVOledb(file);
                     ExcelByBase.ConvertDataTableToJsonByPath(dt, Path.ChangeExtension(file, ".json"));
                 });
             }
@@ -87,6 +85,65 @@ namespace Script
             }
         }
 
+        public class ToKvExcel : ActionCSV
+        {
+            public ToKvExcel()
+            {
+                ExcelByNpoi.OnSheetAction = null;
+                List<string> files = CheckPath(".csv");
+                if (files.Count == 0) return;
+                var dts = new List<DataTable>();
+                files.ForEach(file =>
+                {
+                    Console.WriteLine(" is now : " + file);
+                    //var dt = OpenCSV(file);
+                    var dt = ExcelByBase.ConvertCsvToDataTable(file);
+                    dt.TableName = file.Replace(InputPath, "");
+                    string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+                    var list = ExcelByBase.ConvertDataTableToRowsList(dt)
+                            .Select(p => string.Join("|", p.Cast<string>().ToArray()))
+                            .Select(p => Regex.IsMatch(p, regex))
+                            .ToList();
+                    //返回符合正则表达式的列
+                    var header =
+                        ExcelByBase.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
+
+                    var resdt = dt.DefaultView.ToTable(false, header.ToArray());
+
+                    //foreach (object o in header.Skip(1))
+                    //{
+                    //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
+                    //}
+                    if (header.Count > 1)
+                        dts.Add(resdt);
+                });
+
+                if (dts.Count==0)
+                    return;
+
+                DataTable dd = new DataTable();
+                dd.Columns.Add("path", typeof (string));
+                dd.Columns.Add("id", typeof (string));
+                dd.Columns.Add("key", typeof(string));
+                dd.Columns.Add("value", typeof (string));
+                foreach (DataTable dataTable in dts)
+                {
+                    var header = ExcelByBase.GetHeaderList(dataTable);
+                    foreach (DataRow dr in dataTable.Rows)
+                    {
+                        foreach (string s in header.Skip(1))
+                        {
+                            List<object> objects = new List<object> {dataTable.TableName, dr[0], s, dr[s]};
+                            dd.Rows.Add(objects.ToArray());
+                        }
+                    }
+                }
+                dd.Columns.Add("value_zh_cn", typeof(string));
+                dd.Columns.Add("value_zh_cw", typeof(string));
+                ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dd);
+            }
+        }
+
 
         public static void SaveCSV(DataTable dt, string fullPath)//table数据写入csv
         {
@@ -95,8 +152,7 @@ namespace Script
             {
                 fi.Directory.Create();
             }
-            FileStream fs = new FileStream(fullPath, FileMode.Create,
-                FileAccess.Write);
+            FileStream fs = new FileStream(fullPath, FileMode.Create,FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
             string data = "";
 
@@ -118,8 +174,7 @@ namespace Script
                     string str = dt.Rows[i][j].ToString();
                     str = str.Replace("\"", "\"\"");//替换英文冒号 英文冒号需要换成两个冒号
 
-                    var charar = str.ToCharArray().ToList();
-                    if (charar.Contains(',') || str.Contains('\"')|| charar.Contains('\r') || charar.Contains('\n')) //含逗号 冒号 换行符的需要放到引号中
+                    if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n')) //含逗号 冒号 换行符的需要放到引号中
                     {
                         str = string.Format("\"{0}\"", str);
                     }
@@ -134,6 +189,27 @@ namespace Script
             }
             sw.Close();
             fs.Close();
+        }
+
+        public static DataTable OpenCSVOledb(string filePath) //从csv读取数据返回table  
+        {
+            using (OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:csv;Extended Properties=Text;"))
+            {
+                DataTable dtTable = new DataTable();
+
+                var name = Path.GetFileName(filePath);
+                OleDbDataAdapter adapter = new OleDbDataAdapter(string.Format("SELECT * FROM [{0}]", name), conn);
+                try
+                {
+                    adapter.Fill(dtTable);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    dtTable = new DataTable();
+                }
+                return dtTable;
+            }
         }
 
         public static DataTable OpenCSV(string filePath) //从csv读取数据返回table  

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Library.Extensions;
 using Library.Helper;
 using Library.LitJson;
 using LitJson;
@@ -55,6 +56,15 @@ namespace Library.Excel
             string[] content = File.ReadAllLines(path);
             var list = content.Select(p => p.Split(',').Cast<object>().ToList()).ToList();
 
+            var countList = list.Select(p => p.Count()).ToList();
+            if (countList.Min() != countList.Max())
+            {
+                Ldebug.Log("\n--------------------------------");
+                Ldebug.Log("文件格式有问题!");
+                Ldebug.Log("--------------------------------\n");
+                SystemExtensions.QuitReadKey();
+            }
+
             dtName = string.IsNullOrEmpty(dtName) ? Path.GetFileNameWithoutExtension(path) : dtName;
             return ConvertListToDataTable(list, dtName);
         }
@@ -64,10 +74,21 @@ namespace Library.Excel
             var list = ConvertDataTableToList(dt);
             if (string.IsNullOrEmpty(file))
                 file = dt.TableName;
-            var contents = list.Select(p => string.Join(",", p.Select(q => q.ToString()).ToArray())).ToArray();
+            var contents = list.Select(p => string.Join(",", p.Select(q =>
+            {
+                var str = q.ToString().Replace("\"", "\"\"");//替换英文冒号 英文冒号需要换成两个冒号
+                var charar = str.ToCharArray().ToList();
+                if (charar.Contains(',') || str.Contains('\"') || charar.Contains('\r') || charar.Contains('\n')) //含逗号 冒号 换行符的需要放到引号中
+                {
+                    str = string.Format("\"{0}\"", str);
+                }
+                return str;
+                return q.ToString();
+            }).ToArray())).ToArray();
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? dt.TableName : file, ".csv");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllLines(newPath, contents, new UTF8Encoding(false));
+            //File.WriteAllLines(newPath, contents, new UTF8Encoding(true));
         }
 
         #endregion
@@ -250,7 +271,6 @@ namespace Library.Excel
 
         public static void ConvertListToJsonFile(KeyValuePair<string, List<List<object>>> keyValuePair, string file)
         {
-            Ldebug.Log(" is now sheet: " + keyValuePair.Key);
             JsonData resJsonDatas = ConvertListToJson(keyValuePair);
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file, ".json");
             FileHelper.CreateDirectory(newPath);

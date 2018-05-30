@@ -63,6 +63,7 @@
     <Compile Include="Script\Base\ExcelByBase.cs" />
     <Compile Include="Script\Base\KillExcel.cs" />
     <Compile Include="Script\ExcelByNpoi.cs" />
+    <Compile Include="Script\Extensions\ExcelByNpoiExtensions.cs" />
     <Compile Include="Script\ExcelByOffice.cs" />
     <Compile Include="Script\ExcelByOleDb.cs" />
     <Compile Include="Script\ExcelByReader.cs" />

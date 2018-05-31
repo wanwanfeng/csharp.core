@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
 
@@ -57,8 +58,15 @@ namespace Script
 
         public void WriteAllLines(Dictionary<string,string> dic)
         {
-            WriteAllLines("key", dic.Keys.ToArray());
-            WriteAllLines("value", dic.Values.ToArray());
+            //WriteAllLines("key", dic.Keys.ToArray());
+            //WriteAllLines("value", dic.Values.ToArray());
+
+            //直接写入excel
+            List<List<object>> vals = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList();
+            vals.Insert(0,new List<object>(){"key","value"});
+            ExcelByNpoi.DataTableToExcel(Folder + "Haha.xlsx", ExcelByBase.ConvertListToDataTable(vals));
+
+
             //WriteAllLines("kv", dic.Select(p => p.Value + "\r\n" + p.Key).ToArray());
         }
 

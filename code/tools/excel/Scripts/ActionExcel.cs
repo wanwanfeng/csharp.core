@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Library.Excel;
@@ -10,80 +13,45 @@ namespace Script
 {
     public class ActionExcel : ActionBase
     {
-        public class ToCsv : ActionExcel
+        public class ToXml
+        {
+            public ToXml()
+            {
+                ToXml(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+            }
+        }
+
+        public class ToCsv
         {
             public ToCsv()
             {
-                List<string> files = CheckPath(".xlsx|.xls");
-                if (files.Count == 0) return;
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    var dts = ExcelByNpoi.ExcelToDataTable(file);
-                    dts.ForEach(p =>
-                    {
-                        ExcelByBase.ConvertDataTableToCsv(p, Path.ChangeExtension(file, ".csv"));
-                    });
-                });
+                ToCsv(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
             }
         }
 
-        public class ToJson : ActionExcel
+        public class ToJson
         {
             public ToJson()
             {
-                List<string> files = CheckPath(".xlsx|.xls");
-                if (files.Count == 0) return;
-                ExcelByNpoi excel = new ExcelByNpoi();
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    var vals = excel.ReadFromExcels(file);
-
-                    if (vals.Count == 1)
-                    {
-                        ExcelByBase.ConvertListToJsonFile(vals.First(), file);
-                        return;
-                    }
-
-                    foreach (KeyValuePair<string, List<List<object>>> pair in vals)
-                    {
-                        string newPath = file.Replace(Path.GetExtension(file), "\\" + pair.Key.Replace("$", ""));
-                        FileHelper.CreateDirectory(newPath);
-                        ExcelByBase.ConvertListToJsonFile(pair, newPath);
-                    }
-                });
+                ToJson(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
             }
         }
 
-        public class ToOneExcel : ActionExcel
+        [Description("读取多个Excel文件分解每一个文件的sheet到一个Excel文件")]
+        public class ToExcel
+        {
+            public ToExcel()
+            {
+                ToExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+            }
+        }
+
+        [Description("读取多个Excel文件的多个sheet合并到一个Excel文件")]
+        public class ToOneExcel
         {
             public ToOneExcel()
             {
-                List<string> files = CheckPath(".xlsx|.xls", SelectType.Folder);
-                if (files.Count == 0) return;
-
-                var dic = new Dictionary<string, List<List<object>>>();
-                files.ForEach(file =>
-                {
-                    var vals = new ExcelByNpoi().ReadFromExcels(file);
-
-                    if (vals.Count == 1)
-                    {
-                        dic[file] =
-                            ExcelByBase.ConvertJsonToList(
-                                LitJsonHelper.ToJson(ExcelByBase.ConvertListToJson(vals.First())));
-                        return;
-                    }
-
-                    foreach (KeyValuePair<string, List<List<object>>> pair in vals)
-                    {
-                        dic[file + "/" + pair.Key] =
-                            ExcelByBase.ConvertJsonToList(LitJsonHelper.ToJson(ExcelByBase.ConvertListToJson(pair)));
-                    }
-
-                });
-                new ExcelByNpoi().WriteToOneExcel(InputPath + ".xlsx", dic);
+                ToOneExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
             }
         }
     }

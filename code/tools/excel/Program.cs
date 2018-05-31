@@ -26,14 +26,27 @@ namespace Library.Excel
     public enum CaoType
     {
         CompareExcel = 0,
+        [TypeValue(typeof (ActionJson.ToXml))] JsonToXml,
         [TypeValue(typeof (ActionJson.ToCsv))] JsonToCsv,
         [TypeValue(typeof (ActionJson.ToExcel))] JsonToExcel,
         [TypeValue(typeof (ActionJson.ToOneExcel))] JsonToOneExcel,
+        [TypeValue(typeof (ActionJson.ToKvExcel))] JsonToKvExcel,
+        [TypeValue(typeof (ActionJson.KvExcelTo))] JsonKvExcelTo,
 
+        [TypeValue(typeof (ActionExcel.ToXml))] ExcelToXml,
         [TypeValue(typeof (ActionExcel.ToCsv))] ExcelToCsv,
         [TypeValue(typeof (ActionExcel.ToJson))] ExcelToJson,
+        [TypeValue(typeof (ActionExcel.ToExcel))] ExcelToExcel,
         [TypeValue(typeof (ActionExcel.ToOneExcel))] ExcelToOneExcel,
 
+        [TypeValue(typeof (ActionXml.ToCsv))] XmlToCsv,
+        [TypeValue(typeof (ActionXml.ToJson))] XmlToJson,
+        [TypeValue(typeof (ActionXml.ToExcel))] XmlToExcel,
+        [TypeValue(typeof (ActionXml.ToOneExcel))] XmlToOneExcel,
+        [TypeValue(typeof (ActionXml.ToKvExcel))] XmlToKvExcel,
+        [TypeValue(typeof (ActionXml.KvExcelTo))] XmlKvExcelTo,
+
+        [TypeValue(typeof (ActionCSV.ToXml))] CsvToXml,
         [TypeValue(typeof (ActionCSV.ToJson))] CsvToJson,
         [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
         [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
@@ -52,54 +65,6 @@ namespace Library.Excel
 
         private static void Main(string[] args)
         {
-            /* var hh = new ExcelClass().ReadFromExcels("ff.xlsx");
-            foreach (KeyValuePair<string, List<List<object>>> pair in hh)
-            {
-                //ExcelClass.ConvertListToJson(pair);
-               // ExcelClass.ConvertDataTableToXml(ExcelClass.ConvertListToDataTable(pair.Value, pair.Key), pair.Key);
-                ExcelClass.ConvertDataTableToCsv(ExcelClass.ConvertListToDataTable(pair.Value, pair.Key), pair.Key);
-            }
-            Console.ReadKey();
-            return;
-            Dictionary<string, List<List<object>>> dic = new Dictionary<string, List<List<object>>>()
-            {
-                {
-                    "xx.xlsx", new List<List<object>>()
-                    {
-                        new List<object>() {"haha", "lala", "xx"},
-                        new List<object>() {"2", "3", "4"},
-                        new List<object>() {"p", "6", "2"},
-                    }
-                },
-                 {
-                    "yy.xlsx", new List<List<object>>()
-                    {
-                        new List<object>() {"haha", "lala", "xx"},
-                        new List<object>() {"2", "3", "4"},
-                        new List<object>() {"p", "6", "2"},
-                    }
-                }
-            };
-
-            new ExcelClass().WriteToOneExcel(
-                Environment.CurrentDirectory + "/" + Path.ChangeExtension("ff.x", ".xlsx"), dic);
-
-            //Console.ReadKey();
-
-            //foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-            //{
-            //    new ExcelClass().WriteToExcel(
-            //        Environment.CurrentDirectory + "/" + Path.ChangeExtension(pair.Key, ".xlsx"), pair.Value);
-            //}
-            //Console.ReadKey();
-
-            return;
-            
-
-            ReadExcelToJson(new List<string>() {"ff.xlsx", "xx.xlsx", "yy.xlsx"});
-            return;*/
-
-
             do
             {
                 Console.Clear();
@@ -114,8 +79,7 @@ namespace Library.Excel
                 //{
                 var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
                 CaoType caoType = (CaoType) SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
-                //new ActionCSV.KvExcelTo();
-                ActionBase actionBase = (ActionBase) Activator.CreateInstance(cache[caoType]);
+                Activator.CreateInstance(cache[caoType]);
                 //}
                 //catch (Exception e)
                 //{

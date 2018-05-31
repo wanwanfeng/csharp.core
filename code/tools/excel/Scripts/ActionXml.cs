@@ -8,21 +8,21 @@ using Library.Excel;
 
 namespace Script
 {
-    public class ActionJson : ActionBase
+    public class ActionXml : ActionBase
     {
-        public class ToXml
-        {
-            public ToXml()
-            {
-                ToXml(".json", file => new List<DataTable>() { ExcelByBase.ConvertJsonToDataTableByPath(file) });
-            }
-        }
-
         public class ToCsv 
         {
             public ToCsv()
             {
-                ToCsv(".json", file => new List<DataTable>() {ExcelByBase.ConvertJsonToDataTableByPath(file)});
+                ToCsv(".xml", file => new List<DataTable>() {ExcelByBase.ConvertXmlToDataTable(file)});
+            }
+        }
+
+        public class ToJson
+        {
+            public ToJson()
+            {
+                ToJson(".xml", file => new List<DataTable>() { ExcelByBase.ConvertXmlToDataTable(file) });
             }
         }
 
@@ -30,7 +30,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".json", file => new List<DataTable>() { ExcelByBase.ConvertJsonToDataTableByPath(file) });
+                ToExcel(".xml", file => new List<DataTable>() { ExcelByBase.ConvertXmlToDataTable(file) });
             }
         }
 
@@ -38,7 +38,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".json", file => new List<DataTable>() {ExcelByBase.ConvertJsonToDataTableByPath(file)});
+                ToOneExcel(".xml", file => new List<DataTable>() { ExcelByBase.ConvertXmlToDataTable(file) });
             }
         }
 
@@ -49,7 +49,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".json", ExcelByBase.ConvertJsonToDataTableByPath);
+                ToKvExcel(".xml", ExcelByBase.ConvertXmlToDataTable);
             }
         }
 
@@ -60,7 +60,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ConvertDataTableToJsonByPath);
+                KvExcelTo(ExcelByBase.ConvertDataTableToXml);
             }
         }
     }

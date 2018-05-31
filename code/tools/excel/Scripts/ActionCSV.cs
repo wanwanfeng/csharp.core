@@ -6,32 +6,82 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Excel;
+using NPOI.HSSF.UserModel;
 
 namespace Script
 {
     public class ActionCSV : ActionBase
     {
-        //public ActionCSV()
-        //{
-        //    ExcelByNpoi.OnSheetAction = (sheet, dt) =>
-        //    {
-        //        string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
-        //        var list =
-        //            ExcelByNpoi.ConvertDataTableToRowsList(dt)
-        //                .Select(p => string.Join("|", p.Cast<string>().ToArray()))
-        //                .Select(p => Regex.IsMatch(p, regex))
-        //                .ToList();
-        //        for (int i = 0; i < list.Count; i++)
-        //        {
-        //            var show = list[i];
-        //            sheet.SetColumnHidden(i, !show);
-        //            //if (show)
-        //            //    sheet.SetColumnWidth(0, 200*256 + 200);
-        //        }
-        //        //忽略掉不匹配正则的
-        //        return list.All(p => p == false) ? null : dt;
-        //    };
-        //}
+        public ActionCSV()
+        {
+            ExcelByNpoi.OnSheetBeforeAction = (dt) =>
+            {
+                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+                var cache =
+                    ExcelByNpoi.ConvertDataTableToRowsDic(dt)
+                        .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
+                        .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
+                if (cache.Values.All(p => p == false))
+                {
+                    //忽略掉不匹配正则的
+                    return null;
+                }
+
+                int i = 0;
+                foreach (KeyValuePair<string, bool> pair in cache)
+                {
+                    var show = pair.Value;
+                    if (show)
+                    {
+                        var o = pair.Key + "_zh_cn";
+                        if (!dt.Columns.Contains(o))
+                        {
+                            //增加列
+                            dt.Columns.Add(o.ToString(), typeof (string));
+                            dt.Columns[o].SetOrdinal(i + 1);
+                            i++;
+                            //列复制
+                            foreach (DataRow dr in dt.Rows)
+                                dr[o] = dr[pair.Key];
+                        }
+                    }
+                    i++;
+                }
+                return dt;
+            };
+
+            ExcelByNpoi.OnSheetAction = (sheet, dt) =>
+            {
+                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+
+                var cache =
+                    ExcelByNpoi.ConvertDataTableToRowsDic(dt)
+                        .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
+                        .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
+                if (cache.Values.All(p => p == false))
+                {
+                    //忽略掉不匹配正则的
+                    return null;
+                }
+
+                int i = 0;
+                foreach (KeyValuePair<string, bool> pair in cache)
+                {
+                    var show = pair.Value;
+                   
+                    var style = sheet.GetColumnStyle(i);
+                    style.IsLocked = !pair.Key.Contains("_zh_cn");
+                    sheet.SetColumnHidden(i, !show);
+                    sheet.SetDefaultColumnStyle(i,style);
+                    if (show)
+                    {
+                        sheet.AutoSizeColumn(i);
+                    }
+                    i++;
+                }
+                return dt;
+            };
+        }
 
         public class ToXml
         {
@@ -49,7 +99,7 @@ namespace Script
             }
         }
 
-        public class ToExcel
+        public class ToExcel : ActionCSV
         {
             public ToExcel()
             {

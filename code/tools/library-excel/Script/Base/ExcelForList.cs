@@ -93,6 +93,28 @@ namespace Library.Excel
             return vals;
         }
 
+        /// <summary>
+        /// 列集合
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static Dictionary<string, List<object>> ConvertDataTableToRowsDic(DataTable dt)
+        {
+            var vals = new Dictionary<string, List<object>>();
+
+            GetHeaderList(dt).ForEach(p =>
+            {
+                List<object> val = new List<object> {p};
+                foreach (DataRow dr in dt.Rows)
+                {
+                    var obj = (dr[p] is System.DBNull) ? "" : dr[p];
+                    val.Add(obj);
+                }
+                vals.Add(p, val);
+            });
+            return vals;
+        }
+
         public static List<string> GetHeaderList(DataTable dt)
         {
             var vals = new List<string>();

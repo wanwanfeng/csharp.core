@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Library.Helper;
 #if ExcelByNpoi
 
 using NPOI.HSSF.UserModel;
@@ -129,7 +130,8 @@ namespace Library.Excel
         /// <summary>
         /// 针对Sheet
         /// </summary>
-        public static Func<ISheet, DataTable, DataTable> OnSheetAction;
+        public static Func<DataTable, DataTable> OnSheetBeforeAction { get; set; }
+        public static Func<ISheet, DataTable, DataTable> OnSheetAction { get; set; }
 
         /// <summary>
         /// Datable导出成Excel
@@ -163,6 +165,15 @@ namespace Library.Excel
                 {
                     throw new Exception("数据量过大，请保存为.xlsx");
                 }
+
+                if (OnSheetBeforeAction != null)
+                {
+                    if (OnSheetBeforeAction.Invoke(dt) == null)
+                    {
+                        continue;
+                    }
+                }
+
                 ISheet sheet = string.IsNullOrEmpty(dt.TableName)
                     ? workbook.CreateSheet("Sheet1")
                     : workbook.CreateSheet(dt.TableName);
@@ -187,6 +198,15 @@ namespace Library.Excel
                         cell.SetCellValue(value);
                     }
                 }
+
+                //默认一个样式以及自动宽度
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    var style = workbook.CreateCellStyle();
+                    sheet.SetDefaultColumnStyle(i, style);
+                    sheet.AutoSizeColumn(i);
+                }
+               
                 if (OnSheetAction != null)
                 {
                     if (OnSheetAction.Invoke(sheet, dt) == null)
@@ -195,7 +215,7 @@ namespace Library.Excel
                     }
                 }
 
-                //string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+                //string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
                 //var list = ConvertDataTableToRowsList(dt).Select(p => string.Join("|", p.Cast<string>().ToArray())).Select(p => Regex.IsMatch(p, regex)).ToList();
                 //for (int i = 0; i < list.Count; i++)
                 //{
@@ -212,6 +232,7 @@ namespace Library.Excel
             workbook.Write(stream);
             var buf = stream.ToArray();
 
+            FileHelper.CreateDirectory(file);
             //保存为Excel文件  
             using (FileStream fs = new FileStream(file, FileMode.Create, FileAccess.Write))
             {

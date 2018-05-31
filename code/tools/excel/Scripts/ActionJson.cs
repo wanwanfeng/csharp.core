@@ -42,7 +42,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                List<string> files = CheckPath(".json", true);
+                List<string> files = CheckPath(".json", SelectType.Folder);
                 if (files.Count == 0) return;
 
                 var dic = new Dictionary<string, List<List<object>>>();

@@ -38,6 +38,7 @@ namespace Library.Excel
         [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
         [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
         [TypeValue(typeof (ActionCSV.ToKvExcel))] CsvToKvExcel,
+        [TypeValue(typeof (ActionCSV.KvExcelTo))] CsvKvExcelTo,
     }
 
 
@@ -48,8 +49,6 @@ namespace Library.Excel
             Ldebug.OnActionLog += Console.WriteLine;
             Ldebug.OnActionLogError += Console.WriteLine;
         }
-
-        public static string InputPath { get; set; }
 
         private static void Main(string[] args)
         {
@@ -115,7 +114,7 @@ namespace Library.Excel
                 //{
                 var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
                 CaoType caoType = (CaoType) SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
-                //new ActionCSV.ToKvExcel();
+                new ActionCSV.KvExcelTo();
                 ActionBase actionBase = (ActionBase) Activator.CreateInstance(cache[caoType]);
                 //}
                 //catch (Exception e)

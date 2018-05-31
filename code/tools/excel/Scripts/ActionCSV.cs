@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Excel;
+using NPOI.SS.Util.CellWalk;
 
 namespace Script
 {
@@ -126,6 +127,7 @@ namespace Script
                 dd.Columns.Add("id", typeof (string));
                 dd.Columns.Add("key", typeof(string));
                 dd.Columns.Add("value", typeof (string));
+                dd.Columns.Add("value_zh_cn", typeof(string));
                 foreach (DataTable dataTable in dts)
                 {
                     var header = ExcelByBase.GetHeaderList(dataTable);
@@ -133,17 +135,82 @@ namespace Script
                     {
                         foreach (string s in header.Skip(1))
                         {
-                            List<object> objects = new List<object> {dataTable.TableName, dr[0], s, dr[s]};
-                            dd.Rows.Add(objects.ToArray());
+                            dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], dr[s]);
                         }
                     }
                 }
-                dd.Columns.Add("value_zh_cn", typeof(string));
-                dd.Columns.Add("value_zh_cw", typeof(string));
                 ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dd);
             }
         }
 
+
+        public class KvExcelTo : ActionCSV
+        {
+            public KvExcelTo()
+            {
+                ExcelByNpoi.OnSheetAction = null;
+                List<string> files = CheckPath(".xlsx", SelectType.File);
+                if (files.Count == 0) return;
+                var dts = new List<DataTable>();
+                files.ForEach(file =>
+                {
+                    Console.WriteLine(" is now : " + file);
+                    dts.AddRange(ExcelByNpoi.ExcelToDataTable(file));
+                });
+
+                if (dts.Count == 0)
+                    return;
+
+                string root = InputPath.Replace(".xlsx","");
+
+                foreach (DataTable dataTable in dts)
+                {
+                    foreach (DataRow dr in dataTable.Rows)
+                    {
+                        object path = dr["path"];
+                        object id = dr["id"];
+                        string key = dr["key"].ToString();
+                        object value = dr["value"];
+                        object value_zh_cn = dr["value_zh_cn"];
+
+                        string fullpath = root + path;
+
+                        if (File.Exists(fullpath))
+                        {
+                            Console.WriteLine("is now : " + fullpath);
+                            var dt = ExcelByBase.ConvertCsvToDataTable(fullpath);
+                            var columns = dt.Columns;
+                            bool isSave = false;
+                            foreach (DataRow dtr in dt.Rows)
+                            {
+                                if (columns.Contains(key))
+                                {
+                                    var idTemp = dtr[0];
+                                    var keyTemp = dtr[key];
+                                    if (idTemp.Equals(id) && keyTemp.Equals(value))
+                                    {
+                                        dtr[key] = string.Format("\"{0}\"",value_zh_cn);
+                                        isSave = true;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
+                                }
+                            }
+                            if (!isSave) continue;
+                            File.Copy(fullpath, fullpath + ".bak", true);
+                            ExcelByNpoi.ConvertDataTableToCsv(dt, fullpath);
+                        }
+                        else
+                        {
+                            Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
+                        }
+
+                    }
+                }
+            }
+        }
 
         public static void SaveCSV(DataTable dt, string fullPath)//table数据写入csv
         {

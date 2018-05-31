@@ -152,6 +152,7 @@ namespace Library.Excel
                     break;
                 default:
                     workbook = null;
+                    throw new Exception("保存的文件格式不符合要求 ！");
                     break;
             }
             if (workbook == null)

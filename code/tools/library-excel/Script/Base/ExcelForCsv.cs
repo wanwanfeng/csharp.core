@@ -50,27 +50,25 @@ namespace Library.Excel
 
         public static void ConvertDataTableToCsv(DataTable dt, string file = null)
         {
-            //var list = CsvHelper.SaveCSV(path);
 
             var list = ConvertDataTableToList(dt);
             if (string.IsNullOrEmpty(file))
                 file = dt.TableName;
             var contents = list.Select(p => string.Join(",", p.Select(q =>
             {
-                var str = q.ToString().Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
-                var charar = str.ToCharArray().ToList();
-                if (charar.Contains(',') || str.Contains('\"') || charar.Contains('\r') || charar.Contains('\n'))
-                    //含逗号 冒号 换行符的需要放到引号中
-                {
-                    str = string.Format("\"{0}\"", str);
-                }
-                return str;
-                return q.ToString();
+                //var str = q.ToString().Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
+                //if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))
+                //{
+                //    //含逗号 冒号 换行符的需要放到引号中
+                //    str = string.Format("\"{0}\"", str);
+                //}
+                //return str;
+                return string.Format("\"{0}\"", q); ;
             }).ToArray())).ToArray();
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? dt.TableName : file, ".csv");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllLines(newPath, contents, new UTF8Encoding(false));
-            //File.WriteAllLines(newPath, contents, new UTF8Encoding(true));
+            //CsvHelper.SaveCSV(list, newPath);
         }
 
         #endregion

@@ -39,7 +39,7 @@ namespace Library.Excel
         public static List<List<object>> ConvertDataTableToList(DataTable dt)
         {
             var vals = new List<List<object>>();
-
+            vals.Add(GetHeaderList(dt).Cast<object>().ToList());
             foreach (DataRow dr in dt.Rows)
             {
                 vals.Add(dr.ItemArray.ToList());

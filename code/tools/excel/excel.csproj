@@ -67,6 +67,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\ActionBase.cs" />
     <Compile Include="Scripts\ActionCSV.cs" />
+    <Compile Include="Scripts\ActionXml.cs" />
     <Compile Include="Scripts\ActionJson.cs" />
     <Compile Include="Scripts\ActionExcel.cs" />
     <Compile Include="Scripts\CompareExcel.cs" />

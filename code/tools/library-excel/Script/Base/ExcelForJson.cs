@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using LitJson;
 
 namespace Library.Excel
 {
@@ -21,10 +22,10 @@ namespace Library.Excel
             return ConvertListToDataTable(ConvertJsonToList(content), dtName);
         }
 
-        public static void ConvertDataTableToJson(DataTable dt)
+        public static JsonData ConvertDataTableToJson(DataTable dt)
         {
             var kv = new KeyValuePair<string, List<List<object>>>(dt.TableName, ConvertDataTableToList(dt));
-            ConvertListToJson(kv);
+            return ConvertListToJson(kv);
         }
 
         public static void ConvertDataTableToJsonByPath(DataTable dt, string file)

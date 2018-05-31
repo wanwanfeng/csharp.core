@@ -114,7 +114,7 @@ namespace Library.Excel
                 //{
                 var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
                 CaoType caoType = (CaoType) SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
-                new ActionCSV.KvExcelTo();
+                //new ActionCSV.KvExcelTo();
                 ActionBase actionBase = (ActionBase) Activator.CreateInstance(cache[caoType]);
                 //}
                 //catch (Exception e)

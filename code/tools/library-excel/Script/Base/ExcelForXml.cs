@@ -24,7 +24,8 @@ namespace Library.Excel
             StringReader dsr = new StringReader(content);
             XmlTextReader xr = new XmlTextReader(dsr);
 
-            var dt = new DataTable(string.IsNullOrEmpty(dtName) ? "Sheet1" : dtName);
+            var dt = new DataTable();
+            //dt.TableName = string.IsNullOrEmpty(dtName) ? "Sheet1" : dtName;
             dt.ReadXml(xr);
             dsr.Close();
             xr.Close();
@@ -35,7 +36,7 @@ namespace Library.Excel
         {
             StringWriter dsw = new StringWriter();
             XmlTextWriter xw = new XmlTextWriter(dsw);
-            dt.WriteXml(xw);
+            dt.WriteXml(xw, XmlWriteMode.WriteSchema);
             string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? dt.TableName : file, ".xml");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllText(newPath, dsw.ToString(), new UTF8Encoding(false));

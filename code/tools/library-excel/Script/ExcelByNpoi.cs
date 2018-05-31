@@ -50,8 +50,9 @@ namespace Library.Excel
         /// Excel导入成Datable
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
+        /// <param name="containsFirstLine">是否包含第一行</param>
         /// <returns></returns>
-        public static List<DataTable> ExcelToDataTable(string file)
+        public static List<DataTable> ExcelToDataTable(string file,bool containsFirstLine = true)
         {
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -91,7 +92,7 @@ namespace Library.Excel
                         object obj = GetValueType(header.GetCell(i));
                         if (obj == null || obj.ToString() == string.Empty)
                         {
-                            dt.Columns.Add(new DataColumn("Columns" + i.ToString()));
+                            dt.Columns.Add(new DataColumn("Columns" + i));
                         }
                         else
                             dt.Columns.Add(new DataColumn(obj.ToString()));
@@ -99,7 +100,10 @@ namespace Library.Excel
                     }
                     //数据  
                     //for (int i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)//不包括第一行
-                    for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)//包括第一行
+                    //for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)包括第一行
+
+                    var srartLine = sheet.FirstRowNum + (containsFirstLine ? 0 : 1);
+                    for (int i = srartLine; i <= sheet.LastRowNum; i++)
                     {
                         DataRow dr = dt.NewRow();
                         bool hasValue = false;
@@ -116,7 +120,6 @@ namespace Library.Excel
                             dt.Rows.Add(dr);
                         }
                     }
-
                     list.Add(dt);
                 }
                 return list;
@@ -169,7 +172,8 @@ namespace Library.Excel
                 for (int i = 0; i < dt.Columns.Count; i++)
                 {
                     ICell cell = row.CreateCell(i);
-                    cell.SetCellValue(dt.Columns[i].ColumnName);
+                    var value = dt.Columns[i].ColumnName;
+                    cell.SetCellValue(value);
                 }
 
                 //数据  
@@ -179,7 +183,8 @@ namespace Library.Excel
                     for (int j = 0; j < dt.Columns.Count; j++)
                     {
                         ICell cell = row1.CreateCell(j);
-                        cell.SetCellValue(dt.Rows[i][j].ToString());
+                        var value = dt.Rows[i][j].ToString();
+                        cell.SetCellValue(value);
                     }
                 }
                 if (OnSheetAction != null)

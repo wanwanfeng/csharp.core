@@ -4,226 +4,86 @@ using System.Data;
 using System.Data.OleDb;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Library.Excel;
-using LitJson;
 
 namespace Script
 {
     public class ActionCSV : ActionBase
     {
-        public ActionCSV()
-        {
-            ExcelByNpoi.OnSheetAction = (sheet, dt) =>
-            {
-                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
-                var list =
-                    ExcelByNpoi.ConvertDataTableToRowsList(dt)
-                        .Select(p => string.Join("|", p.Cast<string>().ToArray()))
-                        .Select(p => Regex.IsMatch(p, regex))
-                        .ToList();
-                for (int i = 0; i < list.Count; i++)
-                {
-                    var show = list[i];
-                    sheet.SetColumnHidden(i, !show);
-                    //if (show)
-                    //    sheet.SetColumnWidth(0, 200*256 + 200);
-                }
-                //忽略掉不匹配正则的
-                return list.All(p => p == false) ? null : dt;
-            };
-        }
+        //public ActionCSV()
+        //{
+        //    ExcelByNpoi.OnSheetAction = (sheet, dt) =>
+        //    {
+        //        string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+        //        var list =
+        //            ExcelByNpoi.ConvertDataTableToRowsList(dt)
+        //                .Select(p => string.Join("|", p.Cast<string>().ToArray()))
+        //                .Select(p => Regex.IsMatch(p, regex))
+        //                .ToList();
+        //        for (int i = 0; i < list.Count; i++)
+        //        {
+        //            var show = list[i];
+        //            sheet.SetColumnHidden(i, !show);
+        //            //if (show)
+        //            //    sheet.SetColumnWidth(0, 200*256 + 200);
+        //        }
+        //        //忽略掉不匹配正则的
+        //        return list.All(p => p == false) ? null : dt;
+        //    };
+        //}
 
-        public class ToExcel : ActionCSV
+        public class ToXml
         {
-            public ToExcel()
+            public ToXml()
             {
-                List<string> files = CheckPath(".csv");
-                if (files.Count == 0) return;
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    //var dt = OpenCSV(file);
-                    var dt = ExcelByBase.ConvertCsvToDataTable(file);
-                    ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(file, ".xls"), dt);
-                });
-                ExcelByNpoi.OnSheetAction = null;
+                ToXml(".csv", file => new List<DataTable> { ExcelByBase.ConvertCsvToDataTable(file) });
             }
         }
 
-        public class ToJson : ActionCSV
+        public class ToJson
         {
             public ToJson()
             {
-                List<string> files = CheckPath(".csv");
-                if (files.Count == 0) return;
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    //var dt = OpenCSV(file);
-                    var dt = ExcelByBase.ConvertCsvToDataTable(file);
-                    //var dt = OpenCSVOledb(file);
-                    ExcelByBase.ConvertDataTableToJsonByPath(dt, Path.ChangeExtension(file, ".json"));
-                });
+                ToJson(".csv", file => new List<DataTable> {ExcelByBase.ConvertCsvToDataTable(file)});
             }
         }
 
-        public class ToOneExcel : ActionCSV
+        public class ToExcel
+        {
+            public ToExcel()
+            {
+                ToExcel(".csv", file => new List<DataTable> {ExcelByBase.ConvertCsvToDataTable(file)});
+            }
+        }
+
+        public class ToOneExcel
         {
             public ToOneExcel()
             {
-                List<string> files = CheckPath(".csv");
-                if (files.Count == 0) return;
-                var dts = new List<DataTable>();
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    //var dt = OpenCSV(file);
-                    var dt = ExcelByBase.ConvertCsvToDataTable(file);
-                    dts.Add(dt);
-                });
-                ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(InputPath, ".xls"), dts.ToArray());
+                ToOneExcel(".csv", file => new List<DataTable> {ExcelByBase.ConvertCsvToDataTable(file)});
             }
         }
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ToKvExcel : ActionCSV
+        public class ToKvExcel
         {
             public ToKvExcel()
             {
-                ExcelByNpoi.OnSheetAction = null;
-                List<string> files = CheckPath(".csv");
-                if (files.Count == 0) return;
-                var dts = new List<DataTable>();
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    //var dt = OpenCSV(file);
-                    var dt = ExcelByBase.ConvertCsvToDataTable(file);
-                    dt.TableName = file.Replace(InputPath, "");
-                    string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
-                    var list = ExcelByBase.ConvertDataTableToRowsList(dt)
-                            .Select(p => string.Join("|", p.Cast<string>().ToArray()))
-                            .Select(p => Regex.IsMatch(p, regex))
-                            .ToList();
-                    //返回符合正则表达式的列
-                    var header =
-                        ExcelByBase.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
-
-                    var resdt = dt.DefaultView.ToTable(false, header.ToArray());
-
-                    //foreach (object o in header.Skip(1))
-                    //{
-                    //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
-                    //}
-                    if (header.Count > 1)
-                        dts.Add(resdt);
-                });
-
-                if (dts.Count==0)
-                    return;
-
-                DataTable dd = new DataTable();
-                dd.Columns.Add("path", typeof (string));
-                dd.Columns.Add("id", typeof (string));
-                dd.Columns.Add("key", typeof(string));
-                dd.Columns.Add("value", typeof (string));
-                dd.Columns.Add("value_zh_cn", typeof(string));
-                foreach (DataTable dataTable in dts)
-                {
-                    var header = ExcelByBase.GetHeaderList(dataTable);
-                    foreach (DataRow dr in dataTable.Rows)
-                    {
-                        foreach (string s in header.Skip(1))
-                        {
-                            dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], dr[s]);
-                        }
-                    }
-                }
-                ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dd);
+                ToKvExcel(".csv", ExcelByBase.ConvertCsvToDataTable);
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class KvExcelTo : ActionCSV
+        public class KvExcelTo
         {
             public KvExcelTo()
             {
-                ExcelByNpoi.OnSheetAction = null;
-                List<string> files = CheckPath(".xlsx", SelectType.File);
-                if (files.Count == 0) return;
-                var dts = new List<DataTable>();
-                files.ForEach(file =>
-                {
-                    Console.WriteLine(" is now : " + file);
-                    dts.AddRange(ExcelByNpoi.ExcelToDataTable(file));
-                });
-
-                if (dts.Count == 0)
-                    return;
-
-                string root = InputPath.Replace(".xlsx", "");
-
-                foreach (DataTable dataTable in dts)
-                {
-                    var cache =
-                        ExcelByBase.ConvertDataTableToList(dataTable)
-                            .ToLookup(p => p.First())
-                            .ToDictionary(p => p.Key.ToString(), q => q.ToList());
-                    cache.Remove("path");
-
-                    foreach (KeyValuePair<string, List<List<object>>> pair in cache)
-                    {
-                        string fullpath = root + pair.Key;
-
-                        if (File.Exists(fullpath))
-                        {
-                            bool isSave = false;
-                            Console.WriteLine(" is now : " + fullpath);
-                            var dt = ExcelByBase.ConvertCsvToDataTable(fullpath);
-                            var columns = dt.Columns;
-
-                            foreach (List<object> objects in pair.Value)
-                            {
-                                object id = objects[1];
-                                string key = objects[2].ToString();
-                                object value = objects[3];
-                                string value_zh_cn = objects[4].ToString();
-
-                                foreach (DataRow dtr in dt.Rows)
-                                {
-                                    if (columns.Contains(key))
-                                    {
-                                        var idTemp = dtr[0];
-                                        var keyTemp = dtr[key];
-                                        if (idTemp.Equals(id) && keyTemp.Equals(value))
-                                        {
-                                            dtr[key] = value_zh_cn;
-                                            isSave = true;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
-                                    }
-                                }
-                            }
-                            if (!isSave) continue;
-                            File.Copy(fullpath, fullpath + ".bak", true);
-                            ExcelByBase.ConvertDataTableToCsv(dt, fullpath);
-
-                        }
-                        else
-                        {
-                            Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
-                        }
-                    }
-                }
+                KvExcelTo(ExcelByBase.ConvertDataTableToCsv);
             }
         }
 

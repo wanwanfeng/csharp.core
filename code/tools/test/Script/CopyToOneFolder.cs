@@ -87,9 +87,9 @@ namespace Script
         {
             string haha = re;
             if (haha.StartsWith(root))
-                haha = haha.Replace(root, "");
+                haha = haha.Replace(root + "/", "");
 
-            string newPath = Folder + haha.Replace("..", "/");
+            string newPath = root.Replace("_merge", "_new") + haha.Replace("..", "/");
             FileHelper.CreateDirectory(newPath);
             File.Copy(re, newPath, true);
         }

@@ -90,7 +90,6 @@ namespace Script
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    FileHelper.CreateDirectory(newPath);
                     ExcelByBase.ConvertDataTableToXml(dt, Path.ChangeExtension(newPath, ".xml"));
                 });
             });
@@ -113,8 +112,7 @@ namespace Script
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    FileHelper.CreateDirectory(newPath);
-                    ExcelByBase.ConvertDataTableToCsv(dt, Path.ChangeExtension(newPath, ".json"));
+                    ExcelByBase.ConvertDataTableToCsv(dt, Path.ChangeExtension(newPath, ".csv"));
                 });
             });
         }
@@ -136,7 +134,6 @@ namespace Script
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    FileHelper.CreateDirectory(newPath);
                     ExcelByBase.ConvertDataTableToJsonByPath(dt, Path.ChangeExtension(newPath, ".json"));
                 });
             });
@@ -149,7 +146,7 @@ namespace Script
         /// <param name="convertToDataTable"></param>
         public static void ToExcel(string exs, Func<string, List<DataTable>> convertToDataTable)
         {
-            ExcelByNpoi.OnSheetAction = null;
+            //ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
             if (files.Count == 0) return;
             files.ForEach(file =>
@@ -166,7 +163,6 @@ namespace Script
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    FileHelper.CreateDirectory(newPath);
                     ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(newPath, ".xlsx"), dt);
                 });
             });

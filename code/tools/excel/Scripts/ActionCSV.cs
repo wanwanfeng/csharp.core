@@ -4,9 +4,10 @@ using System.Data;
 using System.Data.OleDb;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Library.Excel;
-using NPOI.SS.Util.CellWalk;
+using LitJson;
 
 namespace Script
 {
@@ -86,6 +87,9 @@ namespace Script
             }
         }
 
+        /// <summary>
+        /// 导出为键值对
+        /// </summary>
         public class ToKvExcel : ActionCSV
         {
             public ToKvExcel()
@@ -143,7 +147,9 @@ namespace Script
             }
         }
 
-
+        /// <summary>
+        /// 还原键值对
+        /// </summary>
         public class KvExcelTo : ActionCSV
         {
             public KvExcelTo()
@@ -161,52 +167,61 @@ namespace Script
                 if (dts.Count == 0)
                     return;
 
-                string root = InputPath.Replace(".xlsx","");
+                string root = InputPath.Replace(".xlsx", "");
 
                 foreach (DataTable dataTable in dts)
                 {
-                    foreach (DataRow dr in dataTable.Rows)
-                    {
-                        object path = dr["path"];
-                        object id = dr["id"];
-                        string key = dr["key"].ToString();
-                        object value = dr["value"];
-                        object value_zh_cn = dr["value_zh_cn"];
+                    var cache =
+                        ExcelByBase.ConvertDataTableToList(dataTable)
+                            .ToLookup(p => p.First())
+                            .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                    cache.Remove("path");
 
-                        string fullpath = root + path;
+                    foreach (KeyValuePair<string, List<List<object>>> pair in cache)
+                    {
+                        string fullpath = root + pair.Key;
 
                         if (File.Exists(fullpath))
                         {
-                            Console.WriteLine("is now : " + fullpath);
+                            bool isSave = false;
+                            Console.WriteLine(" is now : " + fullpath);
                             var dt = ExcelByBase.ConvertCsvToDataTable(fullpath);
                             var columns = dt.Columns;
-                            bool isSave = false;
-                            foreach (DataRow dtr in dt.Rows)
+
+                            foreach (List<object> objects in pair.Value)
                             {
-                                if (columns.Contains(key))
+                                object id = objects[1];
+                                string key = objects[2].ToString();
+                                object value = objects[3];
+                                string value_zh_cn = objects[4].ToString();
+
+                                foreach (DataRow dtr in dt.Rows)
                                 {
-                                    var idTemp = dtr[0];
-                                    var keyTemp = dtr[key];
-                                    if (idTemp.Equals(id) && keyTemp.Equals(value))
+                                    if (columns.Contains(key))
                                     {
-                                        dtr[key] = string.Format("\"{0}\"",value_zh_cn);
-                                        isSave = true;
+                                        var idTemp = dtr[0];
+                                        var keyTemp = dtr[key];
+                                        if (idTemp.Equals(id) && keyTemp.Equals(value))
+                                        {
+                                            dtr[key] = value_zh_cn;
+                                            isSave = true;
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
+                                    else
+                                    {
+                                        Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
+                                    }
                                 }
                             }
                             if (!isSave) continue;
                             File.Copy(fullpath, fullpath + ".bak", true);
-                            ExcelByNpoi.ConvertDataTableToCsv(dt, fullpath);
+                            ExcelByBase.ConvertDataTableToCsv(dt, fullpath);
+
                         }
                         else
                         {
                             Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
                         }
-
                     }
                 }
             }

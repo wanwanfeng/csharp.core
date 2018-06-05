@@ -57,7 +57,7 @@ namespace Script
                 Console.ReadKey();
                 return;
             }
-            if (result["words_result_num"].AsInt() <= 0)
+            if (result["words_result_num"].ToInt() <= 0)
                 return;
 #endif
             dic[re.Replace(root, "")] = GetExcelCell(re);

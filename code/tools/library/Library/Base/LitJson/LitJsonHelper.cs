@@ -4,6 +4,84 @@ using System.IO;
 using System.Linq;
 using LitJson;
 
+namespace LitJson
+{
+    public partial class JsonData
+    {
+        public int ToInt()
+        {
+            switch (type)
+            {
+                case JsonType.Int:
+                    return inst_int;
+                case JsonType.Double:
+                    return Convert.ToInt32(inst_double);
+                case JsonType.Long:
+                    return Convert.ToInt32(inst_long);
+                case JsonType.String:
+                    return Convert.ToInt32(inst_string);
+                case JsonType.Boolean:
+                    return Convert.ToInt32(inst_boolean);
+            }
+            throw new Exception("JsonData ToInt error");
+        }
+
+        public long ToLong()
+        {
+            switch (type)
+            {
+                case JsonType.Int:
+                    return Convert.ToInt64(inst_int);
+                case JsonType.Double:
+                    return Convert.ToInt64(inst_double);
+                case JsonType.Long:
+                    return inst_long;
+                case JsonType.String:
+                    return Convert.ToInt64(inst_string);
+                case JsonType.Boolean:
+                    return Convert.ToInt64(inst_boolean);
+            }
+            throw new Exception("JsonData ToLong error");
+        }
+
+        public double ToDouble()
+        {
+            switch (type)
+            {
+                case JsonType.Int:
+                    return Convert.ToDouble(inst_int);
+                case JsonType.Double:
+                    return inst_double;
+                case JsonType.Long:
+                    return Convert.ToDouble(inst_long);
+                case JsonType.String:
+                    return Convert.ToDouble(inst_string);
+                case JsonType.Boolean:
+                    return Convert.ToDouble(inst_boolean);
+            }
+            throw new Exception("JsonData ToDouble error");
+        }
+
+        public bool ToBoolean()
+        {
+            switch (type)
+            {
+                case JsonType.Int:
+                    return Convert.ToBoolean(inst_int);
+                case JsonType.Double:
+                    return Convert.ToBoolean(inst_double);
+                case JsonType.Long:
+                    return Convert.ToBoolean(inst_long);
+                case JsonType.String:
+                    return Convert.ToBoolean(inst_string);
+                case JsonType.Boolean:
+                    return inst_boolean;
+            }
+            throw new Exception("JsonData ToBoolean error");
+        }
+    }
+}
+
 namespace Library.LitJson
 {
     public class LitJsonHelper

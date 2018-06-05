@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Library.Extensions;
 
 namespace Library
 {
@@ -16,8 +17,7 @@ namespace Library
 
         public static string[] GetAnotherNames<T>(string mainName)
         {
-            var atts = typeof(T).GetField(mainName).GetCustomAttributes(true);
-            var att = atts.OfType<NameAttribute>().FirstOrDefault();
+            var att = typeof (T).GetField(mainName).GetFirstCustomAttribute<NameAttribute>();
             return att == null ? new string[0] : att.anotherNames;
         }
 

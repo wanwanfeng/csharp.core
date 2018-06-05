@@ -26,7 +26,7 @@ namespace Library.Excel
         public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
         {
             var dt = ExcelToDataTable(filename);
-            return dt.ToDictionary(p => p.TableName, q=>ConvertDataTableToList(q));
+            return dt.ToDictionary(p => p.TableName, q => ConvertDataTableToList(q));
         }
 
         public override void WriteToExcel(string filename, List<List<object>> vals)

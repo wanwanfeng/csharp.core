@@ -1,7 +1,61 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Library.Helper;
 
 namespace Library.Extensions
 {
+    public class SystemConsole
+    {
+        public static void Run<T>(Action<object> callAction = null) where T : struct
+        {
+            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int) p.Key);
+            var cacheDesc = AttributeHelper.GetCacheDescription<T>();
+            do
+            {
+                Console.Clear();
+
+                List<string> showList = new List<string>();
+                foreach (var value in Enum.GetValues(typeof (T)))
+                {
+                    var tips = cacheDesc[(T) value];
+                    tips = string.IsNullOrEmpty(tips) ? value.ToString() : tips;
+                    showList.Add(string.Format("\t{0}\t", (int) value + "：" + tips));
+                }
+                int maxLine = showList.Max(p => p.Length) + 20;
+                showList.Add(' '.CopyChar(maxLine));
+                showList.Add('-'.CopyChar(maxLine));
+                showList.Insert(0, ' '.CopyChar(maxLine));
+                showList.Insert(0, '-'.CopyChar(maxLine/2 - 2) + "命令索引" + '-'.CopyChar(maxLine/2 - 2));
+                showList.ForEach(Console.WriteLine);
+
+                try
+                {
+                    int caoType = SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
+
+                    if (cacheType.ContainsKey(caoType))
+                    {
+                        var obj = Activator.CreateInstance(cacheType[caoType].Value.value);
+                        if (callAction != null)
+                        {
+                            callAction.Invoke(obj);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("不存在的命令编号！");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                GC.Collect();
+            } while (SystemExtensions.ContinueY());
+        }
+    }
+
     public class SystemExtensions
     {
         /// <summary>

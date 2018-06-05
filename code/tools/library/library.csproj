@@ -51,6 +51,7 @@
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
     <Compile Include="Library\Base\Extensions\StringExtensions.cs" />
+    <Compile Include="Library\Base\Extensions\AttributeExtensions.cs" />
     <Compile Include="Library\Base\Extensions\SystemExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ValueExtensions.cs" />
     <Compile Include="Library\Base\Helper\CsvHelper.cs" />

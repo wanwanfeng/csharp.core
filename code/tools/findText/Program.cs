@@ -19,36 +19,31 @@ namespace findText
 
         private static void Main(string[] args)
         {
-            Console.WriteLine("-------语言列表-------");
-            foreach (var value in Enum.GetValues(typeof (ConvertType)))
+            Action<object> callFunc = obj =>
             {
-                Console.WriteLine(" " + (int) value + ":" + value);
-            }
-            Console.WriteLine("----------------------");
+                BaseActionFor baseActionFor = (BaseActionFor) obj;
 
-            var cache = AttributeHelper.GetCacheTypeValue<ConvertType>();
-            ConvertType convertType = (ConvertType) SystemExtensions.GetInputStr().AsInt();
+                Console.WriteLine("-------操作列表-------");
+                Console.WriteLine("1:搜索");
+                Console.WriteLine("2:还原");
+                Console.WriteLine("----------------------");
 
-            BaseActionFor baseActionFor = (BaseActionFor) Activator.CreateInstance(cache[convertType]);
-            Console.WriteLine("-------操作列表-------");
-            Console.WriteLine("1:搜索");
-            Console.WriteLine("2:还原");
-            Console.WriteLine("----------------------");
-
-            var cmd = SystemExtensions.GetInputStr();
-            do
-            {
-                switch (cmd)
+                var cmd = SystemExtensions.GetInputStr();
+                do
                 {
-                    case "1":
-                        baseActionFor.Open(SystemExtensions.GetInputStr("input dir path:"));
-                        break;
-                    case "2":
-                        baseActionFor.Revert(SystemExtensions.GetInputStr("iinput file path (*.xlsx):"));
-                        break;
-                }
-                Console.ReadKey();
-            } while (SystemExtensions.ContinueY());
+                    switch (cmd)
+                    {
+                        case "1":
+                            baseActionFor.Open(SystemExtensions.GetInputStr("input dir path:"));
+                            break;
+                        case "2":
+                            baseActionFor.Revert(SystemExtensions.GetInputStr("iinput file path (*.xlsx):"));
+                            break;
+                    }
+                    Console.ReadKey();
+                } while (SystemExtensions.ContinueY());
+            };
+            SystemConsole.Run<ConvertType>(callFunc);
         }
     }
 }

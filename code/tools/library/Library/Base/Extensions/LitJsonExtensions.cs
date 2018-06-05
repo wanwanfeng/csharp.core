@@ -11,9 +11,9 @@ namespace Library.LitJson
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static int AsInt(this JsonData value, int def = 0)
+        public static int ToInt(this JsonData value, int def = 0)
         {
-            return value.IsInt ? value.ToString().AsInt(def) : def;
+            return value.IsInt ? (int) value : def;
         }
 
         /// <summary>
@@ -22,9 +22,9 @@ namespace Library.LitJson
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static long AsLong(this JsonData value, long def = 0)
+        public static long ToLong(this JsonData value, long def = 0)
         {
-            return value.IsLong ? value.ToString().AsLong(def) : def;
+            return value.IsLong ? (long) value : def;
         }
 
         /// <summary>
@@ -33,9 +33,9 @@ namespace Library.LitJson
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static float AsFloat(this JsonData value, float def = 0)
+        public static float ToFloat(this JsonData value, float def = 0)
         {
-            return value.IsDouble ? value.ToString().AsFloat(def) : def;
+            return value.IsDouble ? (float) (double) value : def;
         }
 
         /// <summary>
@@ -44,9 +44,9 @@ namespace Library.LitJson
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static double AsDouble(this JsonData value, double def = 0)
+        public static double ToDouble(this JsonData value, double def = 0)
         {
-            return value.IsDouble ? value.ToString().AsDouble(def) : def;
+            return value.IsDouble ? (double) value : def;
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace Library.LitJson
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static bool AsBool(this JsonData value, bool def = false)
+        public static bool ToBool(this JsonData value, bool def = false)
         {
-            return value.IsBoolean ? value.ToString().AsBool(def) : def;
+            return value.IsBoolean ? (bool) value : def;
         }
     }
 }

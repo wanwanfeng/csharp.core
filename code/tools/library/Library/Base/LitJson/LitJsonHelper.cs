@@ -11,15 +11,15 @@ namespace Library.LitJson
         static LitJsonHelper()
         {
             JsonMapper.RegisterImporter<double, float>(input => (float)input);
-            JsonMapper.RegisterImporter<int, long>(input => (long)input);
+            //JsonMapper.RegisterImporter<int, long>(input => (long)input);
             JsonMapper.RegisterExporter<float>((v, w) =>
             {
                 w.Write(v);
             });
-            JsonMapper.RegisterExporter<long>((v, w) =>
-            {
-                w.Write(v);
-            });
+            //JsonMapper.RegisterExporter<long>((v, w) =>
+            //{
+            //    w.Write(v);
+            //});
         }
 
         public static T ToObject<T>(string res)

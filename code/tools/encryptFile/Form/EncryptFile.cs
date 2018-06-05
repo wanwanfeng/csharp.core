@@ -19,13 +19,6 @@ namespace Encrypt
             this.textBox_Out.Text = Define.DefineSave;
             this.textBox_Exclude.Lines = Define.DefineExclude;
             this.textBox_Key.Text = Define.DefineKey;
-
-            LocalEvent.eventManager.addEvent(Debug.NewMessage, NewMessage);
-        }
-
-        private void NewMessage(object obj)
-        {
-
         }
 
         #region 拖拽

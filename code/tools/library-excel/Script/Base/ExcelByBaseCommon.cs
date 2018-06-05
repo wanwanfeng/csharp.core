@@ -5,16 +5,14 @@ namespace Library.Excel
 {
     public abstract partial class ExcelByBase
     {
-        #region virtual
-
-        public KeyValuePair<string, List<List<object>>> ReadFromExcel(string filename)
+        public enum LineType
         {
-            var dic = ReadFromExcels(filename);
-            return dic == null
-                ? new KeyValuePair<string, List<List<object>>>()
-                : new KeyValuePair<string, List<List<object>>>(filename, dic.Values.FirstOrDefault());
+            FieldName,
+            FieldType,
+            FieldValue,
         }
 
+        #region virtual
 
 
         public virtual Dictionary<string, List<List<object>>> ReadFromExcels(string filename)

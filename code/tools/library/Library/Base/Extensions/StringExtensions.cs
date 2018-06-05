@@ -54,6 +54,22 @@ namespace Library.Extensions
         /// <summary>
         /// 字符串添加字符
         /// </summary>
+        /// <param name="cr"></param>
+        /// <param name="lineCount"></param>
+        /// <returns></returns>
+        public static string CopyChar(this char cr, int lineCount)
+        {
+            StringBuilder sb = new StringBuilder(lineCount);
+            for (int i = 0; i < lineCount; i++)
+            {
+                sb.Append(cr);
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 字符串添加字符
+        /// </summary>
         /// <param name="str"></param>
         /// <param name="lineNumber"></param>
         /// <param name="value"></param>

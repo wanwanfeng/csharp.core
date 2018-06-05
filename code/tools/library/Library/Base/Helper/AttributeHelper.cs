@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using Library.Extensions;
 
 namespace Library.Helper
 {
@@ -58,17 +59,14 @@ namespace Library.Helper
     {
         #region enum
 
-        public static IDictionary<T, TA> GetCache<T, TA>() where TA : Attribute
+        public static IDictionary<object, TA> GetCache<T, TA>() where TA : Attribute
         {
-            IDictionary<T, TA> cache = new Dictionary<T, TA>();
+            IDictionary<object, TA> cache = new Dictionary<object, TA>();
             if (typeof (T).IsEnum)
             {
                 foreach (var value in Enum.GetValues(typeof (T)))
                 {
-                    cache[(T) value] = typeof (T).GetField(value.ToString())
-                        .GetCustomAttributes(false)
-                        .OfType<TA>()
-                        .FirstOrDefault();
+                    cache[value] = typeof (T).GetField(value.ToString()).GetFirstCustomAttribute<TA>();
                 }
             }
             else
@@ -81,37 +79,37 @@ namespace Library.Helper
         public static IDictionary<T, Type> GetCacheTypeValue<T>() where T : struct
         {
             return GetCache<T, TypeValueAttribute>()
-                .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.value : null);
+                .ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : null);
         }
 
         public static IDictionary<T, TK> GetCacheDefaultValue<T, TK>() where T : struct
         {
             return GetCache<T, DefaultValueAttribute>()
-                .ToDictionary(k => k.Key, v => v.Value != null ? (TK) v.Value.Value : default(TK));
+                .ToDictionary(k => (T)k.Key, v => v.Value != null ? (TK)v.Value.Value : default(TK));
         }
 
         public static IDictionary<T, string> GetCacheDescription<T>() where T : struct
         {
             return GetCache<T, DescriptionAttribute>()
-                .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.Description : "");
+                .ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.Description : "");
         }
 
         public static IDictionary<T, string> GetCacheStringValue<T>() where T : struct
         {
             return GetCache<T, StringValueAttribute>()
-                .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.value : "");
+                .ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : "");
         }
 
         public static IDictionary<T, string> GetCacheHookValue<T>() where T : struct
         {
             return GetCache<T, HookValueAttribute>()
-                .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.value : "");
+                .ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : "");
         }
 
         public static IDictionary<T, int> GetCacheIntValue<T>() where T : struct
         {
             return GetCache<T, IntValueAttribute>()
-                .ToDictionary(k => k.Key, v => v.Value != null ? v.Value.value : 0);
+                .ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : 0);
         }
 
         #endregion
@@ -130,10 +128,7 @@ namespace Library.Helper
             IDictionary<T, TA> cache = new Dictionary<T, TA>();
             foreach (var t in list)
             {
-                cache[(T) t] = typeof (T).GetField(t.ToString())
-                    .GetCustomAttributes(false)
-                    .OfType<TA>()
-                    .FirstOrDefault();
+                cache[(T) t] = typeof (T).GetField(t.ToString()).GetFirstCustomAttribute<TA>();
             }
             return cache;
         }

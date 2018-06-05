@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,43 +14,27 @@ namespace test
     {
         private enum MyEnum
         {
-            [StringValue("CompareFolder"), TypeValue(typeof(CompareFolder))]
+            [Description("CompareFolder"), TypeValue(typeof(CompareFolder))]
             CompareFolder = 1,
-            [StringValue("ImageFind"), TypeValue(typeof(ImageFind))]
+            [Description("ImageFind"), TypeValue(typeof(ImageFind))]
             ImageFind,
-            [StringValue("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))]
+            [Description("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))]
             ImageFindOrc,
-            [StringValue("CopyToOneFolder"), TypeValue(typeof(CopyToOneFolder))]
+            [Description("CopyToOneFolder"), TypeValue(typeof(CopyToOneFolder))]
             CopyToOneFolder,
-            [StringValue("CreatePhotoDir"), TypeValue(typeof(CreatePhotoDir))]
+            [Description("CreatePhotoDir"), TypeValue(typeof(CreatePhotoDir))]
             CreatePhotoDir,
-            [StringValue("CreateExcelCell"), TypeValue(typeof(CreateExcelCell))]
+            [Description("CreateExcelCell"), TypeValue(typeof(CreateExcelCell))]
             CreateExcelCell,
-            [StringValue("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))]
+            [Description("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))]
             SpliteAtlas,
-            [StringValue("GetLineCount"), TypeValue(typeof(GetLineCount))]
+            [Description("GetLineCount"), TypeValue(typeof(GetLineCount))]
             GetLineCount,
         }
 
         private static void Main(string[] args)
         {
-            do
-            {
-                Console.Clear();
-                Console.WriteLine("-------cmd list-------");
-                foreach (var value in Enum.GetValues(typeof(MyEnum)))
-                {
-                    Console.WriteLine("  " + (int)value + ":" + value);
-                }
-                Console.WriteLine("----------------------");
-
-                var cmd = SystemExtensions.GetInputStr();
-                var dic = AttributeHelper.GetCacheTypeValue<MyEnum>();
-                var en = (MyEnum) cmd.AsInt();
-                if (dic.ContainsKey(en))
-                    Activator.CreateInstance(dic[en]);
-            } while (SystemExtensions.ContinueY());
-
+            SystemConsole.Run<MyEnum>();
 
             //FileInfo fileInfo = new FileInfo("TextFile");
             //Console.WriteLine("ex:{0}", fileInfo.Extension);

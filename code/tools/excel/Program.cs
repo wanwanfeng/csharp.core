@@ -25,7 +25,7 @@ namespace Library.Excel
 {
     public enum CaoType
     {
-        CompareExcel = 0,
+        [TypeValue(typeof (CompareExcel))] CompareExcel = 0,
         [TypeValue(typeof (ActionJson.ToXml))] JsonToXml,
         [TypeValue(typeof (ActionJson.ToCsv))] JsonToCsv,
         [TypeValue(typeof (ActionJson.ToExcel))] JsonToExcel,
@@ -65,29 +65,7 @@ namespace Library.Excel
 
         private static void Main(string[] args)
         {
-            do
-            {
-                Console.Clear();
-                Console.WriteLine("----------命令索引----------");
-                foreach (var value in Enum.GetValues(typeof (CaoType)))
-                {
-                    Console.WriteLine("\t" + (int) value + "：" + value);
-                }
-                Console.WriteLine("----------------------------");
-
-                //try
-                //{
-                var cache = AttributeHelper.GetCacheTypeValue<CaoType>();
-                CaoType caoType = (CaoType) SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
-                Activator.CreateInstance(cache[caoType]);
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine(e.Message);
-                //}
-
-                GC.Collect();
-            } while (SystemExtensions.ContinueY());
+            SystemConsole.Run<CaoType>();
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Library.Extensions;
 
-namespace SvnVersion
+namespace FileVersion
 {
     public abstract class BaseFileInfo
     {

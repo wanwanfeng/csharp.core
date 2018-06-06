@@ -257,8 +257,12 @@ namespace Library.Excel
                     return null;
                 case CellType.Boolean: //BOOLEAN:  
                     return cell.BooleanCellValue;
-                case CellType.Numeric: //NUMERIC:  
-                    return cell.NumericCellValue;
+                case CellType.Numeric: //NUMERIC: 
+                {
+                    if (DateUtil.IsCellDateFormatted(cell))
+                        return cell.DateCellValue;//修正日期显示
+                    return cell.NumericCellValue;//返回正常数字
+                }
                 case CellType.String: //STRING:  
                     return cell.StringCellValue;
                 case CellType.Error: //ERROR:  

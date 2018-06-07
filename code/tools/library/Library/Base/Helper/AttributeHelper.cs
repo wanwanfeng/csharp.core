@@ -7,54 +7,6 @@ using Library.Extensions;
 
 namespace Library.Helper
 {
-    public class TypeValueAttribute : Attribute
-    {
-        public Type value { get; protected set; }
-
-        public TypeValueAttribute(Type value = null)
-        {
-            this.value = value;
-        }
-    }
-
-    public class StringValueAttribute : Attribute
-    {
-        public string value { get; protected set; }
-
-        public StringValueAttribute(string value = "")
-        {
-            this.value = value;
-        }
-    }
-
-    public class HookValueAttribute : StringValueAttribute
-    {
-        public HookValueAttribute(string value = "")
-        {
-            this.value = value;
-        }
-    }
-
-    public class IntValueAttribute : Attribute
-    {
-        public int value { get; protected set; }
-
-        public IntValueAttribute(int value = 0)
-        {
-            this.value = value;
-        }
-    }
-
-    public class BoolValueAttribute : Attribute
-    {
-        public bool value { get; protected set; }
-
-        public BoolValueAttribute(bool value = false)
-        {
-            this.value = value;
-        }
-    }
-
     public static class AttributeHelper
     {
         #region enum
@@ -133,6 +85,13 @@ namespace Library.Helper
             return cache;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T">FieldInfo</typeparam>
+        /// <typeparam name="TK">Attribute</typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static IDictionary<T, TK> GetCacheDefaultValue<T, TK>(List<T> list) where T : struct
         {
             return GetCache<T, DefaultValueAttribute>(list)

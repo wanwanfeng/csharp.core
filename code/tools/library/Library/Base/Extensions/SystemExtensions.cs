@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Library.Helper;
 
@@ -7,26 +8,42 @@ namespace Library.Extensions
 {
     public class SystemConsole
     {
-        public static void Run<T>(Action<object> callAction = null) where T : struct
+        public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
-            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int) p.Key);
+            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int)p.Key);
             var cacheDesc = AttributeHelper.GetCacheDescription<T>();
             do
             {
                 Console.Clear();
 
                 List<string> showList = new List<string>();
-                foreach (var value in Enum.GetValues(typeof (T)))
+
+                var lineNum = (cacheType.Count/columnsCount + 1);
+                var cache =
+                    EnumHelper.ToIntDic<T>()
+                        .ToDictionary(p => p.Value, q => q.Key)
+                        .ToLookup(p => p.Key % lineNum, q => q)
+                        .ToDictionary(p => p.Key, q => q.ToList());
+
+                foreach (var value in cache)
                 {
-                    var tips = cacheDesc[(T) value];
-                    tips = string.IsNullOrEmpty(tips) ? value.ToString() : tips;
-                    showList.Add(string.Format("\t{0}\t", (int) value + "：" + tips));
+                    var res = new List<string>();
+                    foreach (KeyValuePair<int, T> pair in value.Value)
+                    {
+                        var tips = cacheDesc[pair.Value];
+                        tips = pair.Key + "：" + (string.IsNullOrEmpty(tips) ? pair.Value.ToString() : tips);
+                        res.Add(tips.PadRight(20));
+                    }
+                  
+                    showList.Add("\t" + string.Join("\t",res.ToArray()));
                 }
+
                 int maxLine = showList.Max(p => p.Length) + 20;
+
                 showList.Add(' '.CopyChar(maxLine));
                 showList.Add('-'.CopyChar(maxLine));
                 showList.Insert(0, ' '.CopyChar(maxLine));
-                showList.Insert(0, '-'.CopyChar(maxLine/2 - 2) + "命令索引" + '-'.CopyChar(maxLine/2 - 2));
+                showList.Insert(0, '-'.CopyChar(maxLine/2 - 4) + "命令索引" + '-'.CopyChar(maxLine/2 - 4));
                 showList.ForEach(Console.WriteLine);
 
                 try
@@ -35,6 +52,7 @@ namespace Library.Extensions
 
                     if (cacheType.ContainsKey(caoType))
                     {
+                        Console.WriteLine("当前的选择：" + caoType);
                         var obj = Activator.CreateInstance(cacheType[caoType].Value.value);
                         if (callAction != null)
                         {

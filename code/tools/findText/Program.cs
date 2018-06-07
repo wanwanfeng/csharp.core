@@ -1,7 +1,7 @@
 ﻿using System;
 using findText.Script;
+using Library;
 using Library.Extensions;
-using Library.Helper;
 
 namespace findText
 {

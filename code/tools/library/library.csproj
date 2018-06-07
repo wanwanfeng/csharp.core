@@ -47,6 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Base\Attribute\NameAttribute.cs" />
+    <Compile Include="Library\Base\Attribute\Value\StringValueAttribute.cs" />
+    <Compile Include="Library\Base\Attribute\HookValueAttribute.cs" />
+    <Compile Include="Library\Base\Attribute\Value\IntValueAttribute.cs" />
+    <Compile Include="Library\Base\Attribute\Value\BoolValueAttribute.cs" />
+    <Compile Include="Library\Base\Attribute\Value\TypeValueAttribute.cs" />
     <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />

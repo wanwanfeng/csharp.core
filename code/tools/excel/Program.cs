@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using Library.Extensions;
@@ -25,7 +26,6 @@ namespace Library.Excel
 {
     public enum CaoType
     {
-        [TypeValue(typeof (CompareExcel))] CompareExcel = 0,
         [TypeValue(typeof (ActionJson.ToXml))] JsonToXml,
         [TypeValue(typeof (ActionJson.ToCsv))] JsonToCsv,
         [TypeValue(typeof (ActionJson.ToExcel))] JsonToExcel,
@@ -38,6 +38,8 @@ namespace Library.Excel
         [TypeValue(typeof (ActionExcel.ToJson))] ExcelToJson,
         [TypeValue(typeof (ActionExcel.ToExcel))] ExcelToExcel,
         [TypeValue(typeof (ActionExcel.ToOneExcel))] ExcelToOneExcel,
+        [TypeValue(typeof (ActionExcel.ToKvExcel))] ExcelToKvExcel,
+        [TypeValue(typeof (ActionExcel.KvExcelTo))] ExcelKvExcelTo,
 
         [TypeValue(typeof (ActionXml.ToCsv))] XmlToCsv,
         [TypeValue(typeof (ActionXml.ToJson))] XmlToJson,
@@ -52,6 +54,8 @@ namespace Library.Excel
         [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
         [TypeValue(typeof (ActionCSV.ToKvExcel))] CsvToKvExcel,
         [TypeValue(typeof (ActionCSV.KvExcelTo))] CsvKvExcelTo,
+
+        [TypeValue(typeof (CompareExcel))] CompareExcel,
     }
 
 
@@ -65,7 +69,7 @@ namespace Library.Excel
 
         private static void Main(string[] args)
         {
-            SystemConsole.Run<CaoType>();
+            SystemConsole.Run<CaoType>(null, 3);
         }
     }
 }

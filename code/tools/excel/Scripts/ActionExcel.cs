@@ -54,5 +54,27 @@ namespace Script
                 ToOneExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
             }
         }
+
+        /// <summary>
+        /// 导出为键值对
+        /// </summary>
+        public class ToKvExcel
+        {
+            public ToKvExcel()
+            {
+                ToKvExcel(".xlsx|.xls", (file, b) => ExcelByNpoi.ExcelToDataTable(file, false).FirstOrDefault());
+            }
+        }
+
+        /// <summary>
+        /// 还原键值对
+        /// </summary>
+        public class KvExcelTo
+        {
+            public KvExcelTo()
+            {
+                KvExcelTo((dt, file) => ExcelByNpoi.DataTableToExcel(file, dt));
+            }
+        }
     }
 }

@@ -17,8 +17,8 @@ namespace Script
 
         public CompareExcel()
         {
-            dir1 = SystemExtensions.GetInputStr("请拖入选定文件(.xls|xlsx):", "您选择的文件：");
-            dir2 = SystemExtensions.GetInputStr("请拖入选定文件(.xls|xlsx):", "您选择的文件：");
+            dir1 = SystemConsole.GetInputStr("请拖入选定文件(.xls|xlsx):", "您选择的文件：");
+            dir2 = SystemConsole.GetInputStr("请拖入选定文件(.xls|xlsx):", "您选择的文件：");
 
             var vals1 = new ExcelByNpoi().ReadFromExcels(dir1);
             var vals2 = new ExcelByNpoi().ReadFromExcels(dir2);

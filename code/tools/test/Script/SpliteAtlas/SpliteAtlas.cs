@@ -20,8 +20,8 @@ namespace Script
         /// </summary>
         public SpliteAtlas()
         {
-            cmd = SystemExtensions.GetInputStr("图集拆解(y)，图集合并(n)，文件夹删除(d):", "","y");
-            root = SystemExtensions.GetInputStr("请拖入选定（文件夹或文件）:");
+            cmd = SystemConsole.GetInputStr("图集拆解(y)，图集合并(n)，文件夹删除(d):", "","y");
+            root = SystemConsole.GetInputStr("请拖入选定（文件夹或文件）:");
 
             List<string> res = new List<string>();
             if (Directory.Exists(root))

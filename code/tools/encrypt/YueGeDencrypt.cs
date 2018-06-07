@@ -26,7 +26,7 @@ namespace encrypt
             Console.WriteLine("-----------------------------");
             Console.WriteLine("");
 
-            string root = SystemExtensions.GetInputStr("输入加密的目标目录:");
+            string root = SystemConsole.GetInputStr("输入加密的目标目录:");
             if (Directory.Exists(root))
             {
                 var folder = Path.GetFileName(root);
@@ -72,7 +72,7 @@ namespace encrypt
         {
             Dictionary<string, string> cache = new Dictionary<string, string>();
 
-            string root = SystemExtensions.GetInputStr("输入原始目录获取md5对应关系:");
+            string root = SystemConsole.GetInputStr("输入原始目录获取md5对应关系:");
 
             var folder = Path.GetFileName(root);
             if (folder != "app")

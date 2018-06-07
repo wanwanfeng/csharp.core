@@ -23,7 +23,7 @@ namespace Script
             get
             {
                 if (!string.IsNullOrEmpty(_root)) return _root;
-                _root = SystemExtensions.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
+                _root = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
                 if (!string.IsNullOrEmpty(_root)) _root = _root.Replace("\\", "/");
                 return _root;
             }

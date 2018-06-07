@@ -13,7 +13,7 @@ namespace scenario_tools
     {
         private static void Main(string[] args)
         {
-            switch (SystemExtensions.GetInputStr("1:读取csv写入excel\n2:读取excel写入json\ninput:"))
+            switch (SystemConsole.GetInputStr("1:读取csv写入excel\n2:读取excel写入json\ninput:"))
             {
                 case "1":
                     new ReadCsv();

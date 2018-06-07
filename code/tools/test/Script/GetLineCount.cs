@@ -13,10 +13,10 @@ namespace test
         {
             do
             {
-                var folder = SystemExtensions.GetInputStr("请拖入文件夹：");
+                var folder = SystemConsole.GetInputStr("请拖入文件夹：");
                 if (!Directory.Exists(folder))
                     continue;
-                var ex = SystemExtensions.GetInputStr("请输入文件后缀(如\"cs,cpp\"：");
+                var ex = SystemConsole.GetInputStr("请输入文件后缀(如\"cs,cpp\"：");
                 if (string.IsNullOrEmpty(folder))
                     continue;
 
@@ -34,7 +34,7 @@ namespace test
                         sum += File.ReadAllLines(p).Length;
                 });
                 Console.WriteLine("总行数：" + sum);
-            } while (SystemExtensions.ContinueY());
+            } while (SystemConsole.ContinueY());
         }
     }
 }

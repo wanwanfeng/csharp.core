@@ -1,26 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using Library.Extensions;
-using Library.Helper;
-using Library.LitJson;
 using Script;
-//#define ExcelByOleDb
-//#define ExcelByNpoi
-//#define ExcelByOffice
-//#define ExcelByStream
-
-#if ExcelByOleDb
-using ExcelClass = Library.Excel.ExcelByOleDb;
-#elif ExcelByNpoi
-using ExcelClass = Library.Excel.ExcelByNpoi;
-#elif ExcelByOffice
-using ExcelClass = Library.Excel.ExcelByOffice;
-#elif ExcelByStream
-using ExcelClass = Library.Excel.ExcelByStream;
-#endif
 
 namespace Library.Excel
 {

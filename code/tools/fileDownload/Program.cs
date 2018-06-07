@@ -49,10 +49,10 @@ namespace fileDownload
 
         private static void Main(string[] args)
         {
-            Cmd1 = SystemExtensions.GetInputStr("1:down\n2:md5还原与解密\nInput:");
-            FromExcel = SystemExtensions.GetInputStr("1:来自excel\n2:来自json\nInput:");
+            Cmd1 = SystemConsole.GetInputStr("1:down\n2:md5还原与解密\nInput:");
+            FromExcel = SystemConsole.GetInputStr("1:来自excel\n2:来自json\nInput:");
 
-            root = SystemExtensions.GetInputStr("输入文件目录:");
+            root = SystemConsole.GetInputStr("输入文件目录:");
             Dictionary<string, JsonData> cacheMaster = CacheJson("c_master").ToDictionary(p => "master/" + p.Key, q => q.Value);
             Dictionary<string, JsonData> cacheRresource = CacheJson("c_resource");//.Where(p => p.Key.Contains("unity")).ToDictionary(p => p.Key, q => q.Value);
 

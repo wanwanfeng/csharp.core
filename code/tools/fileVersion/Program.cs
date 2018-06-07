@@ -33,7 +33,7 @@ SvnList [输入sl]
             {
                 Console.WriteLine(msg);
                 CommonBase commonBase = null;
-                switch (SystemExtensions.GetInputStr("请输入选择，然后回车："))
+                switch (SystemConsole.GetInputStr("请输入选择，然后回车："))
                 {
                     case "sm":
                         commonBase = new SvnMaster();
@@ -63,7 +63,7 @@ SvnList [输入sl]
                     commonBase.Run();
 
                 Console.Clear();
-            } while (SystemExtensions.ContinueY("按y键继续,按其余键退出......"));
+            } while (SystemConsole.ContinueY("按y键继续,按其余键退出......"));
         }
 
 

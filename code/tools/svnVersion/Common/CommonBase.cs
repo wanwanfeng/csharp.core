@@ -145,7 +145,7 @@ namespace SvnVersion
         /// <param name="cache"></param>
         protected void MakAESEncrypt(Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemExtensions.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y")
+            if (SystemConsole.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y")
             {
                 int index = 0;
                 foreach (var pair in cache)
@@ -184,7 +184,7 @@ namespace SvnVersion
         /// <param name="cache"></param>
         protected void PathToMd5(Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
+            if (SystemConsole.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
             {
                 int index = 0;
                 foreach (var s in cache)

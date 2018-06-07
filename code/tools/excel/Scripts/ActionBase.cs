@@ -33,7 +33,7 @@ namespace Script
         {
             List<string> files = new List<string>();
 
-            string path = SystemExtensions.GetInputStr(CacheSelect[selectType], "您选择的文件夹或文件：");
+            string path = SystemConsole.GetInputStr(CacheSelect[selectType], "您选择的文件夹或文件：");
             if (string.IsNullOrEmpty(path))
                 return files;
 

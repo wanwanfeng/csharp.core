@@ -153,12 +153,12 @@ namespace FileVersion
             if (count == 0)
             {
                 Console.WriteLine("可更新文件数目为零！");
-                SystemExtensions.QuitReadKey();
+                SystemConsole.QuitReadKey();
             }
             else
             {
                 Console.WriteLine("可更新文件数目为{0}！", count);
-                SystemExtensions.ContinueReadKey();
+                SystemConsole.ContinueReadKey();
             }
         }
 
@@ -195,7 +195,7 @@ namespace FileVersion
         /// <param name="cache"></param>
         protected void PathToMd5(string dir, string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemExtensions.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
+            if (SystemConsole.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
             {
                 if (dir == null) return;
                 string targetMd5Dir;
@@ -229,7 +229,7 @@ namespace FileVersion
         /// <param name="cache"></param>
         protected void MakAESEncrypt(string targetDir, Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemExtensions.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y")
+            if (SystemConsole.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y")
             {
                 int index = 0;
                 foreach (var s in cache)
@@ -266,7 +266,7 @@ namespace FileVersion
         protected void MakeFolder(string dir, string targetDir)
         {
             if (dir == null) return;
-            bool yes = SystemExtensions.GetInputStr("\n是否将文件夹压缩（y/n）：", "", "y") == "y";
+            bool yes = SystemConsole.GetInputStr("\n是否将文件夹压缩（y/n）：", "", "y") == "y";
             if (!yes) return;
 
             string targetMd5Dir;
@@ -345,7 +345,7 @@ namespace FileVersion
             if (dic.Count == 0) return;
             List<FilePatchInfo> svnPatchInfos = new List<FilePatchInfo>();
 
-            bool yes = SystemExtensions.GetInputStr("\n是否对文件进行加密（y/n），然后回车：", "", "y") == "y";
+            bool yes = SystemConsole.GetInputStr("\n是否对文件进行加密（y/n），然后回车：", "", "y") == "y";
 
             foreach (KeyValuePair<string, List<string>> pair in dic)
             {

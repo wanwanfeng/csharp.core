@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Library.Helper;
 
@@ -48,7 +47,7 @@ namespace Library.Extensions
 
                 try
                 {
-                    int caoType = SystemExtensions.GetInputStr("请选择，然后回车：").AsInt();
+                    int caoType = SystemConsole.GetInputStr("请选择，然后回车：").AsInt();
 
                     if (cacheType.ContainsKey(caoType))
                     {
@@ -70,12 +69,9 @@ namespace Library.Extensions
                 }
 
                 GC.Collect();
-            } while (SystemExtensions.ContinueY());
+            } while (ContinueY());
         }
-    }
 
-    public class SystemExtensions
-    {
         /// <summary>
         /// 用于控制台程序
         /// </summary>

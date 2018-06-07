@@ -14,7 +14,7 @@ namespace FileVersion
         {
             base.Run();
             var msg = string.Format("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = SystemExtensions.GetInputStr(msg).AsLong();
+            endVersion = SystemConsole.GetInputStr(msg).AsLong();
             endVersion = Math.Max(endVersion, lowVersion);
             endVersion = Math.Min(endVersion, highVersion);
             Console.WriteLine("目标版本号：" + endVersion);

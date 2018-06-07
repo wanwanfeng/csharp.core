@@ -13,7 +13,7 @@ namespace scenario_tools
     {
         public ReadCsv()
         {
-            var path = SystemExtensions.GetInputStr("请输入剧情CSV目录：", "", @"D:\Work\yuege\www\assets\res\scenario");
+            var path = SystemConsole.GetInputStr("请输入剧情CSV目录：", "", @"D:\Work\yuege\www\assets\res\scenario");
             var files = Directory.GetFiles(path, "*.txt").ToList();
             files.Sort();
 

@@ -17,8 +17,8 @@ namespace Script
 
         public CompareFolder()
         {
-            dir1 = SystemExtensions.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
-            dir2 = SystemExtensions.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
+            dir1 = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
+            dir2 = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
             var last1 = Directory.GetFiles(dir1, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir1, ""));
             var last2 = Directory.GetFiles(dir2, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir2, ""));
             var last = last1.Except(last2).Select(p => dir1 + p).ToList();

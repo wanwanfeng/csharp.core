@@ -68,7 +68,7 @@ namespace SvnVersion
             }
             catch (Exception e)
             {
-                SystemExtensions.QuitReadKey("请判断远程库连接是否正确！" + e.Message);
+                SystemConsole.QuitReadKey("请判断远程库连接是否正确！" + e.Message);
             }
 
             Dictionary<string, FileDetailInfo> oldCache = new Dictionary<string, FileDetailInfo>();
@@ -114,20 +114,20 @@ namespace SvnVersion
             if (count == 0)
             {
                 Console.WriteLine("可更新文件数目为零！");
-                SystemExtensions.QuitReadKey();
+                SystemConsole.QuitReadKey();
                 return false;
             }
             else
             {
                 Console.WriteLine("可更新文件数目为{0}！", count);
-                SystemExtensions.ContinueReadKey();
+                SystemConsole.ContinueReadKey();
             }
             return true;
         }
 
         private void ExportFile(Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemExtensions.GetInputStr("\n是否导出目标版本号文件（y/n）：", "", "y") == "y")
+            if (SystemConsole.GetInputStr("\n是否导出目标版本号文件（y/n）：", "", "y") == "y")
             {
                 List<string> del = new List<string>();
                 int index = 0;

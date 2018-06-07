@@ -20,7 +20,7 @@ namespace encrypt
         {
             var md5Key = "kEfGhnNmeu4YYuhv";
 
-            var root = SystemExtensions.GetInputStr("输入目录:");
+            var root = SystemConsole.GetInputStr("输入目录:");
             if (Directory.Exists(root))
             {
                 var folder = Path.GetFileName(root);

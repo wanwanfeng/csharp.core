@@ -23,7 +23,7 @@ namespace encrypt
                 Console.WriteLine("2;解密");
                 Console.WriteLine("---------------------------");
 
-                var cmd = SystemExtensions.GetInputStr("输入指令：");
+                var cmd = SystemConsole.GetInputStr("输入指令：");
                 do
                 {
                     switch (cmd)
@@ -35,8 +35,8 @@ namespace encrypt
                             new YueGeDencrypt();
                             break;
                     }
-                } while (SystemExtensions.ContinueY());
-            } while (SystemExtensions.ContinueY());
+                } while (SystemConsole.ContinueY());
+            } while (SystemConsole.ContinueY());
 
             return;
 

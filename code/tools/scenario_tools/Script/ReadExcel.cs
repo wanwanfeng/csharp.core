@@ -16,7 +16,7 @@ namespace scenario_tools
 
         public ReadExcel()
         {
-            path = SystemExtensions.GetInputStr("请输入剧情文件（.xls|.xlsx）：", "", @"D:\Work\yuege\www\assets\res\scenario.xls");
+            path = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：", "", @"D:\Work\yuege\www\assets\res\scenario.xls");
             var dic = new ExcelByNpoi().ReadFromExcels(path);
 
             Dictionary<string, List<JsonData>> dicT = new Dictionary<string, List<JsonData>>();

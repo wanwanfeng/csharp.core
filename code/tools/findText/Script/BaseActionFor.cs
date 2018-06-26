@@ -117,7 +117,7 @@ namespace findText
 
         protected string GetShowAll(int i)
         {
-            Console.WriteLine("搜索中...请稍后" + ((float)i / all.Count).ToString("f") + "\t" + all[i]);
+            Console.WriteLine("搜索中...请稍后" + ((float) i/all.Count).ToString("f") + "\t" + all[i]);
             return File.ReadAllText(all[i]);
         }
 
@@ -135,7 +135,7 @@ namespace findText
 
         protected void GetJsonValue(string val, int i, int k, string[] input)
         {
-            var dir = Path.GetDirectoryName(inputPath).Replace("\\","/");
+            var dir = Path.GetDirectoryName(inputPath).Replace("\\", "/");
             if (string.IsNullOrEmpty(val.Trim())) return;
             JsonData jsonData = new JsonData();
             jsonData["文件名"] = all[i].Replace(dir, "");
@@ -147,50 +147,43 @@ namespace findText
 
         public virtual void Revert(string inputPath)
         {
-            if (!File.Exists(inputPath))
-            {
-                Console.WriteLine("file is not exist!");
-            }
-            else
-            {
-                Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
+            Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
 
-                foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            {
+                JsonData jsonData = SetJsonDataArray(pair.Value, true);
+
+                var i = 0;
+                foreach (JsonData data in jsonData)
                 {
-                    JsonData jsonData = SetJsonDataArray(pair.Value, true);
+                    string temp = data["文件名"].ToString();
+                    Console.WriteLine("还原中...请稍后" + ((float) (++i)/jsonData.Count).ToString("p1") + "\t" + temp);
 
-                    var i = 0;
-                    foreach (JsonData data in jsonData)
-                    {
-                        string temp = data["文件名"].ToString();
-                        Console.WriteLine("还原中...请稍后" + ((float)(++i) / jsonData.Count).ToString("p1") + "\t" + temp);
+                    string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
+                    string[] content = File.ReadAllLines(path);
+                    int line = data["行号"].ToString().AsInt();
+                    string oldStr = data["原文"].ToString();
+                    //string oldStr2 = data["需翻译"].ToString();
+                    string newStr = data["译文"].ToString();
+                    //if (content[line] == oldStr)
 
-                        string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
-                        string[] content = File.ReadAllLines(path);
-                        int line = data["行号"].ToString().AsInt();
-                        string oldStr = data["原文"].ToString();
-                        //string oldStr2 = data["需翻译"].ToString();
-                        string newStr = data["译文"].ToString();
-                        //if (content[line] == oldStr)
-
-                        var linec = content[line - 1];
-                        content[line - 1] = linec.Replace(oldStr, newStr);
-                        File.WriteAllLines(path, content);
-                    }
-
-                    //foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)
-                    //{
-                    //    string temp = data.Value["文件名"].ToString();
-                    //    string[] content = File.ReadAllLines(temp);
-                    //    int line = data.Value["行号"].ToString().AsInt() + 1;
-                    //    string oldStr = data.Value["原文"].ToString();
-                    //    string oldStr2 = data.Value["需翻译"].ToString();
-                    //    string newStr = data.Value["译文"].ToString();
-                    //    if (content[line] == oldStr)
-                    //        content[line] = content[line].Replace(oldStr2, newStr);
-                    //    File.WriteAllLines(temp, content);
-                    //}
+                    var linec = content[line - 1];
+                    content[line - 1] = linec.Replace(oldStr, newStr);
+                    File.WriteAllLines(path, content);
                 }
+
+                //foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)
+                //{
+                //    string temp = data.Value["文件名"].ToString();
+                //    string[] content = File.ReadAllLines(temp);
+                //    int line = data.Value["行号"].ToString().AsInt() + 1;
+                //    string oldStr = data.Value["原文"].ToString();
+                //    string oldStr2 = data.Value["需翻译"].ToString();
+                //    string newStr = data.Value["译文"].ToString();
+                //    if (content[line] == oldStr)
+                //        content[line] = content[line].Replace(oldStr2, newStr);
+                //    File.WriteAllLines(temp, content);
+                //}
             }
         }
     }

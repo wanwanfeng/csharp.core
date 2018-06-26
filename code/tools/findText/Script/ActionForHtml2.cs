@@ -83,6 +83,7 @@ namespace findText.Script
                     .Where(p => !p.HasChildNodes)
                     .Where(node => !string.IsNullOrEmpty(node.InnerText.Trim()))
                     .Where(node => node.InnerText != "\r\n")
+                    .Where(node => !node.InnerText.TrimStart().StartsWith("<%"))
                     .Where(node => regex.Matches(node.InnerText).Count != 0).ToList();
                 foreach (HtmlNode node in childs)
                 {

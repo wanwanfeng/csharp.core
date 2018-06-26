@@ -15,6 +15,7 @@ namespace findText
             [TypeValue(typeof (ActionForJava))] java,
             [TypeValue(typeof (ActionForJavaScript))] javascript,
             [TypeValue(typeof (ActionForHtml))] html,
+            [TypeValue(typeof (ActionForHtml2))] html2,
         }
 
         private static void Main(string[] args)

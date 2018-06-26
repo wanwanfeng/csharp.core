@@ -36,8 +36,9 @@ namespace Library.Extensions
                   
                     showList.Add("\t" + string.Join("\t",res.ToArray()));
                 }
-
                 int maxLine = showList.Max(p => p.Length) + 20;
+                showList.Add("");
+                showList.Add("\t" + "e：exit");
 
                 showList.Add(' '.CopyChar(maxLine));
                 showList.Add('-'.CopyChar(maxLine));

@@ -48,26 +48,12 @@ namespace Script
             return File.ReadAllLines(path);
         }
 
-        public void WriteAllLines(string name, string[] content)
+        public void WriteAllLines(Dictionary<string, string> dic)
         {
-            var path = Folder + name + ".txt";
-            FileHelper.CreateDirectory(path);
-            File.WriteAllLines(path, content);
-        }
-
-
-        public void WriteAllLines(Dictionary<string,string> dic)
-        {
-            //WriteAllLines("key", dic.Keys.ToArray());
-            //WriteAllLines("value", dic.Values.ToArray());
-
             //直接写入excel
             List<List<object>> vals = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList();
-            vals.Insert(0,new List<object>(){"key","value"});
-            ExcelByNpoi.DataTableToExcel(Folder + "Haha.xlsx", ExcelByBase.ConvertListToDataTable(vals));
-
-
-            //WriteAllLines("kv", dic.Select(p => p.Value + "\r\n" + p.Key).ToArray());
+            vals.Insert(0, new List<object>() {"key", "value"});
+            ExcelByNpoi.DataTableToExcel(root, ExcelByBase.ConvertListToDataTable(vals));
         }
 
         public void CreateDirectory(string name)

@@ -34,6 +34,9 @@ namespace encrypt
                         case "2":
                             new YueGeDencrypt();
                             break;
+                        default:
+                            new YueGeDencrypt2();
+                            break;
                     }
                 } while (SystemConsole.ContinueY());
             } while (SystemConsole.ContinueY());

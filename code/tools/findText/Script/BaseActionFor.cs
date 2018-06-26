@@ -26,7 +26,7 @@ namespace findText
             }
         }
 
-        private JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
+        protected virtual JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
         {
             JsonData jsonDatas = new JsonData();
             jsonDatas.SetJsonType(JsonType.Array);
@@ -48,7 +48,7 @@ namespace findText
             return jsonDatas;
         }
 
-        private List<List<object>> GetJsonDataArray(string content)
+        public virtual List<List<object>> GetJsonDataArray(string content)
         {
             return LitJsonHelper.ConvertJsonToList(content, str =>
             {
@@ -65,7 +65,7 @@ namespace findText
                 return;
             }
             Console.WriteLine("正在写入Excel...");
-            string outpath = inputPath + ".xls";
+            string outpath = inputPath + ".xlsx";
             new ExcelByNpoi().WriteToExcel(outpath, vals);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);
@@ -87,14 +87,13 @@ namespace findText
 
         public void Open(string input)
         {
-            inputPath = input;
-
-            if (!Directory.Exists(inputPath))
+            if (!Directory.Exists(input))
             {
                 Console.WriteLine("文件夹路径不存在!");
             }
             else
             {
+                inputPath = input.Replace("\\", "/");
                 all =
                     Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories)
                         .Where(p => exName.Contains(Path.GetExtension(p)))
@@ -115,11 +114,30 @@ namespace findText
             return File.ReadAllLines(all[i]);
         }
 
-        protected void GetJsonValue(string val, int i, int k, string[] input)
+        protected string GetShowAll(int i)
         {
+            Console.WriteLine("搜索中...请稍后" + ((float)i / all.Count).ToString("f") + "\t" + all[i]);
+            return File.ReadAllText(all[i]);
+        }
+
+        protected void GetJsonValue(string val, int i, string k, string input)
+        {
+            var dir = Path.GetDirectoryName(inputPath).Replace("\\", "/");
             if (string.IsNullOrEmpty(val.Trim())) return;
             JsonData jsonData = new JsonData();
-            jsonData["文件名"] = all[i];
+            jsonData["文件名"] = all[i].Replace(dir, "");
+            jsonData["行号"] = k;
+            jsonData["原文"] = input.Trim();
+            jsonData["译文"] = val.Trim();
+            resJsonData.Add(jsonData);
+        }
+
+        protected void GetJsonValue(string val, int i, int k, string[] input)
+        {
+            var dir = Path.GetDirectoryName(inputPath).Replace("\\","/");
+            if (string.IsNullOrEmpty(val.Trim())) return;
+            JsonData jsonData = new JsonData();
+            jsonData["文件名"] = all[i].Replace(dir, "");
             jsonData["行号"] = k + 1;
             jsonData["原文"] = input[k].Trim();
             jsonData["译文"] = val.Trim();
@@ -134,7 +152,7 @@ namespace findText
             }
             else
             {
-                Dictionary<string, List<List<object>>> dic = new ExcelByReader().ReadFromExcels(inputPath);
+                Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
 
                 foreach (KeyValuePair<string, List<List<object>>> pair in dic)
                 {
@@ -144,9 +162,9 @@ namespace findText
                     foreach (JsonData data in jsonData)
                     {
                         string temp = data["文件名"].ToString();
-                        Console.WriteLine("还原中...请稍后" + ((float)i / all.Count).ToString("f") + "\t" + temp);
+                        Console.WriteLine("还原中...请稍后" + ((float)(++i) / jsonData.Count).ToString("p1") + "\t" + temp);
 
-                        string path = (inputPath + temp).Replace("\\", "/");
+                        string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
                         string[] content = File.ReadAllLines(path);
                         int line = data["行号"].ToString().AsInt();
                         string oldStr = data["原文"].ToString();

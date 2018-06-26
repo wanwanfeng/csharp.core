@@ -100,6 +100,7 @@ namespace findText
                         .Select(p => p.Replace("\\", "/"))
                         .ToList();
                 all.Sort();
+                resJsonData = new JsonData();
                 regex = new Regex(regexStr);
                 OpenRun();
                 WriteExcel(resJsonData);

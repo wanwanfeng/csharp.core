@@ -93,7 +93,7 @@ namespace Library
         }
     }
 
-    public interface IEncrypt
+    internal interface IEncrypt
     {
         string Encrypt(byte[] input);
         string Encrypt(string input);
@@ -101,7 +101,7 @@ namespace Library
         bool Comparer(string hash, string str);
     }
 
-    public interface IDencrypt
+    internal interface IDencrypt
     {
         string Dencrypt(byte[] input);
         string Dencrypt(string input);
@@ -155,9 +155,9 @@ namespace Library
     }
 
     /// <summary>
-    /// 加密解密工具
+    /// 加密工具
     /// </summary>
-    public class SHA1 : BaseEncrypt
+    internal class SHA1 : BaseEncrypt
     {
         //SHA1加密  
         public override string Encrypt(byte[] input)
@@ -179,9 +179,9 @@ namespace Library
     }
 
     /// <summary>
-    /// 加密解密工具
+    /// 加密工具
     /// </summary>
-    public class MD5 : BaseEncrypt
+    internal class MD5 : BaseEncrypt
     {
         //MD5加密  
         public override string Encrypt(byte[] input)
@@ -204,9 +204,9 @@ namespace Library
     }
 
     /// <summary>
-    /// 加密解密工具
+    /// 加密工具
     /// </summary>
-    public class MD516 : BaseEncrypt
+    internal class MD516 : BaseEncrypt
     {
         //MD5加密  
         public override string Encrypt(byte[] input)
@@ -217,10 +217,6 @@ namespace Library
                 byte[] data = md5.ComputeHash(input);
                 (md5 as IDisposable).Dispose();
                 return BitConverter.ToString(data, 4, 8).Replace("-", "");
-                var sBuilder = new StringBuilder();
-                foreach (var bt in data)
-                    sBuilder.Append(bt.ToString("x2"));
-                return sBuilder.ToString();
             }
             catch (Exception ex)
             {
@@ -232,7 +228,7 @@ namespace Library
     /// <summary>
     /// 加密解密工具
     /// </summary>
-    public class AES : BaseEncrypt, IDencrypt
+    internal class AES : BaseEncrypt, IDencrypt
     {
         //加密和解密采用相同的key,具体值自己填，但是必须为32位//
         public static string Head = "5986157849545freho950173582krhd0";

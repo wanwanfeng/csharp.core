@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Library.Excel;
 using Library.LitJson;
@@ -116,61 +115,54 @@ namespace findText.Script
 
         public override void Revert(string inputPath)
         {
-            if (!File.Exists(inputPath))
-            {
-                Console.WriteLine("file is not exist!");
-            }
-            else
-            {
-                Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
+            Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
 
-                foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            {
+                JsonData jsonData = SetJsonDataArray(pair.Value, true);
+
+                Dictionary<string, List<JsonData>> cache = new Dictionary<string, List<JsonData>>();
+                foreach (JsonData data in jsonData)
                 {
-                    JsonData jsonData = SetJsonDataArray(pair.Value, true);
+                    string temp = data["文件名"].ToString();
+                    List<JsonData> list;
+                    if (cache.TryGetValue(temp, out list))
+                        list.Add(data);
+                    else
+                        cache[temp] = new List<JsonData>() {data};
+                }
+                var i = 0;
 
-                    Dictionary<string, List<JsonData>> cache = new Dictionary<string, List<JsonData>>();
-                    foreach (JsonData data in jsonData)
+                foreach (KeyValuePair<string, List<JsonData>> valuePair in cache)
+                {
+                    string temp = valuePair.Key;
+                    Console.WriteLine("还原中...请稍后" + ((float) (++i)/cache.Count).ToString("p1") + "\t" + temp);
+
+                    string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
+                    string content = File.ReadAllText(path);
+
+                    HtmlDocument doc = new HtmlDocument();
+                    doc.LoadHtml(content);
+                    HtmlNode rootnode = doc.DocumentNode;
+                    var childs = rootnode.Descendants().Where(p => !p.HasChildNodes).ToList();
+
+                    bool isSave = false;
+
+                    foreach (JsonData data in valuePair.Value)
                     {
-                        string temp = data["文件名"].ToString();
-                        List<JsonData> list;
-                        if (cache.TryGetValue(temp, out list))
-                            list.Add(data);
-                        else
-                            cache[temp] = new List<JsonData>() {data};
+                        string xPath = data["行号"].ToString();
+                        string oldStr = data["原文"].ToString();
+                        string newStr = data["译文"].ToString();
+                        HtmlNode oldNode = childs.FirstOrDefault(p => p.XPath == xPath);
+                        if (oldNode == null) continue;
+                        HtmlNode newNode = HtmlNode.CreateNode(newStr);
+                        if (oldNode.InnerText == oldStr)
+                            continue;
+                        oldNode.ParentNode.ReplaceChild(newNode, oldNode);
+                        isSave = true;
                     }
-                    var i = 0;
-
-                    foreach (KeyValuePair<string, List<JsonData>> valuePair in cache)
-                    {
-                        string temp = valuePair.Key;
-                        Console.WriteLine("还原中...请稍后" + ((float) (++i)/cache.Count).ToString("p1") + "\t" + temp);
-
-                        string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
-                        string content = File.ReadAllText(path);
-
-                        HtmlDocument doc = new HtmlDocument();
-                        doc.LoadHtml(content);
-                        HtmlNode rootnode = doc.DocumentNode;
-                        var childs = rootnode.Descendants().Where(p => !p.HasChildNodes).ToList();
-
-                        bool isSave = false;
-
-                        foreach (JsonData data in valuePair.Value)
-                        {
-                            string xPath = data["行号"].ToString();
-                            string oldStr = data["原文"].ToString();
-                            string newStr = data["译文"].ToString();
-                            HtmlNode oldNode = childs.FirstOrDefault(p => p.XPath == xPath);
-                            if (oldNode == null) continue;
-                            HtmlNode newNode = HtmlNode.CreateNode(newStr);
-                            if (oldNode.InnerText == oldStr)
-                                continue;
-                            oldNode.ParentNode.ReplaceChild(newNode, oldNode);
-                            isSave = true;
-                        }
-                        if (isSave)
-                            doc.Save(path, new UTF8Encoding(false));
-                    }
+                    if (isSave)
+                        doc.Save(path, new UTF8Encoding(false));
                 }
             }
         }

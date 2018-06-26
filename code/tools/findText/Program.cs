@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using findText.Script;
 using Library;
 using Library.Extensions;
@@ -15,7 +16,7 @@ namespace findText
             [TypeValue(typeof (ActionForJava))] java,
             [TypeValue(typeof (ActionForJavaScript))] javascript,
             [TypeValue(typeof (ActionForHtml))] html,
-            [TypeValue(typeof (ActionForHtml2))] html2,
+            [TypeValue(typeof (ActionForHtml2))][Description("html 插件")] html2,
         }
 
         private static void Main(string[] args)

@@ -8,6 +8,26 @@ namespace Library
     {
         public static Encoding DefaultEncoding = Encoding.UTF8;
 
+        public static string MD516(string input)
+        {
+            return new MD516().Encrypt(input);
+        }
+
+        public static bool ComparerMD516(string hash, string input)
+        {
+            return new MD516().Comparer(hash, input);
+        }
+
+        public static string MD516(byte[] input)
+        {
+            return new MD516().Encrypt(input);
+        }
+
+        public static bool ComparerMD516(string hash, byte[] input)
+        {
+            return new MD516().Comparer(hash, input);
+        }
+
         public static string MD5(string input)
         {
             return new MD5().Encrypt(input);
@@ -27,6 +47,7 @@ namespace Library
         {
             return new MD5().Comparer(hash, input);
         }
+
 
         public static string SHA1(string input)
         {
@@ -170,6 +191,32 @@ namespace Library
                 MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
                 byte[] data = md5.ComputeHash(input);
                 (md5 as IDisposable).Dispose();
+                var sBuilder = new StringBuilder();
+                foreach (var bt in data)
+                    sBuilder.Append(bt.ToString("x2"));
+                return sBuilder.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("MD5加密出错：" + ex.Message);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 加密解密工具
+    /// </summary>
+    public class MD516 : BaseEncrypt
+    {
+        //MD5加密  
+        public override string Encrypt(byte[] input)
+        {
+            try
+            {
+                MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+                byte[] data = md5.ComputeHash(input);
+                (md5 as IDisposable).Dispose();
+                return BitConverter.ToString(data, 4, 8).Replace("-", "");
                 var sBuilder = new StringBuilder();
                 foreach (var bt in data)
                     sBuilder.Append(bt.ToString("x2"));

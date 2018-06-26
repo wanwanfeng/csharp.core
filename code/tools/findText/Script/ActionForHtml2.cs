@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Library.Excel;
 using Library.LitJson;
@@ -39,8 +40,6 @@ namespace findText.Script
         //    else
         //    {
         //        if (string.IsNullOrEmpty(node.InnerText.Trim()))
-        //            return;
-        //        if (node.InnerText == "<%")
         //            return;
         //        if (node.InnerText == "\r\n")
         //            return;
@@ -80,7 +79,11 @@ namespace findText.Script
             {
                 HtmlDocument doc = new HtmlDocument();
                 doc.LoadHtml(GetShowAll(i));
-                var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).ToList();
+                var childs = doc.DocumentNode.Descendants()
+                    .Where(p => !p.HasChildNodes)
+                    .Where(node => !string.IsNullOrEmpty(node.InnerText.Trim()))
+                    .Where(node => node.InnerText != "\r\n")
+                    .Where(node => regex.Matches(node.InnerText).Count != 0).ToList();
                 foreach (HtmlNode node in childs)
                 {
                     GetJsonValue(node.InnerText, i, node.XPath, node.InnerText);

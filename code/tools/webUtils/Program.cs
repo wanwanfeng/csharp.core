@@ -5,16 +5,16 @@ using System.Security.Cryptography;
 
 namespace webUtils
 {
-    internal class Program
+    public class Program
     {
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             string projectPath = args.FirstOrDefault();
             if (Directory.Exists(projectPath))
             {
                 var list =
                     Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories)
-                        .Where(p => ".js|.html".Contains(Path.GetExtension(p)))
+                        .Where(p => ".js|.html|.cs".Contains(Path.GetExtension(p)))
                         .ToDictionary(p => p.Replace(projectPath + "\\", "").Replace("\\", "/"),
                             q => Md516(File.ReadAllBytes(q)))
                         .Select(p => string.Format("\"{0}\":\"{1}\"", p.Key, p.Value.ToLower()))

@@ -14,13 +14,13 @@ namespace webUtils
             {
                 var list =
                     Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories)
-                        .Where(p => ".js|.html|.cs".Contains(Path.GetExtension(p)))
+                        .Where(p => ".js|.html|.css".Contains(Path.GetExtension(p)))
                         .ToDictionary(p => p.Replace(projectPath + "\\", "").Replace("\\", "/"),
                             q => Md516(File.ReadAllBytes(q)))
                         .Select(p => string.Format("\"{0}\":\"{1}\"", p.Key, p.Value.ToLower()))
                         .ToList();
 
-                var content = string.Format("var fileTimeStamp = {{{0}}}", string.Join(",", list.ToArray()));
+                var content = string.Format("var fileTimeStamp = {{{0}}};", string.Join(",", list.ToArray()));
                 File.WriteAllText(projectPath + ".txt", content);
 
                 string[] re = File.ReadAllLines(projectPath + "/js/system/replacement.js");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -10,7 +11,7 @@ namespace webUtils
     {
         public static void Main(string[] args)
         {
-            args = new[] { @"E:\Git\HelloHtml\HBuilderProjects\HelloHBuilder", ".js,.html,.css,.jpg,.png,.gif", "1" };
+            //args = new[] { @"E:\Git\HelloHtml\HBuilderProjects\HelloHBuilder", ".js,.html,.css,.jpg,.png,.gif", "2" };
             string projectPath = args.FirstOrDefault();
             string filter = args.Length <= 1 ? ".js,.html,.css" : args[1];
             string mode = args.Length <= 2 ? "" : args[2];
@@ -18,43 +19,60 @@ namespace webUtils
             {
                 var cache = Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories)
                     .Where(p => filter.Contains(Path.GetExtension(p)))
-                    .ToDictionary(p => p.Replace(projectPath + "\\", "").Replace("\\", "/"),
-                        q => Md516(File.ReadAllBytes(q)));
+                    .Select(p => p.Replace(projectPath + "\\", "").Replace("\\", "/")).ToList();
 
                 string content = "";
                 if (string.IsNullOrEmpty(mode))
                 {
-                    var list = cache.Select(p => string.Format("\"{0}\":\"{1}\"", p.Key, p.Value)).ToList();
-                    content = string.Format("var fileTimeStamp = {{{0}}};", string.Join(",", list.ToArray()));
+                    WritePathToReplacement(projectPath, cache);
                 }
                 else if (mode == "1")
                 {
-                    var list =
-                        cache.ToDictionary(p => Md516(p.Key), q => q.Value)
-                            .Select(p => string.Format("\"{0}\":\"{1}\"", p.Key, p.Value))
-                            .ToList();
-                    content = string.Format("var fileTimeStamp = {{{0}}};", string.Join(",", list.ToArray()));
+                    WriteMd5ToReplacement(projectPath, cache);
                 }
                 else if (mode == "2")
                 {
-                    //var list =
-                    //    cache.Select(p => string.Format("{0}/{1}", p.Key, p.Value))
-                    //        .Select(p => p.Split('/').ToList())
-                    //        .ToLookup(p => p.Count)
-                    //        .ToDictionary(p => p.Key, q => q.ToList());
-                    //content = string.Format("var fileTimeStamp = {{{0}}};", string.Join(",", list.ToArray()));
-                }
+                    var list = cache.ToLookup(Path.GetExtension, q => q)
+                        .ToDictionary(p => p.Key, q => new List<string>(q));
 
-                File.WriteAllText(projectPath + ".txt", content);
+                    var cac = list.Keys.ToList().Select(p => string.Format("js/system/replacement/{0}.js", p.Substring(1))).ToList();
+                    list[".js"].RemoveAll(p => cac.Contains(p));
+                    cac.Clear();
 
-                var res = projectPath + "/js/system/replacement.js";
-                if (File.Exists(res))
-                {
-                    string[] re = File.ReadAllLines(res);
-                    re[0] = content;
-                    File.WriteAllLines(res, re);
+                    foreach (var pair in list)
+                    {
+                        var res = "/js/system/replacement/" + pair.Key.Substring(1);
+                        WritePathToReplacement(projectPath, pair.Value, res);
+                        cac.Add(res.Substring(1) + ".js");
+                    }
+
+                    WritePathToReplacement(projectPath, cac);
                 }
             }
+        }
+
+        private static void WritePathToReplacement(string projectPath, List<string> paths, string pre = "/js/system/replacement")
+        {
+            var res = pre + ".js";
+            paths.Remove(res.Substring(1));
+            var list = paths.Select(p => string.Format("\"{0}\":\"{1}\"", p, Md516(File.ReadAllBytes(projectPath +"/"+ p)))).ToList();
+            var content = string.Format("define({{{0}}});", string.Join(",", list));
+            File.WriteAllText(projectPath + ".txt", content);
+            File.WriteAllText(projectPath +  res, content);
+        }
+
+        private static void WriteMd5ToReplacement(string projectPath, List<string> paths,
+            string pre = "/js/system/replacement")
+        {
+            var res = pre + ".js";
+            paths.Remove(res.Substring(1));
+            var list =
+                paths.Select(
+                    p => string.Format("\"{0}\":\"{1}\"", Md516(p), Md516(File.ReadAllBytes(projectPath + "/" + p))))
+                    .ToList();
+            var content = string.Format("define({{{0}}});", string.Join(",", list));
+            File.WriteAllText(projectPath + ".txt", content);
+            File.WriteAllText(projectPath + res, content);
         }
 
         public static string Md516(string input)

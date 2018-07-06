@@ -37,10 +37,10 @@ namespace webScss
                     Console.WriteLine(exception);
                 }
             }
-            string projectPath = args.Skip(1).FirstOrDefault();
-            if (string.IsNullOrEmpty(projectPath)) return;
-            if (!Directory.Exists(projectPath)) return;
-                webUtils.Program.Main(new[] { projectPath });
+            //string projectPath = args.Skip(1).FirstOrDefault();
+            //if (string.IsNullOrEmpty(projectPath)) return;
+            //if (!Directory.Exists(projectPath)) return;
+            //    webUtils.Program.Main(new[] { projectPath });
         }
 
         protected static void StartCmd(string path,string param)

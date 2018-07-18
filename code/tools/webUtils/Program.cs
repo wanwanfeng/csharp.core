@@ -11,7 +11,7 @@ namespace webUtils
     {
         public static void Main(string[] args)
         {
-            //args = new[] { @"E:\Git\HelloHtml\HBuilderProjects\HelloHBuilder", ".js,.html,.css,.jpg,.png,.gif", "2" };
+            //args = new[] { @"D:\Work\mfxy\client\tw\magica", ".js,.html,.css,.jpg,.png,.gif", "2" };
             string projectPath = args.FirstOrDefault();
             string filter = args.Length <= 1 ? ".js,.html,.css" : args[1];
             string mode = args.Length <= 2 ? "" : args[2];
@@ -34,7 +34,7 @@ namespace webUtils
                 {
                     var list = cache.ToLookup(Path.GetExtension, q => q)
                         .ToDictionary(p => p.Key, q => new List<string>(q));
-
+                    list.Remove("");
                     var cac = list.Keys.ToList().Select(p => string.Format("js/system/replacement/{0}.js", p.Substring(1))).ToList();
                     list[".js"].RemoveAll(p => cac.Contains(p));
                     cac.Clear();
@@ -58,6 +58,10 @@ namespace webUtils
             var list = paths.Select(p => string.Format("\"{0}\":\"{1}\"", p, Md516(File.ReadAllBytes(projectPath +"/"+ p)))).ToList();
             var content = string.Format("define({{{0}}});", string.Join(",", list));
             File.WriteAllText(projectPath + ".txt", content);
+
+            if (!Directory.Exists(Path.GetDirectoryName(projectPath + res)))
+                Directory.CreateDirectory(Path.GetDirectoryName(projectPath + res));
+
             File.WriteAllText(projectPath +  res, content);
         }
 

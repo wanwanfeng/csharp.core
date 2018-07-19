@@ -13,7 +13,7 @@ namespace findText.Script
 
         protected override string[] exName
         {
-            get { return new[] {".html", ".htm"}; }
+            get { return new[] {".html", ".htm", ".tpl"}; }
         }
 
         protected override void OpenRun()

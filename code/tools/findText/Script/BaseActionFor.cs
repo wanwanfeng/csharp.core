@@ -184,7 +184,7 @@ namespace findText
                     }
                     else
                     {
-                        list.Add("不存在的文件：" + temp);
+                        list.Add("不存在的文件：" + path);
                     }
                 }
                 File.WriteAllLines(inputPath + ".txt", list.ToArray());

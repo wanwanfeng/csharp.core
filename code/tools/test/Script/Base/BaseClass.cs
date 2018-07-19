@@ -53,7 +53,7 @@ namespace Script
             //直接写入excel
             List<List<object>> vals = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList();
             vals.Insert(0, new List<object>() {"key", "value"});
-            ExcelByNpoi.DataTableToExcel(root, ExcelByBase.ConvertListToDataTable(vals));
+            ExcelByNpoi.DataTableToExcel(root + ".xlsx", ExcelByBase.ConvertListToDataTable(vals));
         }
 
         public void CreateDirectory(string name)

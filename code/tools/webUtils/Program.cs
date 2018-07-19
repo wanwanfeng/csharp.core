@@ -13,13 +13,20 @@ namespace webUtils
         {
             //args = new[] { @"D:\Work\mfxy\client\tw\magica", ".js,.html,.css,.jpg,.png,.gif", "2" };
             string projectPath = args.FirstOrDefault();
-            string filter = args.Length <= 1 ? ".js,.html,.css" : args[1];
+            string filter = args.Length <= 1 ? ".html,.css,.json,.gif,.png,.jpg" : args[1];
             string mode = args.Length <= 2 ? "" : args[2];
+            string exfile = args.Length <= 3 ? "index.html;js/_common/baseConfig.js;js/system/replacement.js" : args[3];
+
+
             if (Directory.Exists(projectPath))
             {
                 var cache = Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories)
                     .Where(p => filter.Contains(Path.GetExtension(p)))
-                    .Select(p => p.Replace(projectPath + "\\", "").Replace("\\", "/")).ToList();
+                    .Select(p => p.Replace(projectPath + "\\", "").Replace("\\", "/"))
+                    .Except(exfile.Split(';'))
+                    .ToList();
+
+                cache.Sort();
 
                 string content = "";
                 if (string.IsNullOrEmpty(mode))

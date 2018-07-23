@@ -30,7 +30,8 @@ namespace Library.Extensions
                     foreach (KeyValuePair<int, T> pair in value.Value)
                     {
                         var tips = cacheDesc[pair.Value];
-                        tips = pair.Key + "：" + (string.IsNullOrEmpty(tips) ? pair.Value.ToString() : tips);
+                        tips = string.Format("{0:d2}：{1}", pair.Key,
+                            string.IsNullOrEmpty(tips) ? pair.Value.ToString() : tips);
                         res.Add(tips.PadRight(20));
                     }
                   

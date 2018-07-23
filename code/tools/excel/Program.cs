@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Library.Extensions;
 using Script;
 
@@ -6,36 +7,36 @@ namespace Library.Excel
 {
     public enum CaoType
     {
-        [TypeValue(typeof (ActionJson.ToXml))] JsonToXml,
-        [TypeValue(typeof (ActionJson.ToCsv))] JsonToCsv,
-        [TypeValue(typeof (ActionJson.ToExcel))] JsonToExcel,
-        [TypeValue(typeof (ActionJson.ToOneExcel))] JsonToOneExcel,
-        [TypeValue(typeof (ActionJson.ToKvExcel))] JsonToKvExcel,
-        [TypeValue(typeof (ActionJson.KvExcelTo))] JsonKvExcelTo,
+        [TypeValue(typeof(CompareExcel))] CompareExcel,
 
-        [TypeValue(typeof (ActionExcel.ToXml))] ExcelToXml,
-        [TypeValue(typeof (ActionExcel.ToCsv))] ExcelToCsv,
-        [TypeValue(typeof (ActionExcel.ToJson))] ExcelToJson,
-        [TypeValue(typeof (ActionExcel.ToExcel))] ExcelToExcel,
-        [TypeValue(typeof (ActionExcel.ToOneExcel))] ExcelToOneExcel,
-        [TypeValue(typeof (ActionExcel.ToKvExcel))] ExcelToKvExcel,
-        [TypeValue(typeof (ActionExcel.KvExcelTo))] ExcelKvExcelTo,
+        [Description("Excel->ToXml")] [TypeValue(typeof(ActionExcel.ToXml))] ExcelToXml,
+        [Description("Excel->ToCsv")] [TypeValue(typeof(ActionExcel.ToCsv))] ExcelToCsv,
+        [Description("Excel->ToJson")] [TypeValue(typeof(ActionExcel.ToJson))] ExcelToJson,
+        [Description("Excel->ToExcel")] [TypeValue(typeof(ActionExcel.ToExcel))] ExcelToExcel,
+        [Description("Excel->ToOneExcel")] [TypeValue(typeof(ActionExcel.ToOneExcel))] ExcelToOneExcel,
+        [Description("Excel->ToKvExcel")] [TypeValue(typeof(ActionExcel.ToKvExcel))] ExcelToKvExcel,
+        [Description("Excel->KvExcelTo")] [TypeValue(typeof(ActionExcel.KvExcelTo))] ExcelKvExcelTo,
 
-        [TypeValue(typeof (ActionXml.ToCsv))] XmlToCsv,
-        [TypeValue(typeof (ActionXml.ToJson))] XmlToJson,
-        [TypeValue(typeof (ActionXml.ToExcel))] XmlToExcel,
-        [TypeValue(typeof (ActionXml.ToOneExcel))] XmlToOneExcel,
-        [TypeValue(typeof (ActionXml.ToKvExcel))] XmlToKvExcel,
-        [TypeValue(typeof (ActionXml.KvExcelTo))] XmlKvExcelTo,
+        [Description("Json->ToXml")] [TypeValue(typeof(ActionJson.ToXml))] JsonToXml,
+        [Description("Json->ToCsv")] [TypeValue(typeof(ActionJson.ToCsv))] JsonToCsv,
+        [Description("Json->ToExcel")] [TypeValue(typeof(ActionJson.ToExcel))] JsonToExcel,
+        [Description("Json->ToOneExcel")] [TypeValue(typeof(ActionJson.ToOneExcel))] JsonToOneExcel,
+        [Description("Json->ToKvExcel")] [TypeValue(typeof(ActionJson.ToKvExcel))] JsonToKvExcel,
+        [Description("Json->KvExcelTo")] [TypeValue(typeof(ActionJson.KvExcelTo))] JsonKvExcelTo,
 
-        [TypeValue(typeof (ActionCSV.ToXml))] CsvToXml,
-        [TypeValue(typeof (ActionCSV.ToJson))] CsvToJson,
-        [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
-        [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
-        [TypeValue(typeof (ActionCSV.ToKvExcel))] CsvToKvExcel,
-        [TypeValue(typeof (ActionCSV.KvExcelTo))] CsvKvExcelTo,
+        [Description("Xml->ToCsv")] [TypeValue(typeof(ActionXml.ToCsv))] XmlToCsv,
+        [Description("Xml->ToJson")] [TypeValue(typeof(ActionXml.ToJson))] XmlToJson,
+        [Description("Xml->ToExcel")] [TypeValue(typeof(ActionXml.ToExcel))] XmlToExcel,
+        [Description("Xml->ToOneExcel")] [TypeValue(typeof(ActionXml.ToOneExcel))] XmlToOneExcel,
+        [Description("Xml->ToKvExcel")] [TypeValue(typeof(ActionXml.ToKvExcel))] XmlToKvExcel,
+        [Description("Xml->KvExcelTo")] [TypeValue(typeof(ActionXml.KvExcelTo))] XmlKvExcelTo,
 
-        [TypeValue(typeof (CompareExcel))] CompareExcel,
+        [Description("CSV->ToXml")] [TypeValue(typeof(ActionCSV.ToXml))] CsvToXml,
+        [Description("CSV->ToJson")] [TypeValue(typeof(ActionCSV.ToJson))] CsvToJson,
+        [Description("CSV->ToExcel")] [TypeValue(typeof(ActionCSV.ToExcel))] CsvToExcel,
+        [Description("CSV->ToOneExcel")] [TypeValue(typeof(ActionCSV.ToOneExcel))] CsvToOneExcel,
+        [Description("CSV->ToKvExcel")] [TypeValue(typeof(ActionCSV.ToKvExcel))] CsvToKvExcel,
+        [Description("CSV->KvExcelTo")] [TypeValue(typeof(ActionCSV.KvExcelTo))] CsvKvExcelTo,
     }
 
 

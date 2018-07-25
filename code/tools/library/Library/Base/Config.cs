@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -14,12 +15,26 @@ namespace Library
 
         private static string inipath = Environment.CurrentDirectory + "\\config.ini";
 
-        static Config()
+        public static void CheckPath(bool check = false)
         {
             if (File.Exists(inipath))
                 return;
-            File.WriteAllText(inipath, "");
+            if (check)
+                File.WriteAllText(inipath, "");
         }
+
+        public static void SetConfigPath(string path, string fineName)
+        {
+            inipath = path + "\\" + fineName;
+            CheckPath(true);
+        }
+
+        public static void SetConfigPath(string path)
+        {
+            inipath = path + "\\config.ini";
+            CheckPath(true);
+        }
+
 
         /// <summary>
         /// 读取配置ini文件

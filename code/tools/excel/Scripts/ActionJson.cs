@@ -45,22 +45,45 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ToKvExcel
+        public class ArrayToKvExcel
         {
-            public ToKvExcel()
+            public ArrayToKvExcel()
             {
-                ToKvExcel(".json", ExcelByBase.ConvertJsonToDataTableByPath);
+                ArrayToKvExcel(".json", ExcelByBase.ConvertJsonToDataTableByPath);
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class KvExcelTo
+        public class ArrayKvExcelTo
         {
-            public KvExcelTo()
+            public ArrayKvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ConvertDataTableToJsonByPath);
+                ArrayKvExcelTo(ExcelByBase.ConvertDataTableToJsonByPath);
+            }
+        }
+
+
+        /// <summary>
+        /// 导出为键值对
+        /// </summary>
+        public class ObjectToKvExcel
+        {
+            public ObjectToKvExcel()
+            {
+                ObjectToKvExcel(".json", ExcelByBase.ConvertJsonToDataTableByPath);
+            }
+        }
+
+        /// <summary>
+        /// 还原键值对
+        /// </summary>
+        public class ObjectKvExcelTo
+        {
+            public ObjectKvExcelTo()
+            {
+                ObjectKvExcelTo(ExcelByBase.ConvertDataTableToJsonByPath);
             }
         }
     }

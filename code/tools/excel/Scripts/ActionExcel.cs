@@ -62,7 +62,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xlsx|.xls", (file, b) => ExcelByNpoi.ExcelToDataTable(file, false).FirstOrDefault());
+                ArrayToKvExcel(".xlsx|.xls", (file, b) => ExcelByNpoi.ExcelToDataTable(file, false).FirstOrDefault());
             }
         }
 
@@ -73,7 +73,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo((dt, file) => ExcelByNpoi.DataTableToExcel(file, dt));
+                ArrayKvExcelTo((dt, file) => ExcelByNpoi.DataTableToExcel(file, dt));
             }
         }
     }

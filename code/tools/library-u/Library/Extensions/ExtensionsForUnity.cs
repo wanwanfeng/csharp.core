@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Library.Extensions;
 
@@ -192,7 +193,7 @@ namespace UnityEngine.Library
         }
 
         /// <summary>
-        /// 获取组件,若果没有，则自动添加一个
+        /// 查找组件,若果没有，则自动添加一个
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
@@ -202,23 +203,12 @@ namespace UnityEngine.Library
         {
             var trans = target.transform;
             if (!string.IsNullOrEmpty(path))
-            {
                 trans = target.transform.Find(path);
-            }
-            if (trans)
-            {
-                T t = trans.GetComponent<T>();
-                if (t == null)
-                {
-                    t = trans.gameObject.AddComponent<T>();
-                }
-                return t;
-            }
-            return default(T);
+            return trans ? trans.GetOrAddComponent<T>() : default(T);
         }
 
         /// <summary>
-        /// 获取组件,若果没有，则自动添加一个
+        /// 查找组件,若果没有，则自动添加一个
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>
@@ -240,19 +230,14 @@ namespace UnityEngine.Library
         {
             var trans = target.transform;
             if (!string.IsNullOrEmpty(path))
-            {
                 trans = target.transform.Find(path);
-            }
-            if (trans)
-            {
-                var component = trans.GetComponent(type);
-                return component == null;
-            }
-            return false;
+            if (!trans) return false;
+            var component = trans.GetComponent(type);
+            return component == null;
         }
 
         /// <summary>
-        /// 获取组件,若果没有，则自动添加一个
+        /// 查找组件,若果没有，则自动添加一个
         /// </summary>
         /// <param name="target"></param>
         /// <param name="type"></param>
@@ -262,23 +247,12 @@ namespace UnityEngine.Library
         {
             var trans = target.transform;
             if (!string.IsNullOrEmpty(path))
-            {
                 trans = target.transform.Find(path);
-            }
-            if (trans)
-            {
-                var component = trans.GetComponent(type);
-                if (component == null)
-                {
-                    component = trans.gameObject.AddComponent(type);
-                }
-                return component;
-            }
-            return null;
+            return trans ? trans.GetOrAddComponent(type) : null;
         }
 
         /// <summary>
-        /// 获取组件,若果没有，则自动添加一个
+        /// 查找组件,若果没有，则自动添加一个
         /// </summary>
         /// <param name="target"></param>
         /// <param name="type"></param>
@@ -337,31 +311,7 @@ namespace UnityEngine.Library
             }
         }
 
-        /// <summary>
-        /// 移除物体下所有孩子
-        /// </summary>
-        /// <param name="target"></param>
-        public static void ClearChildren(this Transform target)
-        {
-            if (target.childCount == 0) return;
-            for (int i = 0; i < target.childCount; i++)
-            {
-                Object.Destroy(target.GetChild(i).gameObject);
-            }
-        }
-
-        /// <summary>
-        /// 向物体添加孩子
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="child"></param>
-        public static void AddChild(this Transform target, Transform child)
-        {
-            child.transform.SetParent(target);
-            child.transform.localPosition = Vector3.zero;
-            child.transform.localScale = Vector3.one;
-            child.transform.localRotation = Quaternion.identity;
-        }
+        #region  Position
 
         public static void SetPosX(this Transform target, float value)
         {
@@ -393,53 +343,7 @@ namespace UnityEngine.Library
             target.localPosition = new Vector3(target.localPosition.x, target.localPosition.y, value);
         }
 
-        /// <summary>
-        /// 交换位置
-        /// </summary>
-        /// <param name="sourceTrans"></param>
-        /// <param name="targetTrans"></param>
-        public static void SwapPosition(this Transform sourceTrans, Transform targetTrans)
-        {
-            Vector3 pos = sourceTrans.position;
-            targetTrans.position = sourceTrans.position;
-            sourceTrans.position = pos;
-        }
-
-        /// <summary>
-        /// 交换位置
-        /// </summary>
-        /// <param name="sourceTrans"></param>
-        /// <param name="targetTrans"></param>
-        public static void SwapLocalPosition(this Transform sourceTrans, Transform targetTrans)
-        {
-            Vector3 pos = sourceTrans.localPosition;
-            targetTrans.localPosition = sourceTrans.localPosition;
-            sourceTrans.localPosition = pos;
-        }
-
-        /// <summary>
-        /// 交换角度
-        /// </summary>
-        /// <param name="sourceTrans"></param>
-        /// <param name="targetTrans"></param>
-        public static void SwapEulerAngles(this Transform sourceTrans, Transform targetTrans)
-        {
-            Vector3 angles = sourceTrans.eulerAngles;
-            targetTrans.eulerAngles = sourceTrans.eulerAngles;
-            sourceTrans.eulerAngles = angles;
-        }
-
-        /// <summary>
-        /// 交换角度
-        /// </summary>
-        /// <param name="sourceTrans"></param>
-        /// <param name="targetTrans"></param>
-        public static void SwapLocalEulerAngles(this Transform sourceTrans, Transform targetTrans)
-        {
-            Vector3 angles = sourceTrans.localEulerAngles;
-            targetTrans.localEulerAngles = sourceTrans.localEulerAngles;
-            sourceTrans.localEulerAngles = angles;
-        }
+        #endregion
 
         /// <summary>
         ///随机位置
@@ -461,5 +365,204 @@ namespace UnityEngine.Library
         {
             return new Vector3(UnityEngine.Random.Range(from.x, to.x), UnityEngine.Random.Range(from.y, to.y));
         }
+
+        #region GetOrAddComponent
+
+        /// <summary>
+        /// 获取组件(没有时自动添加)
+        /// </summary>
+        /// <param name="go"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Component GetOrAddComponent(this GameObject go, Type type)
+        {
+            if (go == null) return null;
+            Component t = go.GetComponent(type);
+            if (t == null) t = go.AddComponent(type);
+            return t;
+        }
+
+        /// <summary>
+        /// 获取组件(没有时自动添加)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        public static Component GetOrAddComponent(this Component component, Type type)
+        {
+            if (component == null) return null;
+            return component.gameObject.GetOrAddComponent(type);
+        }
+
+        /// <summary>
+        /// 获取组件(没有时自动添加)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="go"></param>
+        /// <returns></returns>
+        public static T GetOrAddComponent<T>(this GameObject go) where T : Component
+        {
+            if (go == null)
+                return default(T);
+            T t = go.GetComponent<T>();
+            if (t == null) t = go.AddComponent<T>();
+            return t;
+        }
+
+        /// <summary>
+        /// 获取组件(没有时自动添加)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        public static T GetOrAddComponent<T>(this Component component) where T : Component
+        {
+            if (component == null)
+                return default(T);
+            T t = component.GetComponent<T>();
+            if (t == null) t = component.gameObject.AddComponent<T>();
+            return t;
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// 移除物体下所有孩子
+        /// </summary>
+        /// <param name="target"></param>
+        public static void ClearChild(this Transform target)
+        {
+            if (target.childCount == 0) return;
+            while (target.childCount != 0)
+                Object.Destroy(target.GetChild(0).gameObject);
+        }
+
+        /// <summary>
+        /// 向物体添加孩子
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="child"></param>
+        public static void AddChild(this Transform target, Transform child)
+        {
+            child.transform.SetParent(target);
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localScale = Vector3.one;
+            child.transform.localRotation = Quaternion.identity;
+        }
+
+        /// <summary>
+        /// 克隆物体并添加到parent下
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="clone"></param>
+        /// <returns></returns>
+        public static GameObject CloneAndAddClild(this Transform parent, GameObject clone)
+        {
+            var obj = (GameObject) UnityEngine.Object.Instantiate(clone);
+            parent.AddChild(obj.transform);
+            return obj;
+        }
+
+        #region 获取预定义个数的物体或组件
+
+        /// <summary>
+        /// 获取预定义个数的同种类型子物体
+        /// 个数不够时自动克隆，多余时隐藏
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="needCount"></param>
+        /// <returns></returns>
+        public static List<Transform> GetChildTransforms(this Transform parent, int needCount)
+        {
+            var clone = parent.GetChild(0);
+            return clone == null
+                ? new List<Transform>()
+                : ChildTransforms(parent, needCount, clone.gameObject);
+        }
+
+        /// <summary>
+        /// 获取预定义个数的兄弟姐妹物体(包括自己)
+        /// 个数不够时自动克隆，多余时隐藏
+        /// </summary>
+        /// <param name="clone"></param>
+        /// <param name="needCount"></param>
+        /// <returns></returns>
+        public static List<Transform> GetSiblingTransforms(this GameObject clone, int needCount)
+        {
+            Transform parent = clone.transform.parent;
+            return parent == null
+                ? new List<Transform>()
+                : ChildTransforms(parent, needCount, clone);
+        }
+
+        /// <summary>
+        /// 获取预定义个数的同种类型子物体组件
+        /// 个数不够时自动克隆，多余时隐藏
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="needCount"></param>
+        /// <returns></returns>
+        public static List<T> GetChildComponents<T>(this Transform parent, int needCount) where T : Component
+        {
+            var clone = parent.GetChild(0);
+            return clone == null
+                ? new List<T>()
+                : ChildTransforms(parent, needCount, clone.gameObject).Select(p => p.GetOrAddComponent<T>()).ToList();
+        }
+
+        /// <summary>
+        /// 获取预定义个数的兄弟姐妹物体组件(包括自己)
+        /// 个数不够时自动克隆，多余时隐藏
+        /// </summary>
+        /// <param name="clone"></param>
+        /// <param name="needCount"></param>
+        /// <returns></returns>
+        public static List<T> GetSiblingComponents<T>(this GameObject clone, int needCount) where T : Component
+        {
+            Transform parent = clone.transform.parent;
+            return parent == null
+                ? new List<T>()
+                : ChildTransforms(parent, needCount, clone).Select(p => p.GetOrAddComponent<T>()).ToList();
+        }
+
+        private static List<Transform> ChildTransforms(Transform parent, int needCount, GameObject clone)
+        {
+            List<Transform> list = new List<Transform>();
+
+            if (parent.childCount < needCount)
+            {
+                for (int i = 0; i < parent.childCount; i++)
+                {
+                    parent.GetChild(i).gameObject.SetActive(true);
+                    list.Add(parent.GetChild(i));
+                }
+
+                while (parent.childCount < needCount)
+                {
+                    var obj = parent.CloneAndAddClild(clone);
+                    obj.SetActive(true);
+                    list.Add(obj.transform);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < needCount; i++)
+                {
+                    parent.GetChild(i).gameObject.SetActive(true);
+                    list.Add(parent.GetChild(i));
+                }
+
+                for (int i = needCount; i < parent.childCount; i++)
+                {
+                    parent.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+
+            return list;
+        }
+
+        #endregion
+
     }
 }

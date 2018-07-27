@@ -122,7 +122,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".csv", ExcelByBase.ConvertCsvToDataTable);
+                ArrayToKvExcel(".csv", ExcelByBase.ConvertCsvToDataTable);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ConvertDataTableToCsv);
+                ArrayKvExcelTo(ExcelByBase.ConvertDataTableToCsv);
             }
         }
 

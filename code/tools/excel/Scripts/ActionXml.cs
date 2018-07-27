@@ -49,7 +49,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xml", ExcelByBase.ConvertXmlToDataTable);
+                ArrayToKvExcel(".xml", ExcelByBase.ConvertXmlToDataTable);
             }
         }
 
@@ -60,7 +60,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ConvertDataTableToXml);
+                ArrayKvExcelTo(ExcelByBase.ConvertDataTableToXml);
             }
         }
     }

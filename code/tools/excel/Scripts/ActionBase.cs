@@ -22,6 +22,12 @@ namespace Script
 
         public static IDictionary<SelectType, string> CacheSelect;
 
+
+        public static string regex =
+            "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+        //"[\\x{3041}-\\x{3096}\\x{30A0}-\\x{30FF}\\x{3400}-\\x{4DB5}\\x{4E00}-\\x{9FCB}\\x{F900}-\\x{FA6A}\\x{2E80}-\\x{2FD5}\\x{FF5F}-\\x{FF9F}\\x{3000}-\\x{303F}\\x{31F0}-\\x{31FF}\\x{3220}-\\x{3243}\\x{3280}-\\x{337F}\\x{FF01}-\\x{FF5E}].+";
+
+
         static ActionBase()
         {
             CacheSelect = AttributeHelper.GetCacheDescription<SelectType>();
@@ -191,12 +197,12 @@ namespace Script
             ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dts.ToArray());
         }
 
-        #region 键值对
+        #region 数组键值对
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public static void ToKvExcel(string exs, Func<string, string, DataTable> convertToDataTable)
+        public static void ArrayToKvExcel(string exs, Func<string, string, DataTable> convertToDataTable)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
@@ -208,7 +214,6 @@ namespace Script
                 Console.WriteLine(" is now : " + file);
                 var dt = convertToDataTable.Invoke(file, null);
                 dt.TableName = file.Replace(InputPath, "");
-                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
                 var list = ExcelByBase.ConvertDataTableToRowsList(dt)
                     .Select(p => string.Join("|", p.Cast<string>().ToArray()))
                     .Select(p => Regex.IsMatch(p, regex))
@@ -253,7 +258,133 @@ namespace Script
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelTo(Action<DataTable, string> saveAction)
+        public static void ArrayKvExcelTo(Action<DataTable, string> saveAction)
+        {
+            ExcelByNpoi.OnSheetAction = null;
+            List<string> files = CheckPath(".xlsx", SelectType.File);
+            if (files.Count == 0) return;
+            var dts = new List<DataTable>();
+            files.ForEach(file =>
+            {
+                Console.WriteLine(" is now : " + file);
+                dts.AddRange(ExcelByNpoi.ExcelToDataTable(file));
+            });
+
+            if (dts.Count == 0)
+                return;
+
+            string root = InputPath.Replace(".xlsx", "");
+
+            foreach (DataTable dataTable in dts)
+            {
+                var cache =
+                    ExcelByBase.ConvertDataTableToList(dataTable)
+                        .ToLookup(p => p.First())
+                        .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                cache.Remove("path");
+
+                foreach (KeyValuePair<string, List<List<object>>> pair in cache)
+                {
+                    string fullpath = root + pair.Key;
+
+                    if (File.Exists(fullpath))
+                    {
+                        bool isSave = false;
+                        Console.WriteLine(" is now : " + fullpath);
+                        var dt = ExcelByBase.ConvertCsvToDataTable(fullpath);
+                        var columns = dt.Columns;
+
+                        foreach (List<object> objects in pair.Value)
+                        {
+                            object id = objects[1];
+                            string key = objects[2].ToString();
+                            object value = objects[3];
+                            string value_zh_cn = objects[4].ToString();
+
+                            foreach (DataRow dtr in dt.Rows)
+                            {
+                                if (columns.Contains(key))
+                                {
+                                    var idTemp = dtr[0];
+                                    var keyTemp = dtr[key];
+                                    if (idTemp.Equals(id) && keyTemp.Equals(value))
+                                    {
+                                        dtr[key] = value_zh_cn;
+                                        isSave = true;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
+                                }
+                            }
+                        }
+                        if (!isSave) continue;
+                        File.Copy(fullpath, fullpath + ".bak", true);
+                        saveAction.Invoke(dt, fullpath);
+                    }
+                    else
+                    {
+                        Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region 对象键值对
+
+        /// <summary>
+        /// 导出为键值对
+        /// </summary>
+        public static void ObjectToKvExcel(string exs, Func<string, string, DataTable> convertToDataTable)
+        {
+            ExcelByNpoi.OnSheetAction = null;
+            List<string> files = CheckPath(exs);
+            if (files.Count == 0) return;
+            var dts = new List<DataTable>();
+
+            files.ForEach(file =>
+            {
+                Console.WriteLine(" is now : " + file);
+                var dt = convertToDataTable.Invoke(file, null);
+                dt.TableName = file.Replace(InputPath, "");
+                var list = ExcelByBase.ConvertDataTableToList(dt)
+                    .ToDictionary(p => p, q => string.Join("|", q.Cast<string>().ToArray()))
+                    .Where(p => Regex.IsMatch(p.Value, regex))
+                    .Select(p => p.Key)
+                    .ToList();
+                //返回符合正则表达式的行
+                list.Insert(0, new List<object>() {"key", "value"});
+                dts.Add(ExcelByBase.ConvertListToDataTable(list, dt.TableName));
+            });
+
+            if (dts.Count == 0)
+                return;
+
+            DataTable dd = new DataTable();
+            dd.Columns.Add("path", typeof(string));
+            dd.Columns.Add("id", typeof(string));
+            dd.Columns.Add("key", typeof(string));
+            dd.Columns.Add("value", typeof(string));
+            dd.Columns.Add("value_zh_cn", typeof(string));
+            foreach (DataTable dataTable in dts)
+            {
+                foreach (DataRow dr in dataTable.Rows)
+                {
+                    dd.Rows.Add(dataTable.TableName, dr[0],
+                        dr[0].ToString().Substring(dr[0].ToString().LastIndexOf("/", StringComparison.Ordinal) + 1),
+                        dr[1], dr[1]);
+                }
+            }
+            ExcelByNpoi.DataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dd);
+        }
+
+        /// <summary>
+        /// 还原键值对
+        /// </summary>
+        public static void ObjectKvExcelTo(Action<DataTable, string> saveAction)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(".xlsx", SelectType.File);

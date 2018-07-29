@@ -68,11 +68,11 @@ namespace Script
                 foreach (KeyValuePair<string, bool> pair in cache)
                 {
                     var show = pair.Value;
-                   
+
                     var style = sheet.GetColumnStyle(i);
                     style.IsLocked = !pair.Key.Contains("_zh_cn");
                     sheet.SetColumnHidden(i, !show);
-                    sheet.SetDefaultColumnStyle(i,style);
+                    sheet.SetDefaultColumnStyle(i, style);
                     if (show)
                     {
                         sheet.AutoSizeColumn(i);
@@ -87,7 +87,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".csv", file => new List<DataTable> { ExcelByBase.ImportCsvToDataTable(file) });
+                ToXml(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
             }
         }
 
@@ -137,18 +137,18 @@ namespace Script
             }
         }
 
-        public static void SaveCSV(DataTable dt, string fullPath)//table数据写入csv
+        public static void SaveCSV(DataTable dt, string fullPath) //table数据写入csv
         {
             FileInfo fi = new FileInfo(fullPath);
             if (!fi.Directory.Exists)
             {
                 fi.Directory.Create();
             }
-            FileStream fs = new FileStream(fullPath, FileMode.Create,FileAccess.Write);
+            FileStream fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
             string data = "";
 
-            for (int i = 0; i < dt.Columns.Count; i++)//写入列名
+            for (int i = 0; i < dt.Columns.Count; i++) //写入列名
             {
                 data += dt.Columns[i].ColumnName.ToString();
                 if (i < dt.Columns.Count - 1)
@@ -164,9 +164,10 @@ namespace Script
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     string str = dt.Rows[i][j].ToString();
-                    str = str.Replace("\"", "\"\"");//替换英文冒号 英文冒号需要换成两个冒号
+                    str = str.Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
 
-                    if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n')) //含逗号 冒号 换行符的需要放到引号中
+                    if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))
+                        //含逗号 冒号 换行符的需要放到引号中
                     {
                         str = string.Format("\"{0}\"", str);
                     }
@@ -185,7 +186,10 @@ namespace Script
 
         public static DataTable OpenCSVOledb(string filePath) //从csv读取数据返回table  
         {
-            using (OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:csv;Extended Properties=Text;"))
+            using (
+                OleDbConnection conn =
+                    new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:csv;Extended Properties=Text;")
+                )
             {
                 DataTable dtTable = new DataTable();
 
@@ -275,9 +279,9 @@ namespace Script
         /// <returns>文件的编码类型</returns>  
         public static System.Text.Encoding GetType(FileStream fs)
         {
-            byte[] Unicode = new byte[] { 0xFF, 0xFE, 0x41 };
-            byte[] UnicodeBIG = new byte[] { 0xFE, 0xFF, 0x00 };
-            byte[] UTF8 = new byte[] { 0xEF, 0xBB, 0xBF }; //带BOM  
+            byte[] Unicode = new byte[] {0xFF, 0xFE, 0x41};
+            byte[] UnicodeBIG = new byte[] {0xFE, 0xFF, 0x00};
+            byte[] UTF8 = new byte[] {0xEF, 0xBB, 0xBF}; //带BOM  
             System.Text.Encoding reVal = System.Text.Encoding.Default;
 
             BinaryReader r = new BinaryReader(fs, System.Text.Encoding.Default);
@@ -299,12 +303,13 @@ namespace Script
             r.Close();
             return reVal;
         }
+
         /// 判断是否是不带 BOM 的 UTF8 格式  
         /// <param name="data"></param>  
         /// <returns></returns>  
         private static bool IsUTF8Bytes(byte[] data)
         {
-            int charByteCounter = 1;　 //计算当前正分析的字符应还有的字节数  
+            int charByteCounter = 1; //计算当前正分析的字符应还有的字节数  
             byte curByte; //当前分析的字节.  
             for (int i = 0; i < data.Length; i++)
             {
@@ -340,6 +345,6 @@ namespace Script
                 throw new Exception("非预期的byte格式");
             }
             return true;
-        }  
+        }
     }
 }

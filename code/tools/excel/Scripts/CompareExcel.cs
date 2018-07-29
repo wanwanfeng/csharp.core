@@ -27,12 +27,11 @@ namespace Script
             var index = 0;
             foreach (var keyValuePair in vals1)
             {
-                var lst = new ListTable();
+                ListTable lst;
                 if (vals2.TryGetValue(keyValuePair.Key, out lst))
                 {
                     keyValuePair.Value.List = keyValuePair.Value.List.Except(lst.List).ToList();
-                    var newName = Path.GetDirectoryName(dir1) + "/" + Path.GetFileNameWithoutExtension(dir1) + "-" +
-                                  Path.GetFileNameWithoutExtension(dir2) + ".xlsx";
+                    var newName = Path.GetDirectoryName(dir1) + "/" + Path.GetFileNameWithoutExtension(dir1) + "-" + Path.GetFileNameWithoutExtension(dir2) + ".xlsx";
                     new ExcelByNpoi().ExportToExcel(newName, lst);
                 }
                 else

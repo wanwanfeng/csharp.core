@@ -16,17 +16,17 @@ namespace Library.Excel
         #region virtual
 
 
-        public virtual Dictionary<string, ListTable> ReadFromExcels(string filename)
+        public virtual List<ListTable> ImportExcelToListTable(string filename)
         {
             return null;
         }
 
-        public virtual void WriteToExcel(string filename, ListTable list)
+        public virtual void ExportToExcel(string filename, ListTable list)
         {
 
         }
 
-        public virtual void WriteToOneExcel(string fileName, List<ListTable> list)
+        public virtual void ExportToOneExcel(string fileName, List<ListTable> list)
         {
 
         }

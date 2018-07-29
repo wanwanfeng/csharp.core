@@ -12,8 +12,7 @@ namespace Library.Excel
 {
     public enum CaoType
     {
-        [Category("文件比较")]
-        [TypeValue(typeof (CompareExcel))] CompareExcel,
+        [Category("文件比较")] [TypeValue(typeof (CompareExcel))] CompareExcel,
 
         [Category("文件转换")] [Description("Excel->ToXml")] [TypeValue(typeof (ActionExcel.ToXml))] ExcelToXml,
         [Category("文件转换")] [Description("Excel->ToCsv")] [TypeValue(typeof (ActionExcel.ToCsv))] ExcelToCsv,
@@ -33,10 +32,11 @@ namespace Library.Excel
         [Category("文件转换")] [Description("Xml->ToOneExcel")] [TypeValue(typeof (ActionXml.ToOneExcel))] XmlToOneExcel,
 
 
-        [Category("文件内容替换")] [Description("CSV->ToXml")] [TypeValue(typeof (ActionCSV.ToXml))] CsvToXml,
-        [Category("文件内容替换")] [Description("CSV->ToJson")] [TypeValue(typeof (ActionCSV.ToJson))] CsvToJson,
-        [Category("文件内容替换")] [Description("CSV->ToExcel")] [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
-        [Category("文件内容替换")] [Description("CSV->ToOneExcel")] [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
+        [Category("文件转换")] [Description("CSV->ToXml")] [TypeValue(typeof (ActionCSV.ToXml))] CsvToXml,
+        [Category("文件转换")] [Description("CSV->ToJson")] [TypeValue(typeof (ActionCSV.ToJson))] CsvToJson,
+        [Category("文件转换")] [Description("CSV->ToExcel")] [TypeValue(typeof (ActionCSV.ToExcel))] CsvToExcel,
+        [Category("文件转换")] [Description("CSV->ToOneExcel")] [TypeValue(typeof (ActionCSV.ToOneExcel))] CsvToOneExcel,
+
         [Category("文件内容替换")] [Description("Excel->ToKvExcel")] [TypeValue(typeof (ActionExcel.ToKvExcel))] ExcelToKvExcel,
         [Category("文件内容替换")] [Description("Excel->KvExcelTo")] [TypeValue(typeof (ActionExcel.KvExcelTo))] ExcelKvExcelTo,
         [Category("文件内容替换")] [Description("Json->ToKvExcel")] [TypeValue(typeof (ActionJson.ToKvExcel))] JsonArrayToKvExcel,

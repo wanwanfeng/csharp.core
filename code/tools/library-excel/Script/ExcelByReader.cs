@@ -4,7 +4,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Excel;
-using Library.LitJson;
 
 #if true
 
@@ -17,21 +16,20 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByReader : ExcelByBase
     {
-        public override Dictionary<string, ListTable> ReadFromExcels(string filename)
+        public override List<ListTable> ImportExcelToListTable(string filename)
         {
-            var dt = ExcelToTable(filename);
-            return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
+            return ImportExcelToDataTable(filename).Select(ConvertDataTableToList).ToList();
         }
 
         [Obsolete("此类本方法无效！", true)]
 
-        public override void WriteToExcel(string filename, ListTable list)
+        public override void ExportToExcel(string filename, ListTable list)
         {
       
         }
 
         [Obsolete("此类本方法无效！", true)]
-        public override void WriteToOneExcel(string fileName, List<ListTable> dic)
+        public override void ExportToOneExcel(string fileName, List<ListTable> dic)
         {
             
         }
@@ -42,7 +40,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static List<DataTable> ExcelToTable(string path)
+        public static List<DataTable> ImportExcelToDataTable(string path)
         {
             FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read);
             IExcelDataReader excelReader = null;

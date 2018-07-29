@@ -210,6 +210,7 @@ namespace Script
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
             if (files.Count == 0) return;
+
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
@@ -230,10 +231,8 @@ namespace Script
 
                     var resdt = dt.DefaultView.ToTable(false, header.ToArray());
 
-                    //foreach (object o in header.Skip(1))
-                    //{
-                    //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
-                    //}
+                    foreach (object o in header.Skip(1))
+                        resdt.Columns.Add(o + "_zh_ch", typeof(string));
                     if (header.Count > 1)
                         dtArray.Add(resdt);
                 }

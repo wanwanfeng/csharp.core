@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
+using Library;
 using Library.Excel;
 using Library.LitJson;
 using LitJson;
@@ -22,7 +23,7 @@ namespace findText.Script
             get { return new[] {".html", ".htm", ".tpl"}; }
         }
 
-        public override List<List<object>> GetJsonDataArray(string content)
+        public override ListTable GetJsonDataArray(string content)
         {
             return LitJsonHelper.ConvertJsonToList(content);
         }
@@ -91,15 +92,14 @@ namespace findText.Script
             }
         }
 
-        protected override JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
+        protected override JsonData SetJsonDataArray(ListTable list, bool isReverse = false)
         {
             JsonData jsonDatas = new JsonData();
             jsonDatas.SetJsonType(JsonType.Array);
-            List<object> first = content.First();
-            content.Remove(first);
+            List<object> first = list.Key;
             if (isReverse)
-                content.Reverse();
-            foreach (List<object> objects in content)
+                list.List.Reverse();
+            foreach (List<object> objects in list.List)
             {
                 JsonData data = new JsonData();
                 for (int j = 0; j < first.Count; j++)
@@ -115,11 +115,11 @@ namespace findText.Script
 
         public override void Revert(string inputPath)
         {
-            Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
+            var tables = new ExcelByNpoi().ImportExcelToListTable(inputPath);
 
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            foreach (var table in tables)
             {
-                JsonData jsonData = SetJsonDataArray(pair.Value, true);
+                JsonData jsonData = SetJsonDataArray(table, true);
 
                 Dictionary<string, List<JsonData>> cache = new Dictionary<string, List<JsonData>>();
                 foreach (JsonData data in jsonData)

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using Library.Excel;
-using Library.Helper;
-using Library.LitJson;
+using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
@@ -17,7 +12,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+                ToXml(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
             }
         }
 
@@ -25,7 +20,7 @@ namespace Script
         {
             public ToCsv()
             {
-                ToCsv(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+                ToCsv(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
             }
         }
 
@@ -33,7 +28,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+                ToJson(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
             }
         }
 
@@ -42,7 +37,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+                ToExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
             }
         }
 
@@ -51,7 +46,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ExcelToDataTable(file, false)));
+                ToOneExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
             }
         }
 
@@ -62,7 +57,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ArrayToKvExcel(".xlsx|.xls", (file, b) => ExcelByNpoi.ExcelToDataTable(file, false).FirstOrDefault());
+                ToKvExcel(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false).FirstOrDefault());
             }
         }
 
@@ -73,7 +68,8 @@ namespace Script
         {
             public KvExcelTo()
             {
-                ArrayKvExcelTo((dt, file) => ExcelByNpoi.DataTableToExcel(file, dt));
+                KvExcelTo((file) => ExcelByNpoi.ImportExcelToDataTable(file, false).FirstOrDefault(),
+                    (dt, file) => ExcelByNpoi.ExportDataTableToExcel(file, dt));
             }
         }
     }

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using Library.Extensions;
 using Library.Helper;
 
 namespace Library.Excel
@@ -14,7 +13,7 @@ namespace Library.Excel
     {
         #region  Convert Csv and DataTable
 
-        public static DataTable ConvertCsvToDataTable(string path, string dtName = "")
+        public static DataTable ImportCsvToDataTable(string path)
         {
             path = Path.ChangeExtension(path, ".csv");
             if (!File.Exists(path))
@@ -44,16 +43,22 @@ namespace Library.Excel
             //}
 
             var list = CsvHelper.ReadCSV(path);
-            dtName = string.IsNullOrEmpty(dtName) ? Path.GetFileNameWithoutExtension(path) : dtName;
-            return ConvertListToDataTable(list, dtName);
+            return ConvertListToDataTable(new ListTable()
+            {
+                TableName = Path.GetFileNameWithoutExtension(path),
+                FullName = path,
+                IsArray = true,
+                Key = list.First(),
+                List = list.Skip(1).ToList()
+            });
         }
 
-        public static void ConvertDataTableToCsv(DataTable dt, string file = null)
+        public static void ExportDataTableToCsv(DataTable dt, string file)
         {
+            file = string.IsNullOrEmpty(file) ? dt.FullName : file;
+
             var list = ConvertDataTableToList(dt);
-            if (string.IsNullOrEmpty(file))
-                file = dt.TableName;
-            var contents = list.Select(p => string.Join(",", p.Select(q =>
+            var contents = list.List.Select(p => string.Join(",", p.Select(q =>
             {
                 //var str = q.ToString().Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
                 //if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))
@@ -64,7 +69,7 @@ namespace Library.Excel
                 //return str;
                 return string.Format("\"{0}\"", q); ;
             }).ToArray())).ToArray();
-            string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? dt.TableName : file, ".csv");
+            string newPath = Path.ChangeExtension(file, ".csv");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllLines(newPath, contents, new UTF8Encoding(false));
             //CsvHelper.SaveCSV(list, newPath);

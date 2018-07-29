@@ -13,7 +13,7 @@ namespace Library.Excel
     {
         #region  Convert Xml and DataTable
 
-        public static DataTable ConvertXmlToDataTable(string path, string dtName = "")
+        public static DataTable ImportXmlToDataTable(string path)
         {
             path = Path.ChangeExtension(path, ".xml");
             if (!File.Exists(path))
@@ -24,20 +24,26 @@ namespace Library.Excel
             StringReader dsr = new StringReader(content);
             XmlTextReader xr = new XmlTextReader(dsr);
 
-            var dt = new DataTable();
-            //dt.TableName = string.IsNullOrEmpty(dtName) ? "Sheet1" : dtName;
+            var dt = new DataTable
+            {
+                FullName = path,
+                TableName = Path.GetFileNameWithoutExtension(path)
+            };
+
             dt.ReadXml(xr);
             dsr.Close();
             xr.Close();
             return dt;
         }
 
-        public static void ConvertDataTableToXml(DataTable dt, string file = null)
+        public static void ExportDataTableToXml(DataTable dt, string file)
         {
+            file = string.IsNullOrEmpty(file) ? dt.FullName : file;
+
             StringWriter dsw = new StringWriter();
             XmlTextWriter xw = new XmlTextWriter(dsw);
             dt.WriteXml(xw, XmlWriteMode.WriteSchema);
-            string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? dt.TableName : file, ".xml");
+            string newPath = Path.ChangeExtension(file, ".xml");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllText(newPath, dsw.ToString(), new UTF8Encoding(false));
             xw.Close();

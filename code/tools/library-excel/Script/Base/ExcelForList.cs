@@ -1,10 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
+using Library.LitJson;
 
+//using DataTable = Library.Excel.DataTable;
 namespace Library.Excel
 {
+    public class DataTable : System.Data.DataTable
+    {
+        public bool IsArray = true;
+        public string FullName = "";
+
+        public DataTable(string table) : base(table)
+        {
+        }
+
+        public DataTable()
+        {
+            
+        }
+    }
+
     /// <summary>
     /// DataTable与List
     /// </summary>
@@ -15,17 +31,21 @@ namespace Library.Excel
         /// <summary>
         /// 行集合转换为DataTable
         /// </summary>
-        /// <param name="vals"></param>
-        /// <param name="dtName"></param>
+        /// <param name="list"></param>
         /// <returns></returns>
-        public static DataTable ConvertListToDataTable(List<List<object>> vals, string dtName = "")
+        public static DataTable ConvertListToDataTable(ListTable list)
         {
-            var dt = new DataTable(string.IsNullOrEmpty(dtName) ? "Sheet1" : dtName);
+            var dt = new DataTable()
+            {
+                TableName = string.IsNullOrEmpty(list.TableName) ? "Sheet1" : list.TableName,
+                FullName = list.FullName,
+                IsArray = list.IsArray,
+            };
 
-            foreach (object o in vals.First())
+            foreach (object o in list.Key)
                 dt.Columns.Add(o.ToString(), typeof (string));
 
-            foreach (List<object> objects in vals.Skip(1))
+            foreach (List<object> objects in list.List)
                 dt.Rows.Add(objects.ToArray());
 
             return dt;
@@ -36,15 +56,21 @@ namespace Library.Excel
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
-        public static List<List<object>> ConvertDataTableToList(DataTable dt)
+        public static ListTable ConvertDataTableToList(DataTable dt)
         {
             var vals = new List<List<object>>();
-            vals.Add(GetHeaderList(dt).Cast<object>().ToList());
             foreach (DataRow dr in dt.Rows)
             {
                 vals.Add(dr.ItemArray.ToList());
             }
-            return vals;
+            return new ListTable()
+            {
+                TableName = dt.TableName,
+                FullName = dt.FullName,
+                IsArray = dt.IsArray,
+                Key = GetHeaderList(dt).Cast<object>().ToList(),
+                List = vals,
+            };
         }
 
         /// <summary>
@@ -55,7 +81,10 @@ namespace Library.Excel
         /// <returns></returns>
         public static DataTable ConvertRowsListToDataTable(List<List<object>> vals, string dtName = "")
         {
-            var dt = new DataTable(string.IsNullOrEmpty(dtName) ? "Sheet1" : dtName);
+            var dt = new DataTable()
+            {
+                TableName = string.IsNullOrEmpty(dtName) ? "Sheet1" : dtName,
+            };
 
             var header = vals.Select(p => p.First()).ToList();
             foreach (object o in header)
@@ -115,7 +144,7 @@ namespace Library.Excel
             return vals;
         }
 
-        public static List<string> GetHeaderList(DataTable dt)
+        public static List<string> GetHeaderList(System.Data.DataTable dt)
         {
             var vals = new List<string>();
             foreach (DataColumn dc in dt.Columns)

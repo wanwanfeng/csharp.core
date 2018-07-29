@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Excel;
+using Library.LitJson;
 
 #if true
 
@@ -16,7 +17,7 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByReader : ExcelByBase
     {
-        public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        public override Dictionary<string, ListTable> ReadFromExcels(string filename)
         {
             var dt = ExcelToTable(filename);
             return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
@@ -24,13 +25,13 @@ namespace Library.Excel
 
         [Obsolete("此类本方法无效！", true)]
 
-        public override void WriteToExcel(string filename, List<List<object>> vals)
+        public override void WriteToExcel(string filename, ListTable list)
         {
       
         }
 
         [Obsolete("此类本方法无效！", true)]
-        public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
+        public override void WriteToOneExcel(string fileName, List<ListTable> dic)
         {
             
         }

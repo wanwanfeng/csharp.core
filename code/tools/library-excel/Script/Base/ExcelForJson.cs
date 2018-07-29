@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using Library.LitJson;
 using LitJson;
 
 namespace Library.Excel
@@ -12,27 +13,25 @@ namespace Library.Excel
     {
         #region  Convert Json and DataTable
 
-        public static DataTable ConvertJsonToDataTableByPath(string path, string dtName = "Sheet1")
+        public static DataTable ConvertJsonToDataTable(string content)
         {
-            return ConvertListToDataTable(ConvertJsonToListByPath(path), dtName);
-        }
-
-        public static DataTable ConvertJsonToDataTable(string content, string dtName = "Sheet1")
-        {
-            return ConvertListToDataTable(ConvertJsonToList(content), dtName);
+            return ConvertListToDataTable(ConvertJsonToList(content));
         }
 
         public static JsonData ConvertDataTableToJson(DataTable dt)
         {
-            var kv = new KeyValuePair<string, List<List<object>>>(dt.TableName, ConvertDataTableToList(dt));
-            return ConvertListToJson(kv);
+            return ConvertListToJson(ConvertDataTableToList(dt));
         }
 
-        public static void ConvertDataTableToJsonByPath(DataTable dt, string file)
+        public static DataTable ImportJsonToDataTable(string path)
         {
-            var dtName = string.IsNullOrEmpty(dt.TableName) ? Path.GetFileNameWithoutExtension(file) : dt.TableName;
-            var kv = new KeyValuePair<string, List<List<object>>>(dtName, ConvertDataTableToList(dt));
-            ConvertListToJsonFile(kv, file);
+            return ConvertListToDataTable(ImportJsonToList(path));
+        }
+
+        public static void ExportDataTableToJson(DataTable dt, string file)
+        {
+            file = string.IsNullOrEmpty(file) ? dt.FullName : file;
+            ExportListToJson(ConvertDataTableToList(dt), Path.ChangeExtension(file, ".json"));
         }
 
         #endregion

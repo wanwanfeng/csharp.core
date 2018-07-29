@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Helper;
+using Library.LitJson;
 #if ExcelByNpoi
 
 using NPOI.HSSF.UserModel;
@@ -23,28 +24,19 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByNpoi : ExcelByBase
     {
-        public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        public override Dictionary<string, ListTable> ReadFromExcels(string filename)
         {
-            var dt = ExcelToDataTable(filename);
-            return dt.ToDictionary(p => p.TableName, q => ConvertDataTableToList(q));
+            return ImportExcelToDataTable(filename).ToDictionary(p => p.TableName, ConvertDataTableToList);
         }
 
-        public override void WriteToExcel(string filename, List<List<object>> vals)
+        public override void WriteToExcel(string filename, ListTable list)
         {
-            var dt = ConvertListToDataTable(vals);
-            DataTableToExcel(filename, dt);
+            ExportDataTableToExcel(filename, ConvertListToDataTable(list));
         }
 
-        public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
+        public override void WriteToOneExcel(string fileName, List<ListTable> list)
         {
-            List<DataTable> dts = new List<DataTable>();
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-            {
-                var dt = ConvertListToDataTable(pair.Value);
-                dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
-                dts.Add(dt);
-            }
-            DataTableToExcel(fileName, dts.ToArray());
+            ExportDataTableToExcel(fileName, list.Select(ConvertListToDataTable).ToArray());
         }
 
         /// <summary>
@@ -53,7 +45,7 @@ namespace Library.Excel
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <param name="containsFirstLine">是否包含第一行</param>
         /// <returns></returns>
-        public static List<DataTable> ExcelToDataTable(string file,bool containsFirstLine = true)
+        public static List<DataTable> ImportExcelToDataTable(string file, bool containsFirstLine = true)
         {
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -83,7 +75,11 @@ namespace Library.Excel
                     ISheet sheet = workbook.GetSheetAt(index);
                     if (sheet.LastRowNum == 0) continue;
 
-                    DataTable dt = new DataTable(sheet.SheetName);
+                    DataTable dt = new DataTable
+                    {
+                        FullName = file,
+                        TableName = sheet.SheetName,
+                    };
 
                     //表头  
                     IRow header = sheet.GetRow(sheet.FirstRowNum);
@@ -138,7 +134,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="file">导出路径(包括文件名与扩展名)</param>
         /// <param name="dts"></param>
-        public static void DataTableToExcel(string file, params DataTable[] dts)
+        public static void ExportDataTableToExcel(string file, params DataTable[] dts)
         {
             IWorkbook workbook;
             string fileExt = Path.GetExtension(file).ToLower();

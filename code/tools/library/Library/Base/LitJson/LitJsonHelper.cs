@@ -359,5 +359,46 @@ namespace Library.LitJson
             }
             return data;
         }
+
+
+         /// <summary>
+        /// data值再覆盖(数组索引作为key)
+        /// </summary>
+        /// <param name="data">修改前的data</param>
+        /// <param name="vals"></param>
+        /// <returns>返回修改后的data</returns>
+        public static JsonData RevertDictionaryToJson2(JsonData data, Dictionary<string, JsonData> vals)
+        {
+            foreach (KeyValuePair<string, JsonData> keyValuePair in vals)
+            {
+                Queue<string> keys = new Queue<string>(keyValuePair.Key.Trim('/').Split('/'));
+                JsonData temp = data;
+                do
+                {
+                    var key = keys.Dequeue();
+                    if (keys.Count == 0)
+                    {
+                        if (temp.IsObject && temp.ContainsKey(key))
+                            temp[key] = keyValuePair.Value;
+                        else if (temp.IsArray)
+                            temp[key.AsInt()] = keyValuePair.Value;
+                        else
+                            temp = new JsonData();
+                    }
+                    else
+                    {
+                        if (temp.IsObject && temp.ContainsKey(key))
+                            temp = temp[key];
+                        else if (temp.IsArray)
+                            temp = temp[key.AsInt()];
+                        else
+                            temp = new JsonData();
+                    }
+                } while (keys.Count != 0);
+            }
+            return data;
+        }
+    }
+
     }
 }

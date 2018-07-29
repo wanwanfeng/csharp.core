@@ -13,26 +13,26 @@ namespace Library.Excel
     {
         #region  Convert List<List<object>> and Json
 
-        public static List<List<object>> ConvertJsonToListByPath(string file)
-        {
-            return LitJsonHelper.ConvertJsonToListByPath(file);
-        }
-
-        public static List<List<object>> ConvertJsonToList(string content)
+        public static ListTable ConvertJsonToList(string content)
         {
             return LitJsonHelper.ConvertJsonToList(content);
         }
 
-        public static JsonData ConvertListToJson(KeyValuePair<string, List<List<object>>> keyValuePair)
+        public static JsonData ConvertListToJson(ListTable list)
         {
-            Ldebug.Log(" is now sheet: " + keyValuePair.Key);
-            return LitJsonHelper.ConvertListToJson(keyValuePair.Value);
+            Ldebug.Log(" is now sheet: " + list.TableName);
+            return LitJsonHelper.ConvertListToJson(list);
         }
 
-        public static void ConvertListToJsonFile(KeyValuePair<string, List<List<object>>> keyValuePair, string file)
+        public static ListTable ImportJsonToList(string file)
         {
-            JsonData resJsonDatas = ConvertListToJson(keyValuePair);
-            string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? keyValuePair.Key : file, ".json");
+            return LitJsonHelper.ImportJsonToList(file);
+        }
+
+        public static void ExportListToJson(ListTable list, string file)
+        {
+            JsonData resJsonDatas = ConvertListToJson(list);
+            string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? list.FullName : file, ".json");
             FileHelper.CreateDirectory(newPath);
             File.WriteAllText(newPath, JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
         }
@@ -43,7 +43,7 @@ namespace Library.Excel
         {
             var headers = GetHeaderList(dt);
 
-            DataTable dataTable = dt.Clone();
+            //DataTable dataTable = (DataTable) dt.Clone();
             //dataTable.DefaultView.ToTable()
             string regex = "";
 
@@ -70,7 +70,7 @@ namespace Library.Excel
                     }
                 }
             }
-            dataTable.AcceptChanges();
+            //dataTable.AcceptChanges();
         }
     }
 }

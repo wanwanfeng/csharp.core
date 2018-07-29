@@ -52,19 +52,29 @@ namespace Library.Extensions
         #region 字符串添加字符
 
         /// <summary>
-        /// 字符串添加字符
+        /// 字符添加字符
         /// </summary>
         /// <param name="cr"></param>
         /// <param name="lineCount"></param>
         /// <returns></returns>
-        public static string CopyChar(this char cr, int lineCount)
+        public static string PadRight(this char cr, int lineCount)
         {
-            StringBuilder sb = new StringBuilder(lineCount);
-            for (int i = 0; i < lineCount; i++)
-            {
-                sb.Append(cr);
-            }
-            return sb.ToString();
+            return cr.ToString().PadRight(lineCount, cr);
+        }
+
+        /// <summary>
+        /// 字符添加字符向两边扩充
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="lineCount"></param>
+        /// <param name="paddingChar"></param>
+        /// <returns></returns>
+        public static string Pad(this string value, int lineCount, char paddingChar = ' ')
+        {
+            //lineCount = 9;
+
+            lineCount += lineCount%2 == 0 ? 0 : 1;
+            return value.PadLeft(lineCount/2 + value.Length/2, paddingChar).PadRight(lineCount, paddingChar);
         }
 
         /// <summary>
@@ -91,7 +101,6 @@ namespace Library.Extensions
         /// <summary>
         /// 字符串添加换行符
         /// </summary>
-        /// <param name="value"></param>
         /// <param name="lineNumber"></param>
         /// <param name="value"></param>
         /// <returns></returns>

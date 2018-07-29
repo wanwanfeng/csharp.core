@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 
@@ -24,15 +25,15 @@ namespace Script
             var vals2 = new ExcelByNpoi().ReadFromExcels(dir2);
 
             var index = 0;
-            foreach (KeyValuePair<string, List<List<object>>> keyValuePair in vals1)
+            foreach (var keyValuePair in vals1)
             {
-                List<List<object>> lst = new List<List<object>>();
+                var lst = new ListTable();
                 if (vals2.TryGetValue(keyValuePair.Key, out lst))
                 {
-                    var haha = keyValuePair.Value.Except(lst).ToList();
+                    keyValuePair.Value.List = keyValuePair.Value.List.Except(lst.List).ToList();
                     var newName = Path.GetDirectoryName(dir1) + "/" + Path.GetFileNameWithoutExtension(dir1) + "-" +
                                   Path.GetFileNameWithoutExtension(dir2) + ".xlsx";
-                    new ExcelByNpoi().WriteToExcel(newName, haha);
+                    new ExcelByNpoi().WriteToExcel(newName, lst);
                 }
                 else
                 {

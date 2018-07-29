@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using Library.Helper;
 
@@ -7,10 +9,27 @@ namespace Library.Extensions
 {
     public class SystemConsole
     {
+        public static void RunCategory<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
+        {
+            var cacheType = AttributeHelper.GetCache<T, CategoryAttribute>()
+                .ToLookup(p => p.Value.Category, q => q.Key)
+                .ToDictionary(p => p.Key, q => q.ToList());
+
+
+        }
+
         public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
+            var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
+                .ToLookup(p => p.Value.Category, q => q.Key)
+                .ToDictionary(p => p.Key, q => q.ToList());
+
             var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int)p.Key);
-            var cacheDesc = AttributeHelper.GetCacheDescription<T>();
+            var cacheDesc = AttributeHelper.GetCacheDescription<T>()
+                .ToDictionary(p => p.Key, q => string.IsNullOrEmpty(q.Value) ? q.Key.ToString() : q.Value);
+
+            int maxLength = cacheDesc.Values.Max(p => p.Length);
+
             do
             {
                 Console.Clear();
@@ -24,27 +43,18 @@ namespace Library.Extensions
                         .ToLookup(p => p.Key % lineNum, q => q)
                         .ToDictionary(p => p.Key, q => q.ToList());
 
-                foreach (var value in cache)
+                foreach (var value in cache.Values)
                 {
-                    var res = new List<string>();
-                    foreach (KeyValuePair<int, T> pair in value.Value)
-                    {
-                        var tips = cacheDesc[pair.Value];
-                        tips = string.Format("{0:d2}：{1}", pair.Key,
-                            string.IsNullOrEmpty(tips) ? pair.Value.ToString() : tips);
-                        res.Add(tips.PadRight(20));
-                    }
-                  
-                    showList.Add("\t" + string.Join("\t",res.ToArray()));
+                    var res = value.Select(p => string.Format("{0:d2}：{1}", p.Key, cacheDesc[p.Value].PadRight(maxLength,'.')));
+                    showList.Add(string.Format("\t{0}\t", string.Join("\t", res.ToArray())));
                 }
-                int maxLine = showList.Max(p => p.Length) + 20;
-                showList.Add("");
-                showList.Add("\t" + "e：exit");
 
-                showList.Add(' '.CopyChar(maxLine));
-                showList.Add('-'.CopyChar(maxLine));
-                showList.Insert(0, ' '.CopyChar(maxLine));
-                showList.Insert(0, '-'.CopyChar(maxLine/2 - 4) + "命令索引" + '-'.CopyChar(maxLine/2 - 4));
+                int maxLine = showList.Max(p => p.Length + columnsCount*4 + 8);
+                maxLine += (maxLine%2 == 0 ? 0 : 1);
+                Console.WindowWidth = maxLine < 80 ? 80 : maxLine;
+                showList.Add("\n\t" + "e：exit\n");
+                showList.Add("-".PadRight(maxLine, '-'));
+                showList.Insert(0, "命令索引".Pad(maxLine - 4, '-') + "\n");
                 showList.ForEach(Console.WriteLine);
 
                 try

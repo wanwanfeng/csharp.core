@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Library.LitJson;
 
 namespace Library.Excel
 {
@@ -15,17 +16,17 @@ namespace Library.Excel
         #region virtual
 
 
-        public virtual Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        public virtual Dictionary<string, ListTable> ReadFromExcels(string filename)
         {
             return null;
         }
 
-        public virtual void WriteToExcel(string filename, List<List<object>> vals)
+        public virtual void WriteToExcel(string filename, ListTable list)
         {
 
         }
 
-        public virtual void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
+        public virtual void WriteToOneExcel(string fileName, List<ListTable> list)
         {
 
         }

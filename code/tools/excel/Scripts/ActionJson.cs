@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using DataTable = Library.Excel.DataTable;
 using Library.Excel;
 
 namespace Script
@@ -14,15 +10,15 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".json", file => new List<DataTable>() { ExcelByBase.ConvertJsonToDataTableByPath(file) });
+                ToXml(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
             }
         }
 
-        public class ToCsv 
+        public class ToCsv
         {
             public ToCsv()
             {
-                ToCsv(".json", file => new List<DataTable>() {ExcelByBase.ConvertJsonToDataTableByPath(file)});
+                ToCsv(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
             }
         }
 
@@ -30,7 +26,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".json", file => new List<DataTable>() { ExcelByBase.ConvertJsonToDataTableByPath(file) });
+                ToExcel(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
             }
         }
 
@@ -38,52 +34,29 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".json", file => new List<DataTable>() {ExcelByBase.ConvertJsonToDataTableByPath(file)});
+                ToOneExcel(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
             }
         }
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ArrayToKvExcel
+        public class ToKvExcel
         {
-            public ArrayToKvExcel()
+            public ToKvExcel()
             {
-                ArrayToKvExcel(".json", ExcelByBase.ConvertJsonToDataTableByPath);
+                ToKvExcel(".json", ExcelByBase.ImportJsonToDataTable);
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class ArrayKvExcelTo
+        public class KvExcelTo
         {
-            public ArrayKvExcelTo()
+            public KvExcelTo()
             {
-                ArrayKvExcelTo(ExcelByBase.ConvertDataTableToJsonByPath);
-            }
-        }
-
-
-        /// <summary>
-        /// 导出为键值对
-        /// </summary>
-        public class ObjectToKvExcel
-        {
-            public ObjectToKvExcel()
-            {
-                ObjectToKvExcel(".json", ExcelByBase.ConvertJsonToDataTableByPath);
-            }
-        }
-
-        /// <summary>
-        /// 还原键值对
-        /// </summary>
-        public class ObjectKvExcelTo
-        {
-            public ObjectKvExcelTo()
-            {
-                ObjectKvExcelTo(ExcelByBase.ConvertDataTableToJsonByPath);
+                KvExcelTo(ExcelByBase.ImportJsonToDataTable, ExcelByBase.ExportDataTableToJson);
             }
         }
     }

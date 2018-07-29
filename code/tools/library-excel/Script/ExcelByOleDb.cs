@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
+using Library.LitJson;
 
 #if true
 
@@ -14,28 +14,21 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByOleDb : ExcelByBase
     {
-        public override Dictionary<string, List<List<object>>> ReadFromExcels(string filename)
+        public override Dictionary<string, ListTable> ReadFromExcels(string filename)
         {
             var dt = ExcelToTable(filename);
             return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
         }
 
-        public override void WriteToExcel(string filename, List<List<object>> vals)
+        public override void WriteToExcel(string filename, ListTable list)
         {
-            var dt = ConvertListToDataTable(vals);
+            var dt = ConvertListToDataTable(list);
             TableToExcel(filename, dt);
         }
 
-        public override void WriteToOneExcel(string fileName, Dictionary<string, List<List<object>>> dic)
+        public override void WriteToOneExcel(string fileName, List<ListTable> list)
         {
-            List<DataTable> dts = new List<DataTable>();
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-            {
-                var dt = ConvertListToDataTable(pair.Value);
-                dt.TableName = Path.GetFileNameWithoutExtension(pair.Key);
-                dts.Add(dt);
-            }
-            TableToExcel(fileName, dts.ToArray());
+            TableToExcel(fileName, list.Select(ConvertListToDataTable).ToArray());
         }
 
         /// <summary>

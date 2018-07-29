@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Excel;
-using NPOI.HSSF.UserModel;
+using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
@@ -87,7 +87,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".csv", file => new List<DataTable> { ExcelByBase.ConvertCsvToDataTable(file) });
+                ToXml(".csv", file => new List<DataTable> { ExcelByBase.ImportCsvToDataTable(file) });
             }
         }
 
@@ -95,7 +95,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".csv", file => new List<DataTable> {ExcelByBase.ConvertCsvToDataTable(file)});
+                ToJson(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
             }
         }
 
@@ -103,7 +103,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".csv", file => new List<DataTable> {ExcelByBase.ConvertCsvToDataTable(file)});
+                ToExcel(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
             }
         }
 
@@ -111,7 +111,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".csv", file => new List<DataTable> {ExcelByBase.ConvertCsvToDataTable(file)});
+                ToOneExcel(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
             }
         }
 
@@ -122,7 +122,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ArrayToKvExcel(".csv", ExcelByBase.ConvertCsvToDataTable);
+                ToKvExcel(".csv", ExcelByBase.ImportCsvToDataTable);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                ArrayKvExcelTo(ExcelByBase.ConvertDataTableToCsv);
+                KvExcelTo(ExcelByBase.ImportCsvToDataTable, ExcelByBase.ExportDataTableToCsv);
             }
         }
 

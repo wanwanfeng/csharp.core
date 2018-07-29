@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+using DataTable = Library.Excel.DataTable;
 using Library.Excel;
 
 namespace Script
@@ -14,7 +11,7 @@ namespace Script
         {
             public ToCsv()
             {
-                ToCsv(".xml", file => new List<DataTable>() {ExcelByBase.ConvertXmlToDataTable(file)});
+                ToCsv(".xml", file => new List<DataTable>() {ExcelByBase.ImportXmlToDataTable(file)});
             }
         }
 
@@ -22,7 +19,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".xml", file => new List<DataTable>() { ExcelByBase.ConvertXmlToDataTable(file) });
+                ToJson(".xml", file => new List<DataTable>() { ExcelByBase.ImportXmlToDataTable(file) });
             }
         }
 
@@ -30,7 +27,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".xml", file => new List<DataTable>() { ExcelByBase.ConvertXmlToDataTable(file) });
+                ToExcel(".xml", file => new List<DataTable>() { ExcelByBase.ImportXmlToDataTable(file) });
             }
         }
 
@@ -38,7 +35,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xml", file => new List<DataTable>() { ExcelByBase.ConvertXmlToDataTable(file) });
+                ToOneExcel(".xml", file => new List<DataTable>() { ExcelByBase.ImportXmlToDataTable(file) });
             }
         }
 
@@ -49,7 +46,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ArrayToKvExcel(".xml", ExcelByBase.ConvertXmlToDataTable);
+                ToKvExcel(".xml", ExcelByBase.ImportXmlToDataTable);
             }
         }
 
@@ -60,7 +57,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                ArrayKvExcelTo(ExcelByBase.ConvertDataTableToXml);
+                KvExcelTo(ExcelByBase.ImportXmlToDataTable, ExcelByBase.ExportDataTableToXml);
             }
         }
     }

@@ -9,20 +9,14 @@ namespace Library.Extensions
 {
     public class SystemConsole
     {
-        public static void RunCategory<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
-        {
-            var cacheType = AttributeHelper.GetCache<T, CategoryAttribute>()
-                .ToLookup(p => p.Value.Category, q => q.Key)
-                .ToDictionary(p => p.Key, q => q.ToList());
-
-
-        }
-
         public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
+            Console.Title = typeof (T).Namespace ?? Console.Title;
+
             var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
-                .ToLookup(p => p.Value.Category, q => q.Key)
-                .ToDictionary(p => p.Key, q => q.ToList());
+                .ToLookup(p => p.Value == null ? "" : p.Value.Category,
+                    q => new KeyValuePair<int, T>((int) q.Key, (T) q.Key))
+                .ToDictionary(p => p.Key, q => q.ToList().ToDictionary(p => p.Key, o => o.Value));
 
             var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int)p.Key);
             var cacheDesc = AttributeHelper.GetCacheDescription<T>()
@@ -36,17 +30,20 @@ namespace Library.Extensions
 
                 List<string> showList = new List<string>();
 
-                var lineNum = (cacheType.Count/columnsCount + 1);
-                var cache =
-                    EnumHelper.ToIntDic<T>()
-                        .ToDictionary(p => p.Value, q => q.Key)
+                foreach (KeyValuePair<string, Dictionary<int, T>> pair in cacheCategory)
+                {
+                    showList.Add(pair.Key);
+
+                    var lineNum = (pair.Value.Count / columnsCount + 1);
+                    var cache = pair.Value
                         .ToLookup(p => p.Key % lineNum, q => q)
                         .ToDictionary(p => p.Key, q => q.ToList());
 
-                foreach (var value in cache.Values)
-                {
-                    var res = value.Select(p => string.Format("{0:d2}：{1}", p.Key, cacheDesc[p.Value].PadRight(maxLength,'.')));
-                    showList.Add(string.Format("\t{0}\t", string.Join("\t", res.ToArray())));
+                    foreach (var value in cache.Values)
+                    {
+                        var res = value.Select(p => string.Format("{0:d2}：{1}", p.Key, cacheDesc[p.Value].PadRight(maxLength, '.')));
+                        showList.Add(string.Format("\t{0}\t", string.Join("\t", res.ToArray())));
+                    }
                 }
 
                 int maxLine = showList.Max(p => p.Length + columnsCount*4 + 8);
@@ -56,6 +53,7 @@ namespace Library.Extensions
                 showList.Add("-".PadRight(maxLine, '-'));
                 showList.Insert(0, "命令索引".Pad(maxLine - 4, '-') + "\n");
                 showList.ForEach(Console.WriteLine);
+                Console.WindowHeight = showList.Count < 25 ? 25 : showList.Count + 5;
 
                 try
                 {

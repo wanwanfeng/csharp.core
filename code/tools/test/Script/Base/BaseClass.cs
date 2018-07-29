@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -51,9 +52,12 @@ namespace Script
         public void WriteAllLines(Dictionary<string, string> dic)
         {
             //直接写入excel
-            List<List<object>> vals = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList();
-            vals.Insert(0, new List<object>() {"key", "value"});
-            ExcelByNpoi.DataTableToExcel(root + ".xlsx", ExcelByBase.ConvertListToDataTable(vals));
+            var listTable = new ListTable()
+            {
+                List = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
+                Key = new List<object>() {"key", "value"}
+            };
+            new ExcelByNpoi().ExportToExcel(root + ".xlsx", listTable);
         }
 
         public void CreateDirectory(string name)

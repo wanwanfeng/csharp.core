@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.LitJson;
@@ -26,16 +27,15 @@ namespace findText
             }
         }
 
-        protected virtual JsonData SetJsonDataArray(List<List<object>> content, bool isReverse = false)
+        protected virtual JsonData SetJsonDataArray(ListTable list, bool isReverse = false)
         {
-            List<object> first = content.First();
-            content.Remove(first);
+            List<object> first = list.Key;
             if (isReverse)
-                content.Reverse();
+                list.List.Reverse();
 
             JsonData jsonDatas = new JsonData();
             jsonDatas.SetJsonType(JsonType.Array);
-            foreach (List<object> objects in content)
+            foreach (List<object> objects in list.List)
             {
                 JsonData data = new JsonData();
                 for (int j = 0; j < first.Count; j++)
@@ -49,16 +49,14 @@ namespace findText
             return jsonDatas;
         }
 
-        protected virtual Dictionary<string, List<JsonData>> SetDictionary(List<List<object>> content,
-            bool isReverse = false)
+        protected virtual Dictionary<string, List<JsonData>> SetDictionary(ListTable list, bool isReverse = false)
         {
-            var first = content.First();
-            content.Remove(first);
+            var first = list.Key;
             if (isReverse)
-                content.Reverse();
+                 list.List.Reverse();
 
             Dictionary<string, List<JsonData>> dic = new Dictionary<string, List<JsonData>>();
-            foreach (List<object> objects in content)
+            foreach (List<object> objects in list.List)
             {
                 JsonData data = new JsonData();
                 for (int j = 0; j < first.Count; j++)
@@ -82,7 +80,7 @@ namespace findText
         }
 
 
-        public virtual List<List<object>> GetJsonDataArray(string content)
+        public virtual ListTable GetJsonDataArray(string content)
         {
             return LitJsonHelper.ConvertJsonToList(content, str =>
             {
@@ -92,15 +90,15 @@ namespace findText
 
         private void WriteExcel(JsonData resJsonData)
         {
-            List<List<object>> vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
-            if (vals.Count == 0)
+            var vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
+            if (vals.List.Count == 0)
             {
                 Console.WriteLine("未搜索到结果！");
                 return;
             }
             Console.WriteLine("正在写入Excel...");
             string outpath = inputPath + ".xlsx";
-            new ExcelByNpoi().WriteToExcel(outpath, vals);
+            new ExcelByNpoi().ExportToExcel(outpath, vals);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);
         }
@@ -243,13 +241,13 @@ namespace findText
         /// <param name="inputPath"></param>
         public virtual void Revert(string inputPath)
         {
-            Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
+            var tables = new ExcelByNpoi().ImportExcelToListTable(inputPath);
 
             var list = new List<string>();
 
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
+            foreach (var table in tables)
             {
-                Dictionary<string, List<JsonData>> jsonData = SetDictionary(pair.Value, true);
+                Dictionary<string, List<JsonData>> jsonData = SetDictionary(table, true);
 
                 var i = 0;
                 foreach (var kv in jsonData)

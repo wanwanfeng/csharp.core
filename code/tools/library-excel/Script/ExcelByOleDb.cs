@@ -14,21 +14,20 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByOleDb : ExcelByBase
     {
-        public override Dictionary<string, ListTable> ReadFromExcels(string filename)
+        public override List<ListTable> ImportExcelToListTable(string filename)
         {
-            var dt = ExcelToTable(filename);
-            return dt.ToDictionary(p => p.TableName, ConvertDataTableToList);
+            return ImportExcelToDataTable(filename).Select(ConvertDataTableToList).ToList();
         }
 
-        public override void WriteToExcel(string filename, ListTable list)
+        public override void ExportToExcel(string filename, ListTable list)
         {
             var dt = ConvertListToDataTable(list);
-            TableToExcel(filename, dt);
+            ExportDataTableToExcel(filename, dt);
         }
 
-        public override void WriteToOneExcel(string fileName, List<ListTable> list)
+        public override void ExportToOneExcel(string fileName, List<ListTable> list)
         {
-            TableToExcel(fileName, list.Select(ConvertListToDataTable).ToArray());
+            ExportDataTableToExcel(fileName, list.Select(ConvertListToDataTable).ToArray());
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static List<DataTable> ExcelToTable(string path)
+        public static List<DataTable> ImportExcelToDataTable(string path)
         {
             var connectionString = ConnectionString(path, "HDR=NO;IMEX=1");
             if (string.IsNullOrEmpty(connectionString)) return null;
@@ -100,7 +99,7 @@ namespace Library.Excel
             return connectionString;
         }
 
-        private static void TableToExcel(string path, params DataTable[] dts)
+        public static void ExportDataTableToExcel(string path, params DataTable[] dts)
         {
             path = Path.ChangeExtension(path, ".xls");
 

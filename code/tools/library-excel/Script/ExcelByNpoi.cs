@@ -24,17 +24,17 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByNpoi : ExcelByBase
     {
-        public override Dictionary<string, ListTable> ReadFromExcels(string filename)
+        public override List<ListTable> ImportExcelToListTable(string filename)
         {
-            return ImportExcelToDataTable(filename).ToDictionary(p => p.TableName, ConvertDataTableToList);
+            return ImportExcelToDataTable(filename).Select(ConvertDataTableToList).ToList();
         }
 
-        public override void WriteToExcel(string filename, ListTable list)
+        public override void ExportToExcel(string filename, ListTable list)
         {
             ExportDataTableToExcel(filename, ConvertListToDataTable(list));
         }
 
-        public override void WriteToOneExcel(string fileName, List<ListTable> list)
+        public override void ExportToOneExcel(string fileName, List<ListTable> list)
         {
             ExportDataTableToExcel(fileName, list.Select(ConvertListToDataTable).ToArray());
         }

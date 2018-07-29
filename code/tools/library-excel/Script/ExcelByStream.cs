@@ -5,7 +5,6 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using Library.LitJson;
 
 #if true
 
@@ -22,7 +21,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="vals"></param>
-        public override void WriteToExcel(string fileName, ListTable vals)
+        public override void ExportToExcel(string fileName, ListTable vals)
         {
             fileName = Path.ChangeExtension(fileName, ".xls");
             var dt = ConvertListToDataTable(vals);
@@ -36,7 +35,7 @@ namespace Library.Excel
             File.WriteAllBytes(fileName, ExportExcelByMemoryStream(dt));
         }
 
-        public override void WriteToOneExcel(string fileName, List<ListTable> list)
+        public override void ExportToOneExcel(string fileName, List<ListTable> list)
         {
             fileName = Path.ChangeExtension(fileName, ".xls");
             FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate);

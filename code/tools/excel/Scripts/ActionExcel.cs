@@ -12,7 +12,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
+                ToXml(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
             }
         }
 
@@ -20,7 +20,7 @@ namespace Script
         {
             public ToCsv()
             {
-                ToCsv(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
+                ToCsv(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
             }
         }
 
@@ -28,7 +28,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
+                ToJson(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
             }
         }
 
@@ -37,7 +37,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
+                ToExcel(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
             }
         }
 
@@ -46,7 +46,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xlsx|.xls", file => new List<DataTable>(ExcelByNpoi.ImportExcelToDataTable(file, false)));
+                ToOneExcel(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
             }
         }
 

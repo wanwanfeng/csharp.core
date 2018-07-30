@@ -7,11 +7,11 @@ namespace Script
 {
     public class ActionXml : ActionBase
     {
-        public class ToCsv 
+        public class ToCsv
         {
             public ToCsv()
             {
-                ToCsv(".xml", file => new List<DataTable>() {ExcelByBase.ImportXmlToDataTable(file)});
+                ToCsv(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
             }
         }
 
@@ -19,7 +19,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".xml", file => new List<DataTable>() { ExcelByBase.ImportXmlToDataTable(file) });
+                ToJson(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
             }
         }
 
@@ -27,7 +27,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".xml", file => new List<DataTable>() { ExcelByBase.ImportXmlToDataTable(file) });
+                ToExcel(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
             }
         }
 
@@ -35,7 +35,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xml", file => new List<DataTable>() { ExcelByBase.ImportXmlToDataTable(file) });
+                ToOneExcel(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
             }
         }
 
@@ -46,7 +46,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xml", ExcelByBase.ImportXmlToDataTable);
+                ToKvExcel(".xml", ExcelByBase.Xml.ImportToDataTable);
             }
         }
 
@@ -57,7 +57,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ImportXmlToDataTable, ExcelByBase.ExportDataTableToXml);
+                KvExcelTo(ExcelByBase.Xml.ImportToDataTable, ExcelByBase.Data.ExportToXml);
             }
         }
     }

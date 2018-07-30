@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Library.Helper;
 
 namespace Library.Extensions
@@ -12,6 +13,7 @@ namespace Library.Extensions
         public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
             Console.Title = typeof (T).Namespace ?? Console.Title;
+            //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
 
             var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
                 .ToLookup(p => p.Value == null ? "" : p.Value.Category,
@@ -48,7 +50,7 @@ namespace Library.Extensions
 
                 int maxLine = showList.Max(p => p.Length + columnsCount*4 + 8);
                 maxLine += (maxLine%2 == 0 ? 0 : 1);
-                Console.WindowWidth = maxLine < 80 ? 80 : maxLine;
+                Console.WindowWidth = maxLine < Console.WindowWidth ? Console.WindowWidth : maxLine;
                 showList.Add("\n\t" + "e：exit\n");
                 showList.Add("-".PadRight(maxLine, '-'));
                 showList.Insert(0, "命令索引".Pad(maxLine - 4, '-') + "\n");
@@ -57,7 +59,7 @@ namespace Library.Extensions
 
                 try
                 {
-                    int caoType = SystemConsole.GetInputStr("请选择，然后回车：").AsInt();
+                    int caoType = SystemConsole.GetInputStr("请选择，然后回车：", "", "e", "^[0-9]*$").AsInt();
 
                     if (cacheType.ContainsKey(caoType))
                     {
@@ -86,16 +88,23 @@ namespace Library.Extensions
         /// 用于控制台程序
         /// </summary>
         /// <returns></returns>
-        public static string GetInputStr(string beforeTip = "请输入:", string afterTip = "", string def = "e")
+        public static string GetInputStr(string beforeTip = "请输入:", string afterTip = "", string def = "e",
+            string regex = null)
         {
             Console.Write(beforeTip);
             var cmd = Console.ReadLine();
             var str = string.IsNullOrEmpty(cmd) ? def : cmd;
-            if (str == "e")
-                QuitReadKey();
-            str = str.Contains(" ") ? str.Substring(1, str.Length - 2) : str;
-            Console.WriteLine(afterTip + str);
-            return str;
+
+            if (regex == null || Regex.IsMatch(str, "e") || Regex.IsMatch(str, regex))
+            {
+                if (str == "e")
+                    QuitReadKey();
+                str = str.Contains(" ") ? str.Substring(1, str.Length - 2) : str;
+                Console.WriteLine(afterTip + str);
+                return str;
+            }
+
+            return GetInputStr(beforeTip, afterTip, def, regex);
         }
 
         /// <summary>

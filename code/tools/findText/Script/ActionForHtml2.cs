@@ -25,7 +25,7 @@ namespace findText.Script
 
         public override ListTable GetJsonDataArray(string content)
         {
-            return LitJsonHelper.ConvertJsonToList(content);
+            return LitJsonHelper.ConvertJsonToListTable(content);
         }
 
         //public void GetValue(HtmlNode node, ref Dictionary<string, string> cache)

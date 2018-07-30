@@ -13,25 +13,41 @@ namespace Library.Excel
     {
         #region  Convert Json and DataTable
 
-        public static DataTable ConvertJsonToDataTable(string content)
+        public class Json
         {
-            return ConvertListToDataTable(ConvertJsonToList(content));
+            public static ListTable ConvertToListTable(string content)
+            {
+                return LitJsonHelper.ConvertJsonToListTable(content);
+            }
+
+            public static DataTable ConvertToDataTable(string content)
+            {
+                return List.ConvertToDataTable(ConvertToListTable(content));
+            }
+
+            public static DataTable ImportToDataTable(string path)
+            {
+                return List.ConvertToDataTable(ImportToListTable(path));
+            }
+
+            public static ListTable ImportToListTable(string file)
+            {
+                return LitJsonHelper.ImportJsonToListTable(file);
+            }
         }
 
-        public static JsonData ConvertDataTableToJson(DataTable dt)
+        public partial class Data
         {
-            return ConvertListToJson(ConvertDataTableToList(dt));
-        }
+            public static JsonData ConvertToJson(DataTable dt)
+            {
+                return List.ConvertToJson(ConvertToListTable(dt));
+            }
 
-        public static DataTable ImportJsonToDataTable(string path)
-        {
-            return ConvertListToDataTable(ImportJsonToList(path));
-        }
-
-        public static void ExportDataTableToJson(DataTable dt, string file)
-        {
-            file = string.IsNullOrEmpty(file) ? dt.FullName : file;
-            ExportListToJson(ConvertDataTableToList(dt), Path.ChangeExtension(file, ".json"));
+            public static void ExportToJson(DataTable dt, string file)
+            {
+                file = string.IsNullOrEmpty(file) ? dt.FullName : file;
+                List.ExportToJson(ConvertToListTable(dt), Path.ChangeExtension(file, ".json"));
+            }
         }
 
         #endregion

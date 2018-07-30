@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using DataTable = Library.Excel.DataTable;
 using Library.Excel;
+using Library.LitJson;
+using LitJson;
 
 namespace Script
 {
@@ -10,7 +13,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
+                ToXml(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
             }
         }
 
@@ -18,7 +21,7 @@ namespace Script
         {
             public ToCsv()
             {
-                ToCsv(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
+                ToCsv(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
             }
         }
 
@@ -26,7 +29,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
+                ToExcel(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
             }
         }
 
@@ -34,7 +37,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".json", file => new List<DataTable>() {ExcelByBase.ImportJsonToDataTable(file)});
+                ToOneExcel(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
             }
         }
 
@@ -45,7 +48,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".json", ExcelByBase.ImportJsonToDataTable);
+                ToKvExcel(".json", ExcelByBase.Json.ImportToDataTable);
             }
         }
 
@@ -56,7 +59,23 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ImportJsonToDataTable, ExcelByBase.ExportDataTableToJson);
+                KvExcelTo(ExcelByBase.Json.ImportToDataTable, ExcelByBase.Data.ExportToJson, (fullpath, list) =>
+                {
+                    Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
+                    foreach (List<object> objects in list)
+                    {
+                        object id = objects[1];
+                        string key = objects[2].ToString();
+                        object value = objects[3];
+                        string value_zh_cn = objects[4].ToString();
+
+                        dictionary[id.ToString()] = value_zh_cn;
+                    }
+
+                    JsonData jsonData = LitJsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
+                    LitJsonHelper.RevertDictionaryToJson(jsonData, dictionary);
+                    return LitJsonHelper.ToJson(jsonData);
+                });
             }
         }
     }

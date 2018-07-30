@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Library.Helper;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace UnityEditor.Library
 {
@@ -43,10 +45,10 @@ namespace UnityEditor.Library
             outpath = outpath.Replace("\\", "/");
             List<string> res = new List<string>();
             if (File.Exists(outpath))
-                res = new List<string>(File.ReadAllLines(outpath));
-            else
-                Debug.LogError("文件不存在！" + outpath);
-            return res;
+                return File.ReadAllLines(outpath).ToList();
+
+            Debug.LogError("文件不存在！" + outpath);
+            return new List<string>();
         }
 
         /// <summary>

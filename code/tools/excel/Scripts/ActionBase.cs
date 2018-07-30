@@ -93,13 +93,13 @@ namespace Script
                 var dts = importToDataTable.Invoke(file);
                 if (dts.Count == 1)
                 {
-                    ExcelByBase.ExportDataTableToXml(dts.First(), file);
+                    ExcelByBase.Data.ExportToXml(dts.First(), file);
                     return;
                 }
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByBase.ExportDataTableToXml(dt, Path.ChangeExtension(newPath, ".xml"));
+                    ExcelByBase.Data.ExportToXml(dt, Path.ChangeExtension(newPath, ".xml"));
                 });
             });
         }
@@ -115,13 +115,13 @@ namespace Script
                 var dts = importToDataTable.Invoke(file);
                 if (dts.Count == 1)
                 {
-                    ExcelByBase.ExportDataTableToCsv(dts.First(), file);
+                    ExcelByBase.Data.ExportToCsv(dts.First(), file);
                     return;
                 }
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByBase.ExportDataTableToCsv(dt, Path.ChangeExtension(newPath, ".csv"));
+                    ExcelByBase.Data.ExportToCsv(dt, Path.ChangeExtension(newPath, ".csv"));
                 });
             });
         }
@@ -137,13 +137,13 @@ namespace Script
                 var dts = importToDataTable(file);
                 if (dts.Count == 1)
                 {
-                    ExcelByBase.ExportDataTableToJson(dts.First(), file);
+                    ExcelByBase.Data.ExportToJson(dts.First(), file);
                     return;
                 }
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByBase.ExportDataTableToJson(dt, Path.ChangeExtension(newPath, ".json"));
+                    ExcelByBase.Data.ExportToJson(dt, Path.ChangeExtension(newPath, ".json"));
                 });
             });
         }
@@ -221,38 +221,37 @@ namespace Script
                 dt.TableName = file.Replace(InputPath, "");
                 if (dt.IsArray)
                 {
-                    var list = ExcelByBase.ConvertDataTableToRowsList(dt)
+                    var list = ExcelByBase.Data.ConvertToRowsList(dt)
                         .Select(p => string.Join("|", p.Cast<string>().ToArray()))
                         .Select(p => Regex.IsMatch(p, regex))
                         .ToList();
                     //返回符合正则表达式的列
-                    var header =
-                        ExcelByBase.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
+                    var header = ExcelByBase.Data.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
 
                     var resdt = dt.DefaultView.ToTable(false, header.ToArray());
 
-                    foreach (object o in header.Skip(1))
-                        resdt.Columns.Add(o + "_zh_ch", typeof(string));
+                    //foreach (object o in header.Skip(1))
+                    //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
+
                     if (header.Count > 1)
                         dtArray.Add(resdt);
                 }
                 else
                 {
-                    var lt = ExcelByBase.ConvertDataTableToList(dt);
+                    var lt = ExcelByBase.Data.ConvertToListTable(dt);
                     lt.List = lt.List
                         .ToDictionary(p => p, q => string.Join("|", q.Cast<string>().ToArray()))
                         .Where(p => Regex.IsMatch(p.Value, regex))
                         .Select(p => p.Key)
                         .ToList();
                     //返回符合正则表达式的行
-                    dtObject.Add(ExcelByBase.ConvertListToDataTable(lt));
+                    dtObject.Add(ExcelByBase.List.ConvertToDataTable(lt));
                 }
             });
 
-            List<DataTable> res = new List<DataTable>();
+            if (dtArray.Count == 0 && dtObject.Count == 0) return;
 
-            DataTable dd = new DataTable("Array");
-            res.Add(dd);
+            DataTable dd = new DataTable();
             dd.Columns.Add("path", typeof(string));
             dd.Columns.Add("id", typeof(string));
             dd.Columns.Add("key", typeof(string));
@@ -263,23 +262,25 @@ namespace Script
             {
                 foreach (System.Data.DataTable dataTable in dtArray)
                 {
-                    var header = ExcelByBase.GetHeaderList(dataTable);
+                    var header = ExcelByBase.Data.GetHeaderList(dataTable);
                     foreach (DataRow dr in dataTable.Rows)
                     {
                         foreach (string s in header.Skip(1))
                         {
+                            if (string.IsNullOrEmpty(dr[s].ToString())) continue;
                             dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], dr[s]);
                         }
                     }
                 }
             }
 
-            if (dtObject.Count > 0)
+            if (dtObject.Count != 0)
             {
                 foreach (DataTable dataTable in dtObject)
                 {
                     foreach (DataRow dr in dataTable.Rows)
                     {
+                        if (string.IsNullOrEmpty(dr[1].ToString())) continue;
                         dd.Rows.Add(dataTable.TableName, dr[0],
                             dr[0].ToString().Substring(dr[0].ToString().LastIndexOf("/", StringComparison.Ordinal) + 1),
                             dr[1], dr[1]);
@@ -287,18 +288,21 @@ namespace Script
                 }
             }
 
-            if (res.Count == 0) return;
-            ExcelByNpoi.ExportDataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), res.ToArray());
+            ExcelByNpoi.ExportDataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dd);
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelTo(Func<string, DataTable> loadAction, Action<DataTable, string> saveAction)
+        public static void KvExcelTo(Func<string, DataTable> loadAction, Action<DataTable, string> saveAction,
+            Func<string, List<List<object>>, string> isNotArrayAction = null)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(".xlsx", SelectType.File);
             if (files.Count == 0) return;
+
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
+
             var dts = new List<DataTable>();
             files.ForEach(file =>
             {
@@ -314,7 +318,8 @@ namespace Script
             foreach (DataTable dataTable in dts)
             {
                 var cache =
-                    ExcelByBase.ConvertDataTableToList(dataTable).List
+                    ExcelByBase.Data.ConvertToListTable(dataTable)
+                        .List
                         .ToLookup(p => p.First())
                         .ToDictionary(p => p.Key.ToString(), q => q.ToList());
                 cache.Remove("path");
@@ -358,30 +363,17 @@ namespace Script
                                 }
                             }
                             if (!isSave) continue;
-                            File.Copy(fullpath, fullpath + ".bak", true);
+                            if (isBak)
+                                File.Copy(fullpath, fullpath + ".bak", true);
                             saveAction.Invoke(dt, fullpath);
                         }
                         else
                         {
-                            if (Path.GetExtension(fullpath) == ".json")
-                            {
-                                Dictionary<string,JsonData> dictionary = new Dictionary<string, JsonData>();
-                                foreach (List<object> objects in pair.Value)
-                                {
-                                    object id = objects[1];
-                                    string key = objects[2].ToString();
-                                    object value = objects[3];
-                                    string value_zh_cn = objects[4].ToString();
+                            if (isNotArrayAction == null) continue;
 
-                                    dictionary[id.ToString()] = value_zh_cn;
-                                }
-
-                                JsonData jsonData = LitJsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
-                                LitJsonHelper.RevertDictionaryToJson(jsonData, dictionary);
+                            if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                                File.WriteAllText(fullpath, LitJsonHelper.ToJson(jsonData));
-                              
-                            }
+                            File.WriteAllText(fullpath, isNotArrayAction.Invoke(fullpath, pair.Value));
                         }
                     }
                     else

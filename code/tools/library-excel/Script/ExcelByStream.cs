@@ -24,7 +24,7 @@ namespace Library.Excel
         public override void ExportToExcel(string fileName, ListTable vals)
         {
             fileName = Path.ChangeExtension(fileName, ".xls");
-            var dt = ConvertListToDataTable(vals);
+            var dt = List.ConvertToDataTable(vals);
 
             var value = ExportExcelByMemoryStream(dt);
             System.IO.FileStream fs = new System.IO.FileStream(fileName, System.IO.FileMode.OpenOrCreate);
@@ -41,7 +41,7 @@ namespace Library.Excel
             FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate);
             foreach (var table in list)
             {
-                var value = ExportExcelByMemoryStream(ConvertListToDataTable(table));
+                var value = ExportExcelByMemoryStream(List.ConvertToDataTable(table));
                 fs.Write(value, 0, value.Length);
                 fs.Flush();
             }

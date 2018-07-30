@@ -82,7 +82,7 @@ namespace findText
 
         public virtual ListTable GetJsonDataArray(string content)
         {
-            return LitJsonHelper.ConvertJsonToList(content, str =>
+            return LitJsonHelper.ConvertJsonToListTable(content, str =>
             {
                 return str.Replace(":", "::").Replace("\n", "\\n");
             });

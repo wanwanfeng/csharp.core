@@ -16,9 +16,7 @@ namespace Script
         {
             ExcelByNpoi.OnSheetBeforeAction = (dt) =>
             {
-                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
-                var cache =
-                    ExcelByNpoi.ConvertDataTableToRowsDic(dt)
+                var cache = ExcelByBase.Data.ConvertToRowsDictionary(dt)
                         .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
                         .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
                 if (cache.Values.All(p => p == false))
@@ -52,10 +50,7 @@ namespace Script
 
             ExcelByNpoi.OnSheetAction = (sheet, dt) =>
             {
-                string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
-
-                var cache =
-                    ExcelByNpoi.ConvertDataTableToRowsDic(dt)
+                var cache = ExcelByBase.Data.ConvertToRowsDictionary(dt)
                         .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
                         .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
                 if (cache.Values.All(p => p == false))
@@ -87,7 +82,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
+                ToXml(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
             }
         }
 
@@ -95,7 +90,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
+                ToJson(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
             }
         }
 
@@ -103,7 +98,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
+                ToExcel(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
             }
         }
 
@@ -111,7 +106,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".csv", file => new List<DataTable> {ExcelByBase.ImportCsvToDataTable(file)});
+                ToOneExcel(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
             }
         }
 
@@ -122,7 +117,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".csv", ExcelByBase.ImportCsvToDataTable);
+                ToKvExcel(".csv", ExcelByBase.Csv.ImportToDataTable);
             }
         }
 
@@ -133,7 +128,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.ImportCsvToDataTable, ExcelByBase.ExportDataTableToCsv);
+                KvExcelTo(ExcelByBase.Csv.ImportToDataTable, ExcelByBase.Data.ExportToCsv);
             }
         }
 

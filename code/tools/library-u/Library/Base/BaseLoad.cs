@@ -42,7 +42,10 @@ namespace UnityEngine.Library
         {
             if (OnFuncLoad != null)
             {
-                return OnFuncLoad(filePath, instance, obj => { if (callAction != null) callAction(obj as T); }) as T;
+                return OnFuncLoad(filePath, instance, obj =>
+                {
+                    if (callAction != null) callAction(obj as T);
+                }) as T;
             }
             var t = (instance ? Object.Instantiate(Resources.Load<T>(filePath)) : Resources.Load<T>(filePath)) as T;
             if (callAction != null) callAction(t as T);
@@ -91,15 +94,17 @@ namespace UnityEngine.Library
         /// Sprite资源根目录
         /// </summary>
         public static string SpriteRoot = "";
-        
+
         public Sprite LoadSprite(string path)
         {
             path = SpriteRoot + path;
             return OnLoadSprite != null ? OnLoadSprite.Invoke(path) : Load<Sprite>(path);
         }
+
+        #endregion
     }
 
     #endregion
+
 }
 
-#endregion

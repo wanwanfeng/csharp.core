@@ -18,20 +18,7 @@ namespace Library.Excel
     {
         public override List<ListTable> ImportExcelToListTable(string filename)
         {
-            return ImportExcelToDataTable(filename).Select(ConvertDataTableToList).ToList();
-        }
-
-        [Obsolete("此类本方法无效！", true)]
-
-        public override void ExportToExcel(string filename, ListTable list)
-        {
-      
-        }
-
-        [Obsolete("此类本方法无效！", true)]
-        public override void ExportToOneExcel(string fileName, List<ListTable> dic)
-        {
-            
+            return ImportExcelToDataTable(filename).Select(Data.ConvertToListTable).ToList();
         }
 
         /// <summary>

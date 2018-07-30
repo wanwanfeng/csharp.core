@@ -91,7 +91,7 @@ namespace Library
         public string TableName = "";
         public string FullName = "";
         public bool IsArray = true;
-        public List<object> Key = new List<object>();
+        public List<string> Key = new List<string>();
         public List<List<object>> List = new List<List<object>>();
     }
 }
@@ -129,12 +129,12 @@ namespace Library.LitJson
             return JsonMapper.ToJson(t);
         }
 
-        public static ListTable ImportJsonToList(string file, Func<string, string> func = null)
+        public static ListTable ImportJsonToListTable(string file, Func<string, string> func = null)
         {
             if (!File.Exists(file))
                 Ldebug.Log("文件不存在!");
             string content = File.ReadAllText(file);
-            ListTable listTable = ConvertJsonToList(content, func);
+            ListTable listTable = ConvertJsonToListTable(content, func);
             listTable.TableName = Path.GetFileName(file);
             listTable.FullName = file;
             return listTable;
@@ -146,7 +146,7 @@ namespace Library.LitJson
         /// <param name="content"></param>
         /// <param name="func"></param>
         /// <returns>返回的是两种不同的List</returns>
-        public static ListTable ConvertJsonToList(string content, Func<string, string> func = null)
+        public static ListTable ConvertJsonToListTable(string content, Func<string, string> func = null)
         {
             if (string.IsNullOrEmpty(content))
                 return new ListTable();
@@ -172,41 +172,38 @@ namespace Library.LitJson
                     }
                     list.Add(val);
                 }
-                return new ListTable {IsArray = true, Key = keys.Cast<object>().ToList(), List = list};
+                return new ListTable {IsArray = true, Key = keys, List = list};
             }
             if (data.IsObject)
             {
                 Dictionary<string, JsonData> cache = ConvertJsonToDictionary(data);
                 var list = cache.Select(p => new List<object>()
-                {
-                    p.Key,
-                    func == null ? p.Value : func(p.Value.ToString())
-                })
-                    .ToList();
-                return new ListTable {IsArray = false, Key = new List<object>() {"key", "value"}, List = list};
+                    {
+                        p.Key,
+                        func == null ? p.Value : func(p.Value.ToString())
+                    }).ToList();
+                return new ListTable {IsArray = false, Key = new List<string> {"key", "value"}, List = list};
             }
             return new ListTable();
         }
 
         /// <summary>
-        ///  非同种结构转为Array
+        ///  同种结构转为Array
         /// </summary>
         /// <returns></returns>
-        public static JsonData ConvertListToJson(ListTable list)
+        public static JsonData ConvertListTableToJson(ListTable list)
         {
             if (list.IsArray)
             {
-                Queue<List<object>> queue = new Queue<List<object>>(list.List);
-
                 JsonData resJsonDatas = new JsonData();
                 resJsonDatas.SetJsonType(JsonType.Array);
 
-                while (queue.Count != 0)
+                foreach (List<object> objects in list.List)
                 {
-                    Queue<object> queueVal = new Queue<object>(queue.Dequeue());
+                    Queue<object> queueVal = new Queue<object>(objects);
                     JsonData jsonData = new JsonData();
-                    foreach (object o in list.Key)
-                        jsonData[o.ToString()] = queueVal.Dequeue().ToString();
+                    foreach (string o in list.Key)
+                        jsonData[o] = queueVal.Dequeue().ToString();
                     resJsonDatas.Add(jsonData);
                 }
 
@@ -214,9 +211,21 @@ namespace Library.LitJson
             }
             else
             {
-                return ToJson(list.List);
+                //todo
+                JsonData resJsonDatas = new JsonData();
+                resJsonDatas.SetJsonType(JsonType.Array);
+
+                foreach (List<object> objects in list.List)
+                {
+                    Queue<object> queueVal = new Queue<object>(objects);
+                    JsonData jsonData = new JsonData();
+                    foreach (string o in list.Key)
+                        jsonData[o] = queueVal.Dequeue().ToString();
+                    resJsonDatas.Add(jsonData);
+                }
+
+                return resJsonDatas;
             }
-            return new JsonData();
         }
 
         /// <summary>
@@ -341,7 +350,7 @@ namespace Library.LitJson
                             temp[key.AsInt()] = keyValuePair.Value;
                         else
                         {
-                            
+
                         }
                     }
                     else
@@ -352,7 +361,7 @@ namespace Library.LitJson
                             temp = temp[key.AsInt()];
                         else
                         {
-                            
+
                         }
                     }
                 } while (keys.Count != 0);
@@ -361,7 +370,7 @@ namespace Library.LitJson
         }
 
 
-         /// <summary>
+        /// <summary>
         /// data值再覆盖(数组索引作为key)
         /// </summary>
         /// <param name="data">修改前的data</param>
@@ -398,7 +407,5 @@ namespace Library.LitJson
             }
             return data;
         }
-    }
-
     }
 }

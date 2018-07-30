@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,14 @@ namespace Library.Excel
     {
         #region  Convert Csv and DataTable
 
+        public enum CsvMode
+        {
+            CsvHelp,
+            Normal,
+        }
+
+        public static CsvMode CurCsvMode = CsvMode.CsvHelp;
+
         public partial class Csv
         {
             public static DataTable ImportToDataTable(string path)
@@ -22,29 +31,32 @@ namespace Library.Excel
                     Ldebug.Log("文件不存在!");
                 if (path == null) return null;
 
-                //string[] content = File.ReadAllLines(path);
-                //var list =
-                //    content.Select(
-                //        q =>
-                //        {
-                //            CsvHelper.CsvFileReader
+                List<List<object>> list;
 
-                //            return q.Split(',')
-                //                .Select(p => p.StartsWith("\"") ? p.Substring(1, p.Length - 2) : p)
-                //                .Cast<object>()
-                //                .ToList();
-                //        }).ToList();
-
-                //var countList = list.Select(p => p.Count()).ToList();
-                //if (countList.Min() != countList.Max())
-                //{
-                //    Ldebug.Log("\n--------------------------------");
-                //    Ldebug.Log("文件格式有问题!");
-                //    Ldebug.Log("--------------------------------\n");
-                //    SystemExtensions.QuitReadKey();
-                //}
-
-                var list = CsvHelper.ReadCSV(path);
+                switch (CurCsvMode)
+                {
+                    case CsvMode.CsvHelp:
+                    {
+                        list = CsvHelper.ReadCSV(path);
+                    }
+                        break;
+                    case CsvMode.Normal:
+                    {
+                        string[] content = File.ReadAllLines(path);
+                        list = content.Select(
+                                q =>
+                                {
+                                    return q.Split(',')
+                                        .Select(p => p.StartsWith("\"") ? p.Substring(1, p.Length - 2) : p)
+                                        .Cast<object>()
+                                        .ToList();
+                                })
+                            .ToList();
+                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
                 return List.ConvertToDataTable(new ListTable()
                 {
                     TableName = Path.GetFileNameWithoutExtension(path),
@@ -63,24 +75,40 @@ namespace Library.Excel
                 file = string.IsNullOrEmpty(file) ? dt.FullName : file;
 
                 var list = ConvertToListTable(dt);
-                var contents = list.List.Select(p => string.Join(",", p.Select(q =>
-                        {
-                            //var str = q.ToString().Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
-                            //if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))
-                            //{
-                            //    //含逗号 冒号 换行符的需要放到引号中
-                            //    str = string.Format("\"{0}\"", str);
-                            //}
-                            //return str;
-                            return string.Format("\"{0}\"", q);
-                            ;
-                        })
-                        .ToArray()))
-                    .ToArray();
                 string newPath = Path.ChangeExtension(file, ".csv");
-                FileHelper.CreateDirectory(newPath);
-                File.WriteAllLines(newPath, contents, new UTF8Encoding(false));
-                //CsvHelper.SaveCSV(list, newPath);
+                switch (CurCsvMode)
+                {
+                    case CsvMode.CsvHelp:
+                    {
+                        var res = new List<List<object>>(list.List);
+                        res.Insert(0, list.Key.Cast<object>().ToList());
+                        CsvHelper.SaveCSV(res, newPath);
+                    }
+                        break;
+                    case CsvMode.Normal:
+                    {
+
+                        var contents = list.List.Select(p => string.Join(",", p.Select(q =>
+                                {
+                                    //var str = q.ToString().Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
+                                    //if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))
+                                    //{
+                                    //    //含逗号 冒号 换行符的需要放到引号中
+                                    //    str = string.Format("\"{0}\"", str);
+                                    //}
+                                    //return str;
+                                    return string.Format("\"{0}\"", q);
+                                    ;
+                                })
+                                .ToArray()))
+                            .ToArray();
+                        FileHelper.CreateDirectory(newPath);
+                        File.WriteAllLines(newPath, contents, new UTF8Encoding(false));
+                    }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 

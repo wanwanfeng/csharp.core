@@ -112,7 +112,7 @@ namespace Library.Excel
                         {
                             var node = doc.CreateNode(XmlNodeType.Element, "RECORD", "");
                             docNode.AppendChild(node);
-                            Queue<string> keys = new Queue<string>(list.Key);
+                            var keys = new Queue<string>(list.Key);
                             foreach (object o in objects)
                             {
                                 var xmlNode = doc.CreateNode(XmlNodeType.Element, keys.Dequeue(), "");

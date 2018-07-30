@@ -182,7 +182,7 @@ namespace Library.LitJson
                         p.Key,
                         func == null ? p.Value : func(p.Value.ToString())
                     }).ToList();
-                return new ListTable {IsArray = false, Key = new List<string> {"key", "value"}, List = list};
+                return new ListTable { IsArray = false, Key = new List<string> { "key", "value" }, List = list };
             }
             return new ListTable();
         }

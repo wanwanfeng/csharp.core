@@ -24,6 +24,8 @@ namespace SvnVersion
         public string softwareVersion { get; protected set; }
 
         protected static string KeyMd5 { get; private set; }
+        protected static string AESKey { get; private set; }
+        protected static string AESHead { get; private set; }
         protected static string Exclude { get; private set; }
         protected static string Platform { get; private set; }
         protected static string EncryptExclude { get; private set; }
@@ -32,8 +34,8 @@ namespace SvnVersion
         static CommonBase()
         {
             KeyMd5 = Config.IniReadValue("Config", "md5key", "").Trim();
-            AES.Key = Config.IniReadValue("Config", "aeskey", "YmbEV0FVzZN/SvKCCoJje/jSpM").Trim();
-            AES.Head = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
+            AESKey = Config.IniReadValue("Config", "aeskey", "YmbEV0FVzZN/SvKCCoJje/jSpM").Trim();
+            AESHead = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
             Exclude = Config.IniReadValue("Config", "exclude", ".meta").Trim();
             Platform = Config.IniReadValue("Config", "platform", "ios|android,ios,pc").Trim();
 
@@ -45,8 +47,8 @@ namespace SvnVersion
         {
             Console.WriteLine("--------------------------------------");
             Console.WriteLine("KeyMd5:" + KeyMd5);
-            Console.WriteLine("AES.Key:" + AES.Key);
-            Console.WriteLine("AES.Head:" + AES.Head);
+            Console.WriteLine("AES.Key:" + AESKey);
+            Console.WriteLine("AES.Head:" + AESHead);
             Console.WriteLine("Exclude:" + Exclude);
             Console.WriteLine("Platform:" + Platform);
             Console.WriteLine("EncryptExclude:" + EncryptExclude);
@@ -135,8 +137,7 @@ namespace SvnVersion
 
         protected string GetPathHash(string path)
         {
-            return Encrypt.MD5(Path.GetDirectoryName(path) + KeyMd5) + "/" +
-                   Encrypt.MD5(Path.GetFileName(path) + KeyMd5);
+            return Path.GetDirectoryName(path).MD5(KeyMd5) + "/" + Path.GetFileName(path).MD5(KeyMd5);
         }
 
         /// <summary>
@@ -170,8 +171,8 @@ namespace SvnVersion
                     string fullPath = targetDir + "/" + pair.Key;
                     if (!File.Exists(fullPath)) continue;
 
-                    var content = Encrypt.AES(File.ReadAllText(fullPath));
-                    pair.Value.encrypt_hash = Encrypt.MD5(content);
+                    var content = File.ReadAllText(fullPath).AES_Encrypt(AESKey);
+                    pair.Value.encrypt_hash = content.MD5(KeyMd5);
                     pair.Value.encrypt_size = content.Length;
                     File.WriteAllText(fullPath, content);
                 }
@@ -227,7 +228,7 @@ namespace SvnVersion
         protected void EncryptFile(string fileName)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, Encrypt.AES(File.ReadAllText(fileName)), TxTEncoding);
+            File.WriteAllText(fileName, File.ReadAllText(fileName).AES_Encrypt(AESKey), TxTEncoding);
         }
 
         #endregion

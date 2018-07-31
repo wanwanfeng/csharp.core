@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Library.Extensions;
 
 namespace encrypt
 {
@@ -19,7 +20,7 @@ namespace encrypt
                 case "md5":
                 {
                     string input = queue.Count == 0 ? "" : queue.Dequeue();
-                    res = Library.Encrypt.MD5(input);
+                    res = input.MD5();
                 }
                     break;
                 case "aes":
@@ -27,10 +28,9 @@ namespace encrypt
                     string input = queue.Count == 0 ? "" : queue.Dequeue();
                     string key = queue.Count == 0 ? "" : queue.Dequeue();
                     string third = queue.Count == 0 ? "-e" : queue.Dequeue();
-                    Library.AES.Key = key;
                     var resBytes = third == "-d"
-                        ? Library.Dencrypt.AES(File.ReadAllText(input))
-                        : Library.Encrypt.AES(File.ReadAllText(input));
+                        ? File.ReadAllText(input).AES_Dencrypt(key)
+                        : File.ReadAllText(input).AES_Encrypt(key);
                     File.WriteAllText(input, resBytes);
                 }
                     break;

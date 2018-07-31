@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library;
 using Library.Extensions;
 using Library.Helper;
 
@@ -36,8 +37,7 @@ namespace encrypt
                     var path = folder + file;
                     var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
                     var fileName = Path.GetFileName(path);
-                    var newPath = new Library.MD5().Encrypt(dirName + md5Key) + "/" +
-                                  new Library.MD5().Encrypt(fileName + md5Key);
+                    var newPath = dirName.MD5(md5Key) + "/" + fileName.MD5(md5Key);
 
                     var outPath = dirRoot + "md5/" + newPath;
                     var p = ((float) (index++)/files.Count).ToString("P") + "\t" + path;

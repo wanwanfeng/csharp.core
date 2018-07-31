@@ -12,58 +12,42 @@ namespace scenario_tools
 {
     public class ReadExcel
     {
-        private string path = "";
-
         public ReadExcel()
         {
-            path = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：", "", @"D:\Work\yuege\www\assets\res\scenario.xls");
-            var dic = new ExcelByNpoi().ReadFromExcels(path);
+            var filePath = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：", "",
+                @"D:\Work\yuege\www\assets\res\scenario.xls");
+            var listJson = ExcelByNpoi.ImportExcelToDataTable(filePath).Select(ExcelByBase.Data.ConvertToJson).ToList();
 
-            Dictionary<string, List<JsonData>> dicT = new Dictionary<string, List<JsonData>>();
-
-            foreach (KeyValuePair<string, List<List<object>>> keyValuePair in dic)
+            foreach (JsonData data in listJson)
             {
-                JsonData jsonData = ExcelByBase.ConvertListToJson(keyValuePair);
+                var lookup = data.Cast<JsonData>().ToList().ToLookup(p => p["file"].ToString(), q => q);
+                Dictionary<string, List<JsonData>> cache = lookup.ToDictionary(p => p.Key, q => q.ToList());
 
-                foreach (JsonData json in jsonData)
+                var index = 0;
+                foreach (KeyValuePair<string, List<JsonData>> pair in cache)
                 {
-                    if (!json.Keys.Contains("file")) continue;
-                    var fileName = json["file"].ToString();
-                    List<JsonData> jsonDatas;
-                    if (dicT.TryGetValue(fileName, out jsonDatas))
+                    var res = new JsonData();
+                    Console.WriteLine("剧情文件({1})：{0}", pair.Key, (++index) / (float) cache.Count);
+                    foreach (JsonData jsonData in pair.Value)
                     {
-                        jsonDatas.Add(json);
+                        var xx = new JsonData();
+                        var keys = jsonData.Keys.Where(p => !p.Contains("_zh_cn"));
+                        foreach (var key in keys)
+                        {
+                            if (key == "" || key == "file") continue;
+                            if (jsonData.Keys.Contains(key + "_zh_cn"))
+                                xx[key] = jsonData[key + "_zh_cn"];
+                            else
+                                xx[key] = jsonData[key];
+                        }
+                        res.Add(xx);
                     }
-                    else
-                    {
-                        jsonDatas = new List<JsonData>() {json};
-                        dicT.Add(fileName, jsonDatas);
-                    }
+
+                    var fileName = Path.GetDirectoryName(filePath) + "/" + Path.GetFileNameWithoutExtension(filePath) +
+                                   "/" + pair.Key + ".json";
+                    FileHelper.CreateDirectory(fileName);
+                    File.WriteAllText(fileName, LitJsonHelper.ToJson(res));
                 }
-            }
-            var index = 0;
-            foreach (KeyValuePair<string, List<JsonData>> keyValuePair in dicT)
-            {
-                var res = new JsonData();
-                Console.WriteLine(string.Format("剧情文件({1})：{0}", keyValuePair.Key, (++index)/(float) dicT.Count));
-                foreach (JsonData jsonData in keyValuePair.Value)
-                {
-                    var xx = new JsonData();
-                    var keys = jsonData.Keys.Where(p => !p.Contains("_zh_cn"));
-                    foreach (var key in keys)
-                    {
-                        if (key == "" || key == "file") continue;
-                        if (jsonData.Keys.Contains(key + "_zh_cn"))
-                            xx[key] = jsonData[key + "_zh_cn"];
-                        else
-                            xx[key] = jsonData[key];
-                    }
-                    res.Add(xx);
-                }
-                var fileName = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "/" +
-                               keyValuePair.Key + ".json";
-                FileHelper.CreateDirectory(fileName);
-                File.WriteAllText(fileName, LitJsonHelper.ToJson(res));
             }
         }
     }

@@ -5,9 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
+using Library.LitJson;
 using LitJson;
 
 namespace fileDownload
@@ -147,12 +149,11 @@ namespace fileDownload
             {
                 case "1":
                 {
-                    dic = GetCacheValueFromExcel(jsonName);
-                    JsonData jsonData = new JsonData();
-                    foreach (KeyValuePair<string, JsonData> keyValuePair in dic)
-                        jsonData[keyValuePair.Key] = keyValuePair.Value;
-                    var path = root + "res/master/" + jsonName + ".json";
-                    File.WriteAllText(path, JsonMapper.ToJson(jsonData));
+                    var path = string.Format("{0}/{1}.xlsx", root, jsonName);
+                    var tables = new ExcelByNpoi().ImportExcelToListTable(path).Select(ExcelByBase.List.ConvertToJson).ToList();
+                    dic = tables.First().Cast<JsonData>().ToDictionary(p => p["file_name"].ToString(), q => q);
+                    var newPath = root + "res/master/" + jsonName + ".json";
+                    File.WriteAllText(newPath, JsonMapper.ToJson(dic));
                 }
                     break;
                 case "2":
@@ -166,44 +167,6 @@ namespace fileDownload
                     break;
             }
             return dic;
-        }
-
-        private static Dictionary<string, JsonData> GetCacheValueFromExcel(string jsonName)
-        {
-            var path = string.Format("{0}/{1}.xlsx", root, jsonName);
-            var dic = new ExcelByNpoi().ReadFromExcels(path);
-
-            Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
-            foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-            {
-                JsonData jsonData = SetJsonDataArray(pair.Value);
-
-                foreach (JsonData data in jsonData)
-                {
-                    if (data["file_name"] != null)
-                        cache[data["file_name"].ToString()] = data;
-                }
-            }
-            return cache;
-        }
-
-        private static JsonData SetJsonDataArray(List<List<object>> content)
-        {
-            JsonData jsonDatas = new JsonData();
-            jsonDatas.SetJsonType(JsonType.Array);
-            List<object> first = content.First();
-            content.Remove(first);
-            foreach (List<object> objects in content)
-            {
-                JsonData jsonData = new JsonData();
-                for (int j = 0; j < first.Count; j++)
-                {
-                    string val = objects[j].ToString();
-                    jsonData[first[j].ToString()] = val;
-                }
-                jsonDatas.Add(jsonData);
-            }
-            return jsonDatas;
         }
 
         public static bool HttpDownload(string revision, string hashname, string filename, string hashvalue, string encryptedhashvalue)

@@ -73,6 +73,8 @@ namespace Library.Excel
                                 jsonData.Add(data);
                             }
                         }
+                        if (jsonData.Count == 0)
+                            return null;
                         return Json.ConvertToDataTable(LitJsonHelper.ToJson(jsonData));
                     }
                     default:
@@ -85,9 +87,7 @@ namespace Library.Excel
         {
             public static void ExportToXml(DataTable dt, string file)
             {
-                file = string.IsNullOrEmpty(file) ? dt.FullName : file;
-                string newPath = Path.ChangeExtension(file, ".xml");
-                FileHelper.CreateDirectory(newPath);
+                string newPath = CheckExport(dt, file, ".xml");
 
                 switch (CurXmlMode)
                 {

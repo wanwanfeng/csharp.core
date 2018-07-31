@@ -184,7 +184,20 @@ namespace Library.Excel
                 }
                 return vals;
             }
-        }
 
+            public static string CheckExport(DataTable dt, string file, string extension)
+            {
+                file = string.IsNullOrEmpty(file) ? dt.FullName : file;
+                string newPath = Path.ChangeExtension(file, extension);
+                FileHelper.CreateDirectory(newPath);
+                return newPath;
+            }
+
+            public static void ExportToExcel(DataTable dt, string file)
+            {
+                string newPath = CheckExport(dt, file, ".xlsx");
+                ExcelByNpoi.ExportDataTableToExcel(newPath, dt);
+            }
+        }
     }
 }

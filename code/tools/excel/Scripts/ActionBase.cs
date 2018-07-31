@@ -8,8 +8,6 @@ using System.Text.RegularExpressions;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
-using LitJson;
 using DataTable = Library.Excel.DataTable;
 
 namespace Script
@@ -82,7 +80,7 @@ namespace Script
             return files;
         }
 
-        public static void ToXml(string exs, Func<string, List<DataTable>> importToDataTable)
+        private static void ToCommon(string exs, Func<string, List<DataTable>> import, Action<DataTable, string> export)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
@@ -90,99 +88,46 @@ namespace Script
             files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dts = importToDataTable.Invoke(file);
+                var dts = import.Invoke(file).Where(p => p != null).ToList();
                 if (dts.Count == 1)
                 {
-                    ExcelByBase.Data.ExportToXml(dts.First(), file);
+                    export.Invoke(dts.First(), file);
                     return;
                 }
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByBase.Data.ExportToXml(dt, Path.ChangeExtension(newPath, ".xml"));
+                    export.Invoke(dt, newPath);
                 });
             });
         }
 
-        public static void ToCsv(string exs, Func<string, List<DataTable>> importToDataTable)
+        public static void ToXml(string exs, Func<string, List<DataTable>> import)
         {
-            ExcelByNpoi.OnSheetAction = null;
-            List<string> files = CheckPath(exs);
-            if (files.Count == 0) return;
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                var dts = importToDataTable.Invoke(file);
-                if (dts.Count == 1)
-                {
-                    ExcelByBase.Data.ExportToCsv(dts.First(), file);
-                    return;
-                }
-                dts.ForEach(dt =>
-                {
-                    string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByBase.Data.ExportToCsv(dt, Path.ChangeExtension(newPath, ".csv"));
-                });
-            });
+            ToCommon(exs, import, ExcelByBase.Data.ExportToXml);
         }
 
-        public static void ToJson(string exs, Func<string, List<DataTable>> importToDataTable)
+        public static void ToCsv(string exs, Func<string, List<DataTable>> import)
         {
-            ExcelByNpoi.OnSheetAction = null;
-            List<string> files = CheckPath(exs);
-            if (files.Count == 0) return;
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                var dts = importToDataTable(file);
-                if (dts.Count == 1)
-                {
-                    ExcelByBase.Data.ExportToJson(dts.First(), file);
-                    return;
-                }
-                dts.ForEach(dt =>
-                {
-                    string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByBase.Data.ExportToJson(dt, Path.ChangeExtension(newPath, ".json"));
-                });
-            });
+            ToCommon(exs, import, ExcelByBase.Data.ExportToCsv);
         }
 
-        /// <summary>
-        /// 同一文件作为多个DataTable保存在同一个excel中
-        /// </summary>
-        /// <param name="exs"></param>
-        /// <param name="importToDataTable"></param>
-        public static void ToExcel(string exs, Func<string, List<DataTable>> importToDataTable)
+        public static void ToJson(string exs, Func<string, List<DataTable>> import)
         {
-            //ExcelByNpoi.OnSheetAction = null;
-            List<string> files = CheckPath(exs);
-            if (files.Count == 0) return;
-            files.ForEach(file =>
-            {
-                Console.WriteLine(" is now : " + file);
-                var dts = importToDataTable(file);
+            ToCommon(exs, import, ExcelByBase.Data.ExportToJson);
+        }
 
-                if (dts.Count == 1)
-                {
-                    ExcelByNpoi.ExportDataTableToExcel(Path.ChangeExtension(file, ".xlsx"), dts.First());
-                    return;
-                }
-
-                dts.ForEach(dt =>
-                {
-                    string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
-                    ExcelByNpoi.ExportDataTableToExcel(Path.ChangeExtension(newPath, ".xlsx"), dt);
-                });
-            });
+        public static void ToExcel(string exs, Func<string, List<DataTable>> import)
+        {
+            ToCommon(exs, import, ExcelByBase.Data.ExportToExcel);
         }
 
         /// <summary>
         /// 多个DataTable保存在同一文件
         /// </summary>
         /// <param name="exs"></param>
-        /// <param name="importToDataTable"></param>
-        public static void ToOneExcel(string exs, Func<string, List<DataTable>> importToDataTable)
+        /// <param name="import"></param>
+        public static void ToOneExcel(string exs, Func<string, List<DataTable>> import)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs, SelectType.Folder);
@@ -191,7 +136,9 @@ namespace Script
             files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dt = importToDataTable(file);
+                var dt = import(file).Where(p => p != null).ToList();
+                if (dt.Count <= 0) return;
+                dt.ForEach(q => q.TableName = Path.GetFileNameWithoutExtension(file));
                 dts.AddRange(dt);
             });
 
@@ -205,7 +152,7 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public static void ToKvExcel(string exs, Func<string, DataTable> importToDataTable)
+        public static void ToKvExcel(string exs, Func<string, DataTable> import)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
@@ -217,7 +164,7 @@ namespace Script
             files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dt = importToDataTable.Invoke(file);
+                var dt = import.Invoke(file);
                 dt.TableName = file.Replace(InputPath, "");
                 if (dt.IsArray)
                 {

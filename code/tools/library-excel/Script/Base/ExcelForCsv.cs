@@ -57,6 +57,7 @@ namespace Library.Excel
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                if (list.Count == 0) return null;
                 return List.ConvertToDataTable(new ListTable()
                 {
                     TableName = Path.GetFileNameWithoutExtension(path),
@@ -72,10 +73,9 @@ namespace Library.Excel
         {
             public static void ExportToCsv(DataTable dt, string file)
             {
-                file = string.IsNullOrEmpty(file) ? dt.FullName : file;
+                string newPath = CheckExport(dt, file, ".csv");
 
                 var list = ConvertToListTable(dt);
-                string newPath = Path.ChangeExtension(file, ".csv");
                 switch (CurCsvMode)
                 {
                     case CsvMode.CsvHelp:

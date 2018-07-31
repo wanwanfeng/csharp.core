@@ -45,8 +45,8 @@ namespace Library.Excel
 
             public static void ExportToJson(DataTable dt, string file)
             {
-                file = string.IsNullOrEmpty(file) ? dt.FullName : file;
-                List.ExportToJson(ConvertToListTable(dt), Path.ChangeExtension(file, ".json"));
+                string newPath = CheckExport(dt, file, ".json");
+                List.ExportToJson(ConvertToListTable(dt), newPath);
             }
         }
 

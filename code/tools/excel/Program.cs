@@ -110,9 +110,9 @@ namespace Library.Excel
             //var cache = LitJsonHelper.ConvertDictionaryToDictionary(caDictionary.ToDictionary(p => p.Key, q =>new JsonData(q.Value)));
             //File.WriteAllText("ss.txt", LitJsonHelper.ToJson(cache));
 
-            JsonData json =
-                LitJsonHelper.ConvertDictionaryToJson(caDictionary.ToDictionary(p => p.Key, q => new JsonData(q.Value)));
-            File.WriteAllText("ss.txt", LitJsonHelper.ToJson(json));
+            //JsonData json =
+            //    LitJsonHelper.ConvertDictionaryToJson(caDictionary.ToDictionary(p => p.Key, q => new JsonData(q.Value)));
+            //File.WriteAllText("ss.txt", LitJsonHelper.ToJson(json));
         }
     }
 }

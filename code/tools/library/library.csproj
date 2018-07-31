@@ -55,6 +55,7 @@
     <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
+    <Compile Include="Library\Base\Extensions\PathExtensions.cs" />
     <Compile Include="Library\Base\Extensions\StringExtensions.cs" />
     <Compile Include="Library\Base\Extensions\AttributeExtensions.cs" />
     <Compile Include="Library\Base\Extensions\SystemExtensions.cs" />

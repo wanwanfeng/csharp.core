@@ -55,7 +55,7 @@ namespace Script
             var listTable = new ListTable()
             {
                 List = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
-                Key = new List<object>() {"key", "value"}
+                Key = new List<string>() {"key", "value"}
             };
             new ExcelByNpoi().ExportToExcel(root + ".xlsx", listTable);
         }

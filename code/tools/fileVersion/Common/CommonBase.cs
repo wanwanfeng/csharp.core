@@ -23,6 +23,8 @@ namespace FileVersion
         public string softwareVersion { get; protected set; }
 
         protected static string KeyMd5 { get; private set; }
+        protected static string AESKey { get; private set; }
+        protected static string AESHead { get; private set; }
         protected static string Exclude { get; private set; }
         protected static string Platform { get; private set; }
         protected static string EncryptExclude { get; private set; }
@@ -31,8 +33,8 @@ namespace FileVersion
         static CommonBase()
         {
             KeyMd5 = Config.IniReadValue("Config", "md5key", "").Trim();
-            AES.Key = Config.IniReadValue("Config", "aeskey", "YmbEV0FVzZN/SvKCCoJje/jSpM").Trim();
-            AES.Head = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
+            AESKey = Config.IniReadValue("Config", "aeskey", "YmbEV0FVzZN/SvKCCoJje/jSpM").Trim();
+            AESHead = Config.IniReadValue("Config", "aeshead", "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl").Trim();
             Exclude = Config.IniReadValue("Config", "exclude", ".meta").Trim();
             Platform = Config.IniReadValue("Config", "platform", "ios|android,ios,pc").Trim();
 
@@ -44,8 +46,8 @@ namespace FileVersion
         {
             Console.WriteLine("--------------------------------------");
             Console.WriteLine("KeyMd5:" + KeyMd5);
-            Console.WriteLine("AES.Key:" + AES.Key);
-            Console.WriteLine("AES.Head:" + AES.Head);
+            Console.WriteLine("AES.Key:" + AESKey);
+            Console.WriteLine("AES.Head:" + AESHead);
             Console.WriteLine("Exclude:" + Exclude);
             Console.WriteLine("Platform:" + Platform);
             Console.WriteLine("EncryptExclude:" + EncryptExclude);
@@ -171,20 +173,19 @@ namespace FileVersion
         {
             var bytes = File.ReadAllBytes(fullPath);
             fileDetailInfo.content_size = bytes.Length;
-            fileDetailInfo.content_hash = Encrypt.MD5(bytes);
+            fileDetailInfo.content_hash = bytes.MD5(KeyMd5);
         }
 
         protected static bool TargetMd5Dir(out string targetMd5Dir, string dir, string targetDir)
         {
-            targetMd5Dir = targetDir.Replace(dir, Encrypt.MD5(dir + KeyMd5));
+            targetMd5Dir = targetDir.Replace(dir, dir.MD5(KeyMd5));
             bool md5 = Directory.Exists(targetMd5Dir);
             return md5;
         }
 
         protected string GetPathHash(string path)
         {
-            return Encrypt.MD5(Path.GetDirectoryName(path) + KeyMd5) + "/" +
-                   Encrypt.MD5(Path.GetFileName(path) + KeyMd5);
+            return Path.GetDirectoryName(path).MD5(KeyMd5) + "/" + Path.GetFileName(path).MD5(KeyMd5);
         }
 
         /// <summary>
@@ -250,8 +251,8 @@ namespace FileVersion
                     array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
                     if (array.Any(p => s.Key.StartsWith(p))) continue;
 
-                    var content = Encrypt.AES(File.ReadAllText(fullPath));
-                    s.Value.encrypt_hash = Encrypt.MD5(content);
+                    var content = File.ReadAllText(fullPath).AES_Encrypt(AESKey);
+                    s.Value.encrypt_hash = content.MD5(KeyMd5);
                     s.Value.encrypt_size = content.Length;
                     File.WriteAllText(fullPath, content);
                 }
@@ -300,7 +301,7 @@ namespace FileVersion
         protected void EncryptFile(string fileName)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, Encrypt.AES(File.ReadAllText(fileName)), TxTEncoding);
+            File.WriteAllText(fileName, File.ReadAllText(fileName).AES_Encrypt(AESKey), TxTEncoding);
         }
 
         protected void DeleteInfo(string dir, bool onlyDir = false)
@@ -358,16 +359,16 @@ namespace FileVersion
 
                 if (txt != null && File.Exists(txt))
                 {
-                    filePatchInfo.content_hash = Encrypt.MD5(File.ReadAllBytes(txt));
-                    filePatchInfo.content_size = new System.IO.FileInfo(txt).Length;
+                    filePatchInfo.content_hash = File.ReadAllBytes(txt).MD5(KeyMd5);
+                    filePatchInfo.content_size = new FileInfo(txt).Length;
                     if (yes) EncryptFile(txt);
-                    filePatchInfo.encrypt_hash = Encrypt.MD5(File.ReadAllBytes(txt));
-                    filePatchInfo.encrypt_size = new System.IO.FileInfo(txt).Length;
+                    filePatchInfo.encrypt_hash = File.ReadAllBytes(txt).MD5(KeyMd5);
+                    filePatchInfo.encrypt_size = new FileInfo(txt).Length;
                 }
                 if (zip != null && File.Exists(zip))
                 {
-                    filePatchInfo.zip_hash = Encrypt.MD5(File.ReadAllBytes(zip));
-                    filePatchInfo.zip_size = new System.IO.FileInfo(zip).Length;
+                    filePatchInfo.zip_hash = File.ReadAllBytes(zip).MD5(KeyMd5);
+                    filePatchInfo.zip_size = new FileInfo(zip).Length;
                 }
 
                 var xx = pair.Key.Split('-');

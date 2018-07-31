@@ -48,7 +48,7 @@ namespace encrypt
                     {
                         var outPath = dirRoot + newPath;
                         FileHelper.CreateDirectory(outPath);
-                        var p = ((float) (index++)/files.Count).ToString("P") + "\t" + path;
+                        var p = ((float) (index++) / files.Count).ToString("P") + "\t" + path;
                         if (extensionList.Contains(Path.GetExtension(path)))
                         {
                             Console.WriteLine("路径解码中..." + p);
@@ -92,12 +92,11 @@ namespace encrypt
             var index = 0;
             files.ForEach(file =>
             {
-                Console.WriteLine("路径关系获取中..." + ((float)(index++) / files.Count).ToString("P") + "\t" + file);
+                Console.WriteLine("路径关系获取中..." + ((float) (index++) / files.Count).ToString("P") + "\t" + file);
                 var path = file;
                 var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
                 var fileName = Path.GetFileName(path);
-                var newPath = new Library.MD5().Encrypt(dirName + md5Key) + "/" +
-                              new Library.MD5().Encrypt(fileName + md5Key);
+                var newPath = dirName.MD5(md5Key) + "/" + fileName.MD5(md5Key);
                 cache[newPath] = file;
             });
 
@@ -202,8 +201,7 @@ namespace encrypt
                 var path = file;
                 var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
                 var fileName = Path.GetFileName(path);
-                var newPath = new Library.MD5().Encrypt(dirName + md5Key) + "/" +
-                              new Library.MD5().Encrypt(fileName + md5Key);
+                var newPath = dirName.MD5(md5Key) + "/" + fileName.MD5(md5Key);
                 cache[newPath] = file;
             });
 

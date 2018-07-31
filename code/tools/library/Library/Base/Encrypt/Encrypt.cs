@@ -1,157 +1,152 @@
 ﻿using System.Text;
 using System.Security.Cryptography;
 using System;
+using Library.Extensions;
 
-namespace Library
+namespace Library.Extensions
 {
-    public static class Encrypt
+    public static class EncryptExtensions
     {
         public static Encoding DefaultEncoding = Encoding.UTF8;
 
-        public static string MD516(string input)
+        #region MD516
+
+        public static string MD516(this string input, string key = "")
         {
-            return new MD516().Encrypt(input);
+            return input.MD5(key).Substring(8, 24);
         }
 
-        public static bool ComparerMD516(string hash, string input)
+        public static string MD516(this byte[] input, string key = "")
         {
-            return new MD516().Comparer(hash, input);
+            return input.MD5(key).Substring(8, 24);
         }
 
-        public static string MD516(byte[] input)
+        public static bool ComparerMD516(this string hash, string input, string key = "")
         {
-            return new MD516().Encrypt(input);
+            return hash.MD516(key).Equals(input.MD516(key));
         }
 
-        public static bool ComparerMD516(string hash, byte[] input)
+        public static bool ComparerMD516(this string hash, byte[] input, string key = "")
         {
-            return new MD516().Comparer(hash, input);
+            return hash.MD516(key).Equals(input.MD516(key));
         }
 
-        public static string MD5(string input)
+        #endregion
+
+        #region MD5
+
+        public static string MD5(this string input, string key = "")
         {
-            return new MD5().Encrypt(input);
+            return new MD5().Encrypt(input, key);
         }
 
-        public static bool ComparerMD5(string hash, string input)
+        public static string MD5(this byte[] input, string key = "")
         {
-            return new MD5().Comparer(hash, input);
+            return new MD5().Encrypt(input, key);
         }
 
-        public static string MD5(byte[] input)
+        public static bool ComparerMD5(this string hash, string input, string key = "")
         {
-            return new MD5().Encrypt(input);
+            return hash.MD5(key).Equals(input.MD5(key));
         }
 
-        public static bool ComparerMD5(string hash, byte[] input)
+        public static bool ComparerMD5(this string hash, byte[] input, string key = "")
         {
-            return new MD5().Comparer(hash, input);
+            return hash.MD5(key).Equals(input.MD5(key));
         }
 
+        #endregion
 
-        public static string SHA1(string input)
+        #region SHA1
+
+        public static string SHA1(this string input, string key = "")
         {
-            return new SHA1().Encrypt(input);
+            return new SHA1().Encrypt(input, key);
         }
 
-        public static bool ComparerSHA1(string hash, string input)
+        public static string SHA1(this byte[] input, string key = "")
         {
-            return new SHA1().Comparer(hash, input);
+            return new SHA1().Encrypt(input, key);
         }
 
-        public static string SHA1(byte[] input)
+        public static bool ComparerSHA1(this string hash, string input, string key = "")
         {
-            return new SHA1().Encrypt(input);
+            return hash.SHA1(key).Equals(input.SHA1(key));
         }
 
-        public static bool ComparerSHA1(string hash, byte[] input)
+        public static bool ComparerSHA1(this string hash, byte[] input, string key = "")
         {
-            return new SHA1().Comparer(hash, input);
+            return hash.SHA1(key).Equals(input.SHA1(key));
         }
 
-        public static string AES(string input)
+        #endregion
+
+        #region AES
+
+        public static string AES_Encrypt(this string input, string key = "")
         {
-            return new AES().Encrypt(input);
+            return new AES().Encrypt(input, key);
         }
 
-        public static string AES(byte[] input)
+        public static string AES_Encrypt(this byte[] input, string key = "")
         {
-            return new AES().Encrypt(input);
+            return new AES().Encrypt(input, key);
         }
+
+        public static string AES_Dencrypt(this string input, string key = "")
+        {
+            return new AES().Dencrypt(input, key);
+        }
+
+        public static string AES_Dencrypt(this byte[] input, string key = "")
+        {
+            return new AES().Dencrypt(input, key);
+        }
+
+        #endregion
     }
+    
+}
 
-    public class Dencrypt
-    {
-        public static string AES(string input)
-        {
-            return new AES().Dencrypt(input);
-        }
-
-        public static string AES(byte[] input)
-        {
-            return new AES().Dencrypt(input);
-        }
-    }
-
+namespace Library
+{
     internal interface IEncrypt
     {
-        string Encrypt(byte[] input);
-        string Encrypt(string input);
-        bool Comparer(string hash, byte[] str);
-        bool Comparer(string hash, string str);
+        string Encrypt(byte[] input, string key = "");
+        string Encrypt(string input, string key = "");
     }
 
     internal interface IDencrypt
     {
-        string Dencrypt(byte[] input);
-        string Dencrypt(string input);
+        string Dencrypt(byte[] input, string key = "");
+        string Dencrypt(string input, string key = "");
     }
 
     public abstract class BaseEncrypt : IEncrypt
     {
         public Encoding DefaultEncoding
         {
-            get { return Library.Encrypt.DefaultEncoding; }
+            get { return Extensions.EncryptExtensions.DefaultEncoding; }
         }
 
         /// <summary>
         /// 加密  
         /// </summary>
         /// <param name="input"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public abstract string Encrypt(byte[] input);
+        public virtual string Encrypt(byte[] input, string key = "")
+        {
+            return Encrypt(DefaultEncoding.GetString(input), key);
+        }
 
         /// <summary>
         /// 加密  
         /// </summary>
         /// <param name="input"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public virtual string Encrypt(string input)
-        {
-            return Encrypt(DefaultEncoding.GetBytes(input));
-        }
-
-        /// <summary>
-        /// 校验
-        /// </summary>
-        /// <param name="hash"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public bool Comparer(string hash, string input)
-        {
-            return Encrypt(input) == hash;
-        }
-
-        /// <summary>
-        /// 校验
-        /// </summary>
-        /// <param name="hash"></param>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public bool Comparer(string hash, byte[] input)
-        {
-            return Encrypt(input) == hash;
-        }
+        public abstract string Encrypt(string input, string key = "");
     }
 
     /// <summary>
@@ -160,12 +155,13 @@ namespace Library
     internal class SHA1 : BaseEncrypt
     {
         //SHA1加密  
-        public override string Encrypt(byte[] input)
+        public override string Encrypt(string input, string key = "")
         {
             try
             {
+                byte[] bytes = DefaultEncoding.GetBytes(input + key);
                 SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider();
-                byte[] data = sha1.ComputeHash(input);
+                byte[] data = sha1.ComputeHash(bytes);
                 (sha1 as IDisposable).Dispose();
                 string result = BitConverter.ToString(data);
                 result = result.Replace("-", "");
@@ -184,39 +180,18 @@ namespace Library
     internal class MD5 : BaseEncrypt
     {
         //MD5加密  
-        public override string Encrypt(byte[] input)
+        public override string Encrypt(string input, string key = "")
         {
             try
             {
+                byte[] bytes = DefaultEncoding.GetBytes(input + key);
                 MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-                byte[] data = md5.ComputeHash(input);
+                byte[] data = md5.ComputeHash(bytes);
                 (md5 as IDisposable).Dispose();
                 var sBuilder = new StringBuilder();
                 foreach (var bt in data)
                     sBuilder.Append(bt.ToString("x2"));
                 return sBuilder.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("MD5加密出错：" + ex.Message);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 加密工具
-    /// </summary>
-    internal class MD516 : BaseEncrypt
-    {
-        //MD5加密  
-        public override string Encrypt(byte[] input)
-        {
-            try
-            {
-                MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-                byte[] data = md5.ComputeHash(input);
-                (md5 as IDisposable).Dispose();
-                return BitConverter.ToString(data, 4, 8).Replace("-", "");
             }
             catch (Exception ex)
             {
@@ -232,34 +207,28 @@ namespace Library
     {
         //加密和解密采用相同的key,具体值自己填，但是必须为32位//
         public static string Head = "5986157849545freho950173582krhd0";
-        public static string Key = "59861578495186345095017358264920";
-
-        public override string Encrypt(byte[] input)
-        {
-            return Encrypt(DefaultEncoding.GetString(input));
-        }
 
         /// <summary>
-        ///  AES-256  内容加密
+        /// AES-256  内容加密
         /// 成功加密时返回值
         /// 否则返回空
         /// </summary>
-        public override string Encrypt(string toE)
+        public override string Encrypt(string input, string key = "")
         {
-            if (string.IsNullOrEmpty(toE)) return toE;
+            if (string.IsNullOrEmpty(input)) return input;
             if (!string.IsNullOrEmpty(Head))
-                if (toE.Length > Head.Length)
+                if (input.Length > Head.Length)
                     //已经加密
-                    if (toE.Substring(toE.Length - Head.Length, Head.Length) == Head)
-                        return toE;
+                    if (input.Substring(input.Length - Head.Length, Head.Length) == Head)
+                        return input;
 
 
-            byte[] toEncryptArray = DefaultEncoding.GetBytes(toE);
+            byte[] toEncryptArray = DefaultEncoding.GetBytes(input);
 
             //加密和解密采用相同的key,具体自己填，但是必须为32位//
             RijndaelManaged rm = new RijndaelManaged
             {
-                Key = DefaultEncoding.GetBytes(new MD5().Encrypt(Key)),
+                Key = DefaultEncoding.GetBytes(key.MD5()),
                 Mode = CipherMode.ECB,
                 Padding = PaddingMode.PKCS7
             };
@@ -269,29 +238,29 @@ namespace Library
             return Convert.ToBase64String(resultArray, 0, resultArray.Length) + Head;
         }
 
-        public string Dencrypt(byte[] input)
+        public string Dencrypt(byte[] input, string key = "")
         {
-            return Dencrypt(DefaultEncoding.GetString(input));
+            return Dencrypt(DefaultEncoding.GetString(input), key);
         }
 
         /// <summary>
         /// AES-256 内容解密
         /// </summary>
-        public string Dencrypt(string toD)
+        public string Dencrypt(string input, string key = "")
         {
-            if (string.IsNullOrEmpty(toD)) return toD;
+            if (string.IsNullOrEmpty(input)) return input;
             if (!string.IsNullOrEmpty(Head))
-                if (toD.Length > Head.Length)
+                if (input.Length > Head.Length)
                     //已经解密
-                    if (toD.Substring(toD.Length - Head.Length, Head.Length) != Head)
-                return toD;
-            toD = toD.Substring(0, toD.Length - Head.Length);
-            byte[] toEncryptArray = Convert.FromBase64String(toD);
+                    if (input.Substring(input.Length - Head.Length, Head.Length) != Head)
+                        return input;
+            input = input.Substring(0, input.Length - Head.Length);
+            byte[] toEncryptArray = Convert.FromBase64String(input);
 
             //加密和解密采用相同的key,具体值自己填，但是必须为32位//
             RijndaelManaged rm = new RijndaelManaged
             {
-                Key = DefaultEncoding.GetBytes(new MD5().Encrypt(Key)),
+                Key = DefaultEncoding.GetBytes(key.MD5()),
                 Mode = CipherMode.ECB,
                 Padding = PaddingMode.PKCS7
             };

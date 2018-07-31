@@ -230,6 +230,7 @@ namespace Library.LitJson
 
         /// <summary>
         /// 非同种结构转为对象
+        /// 叶子结点相对于根节点的路径为key
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -262,69 +263,6 @@ namespace Library.LitJson
             {
                 cache.Add(root, data);
             }
-        }
-
-        public static JsonData ConvertDictionaryToJson(Dictionary<string, JsonData> vals)
-        {
-
-            //Dictionary<string, object> dic = new Dictionary<string, object>();
-            //GetDicValue(dic, vals);
-            //return ToJson(dic);
-
-            JsonData data = new JsonData();
-            data.SetJsonType(JsonType.Object);
-
-            foreach (KeyValuePair<string, JsonData> keyValuePair in vals)
-            {
-                Queue<string> keys = new Queue<string>(keyValuePair.Key.Trim('/').Split('/'));
-                JsonData temp = data;
-                do
-                {
-                    var array = keys.Dequeue().Split('@');
-                    var key = array.First();
-                    var index = array.Length > 1 ? array.Last().AsInt() : -1;
-                    if (keys.Count == 0)
-                    {
-                        if (temp.IsArray)
-                            temp.Add(keyValuePair.Value);
-                        else if (temp.IsObject)
-                            temp[key] = keyValuePair.Value;
-                    }
-                    else
-                    {
-                        if (index >= 0)
-                        {
-                            if (index == 0)
-                            {
-                                JsonData json = new JsonData();
-                                json.SetJsonType(JsonType.Array);
-                                temp[key] = json;
-                                temp = json;
-                            }
-                            else
-                            {
-                                //temp[key].Add(json);
-                            }
-                        }
-                        else
-                        {
-                            JsonData json;
-                            if (temp.ContainsKey(key))
-                            {
-                                json = temp[key];
-                            }
-                            else
-                            {
-                                json = new JsonData();
-                                json.SetJsonType(JsonType.Object);
-                                temp[key] = json;
-                            }
-                            temp = json;
-                        }
-                    }
-                } while (keys.Count != 0);
-            }
-            return data;
         }
 
         /// <summary>

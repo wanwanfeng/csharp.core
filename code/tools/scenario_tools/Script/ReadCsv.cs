@@ -39,8 +39,8 @@ namespace scenario_tools
             File.WriteAllText("scenario.txt", JsonMapper.ToJson(res));
 
             string outpath = Environment.CurrentDirectory + "/scenario.xlsx";
-            List<List<object>> vals = ExcelByNpoi.ConvertJsonToList(JsonMapper.ToJson(res));
-            new ExcelByNpoi().WriteToExcel(outpath, vals);
+            var vals = ExcelByBase.Json.ConvertToListTable(JsonMapper.ToJson(res));
+            new ExcelByNpoi().ExportToExcel(outpath, vals);
         }
 
         /// <summary>

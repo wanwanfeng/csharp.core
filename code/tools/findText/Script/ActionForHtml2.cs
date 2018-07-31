@@ -96,7 +96,7 @@ namespace findText.Script
         {
             JsonData jsonDatas = new JsonData();
             jsonDatas.SetJsonType(JsonType.Array);
-            List<object> first = list.Key;
+            List<string> first = list.Key;
             if (isReverse)
                 list.List.Reverse();
             foreach (List<object> objects in list.List)

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Library;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Encrypt
@@ -79,7 +80,7 @@ namespace Encrypt
                 progressBar1.Value = index*100/dic.Count;
                 res.Add(pair.Value);
 
-                res.Add(newname = Library.Encrypt.MD5(pair.Value + Define.DefineKey));
+                res.Add(newname = pair.Value.MD5(Define.DefineKey));
                 FileHelper.CreateDirectory(newname = Define.DefineRoot.Replace("\\", "/") + "/" + newname);
                 File.Move(pair.Key, newname);
             }

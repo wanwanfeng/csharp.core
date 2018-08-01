@@ -141,7 +141,7 @@ namespace Library.Excel
                 GetHeaderList(dt)
                     .ForEach(p =>
                     {
-                        List<object> val = new List<object> {p};
+                        List<object> val = new List<object> { p };
                         foreach (DataRow dr in dt.Rows)
                         {
                             var obj = (dr[p] is System.DBNull) ? "" : dr[p];
@@ -164,7 +164,7 @@ namespace Library.Excel
                 GetHeaderList(dt)
                     .ForEach(p =>
                     {
-                        List<object> val = new List<object> {p};
+                        List<object> val = new List<object> { p };
                         foreach (DataRow dr in dt.Rows)
                         {
                             var obj = (dr[p] is System.DBNull) ? "" : dr[p];
@@ -183,20 +183,6 @@ namespace Library.Excel
                     vals.Add(dc.ColumnName);
                 }
                 return vals;
-            }
-
-            public static string CheckExport(DataTable dt, string file, string extension)
-            {
-                file = string.IsNullOrEmpty(file) ? dt.FullName : file;
-                string newPath = Path.ChangeExtension(file, extension);
-                FileHelper.CreateDirectory(newPath);
-                return newPath;
-            }
-
-            public static void ExportToExcel(DataTable dt, string file)
-            {
-                string newPath = CheckExport(dt, file, ".xlsx");
-                ExcelByNpoi.ExportDataTableToExcel(newPath, dt);
             }
         }
     }

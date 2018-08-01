@@ -117,7 +117,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".csv", ExcelByBase.Csv.ImportToDataTable);
+                ToKvExcel(".csv", file => new List<DataTable> {ExcelByBase.Csv.ImportToDataTable(file)});
             }
         }
 

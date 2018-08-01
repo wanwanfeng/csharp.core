@@ -48,7 +48,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".json", ExcelByBase.Json.ImportToDataTable);
+                ToKvExcel(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
             }
         }
 

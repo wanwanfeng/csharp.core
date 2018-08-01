@@ -12,7 +12,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
+                ToXml(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 
@@ -20,7 +20,7 @@ namespace Script
         {
             public ToCsv()
             {
-                ToCsv(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
+                ToCsv(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 
@@ -28,7 +28,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
+                ToJson(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 
@@ -37,7 +37,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
+                ToExcel(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 
@@ -46,7 +46,7 @@ namespace Script
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false));
+                ToOneExcel(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 
@@ -57,7 +57,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xlsx|.xls", file => ExcelByNpoi.ImportExcelToDataTable(file, false).FirstOrDefault());
+                ToKvExcel(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 
@@ -68,7 +68,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo((file) => ExcelByNpoi.ImportExcelToDataTable(file, false).FirstOrDefault(),
+                KvExcelTo((file) => ExcelByBase.Data.ImportToDataTable(file).FirstOrDefault(),
                     (dt, file) => ExcelByNpoi.ExportDataTableToExcel(file, dt));
             }
         }

@@ -96,7 +96,7 @@ namespace findText
             }
             Console.WriteLine("正在写入Excel...");
             string outpath = inputPath + ".xlsx";
-            new ExcelByNpoi().ExportToExcel(outpath, vals);
+            ExcelByBase.Data.ExportToExcel(vals, outpath);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);
         }
@@ -239,7 +239,7 @@ namespace findText
         /// <param name="inputPath"></param>
         public virtual void Revert(string inputPath)
         {
-            var excels = ExcelByNpoi.ImportExcelToDataTable(inputPath, false)
+            var excels = ExcelByBase.Data.ImportToDataTable(inputPath)
                 .Select(ExcelByBase.Data.ConvertToJson)
                 .ToList();
 

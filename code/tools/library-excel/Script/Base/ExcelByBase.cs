@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Helper;
 
@@ -10,10 +11,6 @@ namespace Library.Excel
     {
         public partial class Data
         {
-            public static List<DataTable> ImportToDataTable(string file)
-            {
-                return ExcelByNpoi.ImportExcelToDataTable(file, false);
-            }
 
             private static string CheckExport(DataTable dt, string file, string extension)
             {
@@ -21,6 +18,11 @@ namespace Library.Excel
                 string newPath = Path.ChangeExtension(file, extension);
                 FileHelper.CreateDirectory(newPath);
                 return newPath;
+            }
+
+            public static List<DataTable> ImportToDataTable(string file)
+            {
+                return ExcelByNpoi.ImportExcelToDataTable(file, false);
             }
 
             public static void ExportToExcel(DataTable dt, string file)
@@ -35,6 +37,25 @@ namespace Library.Excel
                 FileHelper.CreateDirectory(newPath);
                 ExcelByNpoi.ExportDataTableToExcel(newPath, dts.ToArray());
             }
+
+            #region ListTable
+
+            public static List<ListTable> ImportToListTable(string file)
+            {
+                return ImportToDataTable(file).Select(ConvertToListTable).ToList();
+            }
+
+            public static void ExportToExcel(ListTable lt, string file)
+            {
+                ExportToExcel(List.ConvertToDataTable(lt), file);
+            }
+
+            public static void ExportToOneExcel(List<ListTable> dts, string file)
+            {
+                ExportToOneExcel(dts.Select(List.ConvertToDataTable).ToList(), file);
+            }
+
+            #endregion
         }
 
 

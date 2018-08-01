@@ -21,7 +21,7 @@ namespace Library.Excel
     /// 引用 NPOI.OpenXml4Net
     /// 引用 NPOI.OpenXmlFormats
     /// </summary>
-    public class ExcelByNpoi : ExcelByBase
+    internal class ExcelByNpoi : ExcelByBase
     {
         public override List<ListTable> ImportExcelToListTable(string filename)
         {
@@ -123,19 +123,13 @@ namespace Library.Excel
         }
 
         /// <summary>
-        /// 针对Sheet
-        /// </summary>
-        public static Func<DataTable, DataTable> OnSheetBeforeAction { get; set; }
-        public static Func<ISheet, DataTable, DataTable> OnSheetAction { get; set; }
-
-        /// <summary>
         /// Datable导出成Excel
         /// </summary>
         /// <param name="file">导出路径(包括文件名与扩展名)</param>
         /// <param name="dts"></param>
         public static void ExportDataTableToExcel(string file, params DataTable[] dts)
         {
-            IWorkbook workbook;
+            IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
             switch (fileExt)
             {
@@ -146,13 +140,7 @@ namespace Library.Excel
                     workbook = new HSSFWorkbook();
                     break;
                 default:
-                    workbook = null;
                     throw new Exception("保存的文件格式不符合要求 ！");
-                    break;
-            }
-            if (workbook == null)
-            {
-                return;
             }
 
             foreach (DataTable dt in dts)
@@ -160,14 +148,6 @@ namespace Library.Excel
                 if (fileExt == ".xls" && dt.Rows.Count > 65536)
                 {
                     throw new Exception("数据量过大，请保存为.xlsx");
-                }
-
-                if (OnSheetBeforeAction != null)
-                {
-                    if (OnSheetBeforeAction.Invoke(dt) == null)
-                    {
-                        continue;
-                    }
                 }
 
                 ISheet sheet = string.IsNullOrEmpty(dt.TableName)
@@ -202,24 +182,6 @@ namespace Library.Excel
                     sheet.SetDefaultColumnStyle(i, style);
                     sheet.AutoSizeColumn(i);
                 }
-               
-                if (OnSheetAction != null)
-                {
-                    if (OnSheetAction.Invoke(sheet, dt) == null)
-                    {
-                        workbook.RemoveSheetAt(workbook.GetSheetIndex(sheet));
-                    }
-                }
-
-                //string regex = "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
-                //var list = ConvertDataTableToRowsList(dt).Select(p => string.Join("|", p.Cast<string>().ToArray())).Select(p => Regex.IsMatch(p, regex)).ToList();
-                //for (int i = 0; i < list.Count; i++)
-                //{
-                //    var show = list[i];
-                //    sheet.SetColumnHidden(i, !show);
-                //    //if (show)
-                //    //    sheet.SetColumnWidth(0, 200*256 + 200);
-                //}
             }
 
 

@@ -25,7 +25,8 @@ namespace Script
 
 
         public static string regex =
-            "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])|([\u30A0-\u30FF])";
+           // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
+            "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
         //"[\\x{3041}-\\x{3096}\\x{30A0}-\\x{30FF}\\x{3400}-\\x{4DB5}\\x{4E00}-\\x{9FCB}\\x{F900}-\\x{FA6A}\\x{2E80}-\\x{2FD5}\\x{FF5F}-\\x{FF9F}\\x{3000}-\\x{303F}\\x{31F0}-\\x{31FF}\\x{3220}-\\x{3243}\\x{3280}-\\x{337F}\\x{FF01}-\\x{FF5E}].+";
 
 
@@ -144,7 +145,7 @@ namespace Script
 
             if (dts.Count == 0)
                 return;
-            ExcelByNpoi.ExportDataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dts.ToArray());
+            ExcelByBase.Data.ExportToOneExcel(dts, InputPath);
         }
 
         #region 键值对
@@ -152,7 +153,7 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public static void ToKvExcel(string exs, Func<string, DataTable> import)
+        public static void ToKvExcel(string exs, Func<string, List<DataTable>> import)
         {
             ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
@@ -164,36 +165,40 @@ namespace Script
             files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dt = import.Invoke(file);
-                dt.TableName = file.Replace(InputPath, "");
-                if (dt.IsArray)
+                var dts = import(file).Where(p => p != null).ToList();
+                if (dts.Count <= 0) return;
+                dts.ForEach(dt =>
                 {
-                    var list = ExcelByBase.Data.ConvertToRowsList(dt)
-                        .Select(p => string.Join("|", p.Cast<string>().ToArray()))
-                        .Select(p => Regex.IsMatch(p, regex))
-                        .ToList();
-                    //返回符合正则表达式的列
-                    var header = ExcelByBase.Data.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
+                    dt.TableName = file.Replace(InputPath, "");
+                    if (dt.IsArray)
+                    {
+                        var list = ExcelByBase.Data.ConvertToRowsList(dt)
+                            .Select(p => string.Join("|", p.Cast<string>().ToArray()))
+                            .Select(p => Regex.IsMatch(p, regex))
+                            .ToList();
+                        //返回符合正则表达式的列
+                        var header = ExcelByBase.Data.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
 
-                    var resdt = dt.DefaultView.ToTable(false, header.ToArray());
+                        var resdt = dt.DefaultView.ToTable(false, header.ToArray());
 
-                    //foreach (object o in header.Skip(1))
-                    //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
+                        //foreach (object o in header.Skip(1))
+                        //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
 
-                    if (header.Count > 1)
-                        dtArray.Add(resdt);
-                }
-                else
-                {
-                    var lt = ExcelByBase.Data.ConvertToListTable(dt);
-                    lt.List = lt.List
-                        .ToDictionary(p => p, q => string.Join("|", q.Cast<string>().ToArray()))
-                        .Where(p => Regex.IsMatch(p.Value, regex))
-                        .Select(p => p.Key)
-                        .ToList();
-                    //返回符合正则表达式的行
-                    dtObject.Add(ExcelByBase.List.ConvertToDataTable(lt));
-                }
+                        if (header.Count > 1)
+                            dtArray.Add(resdt);
+                    }
+                    else
+                    {
+                        var lt = ExcelByBase.Data.ConvertToListTable(dt);
+                        lt.List = lt.List
+                            .ToDictionary(p => p, q => string.Join("|", q.Cast<string>().ToArray()))
+                            .Where(p => Regex.IsMatch(p.Value, regex))
+                            .Select(p => p.Key)
+                            .ToList();
+                        //返回符合正则表达式的行
+                        dtObject.Add(ExcelByBase.List.ConvertToDataTable(lt));
+                    }
+                });
             });
 
             if (dtArray.Count == 0 && dtObject.Count == 0) return;
@@ -234,8 +239,8 @@ namespace Script
                     }
                 }
             }
-
-            ExcelByNpoi.ExportDataTableToExcel(Path.ChangeExtension(InputPath, ".xlsx"), dd);
+            
+            ExcelByBase.Data.ExportToExcel(dd, InputPath);
         }
 
         /// <summary>

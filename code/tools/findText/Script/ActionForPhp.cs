@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using LitJson;
 
 namespace findText.Script
 {
@@ -63,6 +62,8 @@ namespace findText.Script
                     if (val.TrimStart().StartsWith("///")) continue;
                     if (val.TrimStart().StartsWith("//")) continue;
                     if (val.TrimStart().StartsWith("*")) continue;
+
+                   //if(!Regex.IsMatch(val,regexStr)) continue;
 
                     MatchCollection mc = regex.Matches(val);
                     if (mc.Count == 0) continue;

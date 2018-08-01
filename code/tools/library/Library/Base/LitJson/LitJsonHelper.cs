@@ -244,6 +244,7 @@ namespace Library.LitJson
 
         private static void GetKeyValue(Dictionary<string, JsonData> cache, JsonData data, string root = "")
         {
+            if (data == null) return;
             if (data.IsArray)
             {
                 int index = 0;

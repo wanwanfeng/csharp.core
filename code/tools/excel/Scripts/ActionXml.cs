@@ -46,7 +46,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xml", ExcelByBase.Xml.ImportToDataTable);
+                ToKvExcel(".xml", file => new List<DataTable>() { ExcelByBase.Xml.ImportToDataTable(file) });
             }
         }
 

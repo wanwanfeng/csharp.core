@@ -20,10 +20,9 @@ namespace findText
         {
             get
             {
-                return //"\"([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.*\")|(\".*[\u30A0-\u30FF]+)|([\u30A0-\u30FF])\""
-                    "([\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]')|([\u30A0-\u30FF])|([\u30A0-\u30FF])"
-                    //regexStr = "/u0800-/u4e00"
-                    ;
+                return
+                    // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
+                    "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
             }
         }
 

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using Library.Excel;
-using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
@@ -69,7 +67,7 @@ namespace Script
             public KvExcelTo()
             {
                 KvExcelTo((file) => ExcelByBase.Data.ImportToDataTable(file).FirstOrDefault(),
-                    (dt, file) => ExcelByNpoi.ExportDataTableToExcel(file, dt));
+                    ExcelByBase.Data.ExportToExcel);
             }
         }
     }

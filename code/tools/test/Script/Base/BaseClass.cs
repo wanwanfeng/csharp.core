@@ -57,7 +57,7 @@ namespace Script
                 List = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
                 Key = new List<string>() {"key", "value"}
             };
-            new ExcelByNpoi().ExportToExcel(root + ".xlsx", listTable);
+            ExcelByBase.Data.ExportToExcel(listTable, root + ".xlsx");
         }
 
         public void CreateDirectory(string name)

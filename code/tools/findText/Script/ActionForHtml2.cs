@@ -115,8 +115,7 @@ namespace findText.Script
 
         public override void Revert(string inputPath)
         {
-            var tables = new ExcelByNpoi().ImportExcelToListTable(inputPath);
-
+            var tables = ExcelByBase.Data.ImportToListTable(inputPath);
             foreach (var table in tables)
             {
                 JsonData jsonData = SetJsonDataArray(table, true);

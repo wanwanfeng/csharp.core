@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
+using NPOI.SS.UserModel;
 using DataTable = Library.Excel.DataTable;
 
 namespace Script
@@ -25,7 +26,7 @@ namespace Script
 
 
         public static string regex =
-           // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
+            // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
             "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
         //"[\\x{3041}-\\x{3096}\\x{30A0}-\\x{30FF}\\x{3400}-\\x{4DB5}\\x{4E00}-\\x{9FCB}\\x{F900}-\\x{FA6A}\\x{2E80}-\\x{2FD5}\\x{FF5F}-\\x{FF9F}\\x{3000}-\\x{303F}\\x{31F0}-\\x{31FF}\\x{3220}-\\x{3243}\\x{3280}-\\x{337F}\\x{FF01}-\\x{FF5E}].+";
 
@@ -33,6 +34,70 @@ namespace Script
         static ActionBase()
         {
             CacheSelect = AttributeHelper.GetCacheDescription<SelectType>();
+        }
+
+        protected ActionBase()
+        {
+            //Func<DataTable, DataTable> onSheetBeforeAction = (dt) =>
+            //{
+            //    var cache = ExcelByBase.Data.ConvertToRowsDictionary(dt)
+            //        .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
+            //        .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
+            //    if (cache.Values.All(p => p == false))
+            //    {
+            //        //忽略掉不匹配正则的
+            //        return null;
+            //    }
+
+            //    int i = 0;
+            //    foreach (KeyValuePair<string, bool> pair in cache)
+            //    {
+            //        var show = pair.Value;
+            //        if (show)
+            //        {
+            //            var o = pair.Key + "_zh_cn";
+            //            if (!dt.Columns.Contains(o))
+            //            {
+            //                //增加列
+            //                dt.Columns.Add(o.ToString(), typeof(string));
+            //                dt.Columns[o].SetOrdinal(i + 1);
+            //                i++;
+            //                //列复制
+            //                foreach (DataRow dr in dt.Rows)
+            //                    dr[o] = dr[pair.Key];
+            //            }
+            //        }
+            //        i++;
+            //    }
+            //    return dt;
+            //};
+
+            //Func<ISheet, DataTable, DataTable> onSheetAction = (sheet, dt) =>
+            //{
+            //    var cache = ExcelByBase.Data.ConvertToRowsDictionary(dt)
+            //        .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
+            //        .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
+            //    if (cache.Values.All(p => p == false))
+            //    {
+            //        //忽略掉不匹配正则的
+            //        return null;
+            //    }
+
+            //    int i = 0;
+            //    foreach (KeyValuePair<string, bool> pair in cache)
+            //    {
+            //        var show = pair.Value;
+
+            //        var style = sheet.GetColumnStyle(i);
+            //        style.IsLocked = !pair.Key.Contains("_zh_cn");
+            //        sheet.SetColumnHidden(i, !show);
+            //        sheet.SetDefaultColumnStyle(i, style);
+            //        if (show)
+            //            sheet.AutoSizeColumn(i);
+            //        i++;
+            //    }
+            //    return dt;
+            //};
         }
 
         public static string InputPath { get; set; }
@@ -83,7 +148,6 @@ namespace Script
 
         private static void ToCommon(string exs, Func<string, List<DataTable>> import, Action<DataTable, string> export)
         {
-            ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
             if (files.Count == 0) return;
             files.ForEach(file =>
@@ -130,7 +194,6 @@ namespace Script
         /// <param name="import"></param>
         public static void ToOneExcel(string exs, Func<string, List<DataTable>> import)
         {
-            ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs, SelectType.Folder);
             if (files.Count == 0) return;
             var dts = new List<DataTable>();
@@ -155,7 +218,6 @@ namespace Script
         /// </summary>
         public static void ToKvExcel(string exs, Func<string, List<DataTable>> import)
         {
-            ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(exs);
             if (files.Count == 0) return;
 
@@ -249,7 +311,6 @@ namespace Script
         public static void KvExcelTo(Func<string, DataTable> loadAction, Action<DataTable, string> saveAction,
             Func<string, List<List<object>>, string> isNotArrayAction = null)
         {
-            ExcelByNpoi.OnSheetAction = null;
             List<string> files = CheckPath(".xlsx", SelectType.File);
             if (files.Count == 0) return;
 
@@ -259,7 +320,7 @@ namespace Script
             files.ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                dts.AddRange(ExcelByNpoi.ImportExcelToDataTable(file));
+                dts.AddRange(ExcelByBase.Data.ImportToDataTable(file));
             });
 
             if (dts.Count == 0)

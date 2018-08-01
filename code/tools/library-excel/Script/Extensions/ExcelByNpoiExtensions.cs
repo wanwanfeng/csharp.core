@@ -8,8 +8,101 @@ using NPOI.XSSF.UserModel;
 
 namespace Library.Excel
 {
-    public class ExcelByNpoiExtensions : ExcelByNpoi
+    internal class ExcelByNpoiExtensions : ExcelByNpoi
     {
+        /// <summary>
+        /// Datable导出成Excel
+        /// </summary>
+        /// <param name="file">导出路径(包括文件名与扩展名)</param>
+        /// <param name="dts"></param>
+        /// <param name="onSheetBeforeAction"></param>
+        /// <param name="onSheetAction"></param>
+        public static void ExportDataTableToExcel(string file, List<DataTable> dts,
+            Func<DataTable, DataTable> onSheetBeforeAction = null,
+            Func<ISheet, DataTable, DataTable> onSheetAction = null)
+        {
+            IWorkbook workbook = null;
+            string fileExt = Path.GetExtension(file).ToLower();
+            switch (fileExt)
+            {
+                case ".xlsx":
+                    workbook = new XSSFWorkbook();
+                    break;
+                case ".xls":
+                    workbook = new HSSFWorkbook();
+                    break;
+                default:
+                    throw new Exception("保存的文件格式不符合要求 ！");
+            }
+
+            foreach (DataTable dt in dts)
+            {
+                if (fileExt == ".xls" && dt.Rows.Count > 65536)
+                {
+                    throw new Exception("数据量过大，请保存为.xlsx");
+                }
+
+                if (onSheetBeforeAction != null)
+                {
+                    if (onSheetBeforeAction.Invoke(dt) == null)
+                    {
+                        continue;
+                    }
+                }
+
+                ISheet sheet = string.IsNullOrEmpty(dt.TableName)
+                    ? workbook.CreateSheet("Sheet1")
+                    : workbook.CreateSheet(dt.TableName);
+
+                //表头  
+                IRow row = sheet.CreateRow(0);
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    ICell cell = row.CreateCell(i);
+                    var value = dt.Columns[i].ColumnName;
+                    cell.SetCellValue(value);
+                }
+
+                //数据  
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    IRow row1 = sheet.CreateRow(i + 1);
+                    for (int j = 0; j < dt.Columns.Count; j++)
+                    {
+                        ICell cell = row1.CreateCell(j);
+                        var value = dt.Rows[i][j].ToString();
+                        cell.SetCellValue(value);
+                    }
+                }
+
+                //默认一个样式以及自动宽度
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    var style = workbook.CreateCellStyle();
+                    sheet.SetDefaultColumnStyle(i, style);
+                    sheet.AutoSizeColumn(i);
+                }
+
+                if (onSheetAction != null)
+                {
+                    if (onSheetAction.Invoke(sheet, dt) == null)
+                    {
+                        workbook.RemoveSheetAt(workbook.GetSheetIndex(sheet));
+                    }
+                }
+
+                //string regex = "(([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
+                //var list = ConvertDataTableToRowsList(dt).Select(p => string.Join("|", p.Cast<string>().ToArray())).Select(p => Regex.IsMatch(p, regex)).ToList();
+                //for (int i = 0; i < list.Count; i++)
+                //{
+                //    var show = list[i];
+                //    sheet.SetColumnHidden(i, !show);
+                //    //if (show)
+                //    //    sheet.SetColumnWidth(0, 200*256 + 200);
+                //}
+            }
+        }
+
         /// <summary>
         /// Excel导入成Datable
         /// </summary>

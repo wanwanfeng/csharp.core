@@ -42,7 +42,6 @@ namespace findText
                             baseActionFor.Revert(SystemConsole.GetInputStr("iinput file path (*.xlsx):"));
                             break;
                     }
-                    Console.ReadKey();
                 } while (SystemConsole.ContinueY());
             };
             SystemConsole.Run<ConvertType>(callFunc);

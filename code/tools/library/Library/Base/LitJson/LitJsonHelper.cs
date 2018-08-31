@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Library.Extensions;
 using LitJson;
 
@@ -124,9 +125,10 @@ namespace Library.LitJson
             return JsonMapper.ToObject(res);
         }
 
-        public static string ToJson<T>(T t)
+        public static string ToJson<T>(T t, bool unescape = false)
         {
-            return JsonMapper.ToJson(t);
+            //不转义中文字符
+            return unescape ? Regex.Unescape(JsonMapper.ToJson(t)) : JsonMapper.ToJson(t);
         }
 
         public static ListTable ImportJsonToListTable(string file, Func<string, string> func = null)

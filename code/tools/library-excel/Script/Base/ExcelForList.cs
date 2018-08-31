@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Library.Helper;
 using Library.LitJson;
 using LitJson;
@@ -45,7 +46,7 @@ namespace Library.Excel
                 JsonData resJsonDatas = ConvertToJson(list);
                 string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? list.FullName : file, ".json");
                 FileHelper.CreateDirectory(newPath);
-                File.WriteAllText(newPath, JsonMapper.ToJson(resJsonDatas), new UTF8Encoding(false));
+                File.WriteAllText(newPath, LitJsonHelper.ToJson(resJsonDatas, true), new UTF8Encoding(false));
             }
 
             #endregion

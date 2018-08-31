@@ -319,7 +319,7 @@ namespace Script
             var dts = new List<DataTable>();
             files.ForEach(file =>
             {
-                Console.WriteLine(" is now : " + file);
+                Console.WriteLine(" from : " + file);
                 dts.AddRange(ExcelByBase.Data.ImportToDataTable(file));
             });
 
@@ -363,7 +363,7 @@ namespace Script
                                     {
                                         var idTemp = dtr[0];
                                         var keyTemp = dtr[key];
-                                        if (idTemp.Equals(id) && keyTemp.Equals(value))
+                                        if (idTemp.Equals(id) /*&& keyTemp.Equals(value)*/)
                                         {
                                             dtr[key] = value_zh_cn;
                                             isSave = true;

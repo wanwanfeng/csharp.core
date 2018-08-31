@@ -104,6 +104,8 @@ namespace Library.Excel
                     case XmlMode.Navicat:
                     {
                         XmlDocument doc = new XmlDocument();
+                        XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
+                        doc.AppendChild(xmldecl);
                         XmlNode docNode = doc.CreateNode(XmlNodeType.Element, "RECORDS", "");
                         doc.AppendChild(docNode);
 
@@ -116,10 +118,17 @@ namespace Library.Excel
                             foreach (object o in objects)
                             {
                                 var xmlNode = doc.CreateNode(XmlNodeType.Element, keys.Dequeue(), "");
-                                xmlNode.InnerText = o.ToString();
+
+                                //不赋值时空节点不换行
+                                if (!string.IsNullOrEmpty(o.ToString()))
+                                    xmlNode.InnerText = o.ToString();
                                 node.AppendChild(xmlNode);
                             }
                         }
+
+                        ////是否输出为一行
+                        //doc.PreserveWhitespace = true;
+
                         doc.Save(newPath);
                     }
                         break;

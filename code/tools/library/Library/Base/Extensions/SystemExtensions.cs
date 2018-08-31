@@ -77,7 +77,11 @@ namespace Library.Extensions
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    e.FinalException().ForEach(p =>
+                    {
+                        Console.WriteLine(p.Message);
+                        Console.WriteLine(p.StackTrace);
+                    });
                 }
 
                 GC.Collect();

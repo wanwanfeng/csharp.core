@@ -74,7 +74,7 @@ namespace Script
 
                     JsonData jsonData = LitJsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
                     LitJsonHelper.RevertDictionaryToJson(jsonData, dictionary);
-                    return LitJsonHelper.ToJson(jsonData);
+                    return LitJsonHelper.ToJson(jsonData, true).Replace("＠", "@");
                 });
             }
         }

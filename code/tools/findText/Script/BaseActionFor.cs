@@ -254,14 +254,14 @@ namespace findText
                 foreach (KeyValuePair<string, List<JsonData>> kv in cache)
                 {
                     string temp = kv.Key;
-                    Console.WriteLine("还原中...请稍后" + ((float)(++i) / jsonData.Count).ToString("p1") + "\t" + temp);
+                    Console.WriteLine("还原中...请稍后" + ((float)(++i) / cache.Count).ToString("p1") + "\t" + temp);
                     string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
 
                     if (File.Exists(path))
                     {
+                        string[] content = File.ReadAllLines(path);
                         foreach (var data in kv.Value)
                         {
-                            string[] content = File.ReadAllLines(path);
                             int line = data["行号"].ToString().AsInt();
                             string oldStr = data["原文"].ToString();
                             //string oldStr2 = data["需翻译"].ToString();
@@ -272,13 +272,13 @@ namespace findText
                             if (linec.Contains(oldStr))
                             {
                                 content[line - 1] = linec.Replace(oldStr, newStr);
-                                File.WriteAllLines(path, content);
                             }
                             else
                             {
                                 list.Add("替换失败：" + temp + "/" + line + "/" + oldStr + "/" + newStr);
                             }
                         }
+                        File.WriteAllLines(path, content);
                     }
                     else
                     {

@@ -82,6 +82,114 @@ namespace LitJson
             throw new Exception("JsonData ToBoolean error");
         }
     }
+
+    public static class JsonDataExtensions
+    {
+        public static JsonData Last(this JsonData data)
+        {
+            if (data.IsArray)
+                return data.Count == 0 ? null : data[data.Count - 1];
+            if (data.IsObject)
+                return string.IsNullOrEmpty(data.Keys.LastOrDefault()) ? null : data[data.Keys.LastOrDefault()];
+            return data;
+        }
+
+        public static JsonData First(this JsonData data)
+        {
+            if (data.IsArray)
+                return data.Count == 0 ? null : data[0];
+            if (data.IsObject)
+                return string.IsNullOrEmpty(data.Keys.FirstOrDefault()) ? null : data[data.Keys.FirstOrDefault()];
+            return data;
+        }
+
+        public static JsonData Remove(this JsonData data, JsonData remove)
+        {
+            if (data.IsArray)
+            {
+                var json = new JsonData();
+                json.SetJsonType(JsonType.Array);
+                for (int i = 0; i < data.Count; i++)
+                {
+                    if (data[i].Equals(remove)) continue;
+                    json.Add(data[i]);
+                }
+                return json;
+            }
+            if (data.IsObject)
+            {
+                var json = new JsonData();
+                json.SetJsonType(JsonType.Object);
+                foreach (string key in data.Keys)
+                {
+                    if (data[key].Equals(remove)) continue;
+                    json.Add(key);
+                }
+                return json;
+            }
+            throw new Exception();
+        }
+
+        public static JsonData Remove(this JsonData data, string key)
+        {
+            if (!data.IsObject) return data;
+            if (data.Count == 0) return data;
+            var json = new JsonData();
+            json.SetJsonType(JsonType.Object);
+            foreach (var k in data.Keys.Where(p => !key.Equals(p)))
+            {
+                json[k] = data[k];
+            }
+            return json;
+        }
+
+        public static JsonData RemoveAt(this JsonData data, int index)
+        {
+            if (!data.IsArray) return data;
+            if (data.Count == 0) return data;
+            if (data.Count <= index) return data;
+            var json = new JsonData();
+            json.SetJsonType(JsonType.Array);
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (index == i) continue;
+                json.Add(data[i]);
+            }
+            return data;
+        }
+
+        public static JsonData Remove(this JsonData data, params string[] keys)
+        {
+            if (!data.IsObject) return data;
+            if (data.Count == 0) return data;
+            if (keys.Length == 0) return data;
+            if (!data.Keys.Except(keys).Any()) return data;
+            var json = new JsonData();
+            json.SetJsonType(JsonType.Object);
+            foreach (var k in data.Keys.Where(p => !keys.Contains(p)))
+            {
+                json[k] = data[k];
+            }
+            return json;
+        }
+
+        public static JsonData RemoveAt(this JsonData data, params int[] indexs)
+        {
+            if (!data.IsArray) return data;
+            if (data.Count == 0) return data;
+            if (indexs.Length == 0) return data;
+            indexs = indexs.Where(p => p < data.Count).ToArray();
+            if (indexs.Length == 0) return data;
+            var json = new JsonData();
+            json.SetJsonType(JsonType.Array);
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (indexs.Contains(i)) continue;
+                json.Add(data[i]);
+            }
+            return data;
+        }
+    }
 }
 
 namespace Library
@@ -125,11 +233,25 @@ namespace Library.LitJson
             return JsonMapper.ToObject(res);
         }
 
-        public static string ToJson<T>(T t, bool unescape = false)
+        public static string ToJson<T>(T t)
         {
-            //不转义中文字符
-            return unescape ? Regex.Unescape(JsonMapper.ToJson(t)) : JsonMapper.ToJson(t);
+            return JsonMapper.ToJson(t);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="func"></param>
+        /// <param name="unescape">转不转义</param>
+        /// <returns></returns>
+        public static string ToJson<T>(T t, Func<string, string> func, bool unescape)
+        {
+            string value = func(ToJson(t));
+            return unescape ? Regex.Unescape(value) : value;
+        }
+
 
         public static ListTable ImportJsonToListTable(string file, Func<string, string> func = null)
         {

@@ -81,113 +81,64 @@ namespace LitJson
             }
             throw new Exception("JsonData ToBoolean error");
         }
-    }
 
-    public static class JsonDataExtensions
-    {
-        public static JsonData Last(this JsonData data)
+        public JsonData Last()
         {
-            if (data.IsArray)
-                return data.Count == 0 ? null : data[data.Count - 1];
-            if (data.IsObject)
-                return string.IsNullOrEmpty(data.Keys.LastOrDefault()) ? null : data[data.Keys.LastOrDefault()];
-            return data;
+            if (IsArray)
+                return inst_array.LastOrDefault();
+            if (IsObject)
+                return inst_object.Values.LastOrDefault();
+            return this;
         }
 
-        public static JsonData First(this JsonData data)
+        public JsonData First()
         {
-            if (data.IsArray)
-                return data.Count == 0 ? null : data[0];
-            if (data.IsObject)
-                return string.IsNullOrEmpty(data.Keys.FirstOrDefault()) ? null : data[data.Keys.FirstOrDefault()];
-            return data;
+            if (IsArray)
+                return inst_array.FirstOrDefault();
+            if (IsObject)
+                return inst_object.Values.First();
+            return this;
         }
 
-        public static JsonData Remove(this JsonData data, JsonData remove)
+        public void Remove(JsonData remove)
         {
-            if (data.IsArray)
-            {
-                var json = new JsonData();
-                json.SetJsonType(JsonType.Array);
-                for (int i = 0; i < data.Count; i++)
-                {
-                    if (data[i].Equals(remove)) continue;
-                    json.Add(data[i]);
-                }
-                return json;
-            }
-            if (data.IsObject)
-            {
-                var json = new JsonData();
-                json.SetJsonType(JsonType.Object);
-                foreach (string key in data.Keys)
-                {
-                    if (data[key].Equals(remove)) continue;
-                    json.Add(key);
-                }
-                return json;
-            }
-            throw new Exception();
+            if (IsArray)
+                inst_array.Remove(remove);
         }
 
-        public static JsonData Remove(this JsonData data, string key)
+        public void Remove(string key)
         {
-            if (!data.IsObject) return data;
-            if (data.Count == 0) return data;
-            var json = new JsonData();
-            json.SetJsonType(JsonType.Object);
-            foreach (var k in data.Keys.Where(p => !key.Equals(p)))
-            {
-                json[k] = data[k];
-            }
-            return json;
+            if (!IsObject) return;
+            if (Count == 0) return;
+            inst_object.Remove(key);
         }
 
-        public static JsonData RemoveAt(this JsonData data, int index)
+        public void RemoveAt(int index)
         {
-            if (!data.IsArray) return data;
-            if (data.Count == 0) return data;
-            if (data.Count <= index) return data;
-            var json = new JsonData();
-            json.SetJsonType(JsonType.Array);
-            for (int i = 0; i < data.Count; i++)
-            {
-                if (index == i) continue;
-                json.Add(data[i]);
-            }
-            return data;
+            if (!IsArray) return;
+            if (Count == 0) return;
+            if (Count <= index) return;
+            inst_array.RemoveAt(index);
         }
 
-        public static JsonData Remove(this JsonData data, params string[] keys)
+        public void Remove(params string[] keys)
         {
-            if (!data.IsObject) return data;
-            if (data.Count == 0) return data;
-            if (keys.Length == 0) return data;
-            if (!data.Keys.Except(keys).Any()) return data;
-            var json = new JsonData();
-            json.SetJsonType(JsonType.Object);
-            foreach (var k in data.Keys.Where(p => !keys.Contains(p)))
-            {
-                json[k] = data[k];
-            }
-            return json;
+            if (!IsObject) return;
+            if (Count == 0) return;
+            if (keys.Length == 0) return;
+            if (!Keys.Except(keys).Any()) return;
+            keys.ToList().ForEach(p => { inst_object.Remove(p); });
         }
 
-        public static JsonData RemoveAt(this JsonData data, params int[] indexs)
+        public void RemoveAt(params int[] indexs)
         {
-            if (!data.IsArray) return data;
-            if (data.Count == 0) return data;
-            if (indexs.Length == 0) return data;
-            indexs = indexs.Where(p => p < data.Count).ToArray();
-            if (indexs.Length == 0) return data;
-            var json = new JsonData();
-            json.SetJsonType(JsonType.Array);
-            for (int i = 0; i < data.Count; i++)
-            {
-                if (indexs.Contains(i)) continue;
-                json.Add(data[i]);
-            }
-            return data;
+            if (!IsArray) return;
+            if (Count == 0) return;
+            if (indexs.Length == 0) return;
+            indexs = indexs.Where(p => p < Count).ToArray();
+            if (indexs.Length == 0) return;
+            for (int i = indexs.Length - 1; i >= 0; i--)
+                inst_array.RemoveAt(i);
         }
     }
 }

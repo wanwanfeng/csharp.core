@@ -252,8 +252,20 @@ namespace Library.LitJson
             return unescape ? Regex.Unescape(value) : value;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="unescape">转不转义</param>
+        /// <returns></returns>
+        public static string ToJson<T>(T t,bool unescape)
+        {
+            string value = ToJson(t);
+            return unescape ? Regex.Unescape(value) : value;
+        }
 
-        public static ListTable ImportJsonToListTable(string file, Func<string, string> func = null)
+        public static ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
         {
             if (!File.Exists(file))
                 Ldebug.Log("文件不存在!");
@@ -270,7 +282,7 @@ namespace Library.LitJson
         /// <param name="content"></param>
         /// <param name="func"></param>
         /// <returns>返回的是两种不同的List</returns>
-        public static ListTable ConvertJsonToListTable(string content, Func<string, string> func = null)
+        public static ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)
         {
             if (string.IsNullOrEmpty(content))
                 return new ListTable();
@@ -291,7 +303,7 @@ namespace Library.LitJson
                     List<object> val = new List<object>();
                     foreach (var key in keys)
                     {
-                        var str = jsonData.Keys.Contains(key) ? jsonData[key].ToString() : "";
+                        var str = jsonData.Keys.Contains(key) ? jsonData[key] : null;
                         val.Add(func == null ? str : func(str));
                     }
                     list.Add(val);
@@ -304,7 +316,7 @@ namespace Library.LitJson
                 var list = cache.Select(p => new List<object>()
                     {
                         p.Key,
-                        func == null ? p.Value : func(p.Value.ToString())
+                        func == null ? p.Value : func(p.Value)
                     }).ToList();
                 return new ListTable { IsArray = false, Key = new List<string> { "key", "value" }, List = list };
             }
@@ -317,39 +329,28 @@ namespace Library.LitJson
         /// <returns></returns>
         public static JsonData ConvertListTableToJson(ListTable list)
         {
-            if (list.IsArray)
-            {
-                JsonData resJsonDatas = new JsonData();
-                resJsonDatas.SetJsonType(JsonType.Array);
+            JsonData resJsonDatas = new JsonData();
+            resJsonDatas.SetJsonType(JsonType.Array);
 
-                foreach (List<object> objects in list.List)
+            foreach (List<object> objects in list.List)
+            {
+                Queue<object> queueVal = new Queue<object>(objects);
+                JsonData jsonData = new JsonData();
+                foreach (string o in list.Key)
                 {
-                    Queue<object> queueVal = new Queue<object>(objects);
-                    JsonData jsonData = new JsonData();
-                    foreach (string o in list.Key)
-                        jsonData[o] = queueVal.Dequeue().ToString();
-                    resJsonDatas.Add(jsonData);
+                    var val = queueVal.Dequeue();
+                    if (val is JsonData)
+                    {
+                        jsonData[o] = (JsonData) val;
+                        continue;
+                    }
+                    jsonData[o] = new JsonData(val);
                 }
 
-                return resJsonDatas;
+                resJsonDatas.Add(jsonData);
             }
-            else
-            {
-                //todo
-                JsonData resJsonDatas = new JsonData();
-                resJsonDatas.SetJsonType(JsonType.Array);
 
-                foreach (List<object> objects in list.List)
-                {
-                    Queue<object> queueVal = new Queue<object>(objects);
-                    JsonData jsonData = new JsonData();
-                    foreach (string o in list.Key)
-                        jsonData[o] = queueVal.Dequeue().ToString();
-                    resJsonDatas.Add(jsonData);
-                }
-
-                return resJsonDatas;
-            }
+            return resJsonDatas;
         }
 
         /// <summary>
@@ -426,45 +427,6 @@ namespace Library.LitJson
                         {
 
                         }
-                    }
-                } while (keys.Count != 0);
-            }
-            return data;
-        }
-
-
-        /// <summary>
-        /// data值再覆盖(数组索引作为key)
-        /// </summary>
-        /// <param name="data">修改前的data</param>
-        /// <param name="vals"></param>
-        /// <returns>返回修改后的data</returns>
-        public static JsonData RevertDictionaryToJson2(JsonData data, Dictionary<string, JsonData> vals)
-        {
-            foreach (KeyValuePair<string, JsonData> keyValuePair in vals)
-            {
-                Queue<string> keys = new Queue<string>(keyValuePair.Key.Trim('/').Split('/'));
-                JsonData temp = data;
-                do
-                {
-                    var key = keys.Dequeue();
-                    if (keys.Count == 0)
-                    {
-                        if (temp.IsObject && temp.ContainsKey(key))
-                            temp[key] = keyValuePair.Value;
-                        else if (temp.IsArray)
-                            temp[key.AsInt()] = keyValuePair.Value;
-                        else
-                            temp = new JsonData();
-                    }
-                    else
-                    {
-                        if (temp.IsObject && temp.ContainsKey(key))
-                            temp = temp[key];
-                        else if (temp.IsArray)
-                            temp = temp[key.AsInt()];
-                        else
-                            temp = new JsonData();
                     }
                 } while (keys.Count != 0);
             }

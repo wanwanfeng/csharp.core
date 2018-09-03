@@ -40,6 +40,14 @@ namespace Library.Excel
 
             #region ListTable
 
+            private static string CheckExport(ListTable lt, string file, string extension)
+            {
+                file = string.IsNullOrEmpty(file) ? lt.FullName : file;
+                string newPath = Path.ChangeExtension(file, extension);
+                FileHelper.CreateDirectory(newPath);
+                return newPath;
+            }
+
             public static List<ListTable> ImportToListTable(string file)
             {
                 return ImportToDataTable(file).Select(ConvertToListTable).ToList();

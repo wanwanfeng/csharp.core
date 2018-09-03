@@ -48,6 +48,12 @@ namespace Library.Excel
                 string newPath = CheckExport(dt, file, ".json");
                 List.ExportToJson(ConvertToListTable(dt), newPath);
             }
+
+            public static void ExportToJson(ListTable lt, string file)
+            {
+                string newPath = CheckExport(lt, file, ".json");
+                List.ExportToJson(lt, newPath);
+            }
         }
 
         #endregion

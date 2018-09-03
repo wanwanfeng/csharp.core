@@ -59,22 +59,27 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(ExcelByBase.Json.ImportToDataTable, ExcelByBase.Data.ExportToJson, (fullpath, list) =>
+                KvExcelTo(new ListTableModel()
                 {
-                    Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
-                    foreach (List<object> objects in list)
+                    loadAction = ExcelByBase.Json.ImportToListTable,
+                    saveAction = ExcelByBase.Data.ExportToJson,
+                    isCustomAction = (fullpath, list) =>
                     {
-                        object id = objects[1];
-                        string key = objects[2].ToString();
-                        object value = objects[3];
-                        string value_zh_cn = objects[4].ToString();
+                        Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
+                        foreach (List<object> objects in list)
+                        {
+                            object id = objects[1];
+                            string key = objects[2].ToString();
+                            object value = objects[3];
+                            string value_zh_cn = objects[4].ToString();
 
-                        dictionary[id.ToString()] = value_zh_cn;
+                            dictionary[id.ToString()] = value_zh_cn;
+                        }
+
+                        JsonData jsonData = LitJsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
+                        LitJsonHelper.RevertDictionaryToJson(jsonData, dictionary);
+                        return LitJsonHelper.ToJson(jsonData,(p)=> p.Replace("＠", "@"), true);
                     }
-
-                    JsonData jsonData = LitJsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
-                    LitJsonHelper.RevertDictionaryToJson(jsonData, dictionary);
-                    return LitJsonHelper.ToJson(jsonData, true).Replace("＠", "@");
                 });
             }
         }

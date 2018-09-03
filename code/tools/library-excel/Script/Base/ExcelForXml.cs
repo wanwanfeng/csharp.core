@@ -106,30 +106,36 @@ namespace Library.Excel
                         XmlDocument doc = new XmlDocument();
                         XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
                         doc.AppendChild(xmldecl);
-                        XmlNode docNode = doc.CreateNode(XmlNodeType.Element, "RECORDS", "");
+                        XmlNode docNode = doc.CreateElement("RECORDS");
                         doc.AppendChild(docNode);
 
                         ListTable list = ConvertToListTable(dt);
                         foreach (List<object> objects in list.List)
                         {
-                            var node = doc.CreateNode(XmlNodeType.Element, "RECORD", "");
+                            var node = doc.CreateElement("RECORD");
                             docNode.AppendChild(node);
                             var keys = new Queue<string>(list.Key);
                             foreach (object o in objects)
                             {
-                                var xmlNode = doc.CreateNode(XmlNodeType.Element, keys.Dequeue(), "");
-
+                                var element = doc.CreateElement(keys.Dequeue());
                                 //不赋值时空节点不换行
                                 if (!string.IsNullOrEmpty(o.ToString()))
-                                    xmlNode.InnerText = o.ToString();
-                                node.AppendChild(xmlNode);
+                                    element.InnerText = o.ToString();
+                                node.AppendChild(element);
                             }
                         }
 
                         ////是否输出为一行
                         //doc.PreserveWhitespace = true;
-
                         doc.Save(newPath);
+
+                        //XmlWriterSettings settings = new XmlWriterSettings();
+                        //settings.IndentChars = "";
+                        //settings.Indent = true;
+                        //using (XmlWriter xtw = XmlWriter.Create(newPath, settings))
+                        //{
+                        //    doc.Save(xtw);
+                        //}
                     }
                         break;
                     default:

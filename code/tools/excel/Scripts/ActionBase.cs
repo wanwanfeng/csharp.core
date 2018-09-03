@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -305,11 +306,25 @@ namespace Script
             ExcelByBase.Data.ExportToExcel(dd, InputPath);
         }
 
+        public class DataTableModel
+        {
+            public Func<string, DataTable> loadAction;
+            public Action<DataTable, string> saveAction;
+            public Func<string, List<List<object>>, string> isCustomAction = null;
+        }
+
+        public class ListTableModel
+        {
+            public Func<string, ListTable> loadAction;
+            public Action<ListTable, string> saveAction;
+            public Func<string, List<List<object>>, string> isCustomAction = null;
+        }
+
+
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelTo(Func<string, DataTable> loadAction, Action<DataTable, string> saveAction,
-            Func<string, List<List<object>>, string> isNotArrayAction = null)
+        public static void KvExcelTo(DataTableModel tableModel)
         {
             List<string> files = CheckPath(".xlsx", SelectType.File);
             if (files.Count == 0) return;
@@ -328,10 +343,10 @@ namespace Script
 
             string root = InputPath.Replace(".xlsx", "");
 
-            foreach (DataTable dataTable in dts)
+            foreach (DataTable table in dts)
             {
                 var cache =
-                    ExcelByBase.Data.ConvertToListTable(dataTable)
+                    ExcelByBase.Data.ConvertToListTable(table)
                         .List
                         .ToLookup(p => p.First())
                         .ToDictionary(p => p.Key.ToString(), q => q.ToList());
@@ -345,7 +360,7 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var dt = loadAction(fullpath);
+                        var dt = tableModel.loadAction(fullpath);
                         var columns = dt.Columns;
 
                         if (dt.IsArray)
@@ -361,7 +376,7 @@ namespace Script
                                 {
                                     if (columns.Contains(key))
                                     {
-                                        var idTemp = dtr[0];
+                                        var idTemp = dtr[0].ToString();
                                         var keyTemp = dtr[key];
                                         if (idTemp.Equals(id) /*&& keyTemp.Equals(value)*/)
                                         {
@@ -378,15 +393,102 @@ namespace Script
                             if (!isSave) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            saveAction.Invoke(dt, fullpath);
+                            tableModel.saveAction.Invoke(dt, fullpath);
                         }
                         else
                         {
-                            if (isNotArrayAction == null) continue;
-
+                            if (tableModel.isCustomAction == null) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            File.WriteAllText(fullpath, isNotArrayAction.Invoke(fullpath, pair.Value));
+                            File.WriteAllText(fullpath, tableModel.isCustomAction.Invoke(fullpath, pair.Value));
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 还原键值对
+        /// </summary>
+        public static void KvExcelTo(ListTableModel tableModel)
+        {
+            List<string> files = CheckPath(".xlsx", SelectType.File);
+            if (files.Count == 0) return;
+
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
+
+            var dts = new List<ListTable>();
+            files.ForEach(file =>
+            {
+                Console.WriteLine(" from : " + file);
+                dts.AddRange(ExcelByBase.Data.ImportToListTable(file));
+            });
+
+            if (dts.Count == 0)
+                return;
+
+            string root = InputPath.Replace(".xlsx", "");
+
+            foreach (ListTable table in dts)
+            {
+                var cache = table.List
+                    .ToLookup(p => p.First())
+                    .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                cache.Remove("path");
+
+                foreach (KeyValuePair<string, List<List<object>>> pair in cache)
+                {
+                    string fullpath = root + pair.Key;
+
+                    if (File.Exists(fullpath))
+                    {
+                        bool isSave = false;
+                        Console.WriteLine(" is now : " + fullpath);
+                        var lt = tableModel.loadAction(fullpath);
+                        var columns = lt.Key;
+
+                        if (lt.IsArray)
+                        {
+                            foreach (List<object> objects in pair.Value)
+                            {
+                                object id = objects[1];
+                                string key = objects[2].ToString();
+                                object value = objects[3];
+                                string value_zh_cn = objects[4].ToString();
+
+                                foreach (List<object> dtr in lt.List)
+                                {
+                                    if (columns.Contains(key))
+                                    {
+                                        var idTemp = dtr[0].ToString();
+                                        var keyTemp = dtr[lt.Key.IndexOf(key)];
+                                        if (idTemp.Equals(id) /*&& keyTemp.Equals(value)*/)
+                                        {
+                                            dtr[lt.Key.IndexOf(key)] = value_zh_cn.Replace("＠", "@");
+                                            isSave = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
+                                    }
+                                }
+                            }
+                            if (!isSave) continue;
+                            if (isBak)
+                                File.Copy(fullpath, fullpath + ".bak", true);
+                            tableModel.saveAction.Invoke(lt, fullpath);
+                        }
+                        else
+                        {
+                            if (tableModel.isCustomAction == null) continue;
+                            if (isBak)
+                                File.Copy(fullpath, fullpath + ".bak", true);
+                            File.WriteAllText(fullpath, tableModel.isCustomAction.Invoke(fullpath, pair.Value));
                         }
                     }
                     else

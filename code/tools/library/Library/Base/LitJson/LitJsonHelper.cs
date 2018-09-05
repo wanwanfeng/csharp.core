@@ -202,6 +202,17 @@ namespace Library
         public bool IsArray = true;
         public List<string> Key = new List<string>();
         public List<List<object>> List = new List<List<object>>();
+
+        public object this[int hang, int lie]
+        {
+            get { return List[hang][lie]; }
+        }
+
+        public object this[int hang, string key]
+        {
+            get { return List[hang][Key.IndexOf(key)]; }
+        }
+
     }
 }
 

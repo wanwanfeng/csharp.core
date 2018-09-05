@@ -114,8 +114,7 @@ namespace Script
         {
             var bitmap = new Bitmap(textureInfo.width, textureInfo.height, PixelFormat.Format32bppArgb);
             Graphics graphic = Graphics.FromImage(bitmap);
-            bitmap.SetResolution((int)textureInfo.resolution.X, (int)textureInfo.resolution.Y);
-
+            bitmap.SetResolution(textureInfo.resolution.X, textureInfo.resolution.Y);
             foreach (var splite in textureInfo.list)
             {
                 var newName = Path.GetDirectoryName(re) + "/" +
@@ -125,7 +124,7 @@ namespace Script
                     using (FileStream fsT = new FileStream(newName, FileMode.Open, FileAccess.Read))
                     {
                         Image temp = Image.FromStream(fsT);
-                        graphic.DrawImage(temp, splite.x, splite.y, new Rectangle(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
+                        graphic.DrawImage(temp, splite.x, splite.y, new RectangleF(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
                     }
                 }
                 else
@@ -133,7 +132,7 @@ namespace Script
                     //特殊要求，绘制透明图片
                     var bm = new Bitmap(splite.width, splite.height, PixelFormat.Format32bppArgb);
                     bm.SetResolution((int)textureInfo.resolution.X, (int)textureInfo.resolution.Y);
-                    graphic.DrawImage(bm, splite.x, splite.y, new Rectangle(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
+                    graphic.DrawImage(bm, splite.x, splite.y, new RectangleF(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
                     bm.Dispose();
                 }
             }

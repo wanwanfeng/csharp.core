@@ -20,10 +20,21 @@ namespace Library.Excel
                 return newPath;
             }
 
+            public static List<DataTable> ImportToDataTable(string file, bool containsFirstLine = false)
+            {
+                return ExcelByNpoi.ImportExcelToDataTable(file, containsFirstLine);
+            }
+
+            /// <summary>
+            /// 未经过滤原样输出
+            /// </summary>
+            /// <param name="file"></param>
+            /// <returns></returns>
             public static List<DataTable> ImportToDataTable(string file)
             {
-                return ExcelByNpoi.ImportExcelToDataTable(file, false);
+                return ExcelByNpoi.ImportExcelToDataTable(file);
             }
+
 
             public static void ExportToExcel(DataTable dt, string file)
             {

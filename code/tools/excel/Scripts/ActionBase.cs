@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -8,34 +7,16 @@ using System.Text.RegularExpressions;
 using Library;
 using Library.Excel;
 using Library.Extensions;
-using Library.Helper;
-using NPOI.SS.UserModel;
 using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
-    public class ActionBase
+    public class ActionBase : Library.Excel.Extensions.BaseExcel
     {
-        public enum SelectType
-        {
-            [Description("请拖入文件：")] File,
-            [Description("请拖入文件夹：")] Folder,
-            [Description("请拖入文件夹或文件：")] All
-        }
-
-        public static IDictionary<SelectType, string> CacheSelect;
-
-
         public static string regex =
             // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
             "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
         //"[\\x{3041}-\\x{3096}\\x{30A0}-\\x{30FF}\\x{3400}-\\x{4DB5}\\x{4E00}-\\x{9FCB}\\x{F900}-\\x{FA6A}\\x{2E80}-\\x{2FD5}\\x{FF5F}-\\x{FF9F}\\x{3000}-\\x{303F}\\x{31F0}-\\x{31FF}\\x{3220}-\\x{3243}\\x{3280}-\\x{337F}\\x{FF01}-\\x{FF5E}].+";
-
-
-        static ActionBase()
-        {
-            CacheSelect = AttributeHelper.GetCacheDescription<SelectType>();
-        }
 
         protected ActionBase()
         {
@@ -99,52 +80,6 @@ namespace Script
             //    }
             //    return dt;
             //};
-        }
-
-        public static string InputPath { get; set; }
-
-        public static List<string> CheckPath(string exce, SelectType selectType = SelectType.All)
-        {
-            List<string> files = new List<string>();
-
-            string path = SystemConsole.GetInputStr(CacheSelect[selectType], "您选择的文件夹或文件：");
-            if (string.IsNullOrEmpty(path))
-                return files;
-
-            switch (selectType)
-            {
-                case SelectType.File:
-                    if (File.Exists(path))
-                    {
-                        files.Add(path);
-                    }
-                    break;
-                case SelectType.Folder:
-                    if (Directory.Exists(path))
-                    {
-                        files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
-                    }
-                    break;
-                case SelectType.All:
-                    if (Directory.Exists(path))
-                    {
-                        files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
-                    }
-                    else if (File.Exists(path))
-                    {
-                        files.Add(path);
-                    }
-                    break;
-                default:
-                    Console.WriteLine("path is not valid!");
-                    return files;
-            }
-
-            InputPath = path;
-            var exs = exce.AsStringArray(',', '|').Select(p => p.StartsWith(".") ? p : "." + p).ToList();
-            files = files.Where(p => exs.Contains(Path.GetExtension(p))).ToList();
-            files.Sort();
-            return files;
         }
 
         private static void ToCommon(string exs, Func<string, List<DataTable>> import, Action<DataTable, string> export)

@@ -169,9 +169,14 @@ namespace Library.Excel
                     IRow row1 = sheet.CreateRow(i + 1);
                     for (int j = 0; j < dt.Columns.Count; j++)
                     {
+                        var value = dt.Rows[i][j];
                         ICell cell = row1.CreateCell(j);
-                        var value = dt.Rows[i][j].ToString();
-                        cell.SetCellValue(value);
+
+                        if (value is int)
+                            cell.SetCellValue((int) value);
+                        if (value is bool)
+                            cell.SetCellValue((bool) value);
+                        cell.SetCellValue(value.ToString());
                     }
                 }
 
@@ -217,8 +222,8 @@ namespace Library.Excel
                 case CellType.Numeric: //NUMERIC: 
                 {
                     if (DateUtil.IsCellDateFormatted(cell))
-                        return cell.DateCellValue;//修正日期显示
-                    return cell.NumericCellValue;//返回正常数字
+                        return cell.DateCellValue; //修正日期显示
+                    return cell.NumericCellValue; //返回正常数字
                 }
                 case CellType.String: //STRING:  
                     return cell.StringCellValue;
@@ -227,6 +232,80 @@ namespace Library.Excel
                 case CellType.Formula: //FORMULA:  
                 default:
                     return "=" + cell.CellFormula;
+            }
+        }
+
+
+        /// <summary>
+        /// Excel导入成Datable
+        /// </summary>
+        /// <param name="file">导入路径(包含文件名与扩展名)</param>
+        /// <returns></returns>
+        public static List<DataTable> ImportExcelToDataTable(string file)
+        {
+            IWorkbook workbook = null;
+            string fileExt = Path.GetExtension(file).ToLower();
+            using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
+            {
+                //XSSFWorkbook 适用XLSX格式，HSSFWorkbook 适用XLS格式
+                switch (fileExt)
+                {
+                    case ".xlsx":
+                        workbook = new XSSFWorkbook(fs);
+                        break;
+                    case ".xls":
+                        workbook = new HSSFWorkbook(fs);
+                        break;
+                    default:
+                        workbook = null;
+                        break;
+                }
+                if (workbook == null)
+                {
+                    return null;
+                }
+                var list = new List<DataTable>();
+                for (int index = 0; index < workbook.NumberOfSheets; index++)
+                {
+                    ISheet sheet = workbook.GetSheetAt(index);
+                    if (sheet.LastRowNum == 0) continue;
+                    DataTable dt = new DataTable
+                    {
+                        FullName = file,
+                        TableName = sheet.SheetName,
+                    };
+
+                    var maxColumsNum = 0;
+                    for (int i = 0; i <= sheet.LastRowNum; i++)
+                    {
+                        maxColumsNum = Math.Max(sheet.GetRow(i).LastCellNum, maxColumsNum);
+                    }
+
+                    List<int> columns = new List<int>();
+                    for (int i = 0; i < maxColumsNum; i++)
+                    {
+                        dt.Columns.Add(new DataColumn("Columns" + i));
+                        columns.Add(i);
+                    }
+
+                    for (int i = 0; i <= sheet.LastRowNum; i++)
+                    {
+                        DataRow dr = dt.NewRow();
+
+                        string s = "";
+                        foreach (int j in columns)
+                        {
+                            dr[j] = GetValueType(sheet.GetRow(i).GetCell(j));
+                            if (dr[j] == null || dr[j].ToString() == string.Empty)
+                                dr[j] = "";
+                            s += dr[j];
+                        }
+                        if (string.IsNullOrEmpty(s)) continue;
+                        dt.Rows.Add(dr);
+                    }
+                    list.Add(dt);
+                }
+                return list;
             }
         }
     }

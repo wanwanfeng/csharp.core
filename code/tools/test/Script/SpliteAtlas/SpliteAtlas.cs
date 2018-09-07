@@ -91,7 +91,7 @@ namespace Script
                     FileHelper.CreateDirectory(newName);
 
                     var bitmap = new Bitmap(splite.width, splite.height, PixelFormat.Format32bppArgb);
-                    bitmap.SetResolution((int)image.HorizontalResolution, (int)image.VerticalResolution);
+                    bitmap.SetResolution(image.HorizontalResolution, image.VerticalResolution);
                     Graphics graphic = Graphics.FromImage(bitmap);
                     //graphic.Clear(Color.FromArgb(0, 255, 0, 0));
                      graphic.DrawImage(image, 0, 0, new Rectangle(splite.x, splite.y, splite.width, splite.height),GraphicsUnit.Pixel);
@@ -131,7 +131,7 @@ namespace Script
                 {
                     //特殊要求，绘制透明图片
                     var bm = new Bitmap(splite.width, splite.height, PixelFormat.Format32bppArgb);
-                    bm.SetResolution((int)textureInfo.resolution.X, (int)textureInfo.resolution.Y);
+                    bm.SetResolution(textureInfo.resolution.X, textureInfo.resolution.Y);
                     graphic.DrawImage(bm, splite.x, splite.y, new RectangleF(0, 0, splite.width, splite.height), GraphicsUnit.Pixel);
                     bm.Dispose();
                 }

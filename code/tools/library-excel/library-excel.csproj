@@ -61,16 +61,16 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\Base\ExcelByBase.cs" />
-    <Compile Include="Script\Base\ExcelForList.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Script\Base\ExcelForList.cs" />
     <Compile Include="Script\Base\ExcelForXml.cs" />
     <Compile Include="Script\Base\ExcelForCsv.cs" />
     <Compile Include="Script\Base\ExcelForJson.cs" />
     <Compile Include="Script\Base\ExcelByBaseCommon.cs" />
     <Compile Include="Script\Base\KillExcel.cs" />
     <Compile Include="Script\ExcelByNpoi.cs" />
-    <Compile Include="Script\Extensions\BaseExcel.cs" />
+    <Compile Include="Script\Extensions\DataTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Script\Extensions\ExcelByNpoiExtensions.cs" />
     <Compile Include="Script\ExcelByOffice.cs" />
     <Compile Include="Script\ExcelByOleDb.cs" />

@@ -1,15 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Helper;
 
 namespace Library.Extensions
 {
+    public class BaseSystemConsole
+    {
+        public enum SelectType
+        {
+            [Description("请拖入文件：")] File,
+            [Description("请拖入文件夹：")] Folder,
+            [Description("请拖入文件夹或文件：")] All
+        }
+
+        public static IDictionary<SelectType, string> CacheSelect;
+
+        static BaseSystemConsole()
+        {
+            CacheSelect = AttributeHelper.GetCacheDescription<SelectType>();
+        }
+
+        public static string InputPath { get; set; }
+
+        public static List<string> CheckPath(string exce, SelectType selectType = SelectType.All)
+        {
+            List<string> files = new List<string>();
+
+            string path = SystemConsole.GetInputStr(CacheSelect[selectType], "您选择的文件夹或文件：");
+            if (string.IsNullOrEmpty(path))
+                return files;
+
+            switch (selectType)
+            {
+                case SelectType.File:
+                    if (File.Exists(path))
+                    {
+                        files.Add(path);
+                    }
+                    break;
+                case SelectType.Folder:
+                    if (Directory.Exists(path))
+                    {
+                        files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
+                    }
+                    break;
+                case SelectType.All:
+                    if (Directory.Exists(path))
+                    {
+                        files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
+                    }
+                    else if (File.Exists(path))
+                    {
+                        files.Add(path);
+                    }
+                    break;
+                default:
+                    Console.WriteLine("path is not valid!");
+                    return files;
+            }
+
+            InputPath = path;
+            var exs = exce.AsStringArray(',', '|').Select(p => p.StartsWith(".") ? p : "." + p).ToList();
+            files = files.Where(p => exs.Contains(Path.GetExtension(p))).ToList();
+            files.Sort();
+            return files;
+        }
+    }
+
     public class SystemConsole
     {
+
+        private static string Input { get; set; }
+
         public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
             Console.Title = typeof (T).Namespace ?? Console.Title;
@@ -20,12 +86,14 @@ namespace Library.Extensions
                     q => new KeyValuePair<int, T>((int) q.Key, (T) q.Key))
                 .ToDictionary(p => p.Key, q => q.ToList().ToDictionary(p => p.Key, o => o.Value));
 
-            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int)p.Key);
+            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int) p.Key);
             var cacheDesc = AttributeHelper.GetCacheDescription<T>()
                 .ToDictionary(p => p.Key, q => string.IsNullOrEmpty(q.Value) ? q.Key.ToString() : q.Value);
 
             int maxLength = cacheDesc.Values.Max(p => p.Length);
 
+            reset:
+            bool y = false;
             do
             {
                 Console.Clear();
@@ -36,14 +104,16 @@ namespace Library.Extensions
                 {
                     showList.Add(pair.Key);
 
-                    var lineNum = (pair.Value.Count / columnsCount + 1);
+                    var lineNum = (pair.Value.Count/columnsCount + 1);
                     var cache = pair.Value
-                        .ToLookup(p => p.Key % lineNum, q => q)
+                        .ToLookup(p => p.Key%lineNum, q => q)
                         .ToDictionary(p => p.Key, q => q.ToList());
 
                     foreach (var value in cache.Values)
                     {
-                        var res = value.Select(p => string.Format("{0:d2}：{1}", p.Key, cacheDesc[p.Value].PadRight(maxLength, '.')));
+                        var res =
+                            value.Select(
+                                p => string.Format("{0:d2}：{1}", p.Key, cacheDesc[p.Value].PadRight(maxLength, '.')));
                         showList.Add(string.Format("\t{0}\t", string.Join("\t", res.ToArray())));
                     }
                 }
@@ -59,21 +129,26 @@ namespace Library.Extensions
 
                 try
                 {
-                    int caoType = SystemConsole.GetInputStr("请选择，然后回车：", "", "e", "^[0-9]*$").AsInt();
+                    int caoType = GetInputStr("请选择，然后回车：", "", "e", "^[0-9]*$").AsInt();
 
                     if (cacheType.ContainsKey(caoType))
                     {
                         Console.WriteLine("当前的选择：" + caoType);
-                        var obj = Activator.CreateInstance(cacheType[caoType].Value.value);
-                        if (callAction != null)
+                        do
                         {
-                            callAction.Invoke(obj);
-                        }
+                            var obj = Activator.CreateInstance(cacheType[caoType].Value.value);
+                            if (callAction != null)
+                                callAction.Invoke(obj);
+                            y = ContinueY();
+                            if (Input == "../")
+                                goto reset;
+                        } while (y);
                     }
                     else
                     {
                         Console.WriteLine("不存在的命令编号！");
                     }
+
                 }
                 catch (Exception e)
                 {
@@ -97,6 +172,7 @@ namespace Library.Extensions
         {
             Console.Write(beforeTip);
             var cmd = Console.ReadLine();
+            Input = cmd;
             var str = string.IsNullOrEmpty(cmd) ? def : cmd;
 
             if (regex == null || Regex.IsMatch(str, "e") || Regex.IsMatch(str, regex))
@@ -116,15 +192,26 @@ namespace Library.Extensions
         /// </summary>
         /// <param name="beforeTip"> "press 'y' to continue : "; //"按'y'键继续！"</param>
         /// <returns></returns>
-        public static bool ContinueY(string beforeTip = "按'y'键继续： ")
+        public static bool ContinueY(string beforeTip = "按'y'键继续（默认‘y’）： ")
+        {
+            return ContinueYStr(beforeTip) == "y";
+        }
+
+        /// <summary>
+        /// 用于控制台是否继续，"按'y'键继续，按其余键退出， 
+        /// </summary>
+        /// <param name="beforeTip"> "press 'y' to continue : "; //"按'y'键继续！"</param>
+        /// <returns></returns>
+        public static string ContinueYStr(string beforeTip = "按'y'键继续（默认‘y’）： ")
         {
             Console.Write(Environment.NewLine);
-            var x = GetInputStr(beforeTip, "", "y") == "y";
+            var x = GetInputStr(beforeTip, "", "y");
             Console.Write(Environment.NewLine);
             return x;
         }
 
-         /// <summary>
+       
+        /// <summary>
         /// 用于控制台是否继续
         /// </summary>
         /// <param name="beforeTip"> </param>

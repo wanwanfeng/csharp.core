@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Library.Excel;
-using Library.Excel.Extensions;
 using Library.Extensions;
 using Library.LitJson;
 using LitJson;
 
 namespace checkcard.Scripts
 {
-    public class ExportScenario : BaseExcel
+    public class ExportScenario : BaseSystemConsole
     {
         public ExportScenario()
         {

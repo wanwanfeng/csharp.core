@@ -11,7 +11,7 @@ using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
-    public class ActionBase : Library.Excel.Extensions.BaseExcel
+    public class ActionBase : BaseSystemConsole
     {
         public static string regex =
             // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";

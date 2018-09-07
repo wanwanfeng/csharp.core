@@ -4,12 +4,11 @@ using System.IO;
 using System.Linq;
 using Library;
 using Library.Excel;
-using Library.Excel.Extensions;
 using Library.Extensions;
 
 namespace checkcard.Scripts
 {
-    public class CheckScenario : BaseExcel
+    public class CheckScenario : BaseSystemConsole
     {
         public CheckScenario()
         {
@@ -27,7 +26,7 @@ namespace checkcard.Scripts
             }
         }
 
-        public static void Read()
+        public void Read()
         {
             List<string> files = CheckPath(".xlsx", SelectType.File);
             if (files.Count == 0) return;
@@ -59,7 +58,7 @@ namespace checkcard.Scripts
             }
         }
 
-        public static void Write()
+        public void Write()
         {
             List<string> files = CheckPath(".xlsx", SelectType.File);
             if (files.Count == 0) return;

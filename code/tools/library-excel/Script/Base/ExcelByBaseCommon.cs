@@ -36,11 +36,10 @@ namespace Library.Excel
 
         public static List<string> GetList()
         {
-            string str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var array = str.ToCharArray().Select(p => p.ToString()).ToArray();
-            List<string> list = new List<string>(array);
-            foreach (char c in str)
-                list.AddRange(str.ToCharArray().Select(p => c + p.ToString()).ToArray());
+            char[] charArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            var list = new List<string>(charArray.Select(p => p.ToString()));
+            foreach (var c in charArray)
+                list.AddRange(charArray.Select(p => c + p.ToString()));
             list.TrimExcess();
             return list;
         }

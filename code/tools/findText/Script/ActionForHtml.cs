@@ -11,9 +11,9 @@ namespace findText.Script
             get { return "Find_Html_Text"; }
         }
 
-        protected override string[] exName
+        protected override string exName
         {
-            get { return new[] {".html", ".htm", ".tpl"}; }
+            get { return "*.html|*.htm|*.tpl"; }
         }
 
         protected override void OpenRun()

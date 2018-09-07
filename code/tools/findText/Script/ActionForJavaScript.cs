@@ -10,9 +10,9 @@ namespace findText.Script
             get { return "Find_JavaScript_Text"; }
         }
 
-        protected override string[] exName
+        protected override string exName
         {
-            get { return new[] {".js"}; }
+            get { return "*.js"; }
         }
 
         protected override void OpenRun()

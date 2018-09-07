@@ -26,9 +26,9 @@ namespace findText.Script
             get { return "Find_Php_Text"; }
         }
 
-        protected override string[] exName
+        protected override string exName
         {
-            get { return new[] {".php"}; }
+            get { return "*.php"; }
         }
 
         protected override void OpenRun()

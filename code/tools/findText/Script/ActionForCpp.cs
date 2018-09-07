@@ -10,9 +10,9 @@ namespace findText.Script
             get { return "Find_Cpp_Text"; }
         }
 
-        protected override string[] exName
+        protected override string exName
         {
-            get { return new[] {".cpp", ".h"}; }
+            get { return "*.cpp|*.h";}
         }
 
         protected override void OpenRun()

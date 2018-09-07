@@ -8,7 +8,7 @@ using Library.Helper;
 
 namespace Library.Extensions
 {
-    public class BaseSystemConsole
+    public abstract class BaseSystemConsole
     {
         public enum SelectType
         {
@@ -29,7 +29,6 @@ namespace Library.Extensions
         public static List<string> CheckPath(string exce, SelectType selectType = SelectType.All)
         {
             List<string> files = new List<string>();
-
             string path = SystemConsole.GetInputStr(new SystemConsole.Model
             {
                 beforeTip = CacheSelect[selectType],

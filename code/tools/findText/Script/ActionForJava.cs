@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text.RegularExpressions;
-using LitJson;
+﻿using System.Text.RegularExpressions;
 
 namespace findText.Script
 {
@@ -12,9 +9,9 @@ namespace findText.Script
             get { return "Find_Java_Text"; }
         }
 
-        protected override string[] exName
+        protected override string exName
         {
-            get { return new[] {".java"}; }
+            get { return ".java"; }
         }
 
         protected override void OpenRun()

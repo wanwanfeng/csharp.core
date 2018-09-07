@@ -4,7 +4,7 @@ namespace Library.Helper
 {
     public class CollectionHelper
     {
-        public static Dictionary<TKey, TValue> Merge<TKey, TValue>(Dictionary<TKey, TValue> source, params Dictionary<TKey, TValue>[] other)
+        public static IDictionary<TKey, TValue> Merge<TKey, TValue>(IDictionary<TKey, TValue> source, params IDictionary<TKey, TValue>[] other)
         {
             foreach (var dictionary in other)
             {
@@ -20,9 +20,9 @@ namespace Library.Helper
 
     public static class CollectionHelperExtensions
     {
-        public static Dictionary<TKey, TValue> Merge<TKey, TValue>(this Dictionary<TKey, TValue> source, params Dictionary<TKey, TValue>[] other)
+        public static Dictionary<TKey, TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> source, params IDictionary<TKey, TValue>[] other)
         {
-            return CollectionHelper.Merge(source, other);
+            return (Dictionary<TKey, TValue>) CollectionHelper.Merge(source, other);
         }
     }
 }

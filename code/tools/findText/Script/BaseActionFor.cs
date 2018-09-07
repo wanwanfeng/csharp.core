@@ -48,36 +48,6 @@ namespace findText
             return jsonDatas;
         }
 
-        protected virtual Dictionary<string, List<JsonData>> SetDictionary(ListTable list, bool isReverse = false)
-        {
-            if (isReverse)
-                 list.List.Reverse();
-
-            Dictionary<string, List<JsonData>> dic = new Dictionary<string, List<JsonData>>();
-            foreach (List<object> objects in list.List)
-            {
-                JsonData data = new JsonData();
-                for (int j = 0; j < list.Key.Count; j++)
-                {
-                    string val = objects[j].ToString();
-                    val = val.Replace("::", ":").Replace("\\n", "\n");
-                    data[list.Key[j]] = val;
-                }
-
-                var key = data["文件名"].ToString();
-                if (dic.ContainsKey(key))
-                {
-                    dic[key].Add(data);
-                }
-                else
-                {
-                    dic[key] = new List<JsonData>() {data};
-                }
-            }
-            return dic;
-        }
-
-
         public virtual ListTable GetJsonDataArray(string content)
         {
             return LitJsonHelper.ConvertJsonToListTable(content, str =>
@@ -110,9 +80,9 @@ namespace findText
             get { return "Find_Text"; }
         }
 
-        protected virtual string[] exName
+        protected virtual string exName
         {
-            get { return new string[0]; }
+            get { return "*.*"; }
         }
 
         public void Open(string input)
@@ -125,8 +95,7 @@ namespace findText
             {
                 inputPath = input.Replace("\\", "/");
                 all =
-                    Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories)
-                        .Where(p => exName.Contains(Path.GetExtension(p)))
+                    Directory.GetFiles(inputPath, exName, SearchOption.AllDirectories)
                         .Select(p => p.Replace("\\", "/"))
                         .ToList();
                 all.Sort();
@@ -174,64 +143,6 @@ namespace findText
             jsonData["译文"] = val.Trim();
             resJsonData.Add(jsonData);
         }
-
-        //public virtual void Revert(string inputPath)
-        //{
-        //    Dictionary<string, List<List<object>>> dic = new ExcelByNpoi().ReadFromExcels(inputPath);
-
-        //    var list = new List<string>();
-
-        //    foreach (KeyValuePair<string, List<List<object>>> pair in dic)
-        //    {
-        //        JsonData jsonData = SetJsonDataArray(pair.Value, true);
-
-        //        var i = 0;
-        //        foreach (JsonData data in jsonData)
-        //        {
-        //            string temp = data["文件名"].ToString();
-        //            Console.WriteLine("还原中...请稍后" + ((float) (++i) / jsonData.Count).ToString("p1") + "\t" + temp);
-
-        //            string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
-        //            if (File.Exists(path))
-        //            {
-        //                string[] content = File.ReadAllLines(path);
-        //                int line = data["行号"].ToString().AsInt();
-        //                string oldStr = data["原文"].ToString();
-        //                //string oldStr2 = data["需翻译"].ToString();
-        //                string newStr = data["译文"].ToString();
-        //                //if (content[line] == oldStr)
-
-        //                var linec = content[line - 1];
-        //                if (linec.Contains(oldStr))
-        //                {
-        //                    content[line - 1] = linec.Replace(oldStr, newStr);
-        //                    File.WriteAllLines(path, content);
-        //                }
-        //                else
-        //                {
-        //                    list.Add("替换失败：" + temp + "/" + line + "/" + oldStr + "/" + newStr);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                list.Add("不存在的文件：" + path);
-        //            }
-        //        }
-        //        File.WriteAllLines(inputPath + ".txt", list.ToArray());
-        //        //foreach (KeyValuePair<string, JsonData> data in jsonData.Inst_Object)
-        //        //{
-        //        //    string temp = data.Value["文件名"].ToString();
-        //        //    string[] content = File.ReadAllLines(temp);
-        //        //    int line = data.Value["行号"].ToString().AsInt() + 1;
-        //        //    string oldStr = data.Value["原文"].ToString();
-        //        //    string oldStr2 = data.Value["需翻译"].ToString();
-        //        //    string newStr = data.Value["译文"].ToString();
-        //        //    if (content[line] == oldStr)
-        //        //        content[line] = content[line].Replace(oldStr2, newStr);
-        //        //    File.WriteAllLines(temp, content);
-        //        //}
-        //    }
-        //}
 
         /// <summary>
         /// 文件只读取一次
@@ -287,54 +198,6 @@ namespace findText
                     File.WriteAllLines(inputPath + ".txt", list.ToArray());
                 }
             }
-
-            return;
-            //{
-            //    var tables = new ExcelByNpoi().ImportExcelToListTable(inputPath);
-
-
-            //    foreach (var table in tables)
-            //    {
-            //        Dictionary<string, List<JsonData>> jsonData = SetDictionary(table, true);
-
-            //        var i = 0;
-            //        foreach (var kv in jsonData)
-            //        {
-            //            string temp = kv.Key;
-            //            Console.WriteLine("还原中...请稍后" + ((float) (++i) / jsonData.Count).ToString("p1") + "\t" + temp);
-            //            string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
-
-            //            if (File.Exists(path))
-            //            {
-            //                foreach (var data in kv.Value)
-            //                {
-            //                    string[] content = File.ReadAllLines(path);
-            //                    int line = data["行号"].ToString().AsInt();
-            //                    string oldStr = data["原文"].ToString();
-            //                    //string oldStr2 = data["需翻译"].ToString();
-            //                    string newStr = data["译文"].ToString();
-            //                    //if (content[line] == oldStr)
-
-            //                    var linec = content[line - 1];
-            //                    if (linec.Contains(oldStr))
-            //                    {
-            //                        content[line - 1] = linec.Replace(oldStr, newStr);
-            //                        File.WriteAllLines(path, content);
-            //                    }
-            //                    else
-            //                    {
-            //                        list.Add("替换失败：" + temp + "/" + line + "/" + oldStr + "/" + newStr);
-            //                    }
-            //                }
-            //            }
-            //            else
-            //            {
-            //                list.Add("不存在的文件：" + path);
-            //            }
-            //        }
-            //        File.WriteAllLines(inputPath + ".txt", list.ToArray());
-            //    }
-            //}
         }
     }
 }

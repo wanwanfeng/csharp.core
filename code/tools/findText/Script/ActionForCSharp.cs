@@ -12,9 +12,9 @@ namespace findText.Script
             get { return "Find_CSharp_Text"; }
         }
 
-        protected override string[] exName
+        protected override string exName
         {
-            get { return new[] {".cs"}; }
+            get { return "*.cs";}
         }
 
         protected override void OpenRun()

@@ -3,9 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Library.Extensions;
-using Library.LitJson;
+using Library.Helper;
 using LitJson;
 
 namespace Script
@@ -31,15 +29,9 @@ namespace Script
 
         public ImageFindOrc()
         {
-            var eList = ".png|.jpg|.bmp|.psd|.tga|.tif|.dds".AsStringArray('|').ToList();
-            var res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
-                //.Where(p => p.Contains("cocos_Data"))
-                //.Where(p => p.Contains("Resources"))
-                .Where(p => eList.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"))
-                .ToList();
-            res.Sort();
+            var res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories);
             if (res.Count == 0) return;
+            res.Sort();
             RunList(res);
             WriteAllLines(dic);
         }

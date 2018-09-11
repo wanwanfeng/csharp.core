@@ -34,11 +34,7 @@ namespace Script
         public CreateExcelCell(string root)
         {
             this.root = root;
-            var res =
-                Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.Replace("\\","/"))
-                    .ToList();
+            var res = Directory.GetFiles(root, "*.*", SearchOption.AllDirectories).Where(p => !string.IsNullOrEmpty(p)).ToList();
             res.Sort();
             RunList(res);
             WriteAllLines(dic);

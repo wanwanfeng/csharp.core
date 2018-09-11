@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Library;
 using Library.Excel;
 using Library.Extensions;
+using Library.Helper;
 using Library.LitJson;
 using LitJson;
 
@@ -93,11 +94,7 @@ namespace findText
             }
             else
             {
-                inputPath = input.Replace("\\", "/");
-                all =
-                    Directory.GetFiles(inputPath, exName, SearchOption.AllDirectories)
-                        .Select(p => p.Replace("\\", "/"))
-                        .ToList();
+                all = DirectoryHelper.GetFiles(inputPath, exName.Replace("*", ""), SearchOption.AllDirectories);
                 all.Sort();
                 resJsonData = new JsonData();
                 regex = new Regex(regexStr);

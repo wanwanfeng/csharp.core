@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using Library.Extensions;
 using Library.Helper;
 
@@ -26,13 +25,10 @@ namespace Script
             List<string> res = new List<string>();
             if (Directory.Exists(root))
             {
-                res = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
-                    //.Where(p => p.Contains("cocos_Data"))
-                    //.Where(p => p.Contains("Resources"))
-                    .Where(p => p.EndsWith(".plist"))
-                    //.Where(p => Directory.Exists(Path.ChangeExtension(p, ".plist").Replace(".plist","")))
-                    .Select(p => p.Replace("\\", "/"))
-                    .ToList();
+                if (File.Exists(root + ".plist"))
+                    res.Add(root + ".plist");
+                else
+                    res.AddRange(Directory.GetFiles(root, "*.plist", SearchOption.AllDirectories));                      
             }
             else
             {

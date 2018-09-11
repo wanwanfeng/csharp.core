@@ -99,6 +99,7 @@ namespace Script
 
         protected void RunList(List<string> res)
         {
+            res = res.Select(p => p.Replace("\\", "/")).ToList();
             var index = 0;
             res.ForEach(p =>
             {

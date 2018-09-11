@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Library.Extensions;
 using Library.Helper;
 
 namespace Script
@@ -33,20 +31,13 @@ namespace Script
                 case "1":
                 {
                     guiyi = true;
-                    var eList = ".png|.jpg|.bmp|.psd|.tga|.tif|.dds".AsStringArray('|').ToList();
-                    res = Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
-                        .Where(p => eList.Contains(Path.GetExtension(p)))
-                        .Select(p => p.Replace("\\", "/"))
-                        .ToList();
+                    res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories);
                     break;
                 }
                 case "2":
                 {
                     guiyi = false;
-                    res =
-                        Directory.GetFiles(root, "*", SearchOption.TopDirectoryOnly)
-                            .Select(p => p.Replace("\\", "/"))
-                            .ToList();
+                    res = DirectoryHelper.GetFiles(root, "*", SearchOption.TopDirectoryOnly);
                     break;
                 }
             }

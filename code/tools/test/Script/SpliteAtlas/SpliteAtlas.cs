@@ -82,17 +82,16 @@ namespace Script
                 Image image = Image.FromStream(fs);
                 foreach (var splite in textureInfo.list)
                 {
-                    var newName = Path.GetDirectoryName(re) + "/" +
-                                  Path.GetFileNameWithoutExtension(textureInfo.name) + "/" + splite.name;
-                    FileHelper.CreateDirectory(newName);
+                    var newName = Path.GetDirectoryName(re) + "/" + Path.GetFileNameWithoutExtension(textureInfo.name) + "/" + splite.name;
+                    DirectoryHelper.CreateDirectory(newName);
 
-                    var bitmap = new Bitmap(splite.width, splite.height, PixelFormat.Format32bppArgb);
+                    var bitmap = new Bitmap(splite.width, splite.height, image.PixelFormat);
                     bitmap.SetResolution(image.HorizontalResolution, image.VerticalResolution);
                     Graphics graphic = Graphics.FromImage(bitmap);
                     //graphic.Clear(Color.FromArgb(0, 255, 0, 0));
-                     graphic.DrawImage(image, 0, 0, new Rectangle(splite.x, splite.y, splite.width, splite.height),GraphicsUnit.Pixel);
+                    graphic.DrawImage(image, 0, 0, new Rectangle(splite.x, splite.y, splite.width, splite.height), GraphicsUnit.Pixel);
                     //bitmap.MakeTransparent(Color.Transparent);
-                    bitmap.Save(newName, ImageFormat.Png);
+                    bitmap.Save(newName);
 
                     /*Image saveImage = Image.FromHbitmap(bitmap.GetHbitmap());
                     //saveImage.Save(newName, image.RawFormat);
@@ -108,13 +107,12 @@ namespace Script
 
         private static void HaveImageAndWrite(string re, TextureInfo textureInfo)
         {
-            var bitmap = new Bitmap(textureInfo.width, textureInfo.height, PixelFormat.Format32bppArgb);
+            var bitmap = new Bitmap(textureInfo.width, textureInfo.height, PixelFormat.Format24bppRgb);
             Graphics graphic = Graphics.FromImage(bitmap);
             bitmap.SetResolution(textureInfo.resolution.X, textureInfo.resolution.Y);
             foreach (var splite in textureInfo.list)
             {
-                var newName = Path.GetDirectoryName(re) + "/" +
-                              Path.GetFileNameWithoutExtension(textureInfo.name) + "/" + splite.name;
+                var newName = Path.GetDirectoryName(re) + "/" + Path.GetFileNameWithoutExtension(textureInfo.name) + "/" + splite.name;
                 if (File.Exists(newName))
                 {
                     using (FileStream fsT = new FileStream(newName, FileMode.Open, FileAccess.Read))

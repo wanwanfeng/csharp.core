@@ -3,9 +3,9 @@ using System.Linq;
 using LitJson;
 using UnityEngine;
 
-public class LitJsonHelper : Library.LitJson.LitJsonHelper
+public class JsonHelper : Library.LitJson.JsonHelper
 {
-    static LitJsonHelper()
+    static JsonHelper()
     {
         JsonMapper.RegisterImporter<string, Vector3>(
             input =>

@@ -6,7 +6,7 @@ using System.Text;
 using HtmlAgilityPack;
 using Library;
 using Library.Excel;
-using Library.LitJson;
+using Library.Helper;
 using LitJson;
 
 namespace findText.Script
@@ -25,7 +25,7 @@ namespace findText.Script
 
         public override ListTable GetJsonDataArray(string content)
         {
-            return LitJsonHelper.ConvertJsonToListTable(content);
+            return JsonHelper.ConvertJsonToListTable(content);
         }
 
         //public void GetValue(HtmlNode node, ref Dictionary<string, string> cache)

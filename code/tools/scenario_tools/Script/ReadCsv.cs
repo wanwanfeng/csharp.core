@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Library.Excel;
 using Library.Extensions;
+using Library.Helper;
 using LitJson;
 
 namespace scenario_tools
@@ -36,10 +37,10 @@ namespace scenario_tools
                     res.Add(xx);
                 }
             }
-            File.WriteAllText("scenario.txt", JsonMapper.ToJson(res));
+            File.WriteAllText("scenario.txt", JsonHelper.ToJson(res));
 
             string outpath = Environment.CurrentDirectory + "/scenario.xlsx";
-            var listTable = ExcelByBase.Json.ConvertToListTable(JsonMapper.ToJson(res));
+            var listTable = ExcelByBase.Json.ConvertToListTable(JsonHelper.ToJson(res));
             ExcelByBase.Data.ExportToExcel(listTable, outpath);
         }
 

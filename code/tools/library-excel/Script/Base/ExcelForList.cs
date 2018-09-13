@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Library.Helper;
-using Library.LitJson;
 using LitJson;
 
 namespace Library.Excel
@@ -21,7 +20,7 @@ namespace Library.Excel
             public static JsonData ConvertToJson(ListTable list)
             {
                 Ldebug.Log(" is now sheet: " + list.TableName);
-                return LitJsonHelper.ConvertListTableToJson(list);
+                return JsonHelper.ConvertListTableToJson(list);
             }
 
             public static void ExportToJson(ListTable list, string file)
@@ -29,7 +28,7 @@ namespace Library.Excel
                 JsonData resJsonDatas = ConvertToJson(list);
                 string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? list.FullName : file, ".json");
                 FileHelper.CreateDirectory(newPath);
-                File.WriteAllText(newPath, LitJsonHelper.ToJson(resJsonDatas, true), new UTF8Encoding(false));
+                File.WriteAllText(newPath, JsonHelper.ToJson(resJsonDatas), new UTF8Encoding(false));
             }
 
             #endregion

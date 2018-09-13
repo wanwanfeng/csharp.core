@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Library.Extensions;
+using Library.Helper;
 using LitJson;
 
 namespace LitJson
@@ -143,33 +144,9 @@ namespace LitJson
     }
 }
 
-namespace Library
-{
-    [Serializable]
-    public class ListTable
-    {
-        public string TableName = "";
-        public string FullName = "";
-        public bool IsArray = true;
-        public List<string> Key = new List<string>();
-        public List<List<object>> List = new List<List<object>>();
-
-        public object this[int hang, int lie]
-        {
-            get { return List[hang][lie]; }
-        }
-
-        public object this[int hang, string key]
-        {
-            get { return List[hang][Key.IndexOf(key)]; }
-        }
-
-    }
-}
-
 namespace Library.LitJson
 {
-    public class LitJsonHelper
+    public class LitJsonHelper : IJsonHelper
     {
         static LitJsonHelper()
         {
@@ -185,49 +162,22 @@ namespace Library.LitJson
             //});
         }
 
-        public static T ToObject<T>(string res)
+        public T ToObject<T>(string res)
         {
             return JsonMapper.ToObject<T>(res);
         }
 
-        public static JsonData ToObject(string res)
+        public JsonData ToObject(string res)
         {
             return JsonMapper.ToObject(res);
         }
 
-        public static string ToJson<T>(T t)
+        public string ToJson<T>(T t)
         {
             return JsonMapper.ToJson(t);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="func"></param>
-        /// <param name="unescape">转不转义</param>
-        /// <returns></returns>
-        public static string ToJson<T>(T t, Func<string, string> func, bool unescape)
-        {
-            string value = func(ToJson(t));
-            return unescape ? Regex.Unescape(value) : value;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="unescape">转不转义</param>
-        /// <returns></returns>
-        public static string ToJson<T>(T t,bool unescape)
-        {
-            string value = ToJson(t);
-            return unescape ? Regex.Unescape(value) : value;
-        }
-
-        public static ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
+        public ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
         {
             if (!File.Exists(file))
                 Ldebug.Log("文件不存在!");
@@ -244,7 +194,7 @@ namespace Library.LitJson
         /// <param name="content"></param>
         /// <param name="func"></param>
         /// <returns>返回的是两种不同的List</returns>
-        public static ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)
+        public ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)
         {
             if (string.IsNullOrEmpty(content))
                 return new ListTable();
@@ -289,7 +239,7 @@ namespace Library.LitJson
         ///  同种结构转为Array
         /// </summary>
         /// <returns></returns>
-        public static JsonData ConvertListTableToJson(ListTable list)
+        public JsonData ConvertListTableToJson(ListTable list)
         {
             JsonData resJsonDatas = new JsonData();
             resJsonDatas.SetJsonType(JsonType.Array);
@@ -321,7 +271,7 @@ namespace Library.LitJson
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static Dictionary<string, JsonData> ConvertJsonToDictionary(JsonData data)
+        public Dictionary<string, JsonData> ConvertJsonToDictionary(JsonData data)
         {
             if (!data.IsObject) return new Dictionary<string, JsonData>();
             Dictionary<string, JsonData> cache = new Dictionary<string, JsonData>();
@@ -329,7 +279,7 @@ namespace Library.LitJson
             return cache;
         }
 
-        private static void GetKeyValue(Dictionary<string, JsonData> cache, JsonData data, string root = "")
+        private void GetKeyValue(Dictionary<string, JsonData> cache, JsonData data, string root = "")
         {
             if (data == null) return;
             if (data.IsArray)
@@ -359,7 +309,7 @@ namespace Library.LitJson
         /// <param name="data">修改前的data</param>
         /// <param name="vals"></param>
         /// <returns>返回修改后的data</returns>
-        public static JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals)
+        public JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals)
         {
             foreach (KeyValuePair<string, JsonData> keyValuePair in vals)
             {

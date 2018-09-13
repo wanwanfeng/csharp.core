@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panel2 = new System.Windows.Forms.Panel();
+            this.button10 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.textBox_Key = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
@@ -65,6 +66,10 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.button11 = new System.Windows.Forms.Button();
+            this.label16 = new System.Windows.Forms.Label();
+            this.textBox9 = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.progressBar3 = new System.Windows.Forms.ProgressBar();
             this.button6 = new System.Windows.Forms.Button();
@@ -79,11 +84,6 @@
             this.textBox7 = new System.Windows.Forms.TextBox();
             this.button9 = new System.Windows.Forms.Button();
             this.textBox8 = new System.Windows.Forms.TextBox();
-            this.button10 = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
-            this.textBox9 = new System.Windows.Forms.TextBox();
-            this.button11 = new System.Windows.Forms.Button();
             this.panel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -115,6 +115,15 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(660, 366);
             this.panel2.TabIndex = 13;
+            // 
+            // button10
+            // 
+            this.button10.Location = new System.Drawing.Point(552, 276);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(83, 23);
+            this.button10.TabIndex = 25;
+            this.button10.Text = "AES解密";
+            this.button10.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -196,9 +205,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(18, 181);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(155, 12);
+            this.label6.Size = new System.Drawing.Size(149, 12);
             this.label6.TabIndex = 14;
-            this.label6.Text = "排除的文件后缀(逗号分隔):";
+            this.label6.Text = "忽略的文件后缀(\'|\'分隔):";
             // 
             // label4
             // 
@@ -374,9 +383,9 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(18, 181);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(155, 12);
+            this.label8.Size = new System.Drawing.Size(149, 12);
             this.label8.TabIndex = 14;
-            this.label8.Text = "排除的文件后缀(逗号分隔):";
+            this.label8.Text = "忽略的文件后缀(\'|\'分隔):";
             // 
             // label9
             // 
@@ -476,6 +485,41 @@
             this.panel3.Size = new System.Drawing.Size(660, 366);
             this.panel3.TabIndex = 14;
             // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(569, 274);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(67, 23);
+            this.button11.TabIndex = 27;
+            this.button11.Text = "解压";
+            this.button11.UseVisualStyleBackColor = true;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(177, 277);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(35, 12);
+            this.label16.TabIndex = 26;
+            this.label16.Text = "密码:";
+            // 
+            // textBox9
+            // 
+            this.textBox9.AllowDrop = true;
+            this.textBox9.Location = new System.Drawing.Point(218, 274);
+            this.textBox9.Name = "textBox9";
+            this.textBox9.Size = new System.Drawing.Size(95, 21);
+            this.textBox9.TabIndex = 25;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(19, 279);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(47, 12);
+            this.label11.TabIndex = 24;
+            this.label11.Text = "用户名:";
+            // 
             // textBox5
             // 
             this.textBox5.AllowDrop = true;
@@ -540,9 +584,9 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(18, 181);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(155, 12);
+            this.label13.Size = new System.Drawing.Size(149, 12);
             this.label13.TabIndex = 14;
-            this.label13.Text = "排除的文件后缀(逗号分隔):";
+            this.label13.Text = "忽略的文件后缀(\'|\'分隔):";
             // 
             // label14
             // 
@@ -595,50 +639,6 @@
             this.textBox8.Name = "textBox8";
             this.textBox8.Size = new System.Drawing.Size(341, 21);
             this.textBox8.TabIndex = 4;
-            // 
-            // button10
-            // 
-            this.button10.Location = new System.Drawing.Point(552, 276);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(83, 23);
-            this.button10.TabIndex = 25;
-            this.button10.Text = "AES解密";
-            this.button10.UseVisualStyleBackColor = true;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(19, 279);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(47, 12);
-            this.label11.TabIndex = 24;
-            this.label11.Text = "用户名:";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(177, 277);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(35, 12);
-            this.label16.TabIndex = 26;
-            this.label16.Text = "密码:";
-            // 
-            // textBox9
-            // 
-            this.textBox9.AllowDrop = true;
-            this.textBox9.Location = new System.Drawing.Point(218, 274);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(95, 21);
-            this.textBox9.TabIndex = 25;
-            // 
-            // button11
-            // 
-            this.button11.Location = new System.Drawing.Point(569, 274);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(67, 23);
-            this.button11.TabIndex = 27;
-            this.button11.Text = "解压";
-            this.button11.UseVisualStyleBackColor = true;
             // 
             // EncryptFile
             // 

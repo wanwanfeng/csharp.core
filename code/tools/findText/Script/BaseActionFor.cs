@@ -7,7 +7,6 @@ using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
 using LitJson;
 
 namespace findText
@@ -51,7 +50,7 @@ namespace findText
 
         public virtual ListTable GetJsonDataArray(string content)
         {
-            return LitJsonHelper.ConvertJsonToListTable(content, str =>
+            return JsonHelper.ConvertJsonToListTable(content, str =>
             {
                 return str.ToString().Replace(":", "::").Replace("\n", "\\n");
             });
@@ -59,7 +58,7 @@ namespace findText
 
         private void WriteExcel(JsonData resJsonData)
         {
-            var vals = GetJsonDataArray(JsonMapper.ToJson(resJsonData));
+            var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
             if (vals.List.Count == 0)
             {
                 Console.WriteLine("未搜索到结果！");

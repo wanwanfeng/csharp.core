@@ -5,7 +5,6 @@ using System.Linq;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
 using LitJson;
 
 namespace scenario_tools
@@ -46,7 +45,7 @@ namespace scenario_tools
                     var fileName = Path.GetDirectoryName(filePath) + "/" + Path.GetFileNameWithoutExtension(filePath) +
                                    "/" + pair.Key + ".json";
                     FileHelper.CreateDirectory(fileName);
-                    File.WriteAllText(fileName, LitJsonHelper.ToJson(res));
+                    File.WriteAllText(fileName, JsonHelper.ToJson(res));
                 }
             }
         }

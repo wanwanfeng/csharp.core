@@ -2,7 +2,7 @@
 using System.IO;
 using DataTable = Library.Excel.DataTable;
 using Library.Excel;
-using Library.LitJson;
+using Library.Helper;
 using LitJson;
 
 namespace Script
@@ -76,9 +76,9 @@ namespace Script
                             dictionary[id.ToString()] = value_zh_cn;
                         }
 
-                        JsonData jsonData = LitJsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
-                        LitJsonHelper.RevertDictionaryToJson(jsonData, dictionary);
-                        return LitJsonHelper.ToJson(jsonData,(p)=> p.Replace("＠", "@"), true);
+                        JsonData jsonData = JsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
+                        JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
+                        return JsonHelper.ToJson(jsonData);
                     }
                 });
             }

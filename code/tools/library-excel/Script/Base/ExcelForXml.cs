@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using Library.Helper;
-using Library.LitJson;
 using LitJson;
 
 namespace Library.Excel
@@ -75,7 +74,7 @@ namespace Library.Excel
                         }
                         if (jsonData.Count == 0)
                             return null;
-                        return Json.ConvertToDataTable(LitJsonHelper.ToJson(jsonData));
+                        return Json.ConvertToDataTable(JsonHelper.ToJson(jsonData));
                     }
                     default:
                         throw new ArgumentOutOfRangeException();

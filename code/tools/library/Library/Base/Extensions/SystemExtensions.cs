@@ -48,13 +48,13 @@ namespace Library.Extensions
                 case SelectType.Folder:
                     if (Directory.Exists(path))
                     {
-                        files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
+                        files = DirectoryHelper.GetFiles(path, exce, SearchOption.AllDirectories);
                     }
                     break;
                 case SelectType.All:
                     if (Directory.Exists(path))
                     {
-                        files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).ToList();
+                        files = DirectoryHelper.GetFiles(path, exce, SearchOption.AllDirectories);
                     }
                     else if (File.Exists(path))
                     {
@@ -67,8 +67,6 @@ namespace Library.Extensions
             }
 
             InputPath = path;
-            var exs = exce.AsStringArray(',', '|').Select(p => p.StartsWith(".") ? p : "." + p).ToList();
-            files = files.Where(p => exs.Contains(Path.GetExtension(p))).ToList();
             files.Sort();
             return files;
         }

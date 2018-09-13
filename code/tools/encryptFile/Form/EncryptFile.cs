@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Library;
 using Library.Extensions;
 using Library.Helper;
 
@@ -16,10 +15,10 @@ namespace Encrypt
         {
             InitializeComponent();
 
-            this.textBox_In.Text = Define.DefineRoot;
-            this.textBox_Out.Text = Define.DefineSave;
-            this.textBox_Exclude.Lines = Define.DefineExclude;
-            this.textBox_Key.Text = Define.DefineKey;
+            textBox_In.Text = Define.DefineRoot;
+            textBox_Out.Text = Define.DefineSave;
+            textBox_Exclude.Text = Define.DefineExclude;
+            textBox_Key.Text = Define.DefineKey;
         }
 
         #region 拖拽
@@ -58,19 +57,19 @@ namespace Encrypt
         {
             var textBox = sender as TextBox;
             if (textBox == null || string.IsNullOrEmpty(textBox.Text)) return;
-            if (textBox == this.textBox_In)
-                Define.DefineRoot = this.textBox_In.Lines.FirstOrDefault();
-            if (textBox == this.textBox_Out)
-                Define.DefineSave = this.textBox_Out.Lines.FirstOrDefault();
-            if (textBox == this.textBox_Exclude)
-                Define.DefineExclude = this.textBox_Exclude.Lines;
-            if (textBox == this.textBox_Key)
-                Define.DefineKey = this.textBox_Key.Lines.FirstOrDefault();
+            if (textBox == textBox_In)
+                Define.DefineRoot = textBox_In.Lines.FirstOrDefault();
+            if (textBox == textBox_Out)
+                Define.DefineSave = textBox_Out.Lines.FirstOrDefault();
+            if (textBox == textBox_Exclude)
+                Define.DefineExclude = textBox_Exclude.Text;
+            if (textBox == textBox_Key)
+                Define.DefineKey = textBox_Key.Lines.FirstOrDefault();
         }
 
         private void button_md5_Click(object sender, EventArgs e)
         {
-            var list = FileHelper.GetFiles(Define.DefineRoot, SearchOption.AllDirectories, Define.DefineExclude);
+            var list = DirectoryHelper.GetFiles(Define.DefineRoot, SearchOption.AllDirectories, Define.DefineExclude);
             var dic = list.ToDictionary(p => p, q => q.Replace(Define.DefineRoot.Replace("\\", "/") + "/", ""));
             var res = new List<string>();
             int index = 0;
@@ -81,7 +80,7 @@ namespace Encrypt
                 res.Add(pair.Value);
 
                 res.Add(newname = pair.Value.MD5(Define.DefineKey));
-                FileHelper.CreateDirectory(newname = Define.DefineRoot.Replace("\\", "/") + "/" + newname);
+                DirectoryHelper.CreateDirectory(newname = Define.DefineRoot.Replace("\\", "/") + "/" + newname);
                 File.Move(pair.Key, newname);
             }
 

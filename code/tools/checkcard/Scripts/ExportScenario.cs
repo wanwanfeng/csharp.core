@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Library.Excel;
 using Library.Extensions;
-using Library.LitJson;
+using Library.Helper;
 using LitJson;
 
 namespace checkcard.Scripts
@@ -31,8 +31,7 @@ namespace checkcard.Scripts
                 Console.WriteLine(" is now : " + dt.FullName);
                 if (!dt.IsArray) continue;
 
-                File.WriteAllText(Path.ChangeExtension(dt.FullName, "json"),
-                    LitJsonHelper.ToJson(GetJsonValue(dt), true));
+                File.WriteAllText(Path.ChangeExtension(dt.FullName, "json"), JsonHelper.ToJson(GetJsonValue(dt)));
             }
         }
 

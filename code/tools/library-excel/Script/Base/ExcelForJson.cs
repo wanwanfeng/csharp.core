@@ -1,4 +1,4 @@
-﻿using Library.LitJson;
+﻿using Library.Helper;
 using LitJson;
 
 namespace Library.Excel
@@ -14,7 +14,7 @@ namespace Library.Excel
         {
             public static ListTable ConvertToListTable(string content)
             {
-                return LitJsonHelper.ConvertJsonToListTable(content);
+                return JsonHelper.ConvertJsonToListTable(content);
             }
 
             public static DataTable ConvertToDataTable(string content)
@@ -29,7 +29,7 @@ namespace Library.Excel
 
             public static ListTable ImportToListTable(string file)
             {
-                return LitJsonHelper.ImportJsonToListTable(file);
+                return JsonHelper.ImportJsonToListTable(file);
             }
         }
 

@@ -12,10 +12,10 @@ namespace Encrypt
             set { Config.IniWriteValue("Config", "md5key", value.Trim()); }
         }
 
-        public static string[] DefineExclude
+        public static string DefineExclude
         {
-            get { return Config.IniReadValue("Path", "exclude").Split(','); }
-            set { Config.IniWriteValue("Path", "exclude", string.Join(",", value)); }
+            get { return Config.IniReadValue("Path", "exclude"); }
+            set { Config.IniWriteValue("Path", "exclude",value); }
         }
 
         public static string DefineRoot

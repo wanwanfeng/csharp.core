@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
 using LitJson;
 
 namespace fileDownload
@@ -155,7 +152,7 @@ namespace fileDownload
                         .ToList();
                     dic = tables.First().Cast<JsonData>().ToDictionary(p => p["file_name"].ToString(), q => q);
                     var newPath = root + "res/master/" + jsonName + ".json";
-                    File.WriteAllText(newPath, JsonMapper.ToJson(dic));
+                    File.WriteAllText(newPath, JsonHelper.ToJson(dic));
                 }
                     break;
                 case "2":

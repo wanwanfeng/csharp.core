@@ -177,17 +177,6 @@ namespace Library.LitJson
             return JsonMapper.ToJson(t);
         }
 
-        public ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
-        {
-            if (!File.Exists(file))
-                Ldebug.Log("文件不存在!");
-            string content = File.ReadAllText(file);
-            ListTable listTable = ConvertJsonToListTable(content, func);
-            listTable.TableName = Path.GetFileName(file);
-            listTable.FullName = file;
-            return listTable;
-        }
-
         /// <summary>
         ///  同种结构JsonArray转为List数组,非同种结构JsonObject转为数组
         /// </summary>

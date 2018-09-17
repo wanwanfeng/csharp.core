@@ -107,7 +107,7 @@ namespace Script
 
         private static void HaveImageAndWrite(string re, TextureInfo textureInfo)
         {
-            var bitmap = new Bitmap(textureInfo.width, textureInfo.height, PixelFormat.Format24bppRgb);
+            var bitmap = new Bitmap(textureInfo.width, textureInfo.height, PixelFormat.Format32bppArgb);
             Graphics graphic = Graphics.FromImage(bitmap);
             bitmap.SetResolution(textureInfo.resolution.X, textureInfo.resolution.Y);
             foreach (var splite in textureInfo.list)

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Library.LitJson;
-using JsonData = LitJson.JsonData;
+using LitJson;
 
 namespace Library.Helper
 {
@@ -10,7 +11,6 @@ namespace Library.Helper
         T ToObject<T>(string res);
         JsonData ToObject(string res);
         string ToJson<T>(T t);
-        ListTable ImportJsonToListTable(string file, Func<object, object> func = null);
         ListTable ConvertJsonToListTable(string content, Func<object, object> func = null);
         JsonData ConvertListTableToJson(ListTable list);
         JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals);
@@ -46,16 +46,6 @@ namespace Library.Helper
             return isUnicode ? value : StringHelper.Unicode2String(value);
         }
 
-        public static ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
-        {
-            return Helper.ImportJsonToListTable(file, func);
-        }
-
-        public static ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)
-        {
-            return Helper.ConvertJsonToListTable(content, func);
-        }
-
         public static JsonData ConvertListTableToJson(ListTable list)
         {
             return Helper.ConvertListTableToJson(list);
@@ -64,6 +54,22 @@ namespace Library.Helper
         public static JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals)
         {
             return Helper.RevertDictionaryToJson(data, vals);
+        }
+
+        public static ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)
+        {
+            return Helper.ConvertJsonToListTable(content, func);
+        }
+
+        public static ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
+        {
+            if (!File.Exists(file))
+                Ldebug.Log("文件不存在!");
+            string content = File.ReadAllText(file);
+            ListTable listTable = ConvertJsonToListTable(content, func);
+            listTable.TableName = Path.GetFileName(file);
+            listTable.FullName = file;
+            return listTable;
         }
     }
 }

@@ -12,28 +12,33 @@ namespace Library
         [DllImport("kernel32")]
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
 
-        private static string inipath = Environment.CurrentDirectory + "\\config.ini";
+        private static string Inipath { get; set; }
 
-        public static void CheckPath(bool check = false)
+        static Config()
         {
-            if (File.Exists(inipath))
-                return;
-            if (check)
-                File.WriteAllText(inipath, "");
+            Init(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
         }
 
-        public static void SetConfigPath(string path, string fineName)
+        /// <summary>
+        /// 初始化文件信息
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="defaultName"></param>
+        public static void Init(string path, string defaultName = "config.ini")
         {
-            inipath = path + "\\" + fineName;
-            CheckPath(true);
+            if (Path.HasExtension(path))
+            {
+                Inipath = path;
+            }
+            else
+            {
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                Inipath = Path.Combine(path, defaultName);
+            }
+            if (!File.Exists(Inipath))
+                File.WriteAllText(Inipath, "");
         }
-
-        public static void SetConfigPath(string path)
-        {
-            inipath = path + "\\config.ini";
-            CheckPath(true);
-        }
-
 
         /// <summary>
         /// 读取配置ini文件
@@ -46,7 +51,7 @@ namespace Library
         public static string IniReadValue(string section, string key, string defaultValue = "",int buffSize = 500)
         {
             StringBuilder temp = new StringBuilder(buffSize);
-            var value = GetPrivateProfileString(section, key, "", temp, buffSize, inipath);
+            var value = GetPrivateProfileString(section, key, "", temp, buffSize, Inipath);
             if (value != 0) return temp.ToString();
             IniWriteValue(section, key, defaultValue);
             return defaultValue;
@@ -60,7 +65,7 @@ namespace Library
         /// <param name="value">键值</param>
         public static void IniWriteValue(string section, string key, string value)
         {
-            WritePrivateProfileString(section, key, value, inipath);
+            WritePrivateProfileString(section, key, value, Inipath);
         }
     }
 }

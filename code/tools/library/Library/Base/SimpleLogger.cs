@@ -6,7 +6,7 @@ namespace Library
 {
     public class SimpleLogger
     {
-        public static string Path { get; private set; }
+        private static string LogFile { get; set; }
         private static TextWriterTraceListener TraceListener { get; set; }
 
         private static string GetTime
@@ -14,13 +14,29 @@ namespace Library
             get { return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"); }
         }
 
-        public static void Init(string logFile)
+
+        /// <summary>
+        /// 初始化文件信息
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="defaultName"></param>
+        public static void Init(string path, string defaultName = "log.txt")
         {
-            if (!File.Exists(logFile))
-                File.Create(logFile);
+            if (Path.HasExtension(path))
+            {
+                LogFile = path;
+            }
+            else
+            {
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                LogFile = Path.Combine(path, defaultName);
+            }
+            if (!File.Exists(LogFile))
+                File.WriteAllText(LogFile, "");
 
             Trace.AutoFlush = true;
-            TraceListener = new TextWriterTraceListener(Path = logFile);
+            TraceListener = new TextWriterTraceListener(LogFile);
             Trace.Listeners.Add(TraceListener);
         }
 

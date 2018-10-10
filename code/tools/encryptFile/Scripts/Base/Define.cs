@@ -20,13 +20,21 @@ namespace Encrypt
 
         public static string DefineRoot
         {
-            get { return Config.IniReadValue("Path", "defineRoot", Environment.CurrentDirectory + "\\Root", 1000); }
+            get
+            {
+                return Config.IniReadValue("Path", "defineRoot",
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Root"), 1000);
+            }
             set { Config.IniWriteValue("Path", "defineRoot", value); }
         }
 
         public static string DefineSave
         {
-            get { return Config.IniReadValue("Path", "defineSave", Environment.CurrentDirectory + "\\Save", 1000); }
+            get
+            {
+                return Config.IniReadValue("Path", "defineSave",
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Save"), 1000);
+            }
             set { Config.IniWriteValue("Path", "defineSave", value); }
         }
     }

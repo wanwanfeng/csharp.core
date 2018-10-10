@@ -41,13 +41,13 @@ namespace UnityEngine.Library
             var temp = Array.ConvertAll(result, p => p.AsFloat());
             switch (temp.Length)
             {
-                case 0:
+                default:
                     return Vector3.zero;
                 case 1:
                     return new Vector3(temp[0], 0, 0);
                 case 2:
                     return new Vector3(temp[0], temp[1], 0);
-                default:
+                case 3:
                     return new Vector3(temp[0], temp[1], temp[2]);
             }
         }
@@ -65,12 +65,12 @@ namespace UnityEngine.Library
             var temp = Array.ConvertAll(result, p => p.AsFloat());
             switch (temp.Length)
             {
-                case 0:
+                default:
                     return Vector2.zero;
                 case 1:
                     return new Vector2(temp[0], 0);
-                default:
-                    return new Vector3(temp[0], temp[1]);
+                case 2:
+                    return new Vector2(temp[0], temp[1]);
             }
         }
 

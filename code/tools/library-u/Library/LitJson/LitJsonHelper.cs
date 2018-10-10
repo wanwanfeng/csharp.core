@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using LitJson;
 using UnityEngine;
 
-public class JsonHelper : Library.LitJson.JsonHelper
+public class JsonHelper : Library.Helper.JsonHelper
 {
     static JsonHelper()
     {

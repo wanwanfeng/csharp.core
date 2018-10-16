@@ -55,6 +55,7 @@
     <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
+    <Compile Include="Library\Base\Extensions\ExtensionsForEvents.cs" />
     <Compile Include="Library\Base\Extensions\ExceptionExtensions.cs" />
     <Compile Include="Library\Base\Extensions\PathExtensions.cs" />
     <Compile Include="Library\Base\Extensions\StringExtensions.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="Library\Base\Extensions\SystemExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ObjectExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ValueExtensions.cs" />
-    <Compile Include="Library\Base\Helper\CollectionHelper.cs" />
+    <Compile Include="Library\Base\Extensions\ICollectionExtensions.cs" />
     <Compile Include="Library\Base\Helper\CsvHelper.cs" />
     <Compile Include="Library\Base\Helper\DirectoryHelper.cs" />
     <Compile Include="Library\Base\Helper\FileHelper.cs" />
@@ -87,8 +88,6 @@
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
     <Compile Include="Library\Ldebug.cs" />
     <Compile Include="Library\Base\Helper\AttributeHelper.cs" />
-    <Compile Include="Library\Base\Event\EventActionListManager.cs" />
-    <Compile Include="Library\Base\Event\EventListManager.cs" />
     <Compile Include="Library\LocalEvent.cs" />
     <Compile Include="Library\Base\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -10,20 +10,3 @@ namespace Library.Extensions
         }
     }
 }
-
-namespace System.IO.Extensions
-{
-    public static class Path
-    {
-        public static string GetFullPathWithoutExtension(string path)
-        {
-            return IO.Path.Combine(IO.Path.GetDirectoryName(path), IO.Path.GetFileNameWithoutExtension(path));
-        }
-    }
-
-
-    public static class Directory
-    {
-        
-    }
-}

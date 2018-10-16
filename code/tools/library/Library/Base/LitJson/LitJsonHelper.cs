@@ -238,12 +238,7 @@ namespace Library.LitJson
                 foreach (string o in list.Key)
                 {
                     var val = queueVal.Dequeue();
-                    if (val is JsonData)
-                    {
-                        jsonData[o] = (JsonData) val;
-                        continue;
-                    }
-                    jsonData[o] = new JsonData(val);
+                    jsonData[o] = (val is JsonData) ? (JsonData) val : new JsonData(val);
                 }
 
                 resJsonDatas.Add(jsonData);
@@ -276,18 +271,17 @@ namespace Library.LitJson
                 {
                     GetKeyValue(cache, json, root + "/" + (index++));
                 }
+                return;
             }
-            else if (data.IsObject)
+            if (data.IsObject)
             {
                 foreach (string jsonKey in data.Keys)
                 {
                     GetKeyValue(cache, data[jsonKey], root + "/" + jsonKey);
                 }
+                return;
             }
-            else
-            {
-                cache.Add(root, data);
-            }
+            cache.Add(root, data);
         }
 
         /// <summary>

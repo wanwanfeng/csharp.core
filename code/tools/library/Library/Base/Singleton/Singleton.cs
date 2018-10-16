@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Library
 {
+
     #region 单例
 
     /// <summary>
@@ -11,11 +12,19 @@ namespace Library
     /// <typeparam name="T"></typeparam>
     public abstract partial class SingletonBase<T> where T : class, new()
     {
+        private static readonly object singletonLock = new object(); //锁同步
         private static T _instance;
 
         public static T Instance
         {
-            get { return _instance ?? (_instance = new T()); }
+            get
+            {
+                if (_instance != null) return _instance;
+                lock (singletonLock)
+                {
+                    return _instance ?? (_instance = new T());
+                }
+            }
             set { _instance = value; }
         }
 

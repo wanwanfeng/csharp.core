@@ -1,19 +1,21 @@
-﻿namespace Library
+﻿using System;
+using System.Collections.Generic;
+
+namespace Library
 {
     public partial class LocalEvent
     {
-        public static EventActionListManager<string, object> eventManager = new EventActionListManager<string, object>();
-
-        public static string NewMessage = "NewMessage";
+        public static EventObject localEvent { get; set; }
 
         static LocalEvent()
         {
+            localEvent = new EventObject();
             Ldebug.OnActionLog += OnLogAction;
         }
 
         private static void OnLogAction(object message)
         {
-            eventManager.throwEvent(NewMessage, message);
+            localEvent.TriggerListener("NewMessage", message);
         }
     }
 }

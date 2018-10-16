@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using checkcard.Scripts;
 using Library;
 using Library.Extensions;
@@ -17,7 +18,37 @@ namespace checkcard
 
         private static void Main(string[] args)
         {
+            BBB.Instance.Init();
+            Console.ReadKey();
             SystemConsole.Run<MyEnum>();
+        }
+
+
+        public class AAA 
+        {
+            public AAA()
+            {
+                Console.WriteLine("AAA");
+            }
+        }
+
+        public class BBB :AAA
+        {
+
+            public static BBB Instance
+            {
+                get { return SingletonBase<BBB>.Instance; }
+            }
+
+            public BBB()
+            {
+                Console.WriteLine("BB");
+            }
+
+            public  void Init()
+            {
+            
+            }
         }
     }
 }

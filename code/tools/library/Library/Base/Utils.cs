@@ -5,7 +5,7 @@ namespace Library
 {
     public static class Utils
     {
-        private static Dictionary<string, string> _TypeCache = new Dictionary<string, string>()
+        private static Dictionary<string, string> _typeCache = new Dictionary<string, string>()
         {
             {"bool", "System.Boolean"},
             {"byte", "System.Byte"},

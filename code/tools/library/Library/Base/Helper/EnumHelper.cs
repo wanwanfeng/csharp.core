@@ -14,11 +14,9 @@ namespace Library.Helper
                 {
                     action.Invoke(array);
                 }
+                return;
             }
-            else
-            {
-                throw new Exception(string.Format("{0} type is not Enum !", type.Name));
-            }
+            throw new Exception(string.Format("{0} type is not Enum !", type.Name));
         }
 
         private static void FunValue<T>(Action<object> action)

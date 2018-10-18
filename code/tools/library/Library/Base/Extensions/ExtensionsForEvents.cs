@@ -5,12 +5,12 @@ namespace Library
 {
     public interface IEvent
     {
-        Dictionary<string, List<Action<object>>> CacheEvents { get; set; }
+        Dictionary<string, Action<object, object>> CacheEvents { get; set; }
     }
 
     public class EventObject : IEvent
     {
-        public Dictionary<string, List<Action<object>>> CacheEvents { get; set; }
+        public Dictionary<string, Action<object, object>> CacheEvents { get; set; }
     }
 
     /// <summary>
@@ -24,18 +24,20 @@ namespace Library
         /// <param name="target"></param>
         /// <param name="eventName"></param>
         /// <param name="callAction"></param>
-        public static void AddListener(this IEvent target, string eventName, Action<object> callAction)
+        public static void AddListener(this IEvent target, string eventName, Action<object, object> callAction)
         {
             if (target == null) return;
-            List<Action<object>> list = null;
-            if (target.CacheEvents.TryGetValue(eventName, out list))
+            if (target.CacheEvents != null)
             {
-                list.Add(callAction);
+                Action<object, object> list = null;
+                if (target.CacheEvents.TryGetValue(eventName, out list))
+                    target.CacheEvents[eventName] += callAction;
+                else
+                    target.CacheEvents[eventName] = callAction;
             }
             else
             {
-                list = new List<Action<object>> {callAction};
-                target.CacheEvents[eventName] = list;
+                target.CacheEvents = new Dictionary<string, Action<object, object>>() {{eventName, callAction}};
             }
         }
 
@@ -45,16 +47,13 @@ namespace Library
         /// <param name="target"></param>
         /// <param name="eventName"></param>
         /// <param name="callAction"></param>
-        public static void RemoveListener(this IEvent target, string eventName, Action<object> callAction)
+        public static void RemoveListener(this IEvent target, string eventName, Action<object, object> callAction)
         {
-            if (target == null) return;
-            List<Action<object>> list = null;
-            if (target.CacheEvents.TryGetValue(eventName, out list))
-            {
-                list.Remove(callAction);
-                if (list.Count == 0)
-                    target.CacheEvents.Remove(eventName);
-            }
+            if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
+            Action<object, object> list = null;
+            if (!target.CacheEvents.TryGetValue(eventName, out list)) return;
+            if (list.GetInvocationList().Length == 0) return;
+            target.CacheEvents[eventName] -= callAction;
         }
 
         /// <summary>
@@ -64,10 +63,10 @@ namespace Library
         /// <param name="eventName"></param>
         public static void RemoveListener(this IEvent target, string eventName)
         {
-            if (target == null) return;
-            List<Action<object>> list = null;
-            if (target.CacheEvents.TryGetValue(eventName, out list))
-                target.CacheEvents.Remove(eventName);
+            if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
+            Action<object, object> list = null;
+            if (!target.CacheEvents.TryGetValue(eventName, out list)) return;
+            target.CacheEvents.Remove(eventName);
         }
 
         /// <summary>
@@ -76,8 +75,9 @@ namespace Library
         /// <param name="target"></param>
         public static void RemoveAllListener(this IEvent target)
         {
-            if (target == null) return;
+            if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
             target.CacheEvents.Clear();
+            target.CacheEvents = null;
         }
 
         /// <summary>
@@ -88,13 +88,10 @@ namespace Library
         /// <param name="param"></param>
         public static void TriggerListener(this IEvent target, string eventName, object param = default(object))
         {
-            if (target == null) return;
-            List<Action<object>> list = null;
+            if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
+            Action<object, object> list = null;
             if (!target.CacheEvents.TryGetValue(eventName, out list)) return;
-            foreach (var action in list)
-            {
-                action.Invoke(param);
-            }
+            list.Invoke(list.Target, param);
         }
     }
 }

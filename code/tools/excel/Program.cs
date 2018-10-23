@@ -53,7 +53,7 @@ namespace Library.Excel
 
         private static void Main(string[] args)
         {
-            SystemConsole.Run<CaoType>(null, 4);
+            SystemConsole.Run<CaoType>(columnsCount: 4);
         }
     }
 }

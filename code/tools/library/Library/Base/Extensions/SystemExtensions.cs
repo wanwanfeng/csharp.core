@@ -29,11 +29,7 @@ namespace Library.Extensions
         public static List<string> CheckPath(string exce, SelectType selectType = SelectType.All)
         {
             List<string> files = new List<string>();
-            string path = SystemConsole.GetInputStr(new SystemConsole.Model
-            {
-                beforeTip = CacheSelect[selectType],
-                afterTip = "您选择的文件夹或文件："
-            });
+            string path = SystemConsole.GetInputStr(beforeTip: CacheSelect[selectType], afterTip: "您选择的文件夹或文件：");
             if (string.IsNullOrEmpty(path))
                 return files;
 
@@ -130,7 +126,7 @@ namespace Library.Extensions
                 try
                 {
                     resetInput:
-                    var index = GetInputStr(new Model {beforeTip = "请选择，然后回车：", def = "e", regex = "^[0-9]*$"}).AsInt();
+                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
                     if (cacheType.ContainsKey(index))
                     {
                         Console.WriteLine("当前的选择：" + index);
@@ -142,7 +138,6 @@ namespace Library.Extensions
                         } while (ContinueY());
                     }
                     goto resetInput;
-
                 }
                 catch (Exception e)
                 {
@@ -157,58 +152,34 @@ namespace Library.Extensions
             } while (ContinueY());
         }
 
-        public class Model
-        {
-            public string beforeTip = "请输入:";
-            public string afterTip = "";
-            public string def = "e";
-            public string regex = null;
-            public Dictionary<string, Action> config = new Dictionary<string, Action>();
-        }
-
-        /// <summary>
-        /// 用于控制台程序
-        /// </summary>
-        /// <returns></returns>
-        public static string GetInputStr(Model model)
-        {
-            Console.Write(model.beforeTip);
-            var cmd = Console.ReadLine();
-            Input = cmd;
-            var str = string.IsNullOrEmpty(cmd) ? model.def : cmd;
-            str = str.Contains(" ") ? str.Substring(1, str.Length - 2) : str;
-
-            model.config = new Dictionary<string, Action>
-            {
-                {"e", () => { QuitReadKey(); }}
-            }.Merge(model.config);
-
-            Console.WriteLine(model.afterTip + str);
-
-            if (model.regex == null || Regex.IsMatch(str, "e|" + model.regex))
-            {
-                if (model.config.ContainsKey(str))
-                    model.config[str].Invoke();
-                return str;
-
-            }
-            return GetInputStr(model);
-        }
-
         /// <summary>
         /// 用于控制台程序
         /// </summary>
         /// <returns></returns>
         public static string GetInputStr(string beforeTip = "请输入:", string afterTip = "", string def = "e",
-            string regex = null)
+            string regex = null, Dictionary<string, Action> config = null)
         {
-            return GetInputStr(new Model()
+            Console.Write(beforeTip);
+            var cmd = Console.ReadLine();
+            Input = cmd;
+            var str = string.IsNullOrEmpty(cmd) ? def : cmd;
+            str = str.Contains(" ") ? str.Substring(1, str.Length - 2) : str;
+
+            config = new Dictionary<string, Action>
             {
-                beforeTip = beforeTip,
-                afterTip = afterTip,
-                def = def,
-                regex = regex
-            });
+                {"e", () => { QuitReadKey(); }}
+            }.Merge(config);
+
+            Console.WriteLine(afterTip + str);
+
+            if (regex == null || Regex.IsMatch(str, "e|" + regex))
+            {
+                if (config.ContainsKey(str))
+                    config[str].Invoke();
+                return str;
+
+            }
+            return GetInputStr(beforeTip, afterTip, def, regex, config);
         }
 
         /// <summary>
@@ -219,11 +190,7 @@ namespace Library.Extensions
         public static bool ContinueY(string beforeTip = "按'y'键继续（默认‘y’）： ")
         {
             Console.Write(Environment.NewLine);
-            var x = GetInputStr(new Model()
-            {
-                beforeTip = beforeTip,
-                def = "y",
-            }) == "y";
+            var x = GetInputStr(beforeTip, def: "y") == "y";
             Console.Write(Environment.NewLine);
             return x;
         }

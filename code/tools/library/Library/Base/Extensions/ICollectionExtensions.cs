@@ -10,6 +10,7 @@ namespace Library.Extensions
         {
             foreach (var dictionary in other)
             {
+                if (dictionary == null) continue;
                 foreach (var value in dictionary)
                 {
                     source[value.Key] = value.Value;
@@ -23,6 +24,7 @@ namespace Library.Extensions
         {
             foreach (var hashTable in other)
             {
+                if (hashTable == null) continue;
                 foreach (var key in hashTable.Keys)
                 {
                     source.Add(key, hashTable[key]);

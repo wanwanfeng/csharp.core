@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.ComponentModel;
 using checkcard.Scripts;
 using Library;
@@ -18,8 +20,8 @@ namespace checkcard
 
         private static void Main(string[] args)
         {
-            BBB.Instance.Init();
-            Console.ReadKey();
+            //BBB.Instance.Init();
+            //Console.ReadKey();
             SystemConsole.Run<MyEnum>();
         }
 

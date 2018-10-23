@@ -13,6 +13,12 @@ namespace Library.Extensions
             return obj == null;
         }
 
+        public static bool IsDefault<T>(this T obj) where T : class
+        {
+            return obj == default(T);
+        }
+
+
         public static object GetPropertyValue(this object value, string name)
         {
             var info = value.GetType().GetProperty(name);

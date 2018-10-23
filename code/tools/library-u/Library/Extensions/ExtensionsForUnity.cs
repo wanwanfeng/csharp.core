@@ -11,24 +11,6 @@ namespace UnityEngine.Library
     public static class ExtensionsForUnity
     {
         /// <summary>
-        /// 获取相对于根节点的路径
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="haveRoot"></param>
-        /// <returns></returns>
-        public static string GetFullPath(this Component target, bool haveRoot = true)
-        {
-            var path = target.name;
-            while (target.transform.parent != null)
-            {
-                path = target.transform.parent.name + "/" + path;
-                target = target.transform.parent;
-            }
-            return haveRoot ? path : path.Replace(target.transform.root.name + "/", "");
-        }
-
-
-        /// <summary>
         /// 转为Vector3型
         /// </summary>
         /// <param name="value"></param>
@@ -104,53 +86,10 @@ namespace UnityEngine.Library
         ///  获取孩子GameObject列表
         /// </summary>
         /// <param name="target"></param>
-        /// <param name="isAll">真,获取全部孩子;否,获取显式孩子</param>
         /// <returns></returns>
-        public static List<T> GetChildrenComponents<T>(this Transform target, bool isAll = true) where T : Component
+        public static List<GameObject> GetChildren(this GameObject target)
         {
-            var list = new List<T>();
-            for (int i = 0; i < target.transform.childCount; i++)
-            {
-                var trans = target.transform.GetChild(i);
-                if (isAll)
-                {
-                    list.Add(trans.GetComponent<T>());
-                }
-                else
-                {
-                    if (trans.gameObject.activeSelf)
-                    {
-                        list.Add(trans.GetComponent<T>());
-                    }
-                }
-            }
-            return list;
-        }
-
-        /// <summary>
-        ///  获取孩子GameObject列表
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="isAll">真,获取全部孩子;否,获取显式孩子</param>
-        /// <returns></returns>
-        public static List<GameObject> GetChildren(this GameObject target, bool isAll = true)
-        {
-            var list = new List<GameObject>();
-            for (int i = 0; i < target.transform.childCount; i++)
-            {
-                if (isAll)
-                {
-                    list.Add(target.transform.GetChild(i).gameObject);
-                }
-                else
-                {
-                    if (target.transform.GetChild(i).gameObject.activeSelf)
-                    {
-                        list.Add(target.transform.GetChild(i).gameObject);
-                    }
-                }
-            }
-            return list;
+            return target.transform.GetChildrenComponents<Transform>().Select(p => p.gameObject).ToList();
         }
 
         /// <summary>
@@ -199,21 +138,6 @@ namespace UnityEngine.Library
         /// <param name="target"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static T Find<T>(this Component target, string path = null) where T : Component
-        {
-            var trans = target.transform;
-            if (!string.IsNullOrEmpty(path))
-                trans = target.transform.Find(path);
-            return trans ? trans.GetOrAddComponent<T>() : default(T);
-        }
-
-        /// <summary>
-        /// 查找组件,若果没有，则自动添加一个
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="target"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
         public static T Find<T>(this GameObject target, string path = null) where T : Component
         {
             return target.transform.Find<T>(path);
@@ -237,46 +161,15 @@ namespace UnityEngine.Library
         }
 
         /// <summary>
-        /// 查找组件,若果没有，则自动添加一个
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="type"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static Component Find(this Component target, Type type, string path = null)
-        {
-            var trans = target.transform;
-            if (!string.IsNullOrEmpty(path))
-                trans = target.transform.Find(path);
-            return trans ? trans.GetOrAddComponent(type) : null;
-        }
-
-        /// <summary>
-        /// 查找组件,若果没有，则自动添加一个
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="type"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static Component Find(this GameObject target, Type type, string path = null)
-        {
-            return Find(target.transform, type, path);
-        }
-
-        /// <summary>
         ///  删除组件
         /// </summary>
         /// <param name="gameObject"></param>
         internal static void Destroy<T>(this GameObject gameObject) where T : Component
         {
-            if (gameObject != null)
-            {
-                Component component = gameObject.GetComponent<T>();
-                if (component != null)
-                {
-                    Object.Destroy(component);
-                }
-            }
+            if (gameObject == null) return;
+            Component component = gameObject.GetComponent<T>();
+            if (component == null) return;
+            Object.Destroy(component);
         }
 
         /// <summary>
@@ -285,14 +178,10 @@ namespace UnityEngine.Library
         /// <param name="gameObject"></param>
         internal static void Enabled<T>(this GameObject gameObject) where T : Behaviour
         {
-            if (gameObject != null)
-            {
-                Behaviour behaviour = gameObject.GetComponent<T>();
-                if (behaviour != null)
-                {
-                    behaviour.enabled = true;
-                }
-            }
+            if (gameObject == null) return;
+            var behaviour = gameObject.GetComponent<T>();
+            if (behaviour == null) return;
+            behaviour.enabled = true;
         }
 
         /// <summary>
@@ -301,49 +190,35 @@ namespace UnityEngine.Library
         /// <param name="gameObject"></param>
         internal static void Disabled<T>(this GameObject gameObject) where T : Behaviour
         {
-            if (gameObject != null)
-            {
-                Behaviour behaviour = gameObject.GetComponent<T>();
-                if (behaviour != null)
-                {
-                    behaviour.enabled = false;
-                }
-            }
+            if (gameObject == null) return;
+            var behaviour = gameObject.GetComponent<T>();
+            if (behaviour == null) return;
+            behaviour.enabled = false;
         }
 
-        #region  Position
-
-        public static void SetPosX(this Transform target, float value)
+        /// <summary>
+        ///  使组件生效
+        /// </summary>
+        /// <param name="gameObject"></param>
+        internal static void EnabledAll<T>(this GameObject gameObject) where T : Behaviour
         {
-            target.position = new Vector3(value, target.position.y, target.position.z);
+            if (gameObject == null) return;
+            var behaviour = gameObject.GetComponents<T>();
+            if (behaviour == null || behaviour.Length == 0) return;
+            behaviour.ToList().ForEach(p => p.enabled = true);
         }
 
-        public static void SetPosY(this Transform target, float value)
+        /// <summary>
+        ///  使组件失效
+        /// </summary>
+        /// <param name="gameObject"></param>
+        internal static void DisabledAll<T>(this GameObject gameObject) where T : Behaviour
         {
-            target.position = new Vector3(target.position.x, value, target.position.z);
+            if (gameObject == null) return;
+            var behaviour = gameObject.GetComponents<T>();
+            if (behaviour == null || behaviour.Length == 0) return;
+            behaviour.ToList().ForEach(p => p.enabled = false);
         }
-
-        public static void SetPosZ(this Transform target, float value)
-        {
-            target.position = new Vector3(target.position.x, target.position.y, value);
-        }
-
-        public static void SetLocalPosX(this Transform target, float value)
-        {
-            target.localPosition = new Vector3(value, target.localPosition.y, target.localPosition.z);
-        }
-
-        public static void SetLocalPosY(this Transform target, float value)
-        {
-            target.localPosition = new Vector3(target.localPosition.x, value, target.localPosition.z);
-        }
-
-        public static void SetLocalPosZ(this Transform target, float value)
-        {
-            target.localPosition = new Vector3(target.localPosition.x, target.localPosition.y, value);
-        }
-
-        #endregion
 
         /// <summary>
         ///随机位置
@@ -425,44 +300,6 @@ namespace UnityEngine.Library
         }
 
         #endregion
-
-
-        /// <summary>
-        /// 移除物体下所有孩子
-        /// </summary>
-        /// <param name="target"></param>
-        public static void ClearChild(this Transform target)
-        {
-            if (target.childCount == 0) return;
-            while (target.childCount != 0)
-                Object.Destroy(target.GetChild(0).gameObject);
-        }
-
-        /// <summary>
-        /// 向物体添加孩子
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="child"></param>
-        public static void AddChild(this Transform target, Transform child)
-        {
-            child.transform.SetParent(target);
-            child.transform.localPosition = Vector3.zero;
-            child.transform.localScale = Vector3.one;
-            child.transform.localRotation = Quaternion.identity;
-        }
-
-        /// <summary>
-        /// 克隆物体并添加到parent下
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="clone"></param>
-        /// <returns></returns>
-        public static GameObject CloneAndAddClild(this Transform parent, GameObject clone)
-        {
-            var obj = (GameObject) UnityEngine.Object.Instantiate(clone);
-            parent.AddChild(obj.transform);
-            return obj;
-        }
 
         #region 获取预定义个数的物体或组件
 
@@ -547,15 +384,17 @@ namespace UnityEngine.Library
             }
             else
             {
-                for (int i = 0; i < needCount; i++)
+                for (int i = 0; i < parent.childCount; i++)
                 {
-                    parent.GetChild(i).gameObject.SetActive(true);
-                    list.Add(parent.GetChild(i));
-                }
-
-                for (int i = needCount; i < parent.childCount; i++)
-                {
-                    parent.GetChild(i).gameObject.SetActive(false);
+                    if (i < needCount)
+                    {
+                        parent.GetChild(i).gameObject.SetActive(true);
+                        list.Add(parent.GetChild(i));
+                    }
+                    else
+                    {
+                        parent.GetChild(i).gameObject.SetActive(false);
+                    }
                 }
             }
 

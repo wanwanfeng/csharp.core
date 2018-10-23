@@ -13,15 +13,11 @@ namespace scenario_tools
     {
         private static void Main(string[] args)
         {
-            switch (SystemConsole.GetInputStr("1:读取csv写入excel\n2:读取excel写入json\ninput:"))
+            SystemConsole.Run(config: new Dictionary<string, Action>()
             {
-                case "1":
-                    new ReadCsv();
-                    break;
-                case "2":
-                    new ReadExcel();
-                    break;
-            }
+                {"读取csv写入excel", () => { new ReadCsv(); }},
+                {"读取excel写入json", () => { new ReadExcel(); }}
+            });
         }
     }
 }

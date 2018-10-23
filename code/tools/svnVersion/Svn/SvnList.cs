@@ -84,7 +84,7 @@ namespace SvnVersion
             {
                 //根据已有查找到最高修订版本版本号以及列表
                 var content = File.ReadAllText(SaveName).Trim('\0');
-                oldCache = LitJsonHelper.ToObject<FileDetailInfo[]>(content).ToDictionary(p => p.path);
+                oldCache = JsonHelper.ToObject<FileDetailInfo[]>(content).ToDictionary(p => p.path);
                 //highRevision = oldCache.Count == 0 ? lowVersion : oldCache.Values.Max(p => p.revision);
             }
             highRevision = highVersion;
@@ -127,43 +127,41 @@ namespace SvnVersion
 
         private void ExportFile(Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemConsole.GetInputStr("\n是否导出目标版本号文件（y/n）：", "", "y") == "y")
+            if (!SystemConsole.ContinueY("是否导出目标版本号文件（y/n）：")) return;
+            List<string> del = new List<string>();
+            int index = 0;
+            foreach (KeyValuePair<string, FileDetailInfo> pair in cache)
             {
-                List<string> del = new List<string>();
-                int index = 0;
-                foreach (KeyValuePair<string, FileDetailInfo> pair in cache)
+                Console.Clear();
+                Console.WriteLine("\n正在导出文件...{0}", highVersion);
+                Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
+                Console.WriteLine("正在导出中...{0}", ((float) (++index)/cache.Count).ToString("P"));
+                Console.WriteLine("is now: {0} v:{1} r:{2}", pair.Key, pair.Value.version, pair.Value.revision);
+                Console.WriteLine();
+
+                string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
+                                  pair.Value.revision + "/" + pair.Key;
+                FileHelper.CreateDirectory(fullPath);
+
+                //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
+                CmdReadAll(string.Format("svn cat -r {0} \"{1}{2}@{0}\">\"{3}\"", highRevision, svnUrl, pair.Key,
+                    fullPath));
+                //RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
+
+                if (File.Exists(fullPath))
                 {
-                    Console.Clear();
-                    Console.WriteLine("\n正在导出文件...{0}", highVersion);
-                    Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
-                    Console.WriteLine("正在导出中...{0}", ((float) (++index)/cache.Count).ToString("P"));
-                    Console.WriteLine("is now: {0} v:{1} r:{2}", pair.Key, pair.Value.version, pair.Value.revision);
+                    var bytes = File.ReadAllBytes(fullPath);
+                    pair.Value.content_size = bytes.Length;
+                    pair.Value.content_hash = bytes.MD5();
                     Console.WriteLine();
-
-                    string fullPath = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
-                                      pair.Value.revision + "/" + pair.Key;
-                    FileHelper.CreateDirectory(fullPath);
-
-                    //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
-                    CmdReadAll(string.Format("svn cat -r {0} \"{1}{2}@{0}\">\"{3}\"", highRevision, svnUrl, pair.Key,
-                        fullPath));
-                    //RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
-
-                    if (File.Exists(fullPath))
-                    {
-                        var bytes = File.ReadAllBytes(fullPath);
-                        pair.Value.content_size = bytes.Length;
-                        pair.Value.content_hash = Encrypt.MD5(bytes);
-                        Console.WriteLine();
-                    }
-                    else
-                    {
-                        del.Add(pair.Key);
-                    }
                 }
-                foreach (string s in del)
-                    cache.Remove(s);
+                else
+                {
+                    del.Add(pair.Key);
+                }
             }
+            foreach (string s in del)
+                cache.Remove(s);
         }
 
         private Dictionary<string, FileDetailInfo> GetListCache(long version)

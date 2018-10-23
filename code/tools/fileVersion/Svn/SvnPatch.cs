@@ -14,12 +14,12 @@ namespace FileVersion
             base.Run();
 
             var msg = string.Format("请输入起始版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            startVersion = SystemConsole.GetInputStr(msg, "", lowVersion.ToString()).AsLong();
+            startVersion = SystemConsole.GetInputStr(msg, def: lowVersion.ToString()).AsLong();
             //startVersion = Math.Max(startVersion, lowVersion);
             Console.WriteLine("起始版本号：" + startVersion);
 
             msg = string.Format("请输入结束版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = SystemConsole.GetInputStr(msg, "", startVersion.ToString()).AsLong();
+            endVersion = SystemConsole.GetInputStr(msg, def: startVersion.ToString()).AsLong();
             endVersion = Math.Max(endVersion, highVersion);
             Console.WriteLine("结束版本号：" + endVersion);
 

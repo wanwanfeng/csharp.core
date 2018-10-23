@@ -17,28 +17,12 @@ namespace encrypt
 
             do
             {
-                Console.Clear();
-                Console.WriteLine("---------------------------");
-                Console.WriteLine("1;加密");
-                Console.WriteLine("2;解密");
-                Console.WriteLine("---------------------------");
-
-                var cmd = SystemConsole.GetInputStr("输入指令：");
-                do
+                SystemConsole.Run(config: new Dictionary<string, Action>()
                 {
-                    switch (cmd)
-                    {
-                        case "1":
-                            new YueGeEncrypt();
-                            break;
-                        case "2":
-                            new YueGeDencrypt();
-                            break;
-                        default:
-                            new YueGeDencrypt2();
-                            break;
-                    }
-                } while (SystemConsole.ContinueY());
+                    {"加密", () => { new YueGeEncrypt(); }},
+                    {"解密", () => { new YueGeDencrypt(); }},
+                    {"解密2", () => { new YueGeDencrypt2(); }}
+                });
             } while (SystemConsole.ContinueY());
 
             return;

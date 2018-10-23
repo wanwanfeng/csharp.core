@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Library.Helper;
 
@@ -147,6 +148,21 @@ namespace Library.Extensions
 
                 GC.Collect();
             } while (ContinueY());
+        }
+
+        public static void Run(Dictionary<string, Action> config)
+        {
+            Console.WriteLine("-------操作列表-------");
+            var index = 0;
+            config.Keys.ToList().ForEach(p => Console.WriteLine((++index) + "：" + p));
+            Console.WriteLine("----------------------");
+            List<Action> result = config.Values.ToList();
+            config = result.ToDictionary(p => (result.IndexOf(p) + 1).ToString());
+            string cmd = "e";
+            do
+            {
+                cmd = GetInputStr("输入指令：", config: config);
+            } while (!config.ContainsKey(cmd));
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace FileVersion
             base.Run();
 
             var beforeTip = string.Format("请输入目标版本号(输入数字,[{0}-{1}]),然后回车：", lowVersion, highVersion);
-            endVersion = SystemConsole.GetInputStr(beforeTip,"",lowVersion.ToString()).AsInt();
+            endVersion = SystemConsole.GetInputStr(beforeTip, def: lowVersion.ToString()).AsInt();
             endVersion = Math.Min(endVersion, highVersion);
             Console.WriteLine("目标版本号：" + endVersion);
             Console.WriteLine();
@@ -28,7 +28,7 @@ namespace FileVersion
 
         private string ExportFile(Dictionary<string, FileDetailInfo> cache)
         {
-            var yes = SystemConsole.GetInputStr("\n是否导出目标版本号文件（y/n）：", "", "y") == "y";
+            var yes = SystemConsole.ContinueY("是否导出目标版本号文件（y/n）：");
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             DeleteInfo(targetDir);
             WriteToTxt(targetDir, cache);

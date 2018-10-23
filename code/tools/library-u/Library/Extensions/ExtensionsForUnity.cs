@@ -102,9 +102,7 @@ namespace UnityEngine.Library
         {
             var trans = go.transform.Find(path);
             if (trans)
-            {
                 return trans.gameObject;
-            }
             Debug.LogWarning("Error! Can not find the gameObject.");
             return null;
         }
@@ -119,16 +117,11 @@ namespace UnityEngine.Library
         public static bool ComponentIsNull<T>(this GameObject target, string path = null) where T : Component
         {
             var trans = target.transform;
-            if (!string.IsNullOrEmpty(path))
-            {
+            if (!path.IsNullOrEmpty())
                 trans = target.transform.Find(path);
-            }
-            if (trans)
-            {
-                T t = trans.GetComponent<T>();
-                return t == null;
-            }
-            return false;
+            if (!trans) return false;
+            T t = trans.GetComponent<T>();
+            return t == null;
         }
 
         /// <summary>
@@ -153,7 +146,7 @@ namespace UnityEngine.Library
         public static bool ComponentIsNull(this GameObject target, Type type, string path = null)
         {
             var trans = target.transform;
-            if (!string.IsNullOrEmpty(path))
+            if (!path.IsNullOrEmpty())
                 trans = target.transform.Find(path);
             if (!trans) return false;
             var component = trans.GetComponent(type);

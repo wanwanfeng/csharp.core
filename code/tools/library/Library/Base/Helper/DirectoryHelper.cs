@@ -26,31 +26,32 @@ namespace Library.Helper
         /// 获取某目录下文件列表
         /// </summary>
         /// <param name="rootPath"></param>
+        /// <param name="selectExtensionArray">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
-        /// <param name="exceptExtension"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string rootPath, SearchOption searchOption = SearchOption.AllDirectories,
-            params string[] exceptExtension)
+        public static List<string> GetFiles(string rootPath, string[] selectExtensionArray,
+            SearchOption searchOption = SearchOption.AllDirectories)
         {
             return Directory.GetFiles(rootPath, "*.*", searchOption)
+                .Where(p => selectExtensionArray.Contains(Path.GetExtension(p)))
                 .Select(p => p.Replace("\\", "/"))
-                .Where(p => exceptExtension.Contains(Path.GetExtension(p)))
                 .ToList();
         }
 
         /// <summary>
-        /// 
+        /// 获取某目录下文件列表
         /// </summary>
         /// <param name="rootPath"></param>
-        /// <param name="exceptExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
+        /// <param name="selectExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string rootPath, string exceptExtension,
+        public static List<string> GetFiles(string rootPath, string selectExtension,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
+            var selectArray = selectExtension.Split('|');
             return Directory.GetFiles(rootPath, "*.*", searchOption)
+                .Where(p => selectArray.Contains(Path.GetExtension(p)))
                 .Select(p => p.Replace("\\", "/"))
-                .Where(p => exceptExtension.Split('|').Contains(Path.GetExtension(p)))
                 .ToList();
         }
 
@@ -58,31 +59,32 @@ namespace Library.Helper
         /// 获取多个目录下文件列表
         /// </summary>
         /// <param name="rootPaths"></param>
+        /// <param name="selectExtensionArray">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
-        /// <param name="exceptExtension"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string[] rootPaths, SearchOption searchOption = SearchOption.AllDirectories,
-            params string[] exceptExtension)
+        public static List<string> GetFiles(string[] rootPaths, string[] selectExtensionArray,
+            SearchOption searchOption = SearchOption.AllDirectories)
         {
             return rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption))
+                .Where(p => selectExtensionArray.Contains(Path.GetExtension(p)))
                 .Select(p => p.Replace("\\", "/"))
-                .Where(p => exceptExtension.Contains(Path.GetExtension(p)))
                 .ToList();
         }
 
         /// <summary>
-        /// 
+        /// 获取多个目录下文件列表
         /// </summary>
         /// <param name="rootPaths"></param>
-        /// <param name="exceptExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
+        /// <param name="selectExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string[] rootPaths, string exceptExtension,
+        public static List<string> GetFiles(string[] rootPaths, string selectExtension,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
+            var selectArray = selectExtension.Split('|');
             return rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption))
+                .Where(p => selectArray.Contains(Path.GetExtension(p)))
                 .Select(p => p.Replace("\\", "/"))
-                .Where(p => exceptExtension.Split('|').Contains(Path.GetExtension(p)))
                 .ToList();
         }
     }

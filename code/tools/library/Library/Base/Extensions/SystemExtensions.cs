@@ -26,7 +26,7 @@ namespace Library.Extensions
 
         public static string InputPath { get; set; }
 
-        public static List<string> CheckPath(string exce, SelectType selectType = SelectType.All)
+        public static List<string> CheckPath(string selectExtension, SelectType selectType = SelectType.All)
         {
             List<string> files = new List<string>();
             string path = SystemConsole.GetInputStr(beforeTip: CacheSelect[selectType], afterTip: "您选择的文件夹或文件：");
@@ -44,13 +44,13 @@ namespace Library.Extensions
                 case SelectType.Folder:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, exce, SearchOption.AllDirectories);
+                        files = DirectoryHelper.GetFiles(path, selectExtension:selectExtension);
                     }
                     break;
                 case SelectType.All:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, exce, SearchOption.AllDirectories);
+                        files = DirectoryHelper.GetFiles(path, selectExtension: selectExtension);
                     }
                     else if (File.Exists(path))
                     {
@@ -70,9 +70,6 @@ namespace Library.Extensions
 
     public class SystemConsole
     {
-
-        private static string Input { get; set; }
-
         public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
             Console.Title = typeof (T).Namespace ?? Console.Title;
@@ -156,12 +153,15 @@ namespace Library.Extensions
         /// 用于控制台程序
         /// </summary>
         /// <returns></returns>
-        public static string GetInputStr(string beforeTip = "请输入:", string afterTip = "", string def = "e",
-            string regex = null, Dictionary<string, Action> config = null)
+        public static string GetInputStr(
+            string beforeTip = "请输入:", 
+            string afterTip = "", 
+            string def = "e",
+            string regex = null,
+            Dictionary<string, Action> config = null)
         {
             Console.Write(beforeTip);
             var cmd = Console.ReadLine();
-            Input = cmd;
             var str = string.IsNullOrEmpty(cmd) ? def : cmd;
             str = str.Contains(" ") ? str.Substring(1, str.Length - 2) : str;
 
@@ -177,7 +177,6 @@ namespace Library.Extensions
                 if (config.ContainsKey(str))
                     config[str].Invoke();
                 return str;
-
             }
             return GetInputStr(beforeTip, afterTip, def, regex, config);
         }
@@ -189,10 +188,15 @@ namespace Library.Extensions
         /// <returns></returns>
         public static bool ContinueY(string beforeTip = "按'y'键继续（默认‘y’）： ")
         {
-            Console.Write(Environment.NewLine);
-            var x = GetInputStr(beforeTip, def: "y") == "y";
-            Console.Write(Environment.NewLine);
-            return x;
+            try
+            {
+                Console.Write(Environment.NewLine);
+                return GetInputStr(beforeTip, def: "y") == "y";
+            }
+            finally
+            {
+                Console.Write(Environment.NewLine);
+            }
         }
 
         /// <summary>

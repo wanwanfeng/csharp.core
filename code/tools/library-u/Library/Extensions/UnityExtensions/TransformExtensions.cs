@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 namespace UnityEngine.Library
 {
     /// <summary>
@@ -50,44 +51,25 @@ namespace UnityEngine.Library
         /// <returns></returns>
         public static GameObject CloneAndAddClild(this Transform parent, GameObject clone)
         {
-            var obj = (GameObject)UnityEngine.Object.Instantiate(clone);
+            var obj = (GameObject) UnityEngine.Object.Instantiate(clone);
             parent.AddChild(obj.transform);
             return obj;
         }
 
-        #region  Position
-
-        public static void SetPosX(this Transform target, float value)
+        public static void SetPosition(this Transform target, float? x, float? y, float? z)
         {
-            target.position = new Vector3(value, target.position.y, target.position.z);
+            target.position = new Vector3(x ?? target.position.x, y ?? target.position.y, z ?? target.position.z);
         }
 
-        public static void SetPosY(this Transform target, float value)
+        public static void SetLocalPosition(this Transform target, float x = 0, float y = 0, float z = 0)
         {
-            target.position = new Vector3(target.position.x, value, target.position.z);
+            target.localPosition = new Vector3(x, y, z);
         }
 
-        public static void SetPosZ(this Transform target, float value)
+        public static void SetLocalScale(this Transform target, float? x, float? y, float? z)
         {
-            target.position = new Vector3(target.position.x, target.position.y, value);
+            target.localScale = new Vector3(x ?? target.localScale.x, y ?? target.localScale.y, z ?? target.localScale.z);
         }
-
-        public static void SetLocalPosX(this Transform target, float value)
-        {
-            target.localPosition = new Vector3(value, target.localPosition.y, target.localPosition.z);
-        }
-
-        public static void SetLocalPosY(this Transform target, float value)
-        {
-            target.localPosition = new Vector3(target.localPosition.x, value, target.localPosition.z);
-        }
-
-        public static void SetLocalPosZ(this Transform target, float value)
-        {
-            target.localPosition = new Vector3(target.localPosition.x, target.localPosition.y, value);
-        }
-
-        #endregion
 
     }
 }

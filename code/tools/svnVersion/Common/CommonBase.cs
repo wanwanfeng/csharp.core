@@ -7,7 +7,6 @@ using FileVersion;
 using Library;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
 
 namespace SvnVersion
 {
@@ -146,36 +145,34 @@ namespace SvnVersion
         /// <param name="cache"></param>
         protected void MakAESEncrypt(Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemConsole.GetInputStr("\n是否对文件夹内每个文件进行加密（y/n）：", "", "y") == "y")
+            if (!SystemConsole.ContinueY("是否对文件夹内每个文件进行加密（y/n）：")) return;
+            int index = 0;
+            foreach (var pair in cache)
             {
-                int index = 0;
-                foreach (var pair in cache)
-                {
-                    Console.Clear();
-                    Console.WriteLine("\n正在加密文件...");
-                    Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
-                    Console.WriteLine("正在加密中...{0}", ((float) (++index)/cache.Count).ToString("P"));
-                    Console.WriteLine("is now: {0}", pair.Key);
-                    Console.WriteLine();
+                Console.Clear();
+                Console.WriteLine("\n正在加密文件...");
+                Console.WriteLine("根据项目大小时间长短不定，请耐心等待...");
+                Console.WriteLine("正在加密中...{0}", ((float) (++index)/cache.Count).ToString("P"));
+                Console.WriteLine("is now: {0}", pair.Key);
+                Console.WriteLine();
 
-                    //文件后缀忽略
-                    var array = EncryptExclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-                    if (array.Contains(Path.GetExtension(pair.Key))) continue;
+                //文件后缀忽略
+                var array = EncryptExclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                if (array.Contains(Path.GetExtension(pair.Key))) continue;
 
-                    //文件根目录忽略
-                    array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-                    if (array.Any(p => pair.Key.StartsWith(p))) continue;
+                //文件根目录忽略
+                array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
+                if (array.Any(p => pair.Key.StartsWith(p))) continue;
 
-                    string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
-                                       pair.Value.revision;
-                    string fullPath = targetDir + "/" + pair.Key;
-                    if (!File.Exists(fullPath)) continue;
+                string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
+                                   pair.Value.revision;
+                string fullPath = targetDir + "/" + pair.Key;
+                if (!File.Exists(fullPath)) continue;
 
-                    var content = File.ReadAllText(fullPath).AES_Encrypt(AESKey);
-                    pair.Value.encrypt_hash = content.MD5(KeyMd5);
-                    pair.Value.encrypt_size = content.Length;
-                    File.WriteAllText(fullPath, content);
-                }
+                var content = File.ReadAllText(fullPath).AES_Encrypt(AESKey);
+                pair.Value.encrypt_hash = content.MD5(KeyMd5);
+                pair.Value.encrypt_size = content.Length;
+                File.WriteAllText(fullPath, content);
             }
         }
 
@@ -185,26 +182,24 @@ namespace SvnVersion
         /// <param name="cache"></param>
         protected void PathToMd5(Dictionary<string, FileDetailInfo> cache)
         {
-            if (SystemConsole.GetInputStr("\n是否将路径MD5化（y/n）：", "", "y") == "y")
+            if (!SystemConsole.ContinueY("是否将路径MD5化（y/n）：")) return;
+            int index = 0;
+            foreach (var s in cache)
             {
-                int index = 0;
-                foreach (var s in cache)
-                {
-                    Console.Clear();
-                    Console.WriteLine();
-                    Console.WriteLine("正在转化中...{0}", ((float)(++index) / cache.Count).ToString("P"));
-                    Console.WriteLine("is now: {0}", s.Key);
-                    Console.WriteLine();
+                Console.Clear();
+                Console.WriteLine();
+                Console.WriteLine("正在转化中...{0}", ((float)(++index) / cache.Count).ToString("P"));
+                Console.WriteLine("is now: {0}", s.Key);
+                Console.WriteLine();
 
-                    string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
-                                       s.Value.revision;
-                    string fullPath = targetDir + "/" + s.Key;
-                    string targetFullPath = targetDir + "/" + GetPathHash(s.Key);
+                string targetDir = Environment.CurrentDirectory.Replace("\\", "/") + "/" + SaveDir +
+                                   s.Value.revision;
+                string fullPath = targetDir + "/" + s.Key;
+                string targetFullPath = targetDir + "/" + GetPathHash(s.Key);
 
-                    if (!File.Exists(fullPath)) continue;
-                    FileHelper.CreateDirectory(targetFullPath);
-                    File.Copy(fullPath, targetFullPath, true);
-                }
+                if (!File.Exists(fullPath)) continue;
+                FileHelper.CreateDirectory(targetFullPath);
+                File.Copy(fullPath, targetFullPath, true);
             }
         }
 
@@ -215,14 +210,14 @@ namespace SvnVersion
             var fileName = SaveName;
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
             FileHelper.CreateDirectory(fileName);
-            File.WriteAllText(fileName, LitJsonHelper.ToJson(cache.Values.ToArray()), TxTEncoding);
+            File.WriteAllText(fileName, JsonHelper.ToJson(cache.Values.ToArray()), TxTEncoding);
         }
 
         protected void WriteToTxt(string fileName, VersionInfo versionInfo)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
             FileHelper.CreateDirectory(fileName);
-            File.WriteAllText(fileName, LitJsonHelper.ToJson(versionInfo), TxTEncoding);
+            File.WriteAllText(fileName, JsonHelper.ToJson(versionInfo), TxTEncoding);
         }
 
         protected void EncryptFile(string fileName)

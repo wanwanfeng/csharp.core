@@ -59,8 +59,7 @@ namespace FileVersion
             }
             ExcludeFile(cache);
 
-            Console.Write("\n是否导出目标版本号文件（y/n）：");
-            var yes = Console.ReadLine() == "y";
+            var yes = SystemConsole.ContinueY("是否导出目标版本号文件（y/n）：");
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             DeleteInfo(targetDir);
             WriteToTxt(targetDir, cache);

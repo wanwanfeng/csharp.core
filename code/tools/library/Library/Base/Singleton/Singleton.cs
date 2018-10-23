@@ -25,12 +25,11 @@ namespace Library
                     return _instance ?? (_instance = new T());
                 }
             }
-            set { _instance = value; }
         }
 
         public static void Reset()
         {
-            Instance = null;
+            _instance = null;
         }
 
         protected SingletonBase()

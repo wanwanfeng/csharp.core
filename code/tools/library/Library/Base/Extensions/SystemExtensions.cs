@@ -93,7 +93,6 @@ namespace Library.Extensions
 
             int maxLength = cacheDesc.Values.Max(p => p.Length);
 
-            reset:
             bool y = false;
             do
             {
@@ -140,10 +139,7 @@ namespace Library.Extensions
                             var obj = Activator.CreateInstance(cacheType[index].Value.value);
                             if (callAction != null)
                                 callAction.Invoke(obj);
-                            y = ContinueY();
-                            if (Input == "../")
-                                goto reset;
-                        } while (y);
+                        } while (ContinueY());
                     }
                     goto resetInput;
 
@@ -167,7 +163,7 @@ namespace Library.Extensions
             public string afterTip = "";
             public string def = "e";
             public string regex = null;
-            public Dictionary<string, Action> config = new Dictionary<string, Action>(); 
+            public Dictionary<string, Action> config = new Dictionary<string, Action>();
         }
 
         /// <summary>
@@ -203,7 +199,8 @@ namespace Library.Extensions
         /// 用于控制台程序
         /// </summary>
         /// <returns></returns>
-        public static string GetInputStr(string beforeTip = "请输入:", string afterTip = "", string def = "e", string regex = null)
+        public static string GetInputStr(string beforeTip = "请输入:", string afterTip = "", string def = "e",
+            string regex = null)
         {
             return GetInputStr(new Model()
             {
@@ -252,6 +249,17 @@ namespace Library.Extensions
             Console.WriteLine(beforeTip);
             Console.ReadKey();
             Environment.Exit(0);
+        }
+
+        public static void SetProgress(int left, int top, float progress, string info = "")
+        {
+            Console.SetCursorPosition(left, top);
+            Console.WriteLine("[{0}] {1}", progress.ToString("p0"), info);
+        }
+
+        public static void SetProgress(int top, float progress, string info = "")
+        {
+            SetProgress(0, top, progress, info);
         }
     }
 }

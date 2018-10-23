@@ -12,15 +12,12 @@ namespace checkcard.Scripts
     {
         public CheckScenario()
         {
-            SystemConsole.GetInputStr(new SystemConsole.Model()
-            {
-                beforeTip = "请输入（读取:d/还原:h）",
-                config = new Dictionary<string, Action>()
+            SystemConsole.GetInputStr("请输入（读取:d/还原:h）",
+                config: new Dictionary<string, Action>()
                 {
                     {"d", Read},
                     {"h", Write}
-                }
-            });
+                });
         }
 
         public void Read()

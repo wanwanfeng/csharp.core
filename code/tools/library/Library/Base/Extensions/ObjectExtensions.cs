@@ -1,4 +1,6 @@
 ﻿
+using System.Reflection;
+
 namespace Library.Extensions
 {
     /// <summary>
@@ -6,6 +8,11 @@ namespace Library.Extensions
     /// </summary>
     public static class ObjectExtensions
     {
+        public static bool IsNull(this object obj)
+        {
+            return obj == null;
+        }
+
         public static object GetPropertyValue(this object value, string name)
         {
             var info = value.GetType().GetProperty(name);
@@ -14,7 +21,8 @@ namespace Library.Extensions
 
         public static object GetFieldValue(this object value, string name)
         {
-            var info = value.GetType().GetField(name);
+            var type = value.GetType();
+            var info = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             return info != null ? info.GetValue(value) : null;
         }
     }

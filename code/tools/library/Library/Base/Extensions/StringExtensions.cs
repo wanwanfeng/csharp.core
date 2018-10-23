@@ -5,18 +5,43 @@ namespace Library.Extensions
 {
     public static class StringExtensions
     {
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
+        public static string Join(this string str, string separator, string[] value)
+        {
+            return string.Join(separator, value);
+        }
+
+        public static string Join(this string str, string separator, string[] value, int startIndex, int count)
+        {
+            return string.Join(separator, value, startIndex, count);
+        }
+
+        public static string IsInterned(this string str)
+        {
+            return string.IsInterned(str);
+        }
+
+        public static string Intern(this string str)
+        {
+            return string.Intern(str);
+        }
+
         #region 裁剪字符串并追加
 
         /// <summary>
-        /// 裁剪字符串并追加(纯英文)
+        /// 裁剪字符串并追加end
         /// </summary>
         /// <param name="str"></param>
         /// <param name="length"></param>
-        /// <param name="add"></param>
+        /// <param name="end"></param>
         /// <returns></returns>
-        public static string Cut(this string str, int length, bool add = true)
+        public static string Substring(this string str, int length, string end = "")
         {
-            return str.Length < length ? str : str.Substring(0, length) + (add ? "……" : "");
+            return str.Length < length ? str : str.Substring(0, length) + end;
         }
 
         /// <summary>
@@ -24,9 +49,9 @@ namespace Library.Extensions
         /// </summary>
         /// <param name="str"></param>
         /// <param name="length"></param>
-        /// <param name="add"></param>
+        /// <param name="end"></param>
         /// <returns></returns>
-        public static string Cut2(this string str, int length, bool add = true)
+        public static string SubstringReal(this string str, int length, string end = "")
         {
             byte[] bs = System.Text.Encoding.Default.GetBytes(str);
             if (bs.Length > length)
@@ -34,11 +59,11 @@ namespace Library.Extensions
                 byte[] bs2 = new byte[length];
                 //Buffer.BlockCopy(bs, 0, bs2, 0, length * 4);
                 Array.ConstrainedCopy(bs, 0, bs2, 0, length);
-                str = System.Text.Encoding.Default.GetString(bs2) + (add ? "……" : "");
+                str = System.Text.Encoding.Default.GetString(bs2) + end;
             }
             else
             {
-                str = str + (add ? "……" : "");
+                str = str + end;
             }
             return str;
         }

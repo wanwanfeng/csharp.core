@@ -158,10 +158,17 @@ namespace Library.Extensions
             Console.WriteLine("----------------------");
             List<Action> result = config.Values.ToList();
             config = result.ToDictionary(p => (result.IndexOf(p) + 1).ToString());
+            config = new Dictionary<string, Action>
+            {
+                {"e", () => { QuitReadKey(); }}
+            }.Merge(config);
+
             string cmd = "e";
             do
             {
-                cmd = GetInputStr("输入指令：", config: config);
+                cmd = GetInputStr("输入指令：");
+                if (config.ContainsKey(cmd))
+                    config[cmd].Invoke();
             } while (!config.ContainsKey(cmd));
         }
 
@@ -170,31 +177,29 @@ namespace Library.Extensions
         /// </summary>
         /// <returns></returns>
         public static string GetInputStr(
-            string beforeTip = "请输入:", 
-            string afterTip = "", 
+            string beforeTip = "请输入:",
+            string afterTip = "",
             string def = "e",
-            string regex = null,
-            Dictionary<string, Action> config = null)
+            string regex = null)
         {
             Console.Write(beforeTip);
             var cmd = Console.ReadLine();
             var str = string.IsNullOrEmpty(cmd) ? def : cmd;
             str = str.Contains(" ") ? str.Substring(1, str.Length - 2) : str;
 
-            config = new Dictionary<string, Action>
-            {
-                {"e", () => { QuitReadKey(); }}
-            }.Merge(config);
-
             Console.WriteLine(afterTip + str);
 
             if (regex == null || Regex.IsMatch(str, "e|" + regex))
             {
+                var config = new Dictionary<string, Action>
+                {
+                    {"e", () => { QuitReadKey(); }}
+                }.Merge(null);
                 if (config.ContainsKey(str))
                     config[str].Invoke();
                 return str;
             }
-            return GetInputStr(beforeTip, afterTip, def, regex, config);
+            return GetInputStr(beforeTip, afterTip, def, regex);
         }
 
         /// <summary>

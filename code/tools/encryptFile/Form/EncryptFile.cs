@@ -69,7 +69,7 @@ namespace Encrypt
 
         private void button_md5_Click(object sender, EventArgs e)
         {
-            var list = DirectoryHelper.GetFiles(Define.DefineRoot, SearchOption.AllDirectories, Define.DefineExclude);
+            var list = DirectoryHelper.GetFiles(Define.DefineRoot, Define.DefineExclude);
             var dic = list.ToDictionary(p => p, q => q.Replace(Define.DefineRoot.Replace("\\", "/") + "/", ""));
             var res = new List<string>();
             int index = 0;

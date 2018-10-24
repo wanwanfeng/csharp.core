@@ -8,6 +8,7 @@ namespace Library.Extensions
         public static Dictionary<TKey, TValue> Merge<TKey, TValue>(this Dictionary<TKey, TValue> source,
             params IDictionary<TKey, TValue>[] other)
         {
+            if (other == null) return source;
             foreach (var dictionary in other)
             {
                 if (dictionary == null) continue;
@@ -22,6 +23,7 @@ namespace Library.Extensions
 
         public static Hashtable Merge(this Hashtable source, params Hashtable[] other)
         {
+            if (other == null) return source;
             foreach (var hashTable in other)
             {
                 if (hashTable == null) continue;

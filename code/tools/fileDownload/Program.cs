@@ -100,27 +100,19 @@ namespace fileDownload
             {
                 case "1":
                 {
-                    if (HttpDownload(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue))
-                    {
-                        WriteLog("log/overList", filename);
-                    }
-                    else
-                    {
-                        WriteLog("log/errList", filename);
-                    }
+                    WriteLog(
+                        HttpDownload(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue)
+                            ? "log/overList"
+                            : "log/errList", filename);
                     Console.WriteLine("下载完毕");
                     break;
                 }
                 case "2":
                 {
-                    if (Move(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue))
-                    {
-                        WriteLog("log/overList", filename);
-                    }
-                    else
-                    {
-                        WriteLog("log/errList", filename);
-                    }
+                    WriteLog(
+                        Move(revision, hashname.Trim(), filename, hashvalue, encryptedhashvalue)
+                            ? "log/overList"
+                            : "log/errList", filename);
                     Console.WriteLine("还原完毕");
                     break;
                 }

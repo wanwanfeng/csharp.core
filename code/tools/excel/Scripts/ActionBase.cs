@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Library;
 using Library.Excel;
 using Library.Extensions;
@@ -84,9 +85,7 @@ namespace Script
 
         private static void ToCommon(string exs, Func<string, List<DataTable>> import, Action<DataTable, string> export)
         {
-            List<string> files = CheckPath(exs);
-            if (files.Count == 0) return;
-            files.ForEach(file =>
+            Action<string> action = file =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import.Invoke(file).Where(p => p != null).ToList();
@@ -100,7 +99,10 @@ namespace Script
                     string newPath = file.Replace(Path.GetExtension(file), "\\" + dt.TableName.Replace("$", ""));
                     export.Invoke(dt, newPath);
                 });
-            });
+            };
+
+            Parallel.ForEach(CheckPath(exs), action);//并行操作
+            //CheckPath(exs).ForEach(action);//线性操作
         }
 
         public static void ToXml(string exs, Func<string, List<DataTable>> import)
@@ -130,17 +132,13 @@ namespace Script
         /// <param name="import"></param>
         public static void ToOneExcel(string exs, Func<string, List<DataTable>> import)
         {
-            List<string> files = CheckPath(exs, SelectType.Folder);
-            if (files.Count == 0) return;
-            var dts = new List<DataTable>();
-            files.ForEach(file =>
+            var dts = CheckPath(exs, SelectType.Folder).SelectMany(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dt = import(file).Where(p => p != null).ToList();
-                if (dt.Count <= 0) return;
                 dt.ForEach(q => q.TableName = Path.GetFileNameWithoutExtension(file));
-                dts.AddRange(dt);
-            });
+                return dt;
+            }).AsParallel().WithDegreeOfParallelism(10).ToList();
 
             if (dts.Count == 0)
                 return;
@@ -154,13 +152,10 @@ namespace Script
         /// </summary>
         public static void ToKvExcel(string exs, Func<string, List<DataTable>> import)
         {
-            List<string> files = CheckPath(exs);
-            if (files.Count == 0) return;
-
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
-            files.ForEach(file =>
+            CheckPath(exs).ForEach(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import(file).Where(p => p != null).ToList();
@@ -261,22 +256,17 @@ namespace Script
         /// </summary>
         public static void KvExcelTo(DataTableModel tableModel)
         {
-            List<string> files = CheckPath(".xlsx", SelectType.File);
-            if (files.Count == 0) return;
-
-            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
-
-            var dts = new List<DataTable>();
-            files.ForEach(file =>
+            var dts = CheckPath(".xlsx", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                dts.AddRange(ExcelByBase.Data.ImportToDataTable(file));
-            });
+                return ExcelByBase.Data.ImportToDataTable(file);
+            }).AsParallel().WithDegreeOfParallelism(10).ToList();
 
             if (dts.Count == 0)
                 return;
 
             string root = InputPath.Replace(".xlsx", "");
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
 
             foreach (DataTable table in dts)
             {
@@ -351,22 +341,17 @@ namespace Script
         /// </summary>
         public static void KvExcelTo(ListTableModel tableModel)
         {
-            List<string> files = CheckPath(".xlsx", SelectType.File);
-            if (files.Count == 0) return;
-
-            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
-
-            var dts = new List<ListTable>();
-            files.ForEach(file =>
+            var dts = CheckPath(".xlsx", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                dts.AddRange(ExcelByBase.Data.ImportToListTable(file));
-            });
+                return ExcelByBase.Data.ImportToListTable(file);
+            }).AsParallel().WithDegreeOfParallelism(10).ToList();
 
             if (dts.Count == 0)
                 return;
 
             string root = InputPath.Replace(".xlsx", "");
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
 
             foreach (ListTable table in dts)
             {

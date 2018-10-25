@@ -21,15 +21,11 @@ namespace checkcard.Scripts
 
         public void Read()
         {
-            List<string> files = CheckPath(".xlsx", SelectType.File);
-            if (files.Count == 0) return;
-
-            var dts = new List<ListTable>();
-            files.ForEach(file =>
+            var dts = CheckPath(".xlsx", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                dts.AddRange(ExcelByBase.Data.ImportToListTable(file));
-            });
+                return (ExcelByBase.Data.ImportToListTable(file));
+            }).AsParallel().WithDegreeOfParallelism(10).ToList();
 
             if (dts.Count == 0)
                 return;

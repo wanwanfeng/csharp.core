@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Library.Extensions;
 using Library.Helper;
 using LitJson;
@@ -18,10 +19,8 @@ namespace checkcard.Scripts
 
         public void Read()
         {
-            List<string> files = CheckPath(".json", SelectType.Folder);
-            if (files.Count == 0) return;
             var res = new List<string>();
-            files.ForEach(file =>
+            Action<string> action = file =>
             {
                 Console.WriteLine(" is now : " + file);
                 try
@@ -34,7 +33,9 @@ namespace checkcard.Scripts
                 {
                     res.Add(file);
                 }
-            });
+            };
+            Parallel.ForEach(CheckPath(".json", SelectType.Folder), action);//并行操作
+            //CheckPath(".json", SelectType.Folder).ForEach(action);//线性操作
 
             File.WriteAllLines(InputPath + ".txt", res.Select(p => p.Replace("/", "\\")).ToArray());
         }

@@ -26,13 +26,32 @@ namespace checkcard.Scripts
             if (dts.Count == 0)
                 return;
 
+            List<string> faied = new List<string>();
             foreach (DataTable dt in dts)
             {
                 Console.WriteLine(" is now : " + dt.FullName);
                 if (!dt.IsArray) continue;
 
-                File.WriteAllText(Path.ChangeExtension(dt.FullName, "json"), JsonHelper.ToJson(GetJsonValue(dt)));
+                try
+                {
+                    var result = GetJsonValue(dt);
+                    if (result == null)
+                    {
+                        faied.Add(dt.FullName);
+                        continue;
+                    }
+                    File.WriteAllText(Path.ChangeExtension(dt.FullName, "json"), JsonHelper.ToJson(result));
+                }
+                catch (Exception e)
+                {
+                    faied.Add(dt.FullName);
+                    faied.Add("#" + e.StackTrace);
+                }
             }
+
+            faied.Add(InputPath + " " + string.Join("|", faied.Select(Path.GetFileName).ToList()));
+
+            File.WriteAllLines(Path.ChangeExtension(InputPath, "txt"), faied);
         }
 
         class ColumIndex
@@ -152,7 +171,7 @@ namespace checkcard.Scripts
         void add_param_skip_transition(string key, object value, JsonData skip_transition)
         {
             if (key == "canSkip")
-                value = (bool) value;
+                value = (bool) value.ToString().AsBool(true);
             skip_transition[key] = new JsonData(value);
         }
 
@@ -168,9 +187,9 @@ namespace checkcard.Scripts
             return value != ""; //右移
         }
 
-        bool is_single_param(DataTable sheet, int row)
+        private bool is_single_param(DataTable sheet, int row)
         {
-            if (row + 1 == sheet.Rows.Count)
+            if (row + 1 == sheet.Rows.Count || sheet.Columns.Count <= ColumIndex.second)
                 return true;
             return sheet.Rows[row + 1][ColumIndex.second].ToString() == ""; //右移
         }
@@ -255,6 +274,9 @@ namespace checkcard.Scripts
 
             var row = 2;
             var sheet_1 = dt;
+
+            bool isFailed = false;
+
             while (row < dt.Rows.Count)
             {
                 if (can_create_skip_transition_list(sheet_1, row))
@@ -280,7 +302,7 @@ namespace checkcard.Scripts
                         if (can_create_skip_transition_param(sheet_1, row))
                         {
                             var key = sheet_1.Rows[row][ColumIndex.desc].ToString();
-                            var value = sheet_1.Rows[row][ColumIndex.key];
+                            var value = sheet_1.Rows[row][ColumIndex.key - 1];
                             add_param_skip_transition(key, value, skip_transition);
                             row++;
                         }
@@ -447,10 +469,15 @@ namespace checkcard.Scripts
                             }
                             break;
                         }
+                        default:
+                            isFailed = true;
+                            goto end;
+                            break;
                     }
                 }
             }
-            return m_story;
+            end:
+            return isFailed ? null : m_story;
         }
     }
 }

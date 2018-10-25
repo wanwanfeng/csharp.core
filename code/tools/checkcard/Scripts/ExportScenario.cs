@@ -13,15 +13,11 @@ namespace checkcard.Scripts
     {
         public ExportScenario()
         {
-            List<string> files = CheckPath(".xlsx");
-            if (files.Count == 0) return;
-
-            var dts = new List<DataTable>();
-            files.ForEach(file =>
+            var dts = CheckPath(".xlsx").SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                dts.AddRange(ExcelByBase.Data.ImportToDataTable(file));
-            });
+                return ExcelByBase.Data.ImportToDataTable(file);
+            }).AsParallel().WithDegreeOfParallelism(10).ToList();
 
             if (dts.Count == 0)
                 return;

@@ -34,7 +34,8 @@ namespace checkcard.Scripts
                     res.Add(file);
                 }
             };
-            Parallel.ForEach(CheckPath(".json", SelectType.Folder), action);//并行操作
+            //Parallel.ForEach(CheckPath(".json", SelectType.Folder), action);//并行操作
+            CheckPath(".json", SelectType.Folder).AsParallel().ForAll(action);//并行操作
             //CheckPath(".json", SelectType.Folder).ForEach(action);//线性操作
 
             File.WriteAllLines(InputPath + ".txt", res.Select(p => p.Replace("/", "\\")).ToArray());

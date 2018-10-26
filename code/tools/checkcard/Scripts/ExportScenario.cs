@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,20 +14,16 @@ namespace checkcard.Scripts
     {
         public ExportScenario()
         {
-            var dts = CheckPath(".xlsx").SelectMany(file =>
+            var faied = new ConcurrentBag<string>();
+            faied.Add(DateTime.Now.ToString("yy-MM-dd hh:mm:ss"));
+            CheckPath(".xlsx").AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
                 return ExcelByBase.Data.ImportToDataTable(file);
-            }).AsParallel().WithDegreeOfParallelism(10).ToList();
-
-            if (dts.Count == 0)
-                return;
-
-            List<string> faied = new List<string>();
-            foreach (DataTable dt in dts)
+            }).ForAll(dt =>
             {
                 Console.WriteLine(" is now : " + dt.FullName);
-                if (!dt.IsArray) continue;
+                if (!dt.IsArray) return;
 
                 try
                 {
@@ -34,7 +31,7 @@ namespace checkcard.Scripts
                     if (result == null)
                     {
                         faied.Add(dt.FullName);
-                        continue;
+                        return;
                     }
                     File.WriteAllText(Path.ChangeExtension(dt.FullName, "json"), JsonHelper.ToJson(result));
                 }
@@ -43,10 +40,9 @@ namespace checkcard.Scripts
                     faied.Add(dt.FullName);
                     faied.Add("#" + e.StackTrace);
                 }
-            }
-
+            });
+            faied.Add(DateTime.Now.ToString("yy-MM-dd hh:mm:ss"));
             faied.Add(InputPath + " " + string.Join("|", faied.Select(Path.GetFileName).ToList()));
-
             File.WriteAllLines(Path.ChangeExtension(InputPath, "txt"), faied);
         }
 

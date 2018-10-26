@@ -21,19 +21,14 @@ namespace checkcard.Scripts
 
         public void Read()
         {
-            var dts = CheckPath(".xlsx", SelectType.File).SelectMany(file =>
+            CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
                 return (ExcelByBase.Data.ImportToListTable(file));
-            }).AsParallel().WithDegreeOfParallelism(10).ToList();
-
-            if (dts.Count == 0)
-                return;
-
-            foreach (ListTable lt in dts)
+            }).ForAll(lt =>
             {
                 Console.WriteLine(" is now : " + lt.FullName);
-                if (!lt.IsArray) continue;
+                if (!lt.IsArray) return;
                 List<string> res = new List<string>();
 
                 foreach (List<object> list in lt.List)
@@ -44,20 +39,16 @@ namespace checkcard.Scripts
                     res.Add("");
                 }
                 File.WriteAllLines(InputPath + ".txt", res.ToArray());
-            }
+            });
         }
 
         public void Write()
         {
-            List<string> files = CheckPath(".xlsx", SelectType.File);
-            if (files.Count == 0) return;
-
-            var dts = new List<ListTable>();
-            files.ForEach(file =>
+            var dts = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                dts.AddRange(ExcelByBase.Data.ImportToListTable(file));
-            });
+                return ExcelByBase.Data.ImportToListTable(file);
+            }).ToList();
 
             if (dts.Count == 0)
                 return;

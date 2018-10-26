@@ -12,11 +12,10 @@ namespace checkcard.Scripts
         {
             var root = SystemConsole.GetInputStr("itemid:") + "\\";
             var xx = File.ReadAllLines("itemid.txt").ToList();
-            xx = xx.Select(p => new List<string>()
+            xx = xx.AsParallel().Select(p => new List<string>()
             {
                 string.Format("{0}", p.ToLower()),
-            }).SelectMany(p => p).ToList();
-            xx = xx.Where(p => !File.Exists(root + p + ".png")).ToList();
+            }).SelectMany(p => p).Where(p => !File.Exists(root + p + ".png")).ToList();
 
             File.WriteAllLines("checkItem.txt", xx);
         }

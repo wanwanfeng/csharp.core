@@ -2,9 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
+using System.IO;
 using checkcard.Scripts;
 using Library;
 using Library.Extensions;
+using Library.Helper;
 
 namespace checkcard
 {
@@ -20,6 +22,12 @@ namespace checkcard
 
         private static void Main(string[] args)
         {
+            //var root = @"D:\Work\magica\client\~public\tw\magica";
+            //File.WriteAllText("test.txt",
+            //    JsonHelper.ToJson(FileHelper.Path2Dictionary(root, (k, p) => File.ReadAllBytes(root + "\\" + p).MD516())));
+            //File.WriteAllText("test1.txt",
+            //    JsonHelper.ToJson(FileHelper.Path2List(root, (p) => File.ReadAllBytes(root + "\\" + p).MD516())));
+
             //BBB.Instance.Init();
             //Console.ReadKey();
             SystemConsole.Run<MyEnum>();

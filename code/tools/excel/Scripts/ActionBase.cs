@@ -101,7 +101,8 @@ namespace Script
                 });
             };
 
-            Parallel.ForEach(CheckPath(exs), action);//并行操作
+            //Parallel.ForEach(CheckPath(exs), action);//并行操作
+            CheckPath(exs).AsParallel().ForAll(action);//并行操作
             //CheckPath(exs).ForEach(action);//线性操作
         }
 
@@ -132,13 +133,13 @@ namespace Script
         /// <param name="import"></param>
         public static void ToOneExcel(string exs, Func<string, List<DataTable>> import)
         {
-            var dts = CheckPath(exs, SelectType.Folder).SelectMany(file =>
+            var dts = CheckPath(exs, SelectType.Folder).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dt = import(file).Where(p => p != null).ToList();
                 dt.ForEach(q => q.TableName = Path.GetFileNameWithoutExtension(file));
                 return dt;
-            }).AsParallel().WithDegreeOfParallelism(10).ToList();
+            }).ToList();
 
             if (dts.Count == 0)
                 return;
@@ -256,28 +257,30 @@ namespace Script
         /// </summary>
         public static void KvExcelTo(DataTableModel tableModel)
         {
-            var dts = CheckPath(".xlsx", SelectType.File).SelectMany(file =>
+            var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
                 return ExcelByBase.Data.ImportToDataTable(file);
-            }).AsParallel().WithDegreeOfParallelism(10).ToList();
+            }).Select(table =>
+            {
+                var cache =
+                   ExcelByBase.Data.ConvertToListTable(table)
+                       .List
+                       .ToLookup(p => p.First())
+                       .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                cache.Remove("path");
+                return cache;
+            }).ToList();
 
-            if (dts.Count == 0)
+            if (caches.Count == 0)
                 return;
 
             string root = InputPath.Replace(".xlsx", "");
             var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
 
-            foreach (DataTable table in dts)
+            foreach (Dictionary<string, List<List<object>>> table in caches)
             {
-                var cache =
-                    ExcelByBase.Data.ConvertToListTable(table)
-                        .List
-                        .ToLookup(p => p.First())
-                        .ToDictionary(p => p.Key.ToString(), q => q.ToList());
-                cache.Remove("path");
-
-                foreach (KeyValuePair<string, List<List<object>>> pair in cache)
+                foreach (KeyValuePair<string, List<List<object>>> pair in table)
                 {
                     string fullpath = root + pair.Key;
 
@@ -341,26 +344,28 @@ namespace Script
         /// </summary>
         public static void KvExcelTo(ListTableModel tableModel)
         {
-            var dts = CheckPath(".xlsx", SelectType.File).SelectMany(file =>
+            var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
                 return ExcelByBase.Data.ImportToListTable(file);
-            }).AsParallel().WithDegreeOfParallelism(10).ToList();
-
-            if (dts.Count == 0)
-                return;
-
-            string root = InputPath.Replace(".xlsx", "");
-            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
-
-            foreach (ListTable table in dts)
+            }).Select(table =>
             {
                 var cache = table.List
                     .ToLookup(p => p.First())
                     .ToDictionary(p => p.Key.ToString(), q => q.ToList());
                 cache.Remove("path");
+                return cache;
+            }).ToList();
 
-                foreach (KeyValuePair<string, List<List<object>>> pair in cache)
+            if (caches.Count == 0)
+                return;
+
+            string root = InputPath.Replace(".xlsx", "");
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
+
+            foreach (Dictionary<string, List<List<object>>> table in caches)
+            {
+                foreach (KeyValuePair<string, List<List<object>>> pair in table)
                 {
                     string fullpath = root + pair.Key;
 

@@ -29,13 +29,12 @@ namespace Library.Helper
         /// <param name="selectExtensionArray">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string rootPath, string[] selectExtensionArray,
+        public static IEnumerable<string> GetFiles(string rootPath, string[] selectExtensionArray,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
             return Directory.GetFiles(rootPath, "*.*", searchOption)
                 .Where(p => selectExtensionArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"))
-                .ToList();
+                .Select(p => p.Replace("\\", "/"));
         }
 
         /// <summary>
@@ -45,14 +44,13 @@ namespace Library.Helper
         /// <param name="selectExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string rootPath, string selectExtension,
+        public static IEnumerable<string> GetFiles(string rootPath, string selectExtension,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
             var selectArray = selectExtension.Split('|');
             return Directory.GetFiles(rootPath, "*.*", searchOption)
                 .Where(p => selectArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"))
-                .ToList();
+                .Select(p => p.Replace("\\", "/"));
         }
 
         /// <summary>
@@ -62,13 +60,12 @@ namespace Library.Helper
         /// <param name="selectExtensionArray">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string[] rootPaths, string[] selectExtensionArray,
+        public static IEnumerable<string> GetFiles(string[] rootPaths, string[] selectExtensionArray,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
             return rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption))
                 .Where(p => selectExtensionArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"))
-                .ToList();
+                .Select(p => p.Replace("\\", "/"));
         }
 
         /// <summary>
@@ -78,14 +75,13 @@ namespace Library.Helper
         /// <param name="selectExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static List<string> GetFiles(string[] rootPaths, string selectExtension,
+        public static IEnumerable<string> GetFiles(string[] rootPaths, string selectExtension,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
             var selectArray = selectExtension.Split('|');
             return rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption))
                 .Where(p => selectArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"))
-                .ToList();
+                .Select(p => p.Replace("\\", "/"));
         }
     }
 }

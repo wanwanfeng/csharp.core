@@ -4,7 +4,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Library;
 using Library.Excel;
 using Library.Extensions;
@@ -83,7 +82,7 @@ namespace Script
             //};
         }
 
-        private static void ToCommon(string exs, Func<string, List<DataTable>> import, Action<DataTable, string> export)
+        private static void ToCommon(string exs, Func<string, IEnumerable<DataTable>> import, Action<DataTable, string> export)
         {
             Action<string> action = file =>
             {
@@ -106,22 +105,22 @@ namespace Script
             //CheckPath(exs).ForEach(action);//线性操作
         }
 
-        public static void ToXml(string exs, Func<string, List<DataTable>> import)
+        public static void ToXml(string exs, Func<string, IEnumerable<DataTable>> import)
         {
             ToCommon(exs, import, ExcelByBase.Data.ExportToXml);
         }
 
-        public static void ToCsv(string exs, Func<string, List<DataTable>> import)
+        public static void ToCsv(string exs, Func<string, IEnumerable<DataTable>> import)
         {
             ToCommon(exs, import, ExcelByBase.Data.ExportToCsv);
         }
 
-        public static void ToJson(string exs, Func<string, List<DataTable>> import)
+        public static void ToJson(string exs, Func<string, IEnumerable<DataTable>> import)
         {
             ToCommon(exs, import, ExcelByBase.Data.ExportToJson);
         }
 
-        public static void ToExcel(string exs, Func<string, List<DataTable>> import)
+        public static void ToExcel(string exs, Func<string, IEnumerable<DataTable>> import)
         {
             ToCommon(exs, import, ExcelByBase.Data.ExportToExcel);
         }
@@ -131,7 +130,7 @@ namespace Script
         /// </summary>
         /// <param name="exs"></param>
         /// <param name="import"></param>
-        public static void ToOneExcel(string exs, Func<string, List<DataTable>> import)
+        public static void ToOneExcel(string exs, Func<string, IEnumerable<DataTable>> import)
         {
             var dts = CheckPath(exs, SelectType.Folder).AsParallel().SelectMany(file =>
             {
@@ -153,7 +152,7 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public static void ToKvExcel(string exs, Func<string, List<DataTable>> import)
+        public static void ToKvExcel(string exs, Func<string, IEnumerable<DataTable>> import)
         {
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();

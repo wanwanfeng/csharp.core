@@ -45,13 +45,13 @@ namespace Library.Extensions
                 case SelectType.Folder:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension:selectExtension);
+                        files = DirectoryHelper.GetFiles(path, selectExtension:selectExtension).ToList();
                     }
                     break;
                 case SelectType.All:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension: selectExtension);
+                        files = DirectoryHelper.GetFiles(path, selectExtension: selectExtension).ToList();
                     }
                     else if (File.Exists(path))
                     {

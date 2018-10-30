@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Library.Helper;
 
 namespace Script
@@ -13,7 +14,7 @@ namespace Script
 
         public ImageFind()
         {
-            var res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories);
+            var res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories).ToList();
             if (res.Count == 0) return;
             res.Sort();
             RunList(res);

@@ -26,7 +26,7 @@ namespace Library.Excel
             /// <param name="file"></param>
             /// <param name="containsFirstLine"></param>
             /// <returns></returns>
-            public static List<DataTable> ImportToDataTable(string file, bool containsFirstLine)
+            public static IEnumerable<DataTable> ImportToDataTable(string file, bool containsFirstLine)
             {
                 return ExcelByNpoi.ImportExcelToDataTable(file, containsFirstLine);
             }
@@ -36,7 +36,7 @@ namespace Library.Excel
             /// </summary>
             /// <param name="file"></param>
             /// <returns></returns>
-            public static List<DataTable> ImportToDataTable(string file)
+            public static IEnumerable<DataTable> ImportToDataTable(string file)
             {
                 return ExcelByNpoi.ImportExcelToDataTable(file);
             }
@@ -48,9 +48,9 @@ namespace Library.Excel
                 ExcelByNpoi.ExportDataTableToExcel(newPath, dt);
             }
 
-            public static void ExportToOneExcel(List<DataTable> dts, string file)
+            public static void ExportToOneExcel(IEnumerable<DataTable> dts, string file)
             {
-                string newPath = Path.ChangeExtension(file, ".xlsx");
+                string newPath = Path.ChangeExtension(file, "xlsx");
                 FileHelper.CreateDirectory(newPath);
                 ExcelByNpoi.ExportDataTableToExcel(newPath, dts.ToArray());
             }
@@ -65,9 +65,9 @@ namespace Library.Excel
                 return newPath;
             }
 
-            public static List<ListTable> ImportToListTable(string file)
+            public static IEnumerable<ListTable> ImportToListTable(string file)
             {
-                return ImportToDataTable(file).Select(ConvertToListTable).ToList();
+                return ImportToDataTable(file).Select(ConvertToListTable);
             }
 
             public static void ExportToExcel(ListTable lt, string file)
@@ -75,9 +75,9 @@ namespace Library.Excel
                 ExportToExcel(List.ConvertToDataTable(lt), file);
             }
 
-            public static void ExportToOneExcel(List<ListTable> dts, string file)
+            public static void ExportToOneExcel(IEnumerable<ListTable> dts, string file)
             {
-                ExportToOneExcel(dts.Select(List.ConvertToDataTable).ToList(), file);
+                ExportToOneExcel(dts.Select(List.ConvertToDataTable), file);
             }
 
             #endregion

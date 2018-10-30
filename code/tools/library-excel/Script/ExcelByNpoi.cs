@@ -44,7 +44,7 @@ namespace Library.Excel
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <param name="containsFirstLine">是否包含第一行</param>
         /// <returns></returns>
-        public static List<DataTable> ImportExcelToDataTable(string file, bool containsFirstLine = true)
+        public static List<DataTable> ImportExcelToDataTable(string file, bool containsFirstLine)
         {
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();

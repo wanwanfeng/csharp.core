@@ -229,13 +229,11 @@ namespace Script
                     foreach (DataRow dr in dataTable.Rows)
                     {
                         if (string.IsNullOrEmpty(dr[1].ToString())) continue;
-                        dd.Rows.Add(dataTable.TableName, dr[0],
-                            dr[0].ToString().Substring(dr[0].ToString().LastIndexOf("/", StringComparison.Ordinal) + 1),
-                            dr[1], dr[1]);
+                        dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], dr[1]);
                     }
                 }
             }
-            
+
             ExcelByBase.Data.ExportToExcel(dd, InputPath);
         }
 

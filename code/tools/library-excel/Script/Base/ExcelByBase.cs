@@ -20,7 +20,13 @@ namespace Library.Excel
                 return newPath;
             }
 
-            public static List<DataTable> ImportToDataTable(string file, bool containsFirstLine = false)
+            /// <summary>
+            /// 自定义的输出（首行为key）
+            /// </summary>
+            /// <param name="file"></param>
+            /// <param name="containsFirstLine"></param>
+            /// <returns></returns>
+            public static List<DataTable> ImportToDataTable(string file, bool containsFirstLine)
             {
                 return ExcelByNpoi.ImportExcelToDataTable(file, containsFirstLine);
             }

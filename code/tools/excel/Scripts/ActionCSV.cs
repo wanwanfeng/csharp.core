@@ -61,11 +61,10 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(new DataTableModel()
-                {
-                    loadAction = ExcelByBase.Csv.ImportToDataTable,
-                    saveAction = ExcelByBase.Data.ExportToCsv
-                });
+                KvExcelToFromDataTable(
+                    loadAction: ExcelByBase.Csv.ImportToDataTable,
+                    saveAction: ExcelByBase.Data.ExportToCsv
+                    );
             }
         }
 

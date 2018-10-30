@@ -28,7 +28,6 @@ namespace webUtils
 
                 cache.Sort();
 
-                string content = "";
                 if (string.IsNullOrEmpty(mode))
                 {
                     WritePathToReplacement(projectPath, cache);
@@ -39,8 +38,7 @@ namespace webUtils
                 }
                 else if (mode == "2")
                 {
-                    var list = cache.ToLookup(Path.GetExtension, q => q)
-                        .ToDictionary(p => p.Key, q => new List<string>(q));
+                    var list = cache.ToLookup(Path.GetExtension, q => q).ToDictionary(p => p.Key, q => q.ToList());
                     list.Remove("");
                     var cac = list.Keys.ToList().Select(p => string.Format("js/system/replacement/{0}.js", p.Substring(1))).ToList();
                     list[".js"].RemoveAll(p => cac.Contains(p));

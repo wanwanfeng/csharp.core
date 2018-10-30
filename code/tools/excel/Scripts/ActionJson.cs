@@ -59,11 +59,10 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(new ListTableModel()
-                {
-                    loadAction = ExcelByBase.Json.ImportToListTable,
-                    saveAction = ExcelByBase.Data.ExportToJson,
-                    isCustomAction = (fullpath, list) =>
+                KvExcelToFromListTable(
+                    loadAction: ExcelByBase.Json.ImportToListTable,
+                    saveAction: ExcelByBase.Data.ExportToJson,
+                    isCustomAction: (fullpath, list) =>
                     {
                         Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
                         foreach (List<object> objects in list)
@@ -80,7 +79,7 @@ namespace Script
                         JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
                         return JsonHelper.ToJson(jsonData);
                     }
-                });
+                    );
             }
         }
     }

@@ -46,7 +46,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xml", file => new List<DataTable>() { ExcelByBase.Xml.ImportToDataTable(file) });
+                ToKvExcel(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
             }
         }
 
@@ -57,11 +57,10 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo(new DataTableModel()
-                {
-                    loadAction = ExcelByBase.Xml.ImportToDataTable,
-                    saveAction = ExcelByBase.Data.ExportToXml
-                });
+                KvExcelToFromDataTable(
+                    loadAction: ExcelByBase.Xml.ImportToDataTable,
+                    saveAction: ExcelByBase.Data.ExportToXml
+                    );
             }
         }
     }

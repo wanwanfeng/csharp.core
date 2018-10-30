@@ -136,9 +136,11 @@ namespace Script
             var dts = CheckPath(exs, SelectType.Folder).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dt = import(file).Where(p => p != null).ToList();
-                dt.ForEach(q => q.TableName = Path.GetFileNameWithoutExtension(file));
-                return dt;
+                return import(file).Where(p => p != null).Select(p =>
+                {
+                    p.TableName = Path.GetFileNameWithoutExtension(file);
+                    return p;
+                });
             }).ToList();
 
             if (dts.Count == 0)
@@ -237,25 +239,14 @@ namespace Script
             ExcelByBase.Data.ExportToExcel(dd, InputPath);
         }
 
-        public class DataTableModel
-        {
-            public Func<string, DataTable> loadAction;
-            public Action<DataTable, string> saveAction;
-            public Func<string, List<List<object>>, string> isCustomAction = null;
-        }
-
-        public class ListTableModel
-        {
-            public Func<string, ListTable> loadAction;
-            public Action<ListTable, string> saveAction;
-            public Func<string, List<List<object>>, string> isCustomAction = null;
-        }
-
-
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelTo(DataTableModel tableModel)
+        public static void KvExcelToFromDataTable(
+            Func<string, DataTable> loadAction,
+            Action<DataTable, string> saveAction,
+            Func<string, List<List<object>>, string> isCustomAction = null
+            )
         {
             var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
@@ -264,12 +255,12 @@ namespace Script
             }).Select(table =>
             {
                 var cache =
-                   ExcelByBase.Data.ConvertToListTable(table)
-                       .List
-                       .ToLookup(p => p.First())
-                       .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                    ExcelByBase.Data.ConvertToListTable(table)
+                        .List
+                        .ToLookup(p => p.First())
+                        .ToDictionary(p => p.Key.ToString(), q => q.ToList());
                 cache.Remove("path");
-                return cache;
+                return new {dic = cache, file = table.FullName};
             }).ToList();
 
             if (caches.Count == 0)
@@ -278,9 +269,9 @@ namespace Script
             string root = InputPath.Replace(".xlsx", "");
             var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
 
-            foreach (Dictionary<string, List<List<object>>> table in caches)
+            foreach (var table in caches)
             {
-                foreach (KeyValuePair<string, List<List<object>>> pair in table)
+                foreach (KeyValuePair<string, List<List<object>>> pair in table.dic)
                 {
                     string fullpath = root + pair.Key;
 
@@ -288,7 +279,7 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var dt = tableModel.loadAction(fullpath);
+                        var dt = loadAction(fullpath);
                         var columns = dt.Columns;
 
                         if (dt.IsArray)
@@ -321,14 +312,14 @@ namespace Script
                             if (!isSave) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            tableModel.saveAction.Invoke(dt, fullpath);
+                            saveAction.Invoke(dt, fullpath);
                         }
                         else
                         {
-                            if (tableModel.isCustomAction == null) continue;
+                            if (isCustomAction == null) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            File.WriteAllText(fullpath, tableModel.isCustomAction.Invoke(fullpath, pair.Value));
+                            File.WriteAllText(fullpath, isCustomAction.Invoke(fullpath, pair.Value));
                         }
                     }
                     else
@@ -342,7 +333,11 @@ namespace Script
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelTo(ListTableModel tableModel)
+        public static void KvExcelToFromListTable(
+            Func<string, ListTable> loadAction,
+            Action<ListTable, string> saveAction,
+            Func<string, List<List<object>>, string> isCustomAction = null
+            )
         {
             var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
@@ -354,7 +349,7 @@ namespace Script
                     .ToLookup(p => p.First())
                     .ToDictionary(p => p.Key.ToString(), q => q.ToList());
                 cache.Remove("path");
-                return cache;
+                return new {dic = cache, file = table.FullName};
             }).ToList();
 
             if (caches.Count == 0)
@@ -363,9 +358,9 @@ namespace Script
             string root = InputPath.Replace(".xlsx", "");
             var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
 
-            foreach (Dictionary<string, List<List<object>>> table in caches)
+            foreach (var table in caches)
             {
-                foreach (KeyValuePair<string, List<List<object>>> pair in table)
+                foreach (KeyValuePair<string, List<List<object>>> pair in table.dic)
                 {
                     string fullpath = root + pair.Key;
 
@@ -373,7 +368,7 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var lt = tableModel.loadAction(fullpath);
+                        var lt = loadAction(fullpath);
                         var columns = lt.Key;
 
                         if (lt.IsArray)
@@ -406,14 +401,14 @@ namespace Script
                             if (!isSave) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            tableModel.saveAction.Invoke(lt, fullpath);
+                            saveAction.Invoke(lt, fullpath);
                         }
                         else
                         {
-                            if (tableModel.isCustomAction == null) continue;
+                            if (isCustomAction == null) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            File.WriteAllText(fullpath, tableModel.isCustomAction.Invoke(fullpath, pair.Value));
+                            File.WriteAllText(fullpath, isCustomAction.Invoke(fullpath, pair.Value));
                         }
                     }
                     else

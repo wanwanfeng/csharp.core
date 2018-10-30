@@ -31,13 +31,13 @@ namespace Script
                 case "1":
                 {
                     guiyi = true;
-                    res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories);
+                    res.AddRange(DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories));
                     break;
                 }
                 case "2":
                 {
                     guiyi = false;
-                    res = DirectoryHelper.GetFiles(root, "*", SearchOption.TopDirectoryOnly);
+                    res.AddRange(DirectoryHelper.GetFiles(root, "*", SearchOption.TopDirectoryOnly));
                     break;
                 }
             }

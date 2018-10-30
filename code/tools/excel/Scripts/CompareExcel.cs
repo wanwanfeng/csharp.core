@@ -31,7 +31,8 @@ namespace Script
                 if (vals2.TryGetValue(keyValuePair.Key, out lst))
                 {
                     keyValuePair.Value.List = keyValuePair.Value.List.Except(lst.List).ToList();
-                    var newName = Path.GetDirectoryName(dir1) + "/" + Path.GetFileNameWithoutExtension(dir1) + "-" + Path.GetFileNameWithoutExtension(dir2) + ".xlsx";
+                    var newName = Path.ChangeExtension(dir1, "").Trim('.') + "-" +
+                                  Path.GetFileNameWithoutExtension(dir2) + ".xlsx";
                     ExcelByBase.Data.ExportToExcel(lst, newName);
                 }
                 else

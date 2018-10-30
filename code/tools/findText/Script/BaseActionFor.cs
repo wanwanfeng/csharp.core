@@ -93,7 +93,7 @@ namespace findText
             }
             else
             {
-                all = DirectoryHelper.GetFiles(inputPath = input, exName.Replace("*", ""), SearchOption.AllDirectories);
+                all = DirectoryHelper.GetFiles(inputPath = input, exName.Replace("*", ""), SearchOption.AllDirectories).ToList();
                 all.Sort();
                 resJsonData = new JsonData();
                 regex = new Regex(regexStr);

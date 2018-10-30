@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace UnityEditor
@@ -19,11 +20,7 @@ namespace UnityEditor
 
         public static void SplitSeparator(this ScriptableObject target, int count = 1)
         {
-            if (count <= 0) return;
-            for (int i = 0; i < count; i++)
-            {
-                EditorGUILayout.Separator();
-            }
+            Enumerable.Repeat(0, count > 0 ? count : 0).ToList().ForEach(p => EditorGUILayout.Separator());
         }
 
         public static void SplitHorizontal(this ScriptableObject target, int height)

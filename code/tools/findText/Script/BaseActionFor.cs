@@ -146,7 +146,7 @@ namespace findText
         /// <param name="inputPath"></param>
         public virtual void Revert(string inputPath)
         {
-            var excels = ExcelByBase.Data.ImportToDataTable(inputPath)
+            var excels = ExcelByBase.Data.ImportToDataTable(inputPath, false)
                 .Select(ExcelByBase.Data.ConvertToJson)
                 .ToList();
 

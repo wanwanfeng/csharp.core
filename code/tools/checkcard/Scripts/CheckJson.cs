@@ -27,7 +27,7 @@ namespace checkcard.Scripts
                 {
                     JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
                     string jsonStr = JsonHelper.ToJson(json, false);
-                    File.WriteAllText(file, jsonStr, new UTF8Encoding(true));
+                    //File.WriteAllText(file, jsonStr, new UTF8Encoding(true));
                 }
                 catch (Exception)
                 {

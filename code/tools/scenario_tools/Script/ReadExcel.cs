@@ -18,7 +18,7 @@ namespace scenario_tools
 
             foreach (JsonData data in listJson)
             {
-                var lookup = data.Cast<JsonData>().ToList().ToLookup(p => p["file"].ToString(), q => q);
+                var lookup = data.Cast<JsonData>().ToLookup(p => p["file"].ToString(), q => q);
                 Dictionary<string, List<JsonData>> cache = lookup.ToDictionary(p => p.Key, q => q.ToList());
 
                 var index = 0;

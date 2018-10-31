@@ -22,12 +22,18 @@ namespace Library.Helper
                 //StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.Default);
                 StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
                 //写出列名称
-                sw.WriteLine(string.Join(",", dt.First().Select(p => "\"" + p + "\"").ToArray()));
+                sw.WriteLine(string.Join(",", dt.First().Select(p => p.ToString()).ToArray()));
                 //写出各行数据
                 var array = dt.Skip(1).ToList();
-                for (int i = 0; i < array.Count; i++)
+                foreach (List<object> list in array)
                 {
-                    sw.WriteLine(string.Join(",", array.Select(p => "\"" + p + "\"").ToArray()));
+                    sw.WriteLine(string.Join(",", list.Select(p =>
+                    {
+                        double x;
+                        if (double.TryParse(p.ToString(), out x))
+                            return p.ToString();
+                        return "\"" + p + "\"";
+                    }).ToArray()));
                 }
                 sw.Close();
                 fs.Close();

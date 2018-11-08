@@ -12,7 +12,7 @@ namespace Library.Helper
         /// <param name="path"></param>
         public static void CreateDirectory(string path)
         {
-            if (path.EndsWith("/"))
+            if (path.EndsWith("/") || path.EndsWith("\\"))
             {
                 Directory.CreateDirectory(path);
                 return;
@@ -22,19 +22,25 @@ namespace Library.Helper
                 Directory.CreateDirectory(dir);
         }
 
+        private static IEnumerable<string> PredicateFiles(IEnumerable<string> files, string[] selectExtensions)
+        {
+            return (selectExtensions == null || selectExtensions.Length == 0
+                ? files
+                : files.Where(p => selectExtensions.Contains(Path.GetExtension(p))))
+                .Select(p => p.Replace("\\", "/"));
+        }
+
         /// <summary>
         /// 获取某目录下文件列表
         /// </summary>
         /// <param name="rootPath"></param>
-        /// <param name="selectExtensionArray">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
+        /// <param name="selectExtensions">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetFiles(string rootPath, string[] selectExtensionArray,
+        public static IEnumerable<string> GetFiles(string rootPath, string[] selectExtensions,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
-            return Directory.GetFiles(rootPath, "*.*", searchOption)
-                .Where(p => selectExtensionArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"));
+            return PredicateFiles(Directory.GetFiles(rootPath, "*.*", searchOption), selectExtensions);
         }
 
         /// <summary>
@@ -47,25 +53,20 @@ namespace Library.Helper
         public static IEnumerable<string> GetFiles(string rootPath, string selectExtension,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
-            var selectArray = selectExtension.Split('|');
-            return Directory.GetFiles(rootPath, "*.*", searchOption)
-                .Where(p => selectArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"));
+            return PredicateFiles(Directory.GetFiles(rootPath, "*.*", searchOption), selectExtension.Split('|'));
         }
 
         /// <summary>
         /// 获取多个目录下文件列表
         /// </summary>
         /// <param name="rootPaths"></param>
-        /// <param name="selectExtensionArray">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
+        /// <param name="selectExtensions">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetFiles(string[] rootPaths, string[] selectExtensionArray,
+        public static IEnumerable<string> GetFiles(string[] rootPaths, string[] selectExtensions,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
-            return rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption))
-                .Where(p => selectExtensionArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"));
+            return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)), selectExtensions);
         }
 
         /// <summary>
@@ -78,10 +79,7 @@ namespace Library.Helper
         public static IEnumerable<string> GetFiles(string[] rootPaths, string selectExtension,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
-            var selectArray = selectExtension.Split('|');
-            return rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption))
-                .Where(p => selectArray.Contains(Path.GetExtension(p)))
-                .Select(p => p.Replace("\\", "/"));
+            return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)), selectExtension.Split('|'));
         }
     }
 }

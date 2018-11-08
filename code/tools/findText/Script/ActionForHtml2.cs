@@ -92,10 +92,9 @@ namespace findText.Script
             }
         }
 
-        protected override JsonData SetJsonDataArray(ListTable list, bool isReverse = false)
+        protected override List<JsonData> SetJsonDataArray(ListTable list, bool isReverse = false)
         {
-            JsonData jsonDatas = new JsonData();
-            jsonDatas.SetJsonType(JsonType.Array);
+            List<JsonData> jsonDatas = new List<JsonData>();
             List<string> first = list.Key;
             if (isReverse)
                 list.List.Reverse();
@@ -118,18 +117,9 @@ namespace findText.Script
             var tables = ExcelByBase.Data.ImportToListTable(inputPath);
             foreach (var table in tables)
             {
-                JsonData jsonData = SetJsonDataArray(table, true);
+                Dictionary<string, List<JsonData>> cache =
+                     SetJsonDataArray(table, true).ToLookup(p => p["文件名"].ToString(), q => q).ToDictionary(p => p.Key, q => q.ToList());
 
-                Dictionary<string, List<JsonData>> cache = new Dictionary<string, List<JsonData>>();
-                foreach (JsonData data in jsonData)
-                {
-                    string temp = data["文件名"].ToString();
-                    List<JsonData> list;
-                    if (cache.TryGetValue(temp, out list))
-                        list.Add(data);
-                    else
-                        cache[temp] = new List<JsonData>() {data};
-                }
                 var i = 0;
 
                 foreach (KeyValuePair<string, List<JsonData>> valuePair in cache)

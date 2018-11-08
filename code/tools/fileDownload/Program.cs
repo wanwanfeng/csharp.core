@@ -13,11 +13,6 @@ namespace fileDownload
 {
     internal class Program
     {
-
-        private static readonly Object thisLock = new Object();
-        private static readonly Object thisLockIndex = new Object();
-
-
         //public static string root = Environment.CurrentDirectory + "/www/assets/";
         public static string root = "D:/Work/yuege/www/assets/";
 
@@ -38,7 +33,7 @@ namespace fileDownload
         {
             get
             {
-                //return "http://10.23.114.149:9999/assets/app-bs/";
+                return "http://10.23.25.8:9999/assets/app-bs/";
                 return "https://tkpres.global.ssl.fastly.net/assets/app/";
             }
         }
@@ -55,46 +50,31 @@ namespace fileDownload
             Dictionary<string, JsonData> cacheMaster = CacheJson("c_master").ToDictionary(p => "master/" + p.Key, q => q.Value);
             Dictionary<string, JsonData> cacheRresource = CacheJson("c_resource");//.Where(p => p.Key.Contains("unity")).ToDictionary(p => p.Key, q => q.Value);
 
-            var cache = cacheRresource.Concat(cacheMaster).ToDictionary(p => p.Key, q => q.Value);
-
             FileHelper.CreateDirectory("log/");
             if (File.Exists("log/overList.txt"))
                 File.Delete("log/overList.txt");
             if (File.Exists("log/errList.txt"))
                 File.Delete("log/errList.txt");
 
-            //return;
-            count = cache.Count;
-            int max = 25;
-            ThreadPool.SetMaxThreads(max, max);
-            foreach (KeyValuePair<string, JsonData> pair in cache)
-            {
-                ThreadPool.QueueUserWorkItem(new WaitCallback(RunSingle), new object[] { pair });
-            }
-
-            //foreach (KeyValuePair<string, JsonData> pair in cache)
-            //{
-            //    RunSingle(new object[] { pair });
-            //}
+            cacheRresource.Concat(cacheMaster)
+                .ToDictionary(p => p.Key, q => q.Value)
+                .AsParallel()
+                .WithDegreeOfParallelism(4)
+                .ForAll(RunSingle);
 
             GC.Collect();
             Console.ReadKey();
         }
 
-        private static void RunSingle(object obj)
+        private static void RunSingle(KeyValuePair<string, JsonData> pair)
         {
-            object[] objs = (object[]) obj;
-            KeyValuePair<string, JsonData> pair = (KeyValuePair<string, JsonData>) objs[0];
             var filename = pair.Key;
             var hashname = pair.Value["hash_name"].ToString();
             var hashvalue = pair.Value["hash_value"].ToString();
             var encryptedhashvalue = pair.Value["encrypted_hash_value"].ToString();
             var revision = pair.Value["revision"].ToString();
 
-            lock (thisLockIndex)
-            {
-                Console.WriteLine("is Now :{2} \n{0}/{1}", (++index), count, pair.Key);
-            }
+            Console.WriteLine("is Now :{2} \n{0}/{1}", (++index), count, pair.Key);
 
             switch (Cmd1)
             {
@@ -121,14 +101,15 @@ namespace fileDownload
 
         private static void WriteLog(string name, string content)
         {
-            lock (thisLock)
-            {
-                using (StreamWriter streamWriter = File.AppendText(name + ".txt"))
-                {
-                    streamWriter.WriteLine(content);
-                    streamWriter.Close();
-                }
-            }
+            return;
+            //lock (thisLock)
+            //{
+            //    using (StreamWriter streamWriter = File.AppendText(name + ".txt"))
+            //    {
+            //        streamWriter.WriteLine(content);
+            //        streamWriter.Close();
+            //    }
+            //}
         }
 
         private static Dictionary<string, JsonData> CacheJson(string jsonName)

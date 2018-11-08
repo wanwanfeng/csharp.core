@@ -10,13 +10,13 @@ namespace Library
 
     public class EventObject : IEvent
     {
-        public Dictionary<string, Action<object, object>> CacheEvents { get; set; }
+        public Dictionary<string, Action<object, object>> CacheEvents { get; set; }       
     }
 
     /// <summary>
     /// System.Object事件扩展
     /// </summary>
-    public static class ExtensionsForEvents
+    public static class EventsExtensions
     {
         /// <summary>
         /// 事件注册，用 TriggerListener 触发

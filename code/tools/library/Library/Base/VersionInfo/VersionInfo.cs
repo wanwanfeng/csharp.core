@@ -77,6 +77,19 @@ namespace FileVersion
         /// <returns></returns>
         public static bool IsCanDownLoad(string oldV, string newV, params char[] separator)
         {
+            //var runIt = oldV.AsIntArray(separator).GetEnumerator();
+            //var remoteIt = newV.AsIntArray(separator).GetEnumerator();
+            //do
+            //{
+            //    runIt.MoveNext();
+            //    var run = (int) (runIt.Current ?? 0);
+            //    remoteIt.MoveNext();
+            //    var remote = (int) (remoteIt.Current ?? 0);
+            //    if (run == remote) continue;
+            //    return run < remote;
+            //} while (runIt.Current != null || remoteIt.Current != null);
+            //return false;
+
             var runArray = new Queue<int>(oldV.AsIntArray(separator));
             var remoteArray = new Queue<int>(newV.AsIntArray(separator));
             while (runArray.Count > 0 || remoteArray.Count > 0)

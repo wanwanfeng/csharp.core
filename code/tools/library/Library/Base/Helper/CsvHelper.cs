@@ -7,7 +7,6 @@ namespace Library.Helper
 {
     public class CsvHelper
     {
-
         /// <summary>
         /// 将DataTable中数据写入到CSV文件中
         /// </summary>
@@ -18,25 +17,26 @@ namespace Library.Helper
             try
             {
                 FileHelper.CreateDirectory(fullPath);
-                FileStream fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
-                //StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.Default);
-                StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
-                //写出列名称
-                sw.WriteLine(string.Join(",", dt.First().Select(p => p.ToString()).ToArray()));
-                //写出各行数据
-                var array = dt.Skip(1).ToList();
-                foreach (List<object> list in array)
+
+                using (FileStream fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
                 {
-                    sw.WriteLine(string.Join(",", list.Select(p =>
+                    using (StreamWriter sw = new StreamWriter(fs, new System.Text.UTF8Encoding(false)))
                     {
-                        double x;
-                        if (double.TryParse(p.ToString(), out x))
-                            return p.ToString();
-                        return "\"" + p + "\"";
-                    }).ToArray()));
+                        //写出列名称
+                        sw.WriteLine(string.Join(",", dt.First().Select(p => p.ToString()).ToArray()));
+                        //写出各行数据
+                        dt.Skip(1).ToList().ForEach(list =>
+                        {
+                            sw.WriteLine(string.Join(",", list.Select(p =>
+                            {
+                                double x;
+                                if (double.TryParse(p.ToString(), out x))
+                                    return p.ToString();
+                                return "\"" + p + "\"";
+                            }).ToArray()));
+                        });
+                    }
                 }
-                sw.Close();
-                fs.Close();
                 return true;
             }
             catch
@@ -58,12 +58,8 @@ namespace Library.Helper
                 CsvRow row = new CsvRow();
                 while (reader.ReadRow(row))
                 {
-                    List<object> line = new List<object>();
-                    foreach (string s in row)
-                    {
-                        line.Add(s.Replace("\"", ""));
-                    }
-                    res.Add(line);
+                    res.Add(row.Cast<object>().ToList());
+                    //res.Add(row.Select(s => s.Replace("\"", "")).Cast<object>().ToList());
                 }
             }
             return res;

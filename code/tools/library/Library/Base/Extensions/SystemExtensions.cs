@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Library.Helper;
 
@@ -63,7 +62,7 @@ namespace Library.Extensions
                     return files;
             }
 
-            InputPath = path;
+            InputPath = path.Replace("\\", "/");
             files.Sort();
             return files;
         }
@@ -123,19 +122,19 @@ namespace Library.Extensions
 
                 try
                 {
-                    resetInput:
+                    //resetInput:
                     var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
                     if (cacheType.ContainsKey(index))
                     {
                         Console.WriteLine("当前的选择：" + index);
-                        do
-                        {
+                        //do
+                        //{
                             var obj = Activator.CreateInstance(cacheType[index].Value.value);
                             if (callAction != null)
                                 callAction.Invoke(obj);
-                        } while (ContinueY());
+                        //} while (ContinueY());
                     }
-                    goto resetInput;
+                    //goto resetInput;
                 }
                 catch (Exception e)
                 {

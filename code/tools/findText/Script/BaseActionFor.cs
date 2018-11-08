@@ -26,14 +26,13 @@ namespace findText
             }
         }
 
-        protected virtual JsonData SetJsonDataArray(ListTable list, bool isReverse = false)
+        protected virtual List<JsonData> SetJsonDataArray(ListTable list, bool isReverse = false)
         {
             List<string> first = list.Key;
             if (isReverse)
                 list.List.Reverse();
 
-            JsonData jsonDatas = new JsonData();
-            jsonDatas.SetJsonType(JsonType.Array);
+            List<JsonData> jsonDatas = new List<JsonData>();
             foreach (List<object> objects in list.List)
             {
                 JsonData data = new JsonData();

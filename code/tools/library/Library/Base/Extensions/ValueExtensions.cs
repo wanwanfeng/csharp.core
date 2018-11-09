@@ -235,8 +235,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static int[] AsIntArray(this string value, params char[] separator)
         {
-            string[] str = value.AsStringArray(separator);
-            return Array.ConvertAll(str, p => p.AsInt());
+            return value.AsStringArray(separator).AsIntArray();
         }
 
         /// <summary>
@@ -247,8 +246,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static float[] AsFloatArray(this string value, params char[] separator)
         {
-            string[] str = value.AsStringArray(separator);
-            return Array.ConvertAll(str, p => p.AsFloat());
+            return value.AsStringArray(separator).AsFloatArray();
         }
 
         /// <summary>
@@ -259,8 +257,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static double[] AsDoubleArray(this string value, params char[] separator)
         {
-            string[] str = value.AsStringArray(separator);
-            return Array.ConvertAll(str, p => p.AsDouble());
+            return value.AsStringArray(separator).AsDoubleArray();
         }
 
         /// <summary>
@@ -271,8 +268,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static bool[] AsBoolArray(this string value, params char[] separator)
         {
-            string[] str = value.AsStringArray(separator);
-            return Array.ConvertAll(str, p => p.AsBool());
+            return value.AsStringArray(separator).AsBoolArray();
         }
 
         /// <summary>

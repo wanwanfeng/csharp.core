@@ -29,8 +29,17 @@ namespace fileUtils
         {
             public void Run()
             {
-                var xx = CheckPath("*.*", SelectType.Folder)
-                    .SelectMany(p => File.ReadAllBytes(p))
+                var xx = CheckPath(".ts", SelectType.Folder)
+                    .Select(File.ReadAllBytes)
+                    .Aggregate(new List<byte>(), (a, b) =>
+                    {
+                        a.AddRange(b);
+                        return a;
+                    }, b =>
+                    {
+                        b.TrimExcess();
+                        return b;
+                    })
                     .ToArray();
                 File.WriteAllBytes(Path.ChangeExtension(InputPath.Trim('.'), ".ts"), xx);
             }
@@ -40,37 +49,43 @@ namespace fileUtils
         {
             public void Run()
             {
-                var url = SystemConsole.GetInputStr("输入下载地址：");
+                Action<string> singleFile = url =>
+                {
+                    var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(url);
+                    if (string.IsNullOrEmpty(fileNameWithoutExtension)) return;
+                    url = url.Replace(fileNameWithoutExtension, "{0}");
+                    int start = fileNameWithoutExtension
+                        .Reverse()
+                        .TakeWhile(char.IsDigit)
+                        .Aggregate("", (b, a) => a + b)
+                        .AsInt();
+                    string qianzhui = fileNameWithoutExtension
+                        .Reverse()
+                        .SkipWhile(char.IsDigit)
+                        .Aggregate("", (b, a) => a + b);
+                    Enumerable.Range(start, 500)
+                        .Select(p => string.Format(url, qianzhui + p))
+                        .Select(p =>
+                        {
+                            DownLoad(p);
+                            return p;
+                        }).ToList();
+                    //.AsParallel()
+                    //.WithDegreeOfParallelism(4)
+                    //.ForAll(DownLoad);
+                };
 
-                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(url);
-                if (string.IsNullOrEmpty(fileNameWithoutExtension)) return;
-                url = url.Replace(fileNameWithoutExtension, "{0}");
-                int start = fileNameWithoutExtension
-                    .Reverse()
-                    .TakeWhile(char.IsDigit)
-                    .Aggregate("", (b, a) => a + b)
-                    .AsInt();
-                string qianzhui = fileNameWithoutExtension
-                    .Reverse()
-                    .SkipWhile(char.IsDigit)
-                    .Aggregate("", (b, a) => a + b);
-                Enumerable.Range(start, 500)
-                    .Select(p => string.Format(url, qianzhui + p))
-                    .Select(p =>
-                    {
-                        DownLoad(p);
-                        return p;
-                    }).ToList();
-                //.AsParallel()
-                //.WithDegreeOfParallelism(4)
-                //.ForAll(DownLoad);
+                //singleFile(SystemConsole.GetInputStr("输入下载地址："));
+                File.ReadAllLines("task.txt").AsParallel().ForAll(singleFile);
             }
 
             public void DownLoad(string url)
             {
                 var uri = new Uri(url);
                 string newName = uri.LocalPath.TrimStart('/');
+                if (File.Exists(newName)) return;
                 string tempName = Path.ChangeExtension(newName, "temp");
+                if (File.Exists(tempName)) File.Delete(tempName);
                 FileHelper.CreateDirectory(newName);               
 
                 HttpWebRequest request;
@@ -137,6 +152,7 @@ namespace fileUtils
                 {
                     if (File.Exists(tempName))
                         File.Delete(tempName); //存在则删除
+                    Console.WriteLine(ex.Message);
                     Console.WriteLine(ex.StackTrace);
                 }
             }

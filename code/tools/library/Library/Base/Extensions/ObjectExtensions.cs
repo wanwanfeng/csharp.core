@@ -19,17 +19,17 @@ namespace Library.Extensions
         }
 
 
-        public static object GetPropertyValue(this object value, string name)
-        {
-            var info = value.GetType().GetProperty(name);
-            return info != null ? info.GetValue(value, null) : null;
-        }
+        //public static object GetPropertyValue(this object value, string name)
+        //{
+        //    var info = value.GetType().GetProperty(name);
+        //    return info != null ? info.GetValue(value, null) : null;
+        //}
 
-        public static object GetFieldValue(this object value, string name)
-        {
-            var type = value.GetType();
-            var info = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return info != null ? info.GetValue(value) : null;
-        }
+        //public static object GetFieldValue(this object value, string name)
+        //{
+        //    var type = value.GetType();
+        //    var info = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        //    return info != null ? info.GetValue(value) : null;
+        //}
     }
 }

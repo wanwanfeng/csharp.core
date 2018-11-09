@@ -1,12 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Library.Extensions
 {
     /// <summary>
-    /// Object扩展
+    /// Linq扩展
     /// </summary>
     public static class LinqExtensions
     {

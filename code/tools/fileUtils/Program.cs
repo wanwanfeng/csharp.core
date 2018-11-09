@@ -5,10 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Library.Extensions;
 using Library.Helper;
 
@@ -54,25 +51,21 @@ namespace fileUtils
                     var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(url);
                     if (string.IsNullOrEmpty(fileNameWithoutExtension)) return;
                     url = url.Replace(fileNameWithoutExtension, "{0}");
-                    int start = fileNameWithoutExtension
-                        .Reverse()
-                        .TakeWhile(char.IsDigit)
-                        .Aggregate("", (b, a) => a + b)
-                        .AsInt();
                     string qianzhui = fileNameWithoutExtension
                         .Reverse()
                         .SkipWhile(char.IsDigit)
                         .Aggregate("", (b, a) => a + b);
+                    int start = url.Replace(qianzhui, "").AsInt();
                     Enumerable.Range(start, 500)
                         .Select(p => string.Format(url, qianzhui + p))
-                        .Select(p =>
-                        {
-                            DownLoad(p);
-                            return p;
-                        }).ToList();
-                    //.AsParallel()
-                    //.WithDegreeOfParallelism(4)
-                    //.ForAll(DownLoad);
+                        //.Select(p =>
+                        //{
+                        //    DownLoad(p);
+                        //    return p;
+                        //}).ToList();
+                    .AsParallel()
+                    .WithDegreeOfParallelism(4)
+                    .ForAll(DownLoad);
                 };
 
                 //singleFile(SystemConsole.GetInputStr("输入下载地址："));

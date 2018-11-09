@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Library.Helper
 {
@@ -76,14 +77,53 @@ namespace Library.Helper
 
         public static Dictionary<string, object> String2List(IEnumerable<string> path, Func<string, object> func = null)
         {
-            var cache = new Dictionary<string, object>();
-            path.Select(p => p.Replace("\\", "/").TrimStart('/'))
-                .ToList()
-                .ForEach(p =>
+            return path.Select(p => p.Replace("\\", "/").TrimStart('/'))
+                .ToDictionary(p => p, q => func == null ? null : func.Invoke(q));
+        }
+
+        /// <summary>
+        /// 读取每一行
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public IEnumerable<string> ReadAllLines(string path, Encoding encoding = null)
+        {
+            if (!File.Exists(path))
+                throw new Exception("file not exist!");
+            using (var fileStream = File.OpenRead(path))
+            {
+                using (var reader = new StreamReader(fileStream, encoding ?? Encoding.UTF8))
                 {
-                    cache[p] = func == null ? null : func.Invoke(p);
-                });
-            return cache;
+                    string line = null;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        yield return line;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 写入每一行
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="content"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public IEnumerable<string> WriteAllLines(string path, string[] content, Encoding encoding = null)
+        {
+            using (var fileStream = File.OpenWrite(path))
+            {
+                using (var write = new StreamWriter(fileStream, encoding ?? Encoding.UTF8))
+                {
+                    foreach (string line in content)
+                    {
+                        write.WriteLine(line);
+                        yield return line;
+                    }
+                }
+            }
         }
     }
 }

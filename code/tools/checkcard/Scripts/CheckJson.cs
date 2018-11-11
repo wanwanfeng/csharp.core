@@ -35,10 +35,10 @@ namespace checkcard.Scripts
                 }
             };
             //Parallel.ForEach(CheckPath(".json", SelectType.Folder), action);//并行操作
-            CheckPath(".json", SelectType.Folder).AsParallel().ForAll(action);//并行操作
+            CheckPath(".json", SelectType.Folder).AsParallel().ForAll(action); //并行操作
             //CheckPath(".json", SelectType.Folder).ForEach(action);//线性操作
 
-            File.WriteAllLines(InputPath + ".txt", res.Select(p => p.Replace("/", "\\")).ToArray());
+            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "-jsoncheck.txt", res.Select(p => p.Replace("/", "\\")).ToArray());
         }
     }
 }

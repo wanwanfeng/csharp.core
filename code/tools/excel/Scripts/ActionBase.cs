@@ -16,6 +16,7 @@ namespace Script
         public static string regex =
             // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
             "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u3040-\u30FF])";
+
         //"[\\x{3041}-\\x{3096}\\x{30A0}-\\x{30FF}\\x{3400}-\\x{4DB5}\\x{4E00}-\\x{9FCB}\\x{F900}-\\x{FA6A}\\x{2E80}-\\x{2FD5}\\x{FF5F}-\\x{FF9F}\\x{3000}-\\x{303F}\\x{31F0}-\\x{31FF}\\x{3220}-\\x{3243}\\x{3280}-\\x{337F}\\x{FF01}-\\x{FF5E}].+";
 
         protected ActionBase()
@@ -82,7 +83,8 @@ namespace Script
             //};
         }
 
-        private static void ToCommon(string exs, Func<string, IEnumerable<DataTable>> import, Action<DataTable, string> export)
+        private static void ToCommon(string exs, Func<string, IEnumerable<DataTable>> import,
+            Action<DataTable, string> export)
         {
             Action<string> action = file =>
             {
@@ -101,7 +103,7 @@ namespace Script
             };
 
             //Parallel.ForEach(CheckPath(exs), action);//并行操作
-            CheckPath(exs).AsParallel().ForAll(action);//并行操作
+            CheckPath(exs).AsParallel().ForAll(action); //并行操作
             //CheckPath(exs).ForEach(action);//线性操作
         }
 
@@ -199,11 +201,11 @@ namespace Script
             if (dtArray.Count == 0 && dtObject.Count == 0) return;
 
             DataTable dd = new DataTable();
-            dd.Columns.Add("path", typeof(string));
-            dd.Columns.Add("id", typeof(string));
-            dd.Columns.Add("key", typeof(string));
-            dd.Columns.Add("value", typeof(string));
-            dd.Columns.Add("value_zh_cn", typeof(string));
+            dd.Columns.Add("path", typeof (string));
+            dd.Columns.Add("id", typeof (string));
+            dd.Columns.Add("key", typeof (string));
+            dd.Columns.Add("value", typeof (string));
+            dd.Columns.Add("value_zh_cn", typeof (string));
 
             if (dtArray.Count != 0)
             {
@@ -265,14 +267,14 @@ namespace Script
 
             string root = InputPath.Replace(".xlsx", "");
             var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
+            List<List<string>> error = new List<List<string>>();
 
             foreach (var table in caches)
             {
                 foreach (KeyValuePair<string, List<List<object>>> pair in table.dic)
                 {
                     string fullpath = root + pair.Key;
-
-                    if (File.Exists(fullpath))
+                    try
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
@@ -319,10 +321,22 @@ namespace Script
                             File.WriteAllText(fullpath, isCustomAction.Invoke(fullpath, pair.Value));
                         }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
+                        error.Add(new List<string>()
+                        {
+                            error.Count + Enumerable.Repeat("-", 100).Aggregate("", (a, b) => a + b),
+                            fullpath,
+                            e.Message,
+                            e.StackTrace,
+                            ""
+                        });
+                        Console.WriteLine(fullpath + "\t" + e.Message);
                     }
+                    File.WriteAllLines(Path.ChangeExtension(InputPath.TrimEnd('.'), "-export-file.txt"),
+                        error.Select(p => p.Skip(1).First()).ToArray());
+                    File.WriteAllLines(Path.ChangeExtension(InputPath.TrimEnd('.'), "-export-message.txt"),
+                        error.SelectMany(p => p).ToArray());
                 }
             }
         }
@@ -330,7 +344,8 @@ namespace Script
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelToFromListTable(
+        public static
+            void KvExcelToFromListTable(
             Func<string, ListTable> loadAction,
             Action<ListTable, string> saveAction,
             Func<string, List<List<object>>, string> isCustomAction = null
@@ -354,20 +369,19 @@ namespace Script
 
             string root = InputPath.Replace(".xlsx", "");
             var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
+            List<List<string>> error = new List<List<string>>();
 
             foreach (var table in caches)
             {
                 foreach (KeyValuePair<string, List<List<object>>> pair in table.dic)
                 {
                     string fullpath = root + pair.Key;
-
-                    if (File.Exists(fullpath))
+                    try
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
                         var lt = loadAction(fullpath);
                         var columns = lt.Key;
-
                         if (lt.IsArray)
                         {
                             foreach (List<object> objects in pair.Value)
@@ -408,10 +422,22 @@ namespace Script
                             File.WriteAllText(fullpath, isCustomAction.Invoke(fullpath, pair.Value));
                         }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        Console.WriteLine("文件不存在请检查路径!\t" + fullpath);
+                        error.Add(new List<string>()
+                        {
+                            error.Count + Enumerable.Repeat("-", 100).Aggregate("", (a, b) => a + b),
+                            fullpath,
+                            e.Message,
+                            e.StackTrace,
+                            ""
+                        });
+                        Console.WriteLine(fullpath + "\t" + e.Message);
                     }
+                    File.WriteAllLines(Path.ChangeExtension(InputPath.TrimEnd('.'), "-export-file.txt"),
+                        error.Select(p => p.Skip(1).First()).ToArray());
+                    File.WriteAllLines(Path.ChangeExtension(InputPath.TrimEnd('.'), "-export-message.txt"),
+                        error.SelectMany(p => p).ToArray());
                 }
             }
         }

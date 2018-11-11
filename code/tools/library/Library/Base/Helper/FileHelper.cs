@@ -36,9 +36,7 @@ namespace Library.Helper
         /// <returns></returns>
         public static Dictionary<string, object> Path2Dictionary(string path, Func<string, string, object> func = null)
         {
-            return
-                String2Dictionary(
-                    Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(path, "")), func);
+            return String2Dictionary(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(path, "")), func);
         }
 
         /// <summary>
@@ -51,20 +49,19 @@ namespace Library.Helper
             Func<string, string, object> func = null)
         {
             Dictionary<string, object> cache = new Dictionary<string, object>();
-            path.Select(p => p.Replace("\\", "/").TrimStart('/'))
-                .ToList()
-                .ForEach(p =>
+            path.ToList().ForEach(p =>
+            {
+                p = p.Replace("\\", "/").TrimStart('/');
+                var temp = cache;
+                var array = p.Split('/').ToList();
+                array.GetRange(0, array.Count - 1).ForEach(k =>
                 {
-                    var temp = cache;
-                    var array = p.Split('/').ToList();
-                    array.GetRange(0, array.Count - 1).ForEach(k =>
-                    {
-                        if (!temp.ContainsKey(k))
-                            temp[k] = new Dictionary<string, object>();
-                        temp = temp[k] as Dictionary<string, object>;
-                    });
-                    temp[array.Last()] = func == null ? null : func.Invoke(array.Last(), p);
+                    if (!temp.ContainsKey(k))
+                        temp[k] = new Dictionary<string, object>();
+                    temp = temp[k] as Dictionary<string, object>;
                 });
+                temp[array.Last()] = func == null ? null : func.Invoke(array.Last(), p);
+            });
             return cache;
         }
 
@@ -111,7 +108,7 @@ namespace Library.Helper
         /// <param name="content"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public IEnumerable<string> WriteAllLines(string path, string[] content, Encoding encoding = null)
+        public IEnumerable<string> WriteAllLines(string path, IEnumerable<string> content, Encoding encoding = null)
         {
             using (var fileStream = File.OpenWrite(path))
             {

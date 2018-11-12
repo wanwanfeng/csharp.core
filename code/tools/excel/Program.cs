@@ -9,7 +9,7 @@ namespace Library.Excel
 {
     public enum CaoType
     {
-        [Category("文件比较")] [TypeValue(typeof (CompareExcel))] CompareExcel,
+        [Category("两个Excel比较")] [TypeValue(typeof (CompareExcel))] CompareExcel,
 
         [Category("文件转换")] [Description("Excel->ToXml")] [TypeValue(typeof (ActionExcel.ToXml))] ExcelToXml,
         [Category("文件转换")] [Description("Excel->ToCsv")] [TypeValue(typeof (ActionExcel.ToCsv))] ExcelToCsv,

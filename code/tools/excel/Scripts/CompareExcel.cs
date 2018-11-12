@@ -9,37 +9,37 @@ using Library.Extensions;
 namespace Script
 {
     /// <summary>
-    /// 比较文件夹并复制出不同文件
+    /// 比较Excel找出差异并导出到文件
     /// </summary>
     public class CompareExcel
     {
-
-        private string dir1, dir2;
-
         public CompareExcel()
         {
-            dir1 = SystemConsole.GetInputStr("请拖入选定文件(.xls|xlsx):", "您选择的文件：");
-            dir2 = SystemConsole.GetInputStr("请拖入选定文件(.xls|xlsx):", "您选择的文件：");
+            var dir1 = SystemConsole.GetInputStr("请拖入目标文件(.xls|xlsx):", "您选择的文件：");
+            var dir2 = SystemConsole.GetInputStr("请拖入比较文件(.xls|xlsx):", "您选择的文件：");
 
             var vals1 = ExcelByBase.Data.ImportToListTable(dir1).ToDictionary(p => p.TableName);
             var vals2 = ExcelByBase.Data.ImportToListTable(dir2).ToDictionary(p => p.TableName);
 
-            var index = 0;
             foreach (var keyValuePair in vals1)
             {
                 ListTable lst;
                 if (vals2.TryGetValue(keyValuePair.Key, out lst))
                 {
-                    keyValuePair.Value.List = keyValuePair.Value.List.Except(lst.List).ToList();
-                    var newName = Path.ChangeExtension(dir1, "").Trim('.') + "-" +
-                                  Path.GetFileNameWithoutExtension(dir2) + ".xlsx";
-                    ExcelByBase.Data.ExportToExcel(lst, newName);
+                    var exceptList = keyValuePair.Value.List.Except(lst.List).ToList();
+                    var intersectList = keyValuePair.Value.List.Intersect(lst.List).ToList();
+                    var newName = Path.ChangeExtension(dir1, "").Trim('.') + "-" + Path.GetFileNameWithoutExtension(dir2);
+                    keyValuePair.Value.List = exceptList;
+                    ExcelByBase.Data.ExportToExcel(keyValuePair.Value, string.Format("{0}-except.xlsx", newName));
+                    keyValuePair.Value.List = intersectList;
+                    ExcelByBase.Data.ExportToExcel(keyValuePair.Value, string.Format("{0}-intersect.xlsx", newName));
                 }
                 else
                 {
                     Console.WriteLine(dir2 + " 不存在的sheet：" + keyValuePair.Key);
                 }
             }
+            Console.WriteLine("完毕");
         }
     }
 }

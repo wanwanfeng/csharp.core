@@ -10,7 +10,7 @@ namespace Library.Helper
     {
         T ToObject<T>(string res);
         JsonData ToObject(string res);
-        string ToJson<T>(T t);
+        string ToJson<T>(T t, int indentLevel = 0, bool validate = true);
         ListTable ConvertJsonToListTable(string content, Func<object, object> func = null);
         JsonData ConvertListTableToJson(ListTable list);
         JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals);
@@ -40,9 +40,18 @@ namespace Library.Helper
             return Helper.ToObject(res);
         }
 
-        public static string ToJson<T>(T t, bool isUnicode = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="isUnicode">需要转义</param>
+        /// <param name="indentLevel">缩进</param>
+        /// <param name="validate">错误校验输出</param>
+        /// <returns></returns>
+        public static string ToJson<T>(T t, bool isUnicode = false, int indentLevel = 0, bool validate = true)
         {
-            var value = Helper.ToJson(t);
+            var value = Helper.ToJson(t, indentLevel, validate);
             return isUnicode ? value : StringHelper.Unicode2String(value);
         }
 

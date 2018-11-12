@@ -335,10 +335,8 @@ namespace Script
                     }
                 }
             }
-            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "-export-file.txt",
-                error.Select(p => p.Skip(1).First()).ToArray());
-            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "-export-message.txt",
-                error.SelectMany(p => p).ToArray());
+            WriteError("export-file", error.Select(p => p.Skip(1).First()));
+            WriteError("export-message", error.SelectMany(p => p));
         }
 
         /// <summary>
@@ -436,10 +434,8 @@ namespace Script
                     }
                 }
             }
-            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "-export-file.txt",
-                error.Select(p => p.Skip(1).First()).ToArray());
-            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "-export-message.txt",
-                error.SelectMany(p => p).ToArray());
+            WriteError("export-file", error.Select(p => p.Skip(1).First()));
+            WriteError("export-message", error.SelectMany(p => p));
         }
 
         #endregion

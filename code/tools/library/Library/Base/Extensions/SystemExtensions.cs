@@ -44,7 +44,7 @@ namespace Library.Extensions
                 case SelectType.Folder:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension:selectExtension).ToList();
+                        files = DirectoryHelper.GetFiles(path, selectExtension: selectExtension).ToList();
                     }
                     break;
                 case SelectType.All:
@@ -65,6 +65,19 @@ namespace Library.Extensions
             InputPath = path.Replace("\\", "/");
             files.Sort();
             return files;
+        }
+
+        protected static void WriteError(string name, IEnumerable<string> resList)
+        {
+            var enumerable = resList as string[] ?? resList.ToArray();
+            if (enumerable.Length == 0) return;
+            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "[" + name + "].txt",
+                enumerable.ToArray());
+        }
+
+        protected void WriteError(IEnumerable<string> resList)
+        {
+            WriteError(GetType().Name, resList);
         }
     }
 

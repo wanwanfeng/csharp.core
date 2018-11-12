@@ -15,6 +15,9 @@ namespace checkcard
         private enum MyEnum
         {
             [Description("Json文件检测"), TypeValue(typeof (CheckJson))] CheckJson,
+            [Description("Json文件缩进"), TypeValue(typeof (IndentJson))] IndentJson,
+            [Description("Json文件取消缩进"), TypeValue(typeof (CancelIndentJson))] CancelIndentJson,
+
             [Description("卡片检测"), TypeValue(typeof (CheckCard))] CheckCard,
             [Description("剧情符号检测"), TypeValue(typeof (CheckScenario))] CheckScenario,
             [Description("剧情导出"), TypeValue(typeof (ExportScenario))] ExportScenario,

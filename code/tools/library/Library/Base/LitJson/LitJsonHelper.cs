@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Library.Extensions;
 using Library.Helper;
 using LitJson;
@@ -170,9 +171,28 @@ namespace Library.LitJson
             return JsonMapper.ToObject(res);
         }
 
-        public string ToJson<T>(T t)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="validate">错误校验输出</param>
+        /// <returns></returns>
+        public string ToJson<T>(T t, int indentLevel = 0, bool validate = true)
         {
-            return JsonMapper.ToJson(t);
+            if (indentLevel == 0 && validate)
+                return JsonMapper.ToJson(t);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            JsonWriter jsonWriter = new JsonWriter(stringBuilder)
+            {
+                PrettyPrint = true,
+                IndentValue = indentLevel,
+                Validate = validate,
+            };
+            JsonMapper.ToJson(t, jsonWriter);
+            return stringBuilder.ToString().Trim('\r', '\n');
         }
 
         /// <summary>

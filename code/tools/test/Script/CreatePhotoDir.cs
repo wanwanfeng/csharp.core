@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using Library.Extensions;
 
 namespace Script
 {
@@ -7,7 +8,7 @@ namespace Script
     {
         public CreatePhotoDir()
         {
-            new[]
+            new string[]
             {
                 "A_18c1礼盒雅韵三件套",
                 "B_12c1圣经册水晶面板",
@@ -27,7 +28,7 @@ namespace Script
                 "P_10c1精美摆台一副",
                 "Q_12c1水晶摆台一副",
                 "赠送_60x160精美海报一副"
-            }.ToList().ForEach(p => CreateDirectory(p + "/"));
+            }.ForEach(p => CreateDirectory(p + "/"));
         }
     }
 }

@@ -42,8 +42,7 @@ namespace Library.Excel
 
             public static void ExportToJson(DataTable dt, string file)
             {
-                string newPath = CheckExport(dt, file, ".json");
-                List.ExportToJson(ConvertToListTable(dt), newPath);
+                ExportToJson(ConvertToListTable(dt), file);
             }
 
             public static void ExportToJson(ListTable lt, string file)

@@ -91,10 +91,12 @@ namespace webUtils
 
         public static string Md516(byte[] input)
         {
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            byte[] data = md5.ComputeHash(input);
-            (md5 as IDisposable).Dispose();
-            return BitConverter.ToString(data, 4, 8).Replace("-", "").ToLower();
+            using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
+            {
+                byte[] data = md5.ComputeHash(input);
+                //(md5 as IDisposable).Dispose();
+                return BitConverter.ToString(data, 4, 8).Replace("-", "").ToLower();
+            }
         }
     }
 }

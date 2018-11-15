@@ -50,7 +50,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".csv", file => new List<DataTable> {ExcelByBase.Csv.ImportToDataTable(file)});
+                ToKvExcelAll(".csv", file => new List<DataTable> {ExcelByBase.Csv.ImportToDataTable(file)});
             }
         }
 

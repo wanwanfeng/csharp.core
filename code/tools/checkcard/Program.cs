@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.ComponentModel;
-using System.IO;
 using checkcard.Scripts;
 using Library;
 using Library.Extensions;
-using Library.Helper;
 
 namespace checkcard
 {

@@ -49,11 +49,13 @@ namespace Library.Helper
         /// <param name="rootPath"></param>
         /// <param name="selectExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
+        /// <param name="separator"></param>
         /// <returns></returns>
         public static IEnumerable<string> GetFiles(string rootPath, string selectExtension,
-            SearchOption searchOption = SearchOption.AllDirectories)
+            SearchOption searchOption = SearchOption.AllDirectories, params char[] separator)
         {
-            return PredicateFiles(Directory.GetFiles(rootPath, "*.*", searchOption), selectExtension.Split('|'));
+            return PredicateFiles(Directory.GetFiles(rootPath, "*.*", searchOption),
+                selectExtension.Split(separator.Length == 0 ? new[] {'|'} : separator));
         }
 
         /// <summary>
@@ -66,7 +68,8 @@ namespace Library.Helper
         public static IEnumerable<string> GetFiles(string[] rootPaths, string[] selectExtensions,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
-            return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)), selectExtensions);
+            return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)),
+                selectExtensions);
         }
 
         /// <summary>
@@ -75,11 +78,13 @@ namespace Library.Helper
         /// <param name="rootPaths"></param>
         /// <param name="selectExtension">.png|.jpg|.bmp|.psd|.tga|.tif|.dds</param>
         /// <param name="searchOption"></param>
+        /// <param name="separator"></param>
         /// <returns></returns>
         public static IEnumerable<string> GetFiles(string[] rootPaths, string selectExtension,
-            SearchOption searchOption = SearchOption.AllDirectories)
+            SearchOption searchOption = SearchOption.AllDirectories, params char[] separator)
         {
-            return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)), selectExtension.Split('|'));
+            return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)),
+                selectExtension.Split(separator.Length == 0 ? new[] {'|'} : separator));
         }
     }
 }

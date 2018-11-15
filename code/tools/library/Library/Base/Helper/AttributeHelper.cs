@@ -22,7 +22,7 @@ namespace Library.Helper
 
         public static IDictionary<T, TK> GetCacheDefaultValue<T, TK>() where T : struct
         {
-            return GetCache<T, DefaultValueAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? (TK)v.Value.Value : default(TK));
+            return GetCache<T, DefaultValueAttribute>().ToDictionary(k => (T) k.Key, v => v.Value != null ? (TK) v.Value.Value : default(TK));
         }
 
         public static IDictionary<T, string> GetCacheDescription<T>() where T : struct

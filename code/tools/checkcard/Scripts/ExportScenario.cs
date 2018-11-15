@@ -43,7 +43,7 @@ namespace checkcard.Scripts
             });
             faied.Add(DateTime.Now.ToString("yy-MM-dd hh:mm:ss"));
             faied.Add(InputPath + " " + string.Join("|", faied.Select(Path.GetFileName).ToList()));
-            File.WriteAllLines(Path.ChangeExtension(InputPath, "txt"), faied);
+            WriteError("error", faied);
         }
 
         class ColumIndex

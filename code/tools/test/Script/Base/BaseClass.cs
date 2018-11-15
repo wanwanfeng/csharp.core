@@ -100,10 +100,9 @@ namespace Script
         protected void RunList(List<string> res)
         {
             res = res.Select(p => p.Replace("\\", "/")).ToList();
-            var index = 0;
-            res.ForEach(p =>
+            res.ForEach((p, i, count) =>
             {
-                Console.WriteLine((((float) index++)/res.Count).ToString("p") + "\t" + p);
+                Console.WriteLine((((float) i)/count).ToString("p") + "\t" + p);
                 if (File.Exists(p)) RunListOne(p);
             });
         }

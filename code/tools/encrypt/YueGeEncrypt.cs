@@ -30,9 +30,8 @@ namespace encrypt
                         .Select(p => p.Replace(root, "").Replace("\\", "/"))
                         .ToList();
 
-                var index = 0;
                 var dirRoot = root.Replace(folder, "");
-                files.ForEach(file =>
+                files.ForEach((file, i, count) =>
                 {
                     var path = folder + file;
                     var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
@@ -40,7 +39,7 @@ namespace encrypt
                     var newPath = dirName.MD5(md5Key) + "/" + fileName.MD5(md5Key);
 
                     var outPath = dirRoot + "md5/" + newPath;
-                    var p = ((float) (index++)/files.Count).ToString("P") + "\t" + path;
+                    var p = ((float)i / count).ToString("P") + "\t" + path;
                     FileHelper.CreateDirectory(outPath);
                     if (extensionList.Contains(Path.GetExtension(path)))
                     {

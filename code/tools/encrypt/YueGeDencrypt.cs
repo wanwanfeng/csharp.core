@@ -37,10 +37,8 @@ namespace encrypt
                         .Where(p => Path.GetFileNameWithoutExtension(p).Length == 32)
                         .ToList();
 
-                var index = 0;
-
                 var dirRoot = root.Replace(folder, "");
-                files.ForEach(file =>
+                files.ForEach((file, i, count) =>
                 {
                     var path = folder + "/" + file;
                     var newPath = "";
@@ -48,7 +46,7 @@ namespace encrypt
                     {
                         var outPath = dirRoot + newPath;
                         FileHelper.CreateDirectory(outPath);
-                        var p = ((float) (index++) / files.Count).ToString("P") + "\t" + path;
+                        var p = ((float)i / count).ToString("P") + "\t" + path;
                         if (extensionList.Contains(Path.GetExtension(path)))
                         {
                             Console.WriteLine("路径解码中..." + p);
@@ -88,11 +86,9 @@ namespace encrypt
                     .Where(p => Path.GetFileNameWithoutExtension(p).Length != 32)
                     .ToList();
 
-
-            var index = 0;
-            files.ForEach(file =>
+            files.ForEach((file, i, count) =>
             {
-                Console.WriteLine("路径关系获取中..." + ((float) (index++) / files.Count).ToString("P") + "\t" + file);
+                Console.WriteLine("路径关系获取中..." + ((float)i / count).ToString("P") + "\t" + file);
                 var path = file;
                 var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
                 var fileName = Path.GetFileName(path);
@@ -118,7 +114,7 @@ namespace encrypt
 
         public YueGeDencrypt2()
         {
-            Dictionary<string, string> cache = null;// GetCache(Md5Key);
+            Dictionary<string, string> cache = null; // GetCache(Md5Key);
 
             Console.WriteLine("-----------------------------");
             Console.WriteLine("");
@@ -136,16 +132,13 @@ namespace encrypt
 
                 files.ForEach(file =>
                 {
-                    File.WriteAllBytes(file+".temp", UtilSecurity.DecryptionBytes(File.ReadAllBytes(root + file)));
+                    File.WriteAllBytes(file + ".temp", UtilSecurity.DecryptionBytes(File.ReadAllBytes(root + file)));
                 });
 
                 return;
 
-                var index = 0;
-
-
                 var dirRoot = root.Replace(folder, "");
-                files.ForEach(file =>
+                files.ForEach((file, i, count) =>
                 {
                     var path = folder + "/" + file;
                     var newPath = "";
@@ -153,7 +146,7 @@ namespace encrypt
                     {
                         var outPath = dirRoot + newPath;
                         FileHelper.CreateDirectory(outPath);
-                        var p = ((float)(index++) / files.Count).ToString("P") + "\t" + path;
+                        var p = ((float) i/count).ToString("P") + "\t" + path;
                         if (extensionList.Contains(Path.GetExtension(path)))
                         {
                             Console.WriteLine("路径解码中..." + p);
@@ -194,10 +187,9 @@ namespace encrypt
                     .ToList();
 
 
-            var index = 0;
-            files.ForEach(file =>
+            files.ForEach((file, i, count) =>
             {
-                Console.WriteLine("路径关系获取中..." + ((float)(index++) / files.Count).ToString("P") + "\t" + file);
+                Console.WriteLine("路径关系获取中..." + ((float) i/count).ToString("P") + "\t" + file);
                 var path = file;
                 var dirName = Path.GetDirectoryName(path).Replace("\\", "/");
                 var fileName = Path.GetFileName(path);

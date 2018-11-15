@@ -28,7 +28,7 @@ namespace Library.Excel
                 JsonData resJsonDatas = ConvertToJson(list);
                 string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? list.FullName : file, ".json");
                 FileHelper.CreateDirectory(newPath);
-                File.WriteAllText(newPath, JsonHelper.ToJson(resJsonDatas), new UTF8Encoding(false));
+                File.WriteAllText(newPath, JsonHelper.ToJson(resJsonDatas, indentLevel: 2), new UTF8Encoding(false));
             }
 
             #endregion

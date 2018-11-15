@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -7,17 +8,23 @@ using System.Text.RegularExpressions;
 using Library;
 using Library.Excel;
 using Library.Extensions;
+using Library.Helper;
 using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
     public class ActionBase : BaseSystemConsole
     {
-        public static string regex =
-            // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
-            "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u3040-\u30FF])";
 
-        //"[\\x{3041}-\\x{3096}\\x{30A0}-\\x{30FF}\\x{3400}-\\x{4DB5}\\x{4E00}-\\x{9FCB}\\x{F900}-\\x{FA6A}\\x{2E80}-\\x{2FD5}\\x{FF5F}-\\x{FF9F}\\x{3000}-\\x{303F}\\x{31F0}-\\x{31FF}\\x{3220}-\\x{3243}\\x{3280}-\\x{337F}\\x{FF01}-\\x{FF5E}].+";
+        [Description("https://www.cnblogs.com/csguo/p/7401874.html")]
+        public enum MyEnum
+        {
+            [Description("日文"), StringValue("([\u0800-\u4E00])")] 日文 = 1,
+            [Description("日文平假名"), StringValue("([\u3040-\u309F])")] 日文平假名,
+            [Description("日文片假名"), StringValue("([\u30A0-\u30FF])")] 日文片假名,
+            [Description("日文片假名语音扩展"), StringValue("([\u31F0-\u31FF])")] 日文片假名语音扩展,
+            [Description("中文"), StringValue("([\u4E00-\u9FA5])")] 中文 = 10
+        }
 
         protected ActionBase()
         {
@@ -151,15 +158,53 @@ namespace Script
 
         #region 键值对
 
+        public static void ToKvExcelAll(string exs, Func<string, IEnumerable<DataTable>> import)
+        {
+            var cache = AttributeHelper.GetCacheStringValue<MyEnum>();
+            var str = string.Join("|", cache.Values);
+            {
+                SystemConsole.Run(config: new Dictionary<string, Action>()
+                {
+                    {
+                        "匹配中文与日文",
+                        () =>
+                        {
+                            ToKvExcel(exs, import, p => Regex.IsMatch(p, str));
+                        }
+                    },
+                    {
+                        "只匹配中文", () =>
+                        {
+                            ToKvExcel(exs, import,
+                                p => Regex.IsMatch(p, str)
+                                ,s => Regex.IsMatch(s, cache[MyEnum.中文])
+                                //,s => !Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
+                                );
+                        }
+                    },
+                    {
+                        "只匹配日文", () =>
+                        {
+                            ToKvExcel(exs, import,
+                                p => Regex.IsMatch(p, str)
+                                ,s => Regex.IsMatch(s,string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
+                                //, s => !Regex.IsMatch(s, cache[MyEnum.中文])
+                                );
+                        }
+                    }
+                });
+           }
+        }
+
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public static void ToKvExcel(string exs, Func<string, IEnumerable<DataTable>> import)
+        private static void ToKvExcel(string exs, Func<string, IEnumerable<DataTable>> import, params Func<string, bool>[] predicate)
         {
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
-            CheckPath(exs).ForEach(file =>
+            CheckPath(exs).ForEach((file, index, count) =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import(file).Where(p => p != null).ToList();
@@ -171,7 +216,7 @@ namespace Script
                     {
                         var list = ExcelByBase.Data.ConvertToRowsList(dt)
                             .Select(p => string.Join("|", p.Cast<string>().ToArray()))
-                            .Select(p => Regex.IsMatch(p, regex))
+                            .Select(p => predicate == null || predicate.First()(p))
                             .ToList();
                         //返回符合正则表达式的列
                         var header = ExcelByBase.Data.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
@@ -188,8 +233,10 @@ namespace Script
                     {
                         var lt = ExcelByBase.Data.ConvertToListTable(dt);
                         lt.List = lt.List
-                            .ToDictionary(p => p, q => string.Join("|", q.Cast<string>().ToArray()))
-                            .Where(p => Regex.IsMatch(p.Value, regex))
+                            .ToDictionary(p => p, p => string.Join("", p.Cast<string>().ToArray()))
+                            .Where(p => predicate == null || predicate.First()(p.Value))
+                            .ToList()
+                            .Where(p => predicate == null || predicate.Last()(p.Value))
                             .Select(p => p.Key)
                             .ToList();
                         //返回符合正则表达式的行

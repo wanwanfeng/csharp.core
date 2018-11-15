@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Media;
 using Library.Extensions;
 
 namespace test
@@ -27,13 +28,7 @@ namespace test
                     res.AddRange(files.Where(p => Path.GetExtension(p) == s));
                 }
                 File.WriteAllLines(ex + ".txt", res.ToArray());
-                var sum = 0;
-                res.ForEach(p =>
-                {
-                    if (File.Exists(p))
-                        sum += File.ReadAllLines(p).Length;
-                });
-                Console.WriteLine("总行数：" + sum);
+                Console.WriteLine("总行数：" + res.Sum(p => File.Exists(p) ? File.ReadAllLines(p).Length : 0));
             } while (SystemConsole.ContinueY());
         }
     }

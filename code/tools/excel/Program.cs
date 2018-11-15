@@ -9,7 +9,9 @@ namespace Library.Excel
 {
     public enum CaoType
     {
-        [Category("两个Excel比较")] [TypeValue(typeof (CompareExcel))] CompareExcel,
+        [Category("两个文件比较")] [TypeValue(typeof (CompareExcel))] CompareExcel,
+        [Category("两个文件比较")] [TypeValue(typeof (CompareJson))] CompareJson,
+
 
         [Category("文件转换")] [Description("Excel->ToXml")] [TypeValue(typeof (ActionExcel.ToXml))] ExcelToXml,
         [Category("文件转换")] [Description("Excel->ToCsv")] [TypeValue(typeof (ActionExcel.ToCsv))] ExcelToCsv,
@@ -43,7 +45,6 @@ namespace Library.Excel
         [Category("文件内容提取与替换")] [Description("CSV->ToKvExcel")] [TypeValue(typeof (ActionCSV.ToKvExcel))] CsvToKvExcel,
         [Category("文件内容提取与替换")] [Description("CSV->FromKvExcel")] [TypeValue(typeof (ActionCSV.KvExcelTo))] CsvFromKvExcel
     }
-
 
     internal class Program
     {

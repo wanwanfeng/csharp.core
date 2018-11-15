@@ -80,6 +80,14 @@ namespace Library.Helper
             listTable.FullName = file;
             return listTable;
         }
+
+        public static T ImportJson<T>(string file)
+        {
+            if (!File.Exists(file))
+                Ldebug.Log("文件不存在!");
+            string content = File.ReadAllText(file);
+            return ToObject<T>(content.Trim('\0'));
+        }
     }
 }
 

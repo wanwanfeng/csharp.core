@@ -55,7 +55,7 @@ namespace Script
         {
             public ToKvExcel()
             {
-                ToKvExcel(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToKvExcelAll(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
             }
         }
 

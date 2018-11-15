@@ -13,11 +13,6 @@ namespace checkcard.Scripts
     {
         public CheckJson()
         {
-            Read();
-        }
-
-        public void Read()
-        {
             var res = new List<string>();
             Action<string> action = file =>
             {
@@ -45,11 +40,6 @@ namespace checkcard.Scripts
     {
         public IndentJson()
         {
-            Read();
-        }
-
-        public void Read()
-        {
             var res = new List<string>();
             Action<string> action = file =>
             {
@@ -76,11 +66,6 @@ namespace checkcard.Scripts
     public class CancelIndentJson : BaseSystemConsole
     {
         public CancelIndentJson()
-        {
-            Read();
-        }
-
-        public void Read()
         {
             var res = new List<string>();
             Action<string> action = file =>

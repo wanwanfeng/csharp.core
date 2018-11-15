@@ -44,17 +44,18 @@ namespace Library.Extensions
                 case SelectType.Folder:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension: selectExtension).ToList();
+                        files = DirectoryHelper.GetFiles(path, selectExtension.Split('|')).ToList();
                     }
                     break;
                 case SelectType.All:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension: selectExtension).ToList();
+                        files = DirectoryHelper.GetFiles(path, selectExtension.Split('|')).ToList();
                     }
                     else if (File.Exists(path))
                     {
-                        files.Add(path);
+                        if (selectExtension.Split('|').Contains(Path.GetExtension(path)))
+                            files.Add(path);
                     }
                     break;
                 default:
@@ -69,10 +70,15 @@ namespace Library.Extensions
 
         protected static void WriteError(string name, IEnumerable<string> resList)
         {
+            // ReSharper disable once PossibleNullReferenceException
+            var newPath = Path.ChangeExtension(InputPath, "").Trim('.') + "[" + name + "].txt";
             var enumerable = resList as string[] ?? resList.ToArray();
-            if (enumerable.Length == 0) return;
-            File.WriteAllLines(Path.ChangeExtension(InputPath, "").Trim('.') + "[" + name + "].txt",
-                enumerable.ToArray());
+            if (enumerable.Length == 0)
+            {
+                File.Delete(newPath);
+                return;
+            }
+            File.WriteAllLines(newPath,enumerable.ToArray());
         }
 
         protected void WriteError(IEnumerable<string> resList)
@@ -89,9 +95,8 @@ namespace Library.Extensions
             //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
 
             var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
-                .ToLookup(p => p.Value == null ? "" : p.Value.Category,
-                    q => new KeyValuePair<int, T>((int) q.Key, (T) q.Key))
-                .ToDictionary(p => p.Key, q => q.ToList().ToDictionary(p => p.Key, o => o.Value));
+                .ToLookup(p => p.Value == null ? "" : p.Value.Category)
+                .ToDictionary(p => p.Key, p => p.ToDictionary(q => (int) q.Key, q => (T) q.Key));
 
             var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int) p.Key);
             var cacheDesc = AttributeHelper.GetCacheDescription<T>()
@@ -165,8 +170,7 @@ namespace Library.Extensions
         public static void Run(Dictionary<string, Action> config)
         {
             Console.WriteLine("-------操作列表-------");
-            var index = 0;
-            config.Keys.ToList().ForEach(p => Console.WriteLine((++index) + "：" + p));
+            config.Keys.ToList().ForEach((p, i) => Console.WriteLine((i + 1) + "：" + p));
             Console.WriteLine("----------------------");
             List<Action> result = config.Values.ToList();
             config = result.ToDictionary(p => (result.IndexOf(p) + 1).ToString());

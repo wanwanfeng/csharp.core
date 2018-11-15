@@ -67,7 +67,7 @@ namespace Library.Excel
 
             public static IEnumerable<ListTable> ImportToListTable(string file)
             {
-                return ImportToDataTable(file).Select(ConvertToListTable);
+                return ImportToDataTable(file, false).Select(ConvertToListTable);
             }
 
             public static void ExportToExcel(ListTable lt, string file)

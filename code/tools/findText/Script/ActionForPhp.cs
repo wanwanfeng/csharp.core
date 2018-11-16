@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace findText.Script
@@ -31,84 +30,79 @@ namespace findText.Script
             get { return "*.php"; }
         }
 
-        protected override void OpenRun()
+        protected override void OpenRun(string[] input)
         {
-            for (int i = 0; i < all.Count; i++)
+            bool isNewLine = false;
+
+            for (int k = 0; k < input.Length; k++)
             {
-                string[] input = GetShowInfo(i);
-
-                bool isNewLine = false;
-
-                for (int k = 0; k < input.Length; k++)
+                var val = input[k];
+                if (val.TrimStart().EndsWith("*/"))
                 {
-                    var val = input[k];
-                    if (val.TrimStart().EndsWith("*/"))
-                    {
-                        if (val.Contains("/*") == false)
-                            isNewLine = false;
-                        continue;
-                    }
-                    //跨行注释
-                    if (val.TrimStart().StartsWith("/*"))
-                    {
-                        if (val.Contains("*/") == false)
-                            isNewLine = true;
-                        continue;
-                    }
-                    if (isNewLine) continue;
-
-                    if (val.TrimStart().StartsWith("#")) continue;
-                    if (val.TrimStart().StartsWith("@brief ")) continue;
-                    if (val.TrimStart().StartsWith("///")) continue;
-                    if (val.TrimStart().StartsWith("//")) continue;
-                    if (val.TrimStart().StartsWith("*")) continue;
-
-                   //if(!Regex.IsMatch(val,regexStr)) continue;
-
-                    MatchCollection mc = regex.Matches(val);
-                    if (mc.Count == 0) continue;
-                    //去除中间有//
-                    var index = val.IndexOf("//", StringComparison.Ordinal);
-                    if (index >= 0)
-                    {
-                        val = val.Substring(0, index);
-                        mc = regex.Matches(val);
-                        if (mc.Count == 0) continue;
-                    }
-                    //去除中间有/**
-                    index = val.IndexOf("/**", StringComparison.Ordinal);
-                    if (index >= 0)
-                    {
-                        val = val.Substring(0, index);
-                        mc = regex.Matches(val);
-                        if (mc.Count == 0) continue;
-                    }
-                    //去除最后一个双引号后的
-                    index = val.LastIndexOf("\"", StringComparison.Ordinal);
-                    if (index >= 0)
-                    {
-                        val = val.Substring(0, index);
-                    }
-                    //去除第一个双引号前的
-                    index = val.IndexOf("\"", StringComparison.Ordinal);
-                    if (index >= 0)
-                    {
-                        val = val.Substring(index + 1);
-                    }
-                    //去除最后一个单引号后的
-                    index = val.LastIndexOf("'", StringComparison.Ordinal);
-                    if (index >= 0)
-                    {
-                        val = val.Substring(0, index);
-                    }
-                    //去除第一个单引号前的
-                    index = val.IndexOf("'", StringComparison.Ordinal);
-                    if (index >= 0)
-                    {
-                        val = val.Substring(index + 1);
-                    }
-                    GetJsonValue(val, i, k, input);
+                    if (val.Contains("/*") == false)
+                        isNewLine = false;
+                    continue;
                 }
+                //跨行注释
+                if (val.TrimStart().StartsWith("/*"))
+                {
+                    if (val.Contains("*/") == false)
+                        isNewLine = true;
+                    continue;
+                }
+                if (isNewLine) continue;
+
+                if (val.TrimStart().StartsWith("#")) continue;
+                if (val.TrimStart().StartsWith("@brief ")) continue;
+                if (val.TrimStart().StartsWith("///")) continue;
+                if (val.TrimStart().StartsWith("//")) continue;
+                if (val.TrimStart().StartsWith("*")) continue;
+
+                //if(!Regex.IsMatch(val,regexStr)) continue;
+
+                MatchCollection mc = regex.Matches(val);
+                if (mc.Count == 0) continue;
+                //去除中间有//
+                var index = val.IndexOf("//", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(0, index);
+                    mc = regex.Matches(val);
+                    if (mc.Count == 0) continue;
+                }
+                //去除中间有/**
+                index = val.IndexOf("/**", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(0, index);
+                    mc = regex.Matches(val);
+                    if (mc.Count == 0) continue;
+                }
+                //去除最后一个双引号后的
+                index = val.LastIndexOf("\"", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(0, index);
+                }
+                //去除第一个双引号前的
+                index = val.IndexOf("\"", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(index + 1);
+                }
+                //去除最后一个单引号后的
+                index = val.LastIndexOf("'", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(0, index);
+                }
+                //去除第一个单引号前的
+                index = val.IndexOf("'", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(index + 1);
+                }
+                GetJsonValue(val, k, input);
             }
         }
     }

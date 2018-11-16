@@ -77,7 +77,7 @@ namespace Script
 
                         JsonData jsonData = JsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
                         JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
-                        return JsonHelper.ToJson(jsonData);
+                        return JsonHelper.ToJson(jsonData, indentLevel: 2);
                     }
                     );
             }

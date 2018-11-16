@@ -49,7 +49,7 @@ namespace findText.Script
         //    }
         //}
 
-        //protected override void OpenRun()
+        //protected override void OpenRun(string[] input)
         //{
         //    Dictionary<string, string> dic = new Dictionary<string, string>();
 
@@ -73,61 +73,49 @@ namespace findText.Script
         //    }
         //}
 
-        protected override void OpenRun()
+        protected override void OpenRun(string[] input)
         {
-            for (int i = 0; i < all.Count; i++)
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(string.Join("", input));
+            var childs = doc.DocumentNode.Descendants()
+                .Where(p => !p.HasChildNodes)
+                .Where(node => !string.IsNullOrEmpty(node.InnerText.Trim()))
+                .Where(node => node.InnerText != "\r\n")
+                .Where(node => !node.InnerText.TrimStart().StartsWith("<%"))
+                .Where(node => regex.Matches(node.InnerText).Count != 0).ToList();
+            foreach (HtmlNode node in childs)
             {
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(GetShowAll(i));
-                var childs = doc.DocumentNode.Descendants()
-                    .Where(p => !p.HasChildNodes)
-                    .Where(node => !string.IsNullOrEmpty(node.InnerText.Trim()))
-                    .Where(node => node.InnerText != "\r\n")
-                    .Where(node => !node.InnerText.TrimStart().StartsWith("<%"))
-                    .Where(node => regex.Matches(node.InnerText).Count != 0).ToList();
-                foreach (HtmlNode node in childs)
-                {
-                    GetJsonValue(node.InnerText, i, node.XPath, node.InnerText);
-                }
+                GetJsonValue(node.InnerText, node.XPath, node.InnerText);
             }
         }
 
-        protected override List<JsonData> SetJsonDataArray(ListTable list, bool isReverse = false)
+        public override void Revert()
         {
-            List<JsonData> jsonDatas = new List<JsonData>();
-            List<string> first = list.Key;
-            if (isReverse)
-                list.List.Reverse();
-            foreach (List<object> objects in list.List)
+            var list = new List<string>();
+            var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
-                JsonData data = new JsonData();
-                for (int j = 0; j < first.Count; j++)
-                {
-                    string val = objects[j].ToString();
-                    //val = val.Replace("::", ":").Replace("\\n", "\n");
-                    data[first[j].ToString()] = val;
-                }
-                jsonDatas.Add(data);
-            }
-            return jsonDatas;
-        }
-
-        public override void Revert(string inputPath)
-        {
-            var tables = ExcelByBase.Data.ImportToListTable(inputPath);
-            foreach (var table in tables)
+                Console.WriteLine(" from : " + file);
+                return ExcelByBase.Data.ImportToDataTable(file);
+            }).Select(table =>
             {
-                Dictionary<string, List<JsonData>> cache =
-                     SetJsonDataArray(table, true).ToLookup(p => p["文件名"].ToString(), q => q).ToDictionary(p => p.Key, q => q.ToList());
+                var cache =
+                    ExcelByBase.Data.ConvertToListTable(table)
+                        .List
+                        .ToLookup(p => p.First())
+                        .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                cache.Remove("文件名");
+                return new {dic = cache, file = table.FullName};
+            }).ToList();
 
+            foreach (var cach in caches)
+            {
                 var i = 0;
-
-                foreach (KeyValuePair<string, List<JsonData>> valuePair in cache)
+                foreach (KeyValuePair<string, List<List<object>>> valuePair in cach.dic)
                 {
                     string temp = valuePair.Key;
-                    Console.WriteLine("还原中...请稍后" + ((float) (++i)/cache.Count).ToString("p1") + "\t" + temp);
+                    Console.WriteLine("还原中...请稍后" + ((float) (++i)/cach.dic.Count).ToString("p1") + "\t" + temp);
 
-                    string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
+                    string path = (Path.GetDirectoryName(InputPath) + temp).Replace("\\", "/");
                     string content = File.ReadAllText(path);
 
                     HtmlDocument doc = new HtmlDocument();
@@ -137,11 +125,11 @@ namespace findText.Script
 
                     bool isSave = false;
 
-                    foreach (JsonData data in valuePair.Value)
+                    foreach (List<object> data in valuePair.Value)
                     {
-                        string xPath = data["行号"].ToString();
-                        string oldStr = data["原文"].ToString();
-                        string newStr = data["译文"].ToString();
+                        string xPath = data[Convert["行号"]].ToString();
+                        string oldStr = data[Convert["原文"]].ToString();
+                        string newStr = data[Convert["译文"]].ToString();
                         HtmlNode oldNode = childs.FirstOrDefault(p => p.XPath == xPath);
                         if (oldNode == null) continue;
                         HtmlNode newNode = HtmlNode.CreateNode(newStr);

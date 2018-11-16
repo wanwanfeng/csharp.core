@@ -27,8 +27,8 @@ namespace findText
                 BaseActionFor baseActionFor = (BaseActionFor) obj;
                 SystemConsole.Run(config: new Dictionary<string, Action>()
                 {
-                    {"搜索", () => { baseActionFor.Open(SystemConsole.GetInputStr("input dir path:")); }},
-                    {"还原", () => { baseActionFor.Revert(SystemConsole.GetInputStr("iinput file path (*.xlsx):")); }},
+                    {"搜索", () => { baseActionFor.Open(); }},
+                    {"还原", () => { baseActionFor.Revert(); }},
                 });
             };
             SystemConsole.Run<ConvertType>(callFunc);

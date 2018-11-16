@@ -186,8 +186,15 @@ namespace Script
                         "只匹配日文", () =>
                         {
                             ToKvExcel(exs, import,
-                                p => Regex.IsMatch(p, str)
-                                ,s => Regex.IsMatch(s,string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
+                                p => Regex.IsMatch(p, str),
+                                p =>
+                                {
+                                    var val = Regex.Replace(p, "[a-z]", "", RegexOptions.IgnoreCase);
+                                    val = Regex.Replace(val, "[0-9]", "", RegexOptions.IgnoreCase);
+                                    val = Regex.Replace(val, "[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”-]", "");
+                                    return Regex.IsMatch(val, str);
+                                }
+                                //,s => Regex.IsMatch(s,string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
                                 //, s => !Regex.IsMatch(s, cache[MyEnum.中文])
                                 );
                         }

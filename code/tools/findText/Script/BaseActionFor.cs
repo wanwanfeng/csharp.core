@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Library;
 using Library.Excel;
@@ -11,67 +13,40 @@ using LitJson;
 
 namespace findText
 {
-    public abstract class BaseActionFor
+    public abstract class BaseActionFor : BaseSystemConsole
     {
+        [Description("https://www.cnblogs.com/csguo/p/7401874.html")]
+        public enum MyEnum
+        {
+            [Description("日文"), StringValue("([\u0800-\u4E00])")] 日文 = 1,
+            [Description("日文平假名"), StringValue("([\u3040-\u309F])")] 日文平假名,
+            [Description("日文片假名"), StringValue("([\u30A0-\u30FF])")] 日文片假名,
+            [Description("日文片假名语音扩展"), StringValue("([\u31F0-\u31FF])")] 日文片假名语音扩展,
+            [Description("中文"), StringValue("([\u4E00-\u9FA5])")] 中文 = 10
+        }
+
 
         protected Regex regex { get; set; }
 
-        public virtual string regexStr
-        {
-            get
-            {
-                return
-                    // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
-                    "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
-            }
-        }
-
-        protected virtual List<JsonData> SetJsonDataArray(ListTable list, bool isReverse = false)
-        {
-            List<string> first = list.Key;
-            if (isReverse)
-                list.List.Reverse();
-
-            List<JsonData> jsonDatas = new List<JsonData>();
-            foreach (List<object> objects in list.List)
-            {
-                JsonData data = new JsonData();
-                for (int j = 0; j < first.Count; j++)
-                {
-                    string val = objects[j].ToString();
-                    val = val.Replace("::", ":").Replace("\\n", "\n");
-                    data[first[j].ToString()] = val;
-                }
-                jsonDatas.Add(data);
-            }
-            return jsonDatas;
+        public virtual string regexStr { get;
+            //{
+            //    //return
+            //    //    // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
+            //    //    "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
+            //}
+            set;
+            //{ }
         }
 
         public virtual ListTable GetJsonDataArray(string content)
         {
+            return JsonHelper.ConvertJsonToListTable(content);
             return JsonHelper.ConvertJsonToListTable(content, str =>
             {
                 return str.ToString().Replace(":", "::").Replace("\n", "\\n");
             });
         }
 
-        private void WriteExcel(JsonData resJsonData)
-        {
-            var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
-            if (vals.List.Count == 0)
-            {
-                Console.WriteLine("未搜索到结果！");
-                return;
-            }
-            Console.WriteLine("正在写入Excel...");
-            string outpath = inputPath + ".xlsx";
-            ExcelByBase.Data.ExportToExcel(vals, outpath);
-            Console.WriteLine("写入完成，正在启动...");
-            System.Diagnostics.Process.Start(outpath);
-        }
-
-        protected string inputPath = "";
-        protected List<string> all = new List<string>();
         private JsonData resJsonData = new JsonData();
 
         protected virtual string textName
@@ -84,94 +59,140 @@ namespace findText
             get { return "*.*"; }
         }
 
-        public void Open(string input)
+        public void Open()
         {
-            if (!Directory.Exists(input))
+            var cache = AttributeHelper.GetCacheStringValue<MyEnum>();
+            var str = string.Join("|", cache.Values);
             {
-                Console.WriteLine("文件夹路径不存在!");
+                SystemConsole.Run(config: new Dictionary<string, Action>()
+                {
+                    {
+                        "匹配中文与日文",
+                        () =>
+                        {
+                            regexStr = str;
+                            GetValue();
+                        }
+                    },
+                    {
+                        "只匹配中文", () =>
+                        {
+                            regexStr = cache[MyEnum.中文];
+                            GetValue();
+                        }
+                    },
+                    {
+                        "只匹配日文", () =>
+                        {
+                            regexStr = string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value));
+                            GetValue();
+                        }
+                    }
+                });
             }
-            else
+        }
+
+        private void GetValue()
+        {
+            resJsonData = new JsonData();
+            regex = new Regex(regexStr);
+            CheckPath(exName.Replace("*.", "."), SelectType.Folder).ForEach((file, i, count) =>
             {
-                all = DirectoryHelper.GetFiles(inputPath = input, exName.Replace("*", ""), SearchOption.AllDirectories).ToList();
-                all.Sort();
-                resJsonData = new JsonData();
-                regex = new Regex(regexStr);
-                OpenRun();
-                WriteExcel(resJsonData);
+                if (Path.GetFileName(file) == "UserStatusView.js")
+                {
+                    Console.WriteLine();
+                }
+                Console.WriteLine("搜索中...请稍后" + ((float) i/count).ToString("p") + "\t" + file);
+                OpenRun(File.ReadAllLines(file));
+            });
+
+            var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
+            if (vals.List.Count == 0)
+            {
+                Console.WriteLine("未搜索到结果！");
+                return;
             }
+            Console.WriteLine("正在写入Excel...");
+            string outpath = string.Format("{0}[{1}].xlsx", InputPath, exName.Replace("*", "").Replace("|", ""));
+            ExcelByBase.Data.ExportToExcel(vals, outpath);
+            Console.WriteLine("写入完成，正在启动...");
+            System.Diagnostics.Process.Start(outpath);
         }
 
-        protected abstract void OpenRun();
+        protected abstract void OpenRun(string[] input);
 
-        protected string[] GetShowInfo(int i)
+        protected void GetJsonValue(string val, string k, string input)
         {
-            Console.WriteLine("搜索中...请稍后" + ((float) i / all.Count).ToString("f") + "\t" + all[i]);
-            return File.ReadAllLines(all[i]);
-        }
-
-        protected string GetShowAll(int i)
-        {
-            Console.WriteLine("搜索中...请稍后" + ((float) i / all.Count).ToString("f") + "\t" + all[i]);
-            return File.ReadAllText(all[i]);
-        }
-
-        protected void GetJsonValue(string val, int i, string k, string input)
-        {
-            var dir = Path.GetDirectoryName(inputPath).Replace("\\", "/");
+            var dir = Path.GetDirectoryName(InputPath).Replace("\\", "/");
             if (string.IsNullOrEmpty(val.Trim())) return;
             JsonData jsonData = new JsonData();
-            jsonData["文件名"] = all[i].Replace(dir, "");
+            jsonData["文件名"] = file.Replace(dir, "");
             jsonData["行号"] = k;
             jsonData["原文"] = input.Trim();
             jsonData["译文"] = val.Trim();
             resJsonData.Add(jsonData);
         }
 
-        protected void GetJsonValue(string val, int i, int k, string[] input)
+        protected void GetJsonValue(string val, int k, string[] input)
         {
-            var dir = Path.GetDirectoryName(inputPath).Replace("\\", "/");
+            var dir = Path.GetDirectoryName(InputPath).Replace("\\", "/");
             if (string.IsNullOrEmpty(val.Trim())) return;
             JsonData jsonData = new JsonData();
-            jsonData["文件名"] = all[i].Replace(dir, "");
+            jsonData["文件名"] = file.Replace(dir, "");
             jsonData["行号"] = k + 1;
             jsonData["原文"] = input[k].Trim();
             jsonData["译文"] = val.Trim();
             resJsonData.Add(jsonData);
         }
 
+        public readonly Dictionary<string, int> Convert = new[]
+        {
+            "文件名",
+            "行号",
+            "原文",
+            "译文"
+        }.Select((p, i) => new {k = p, index = i}).ToDictionary(p => p.k, p => p.index);
+
+
         /// <summary>
         /// 文件只读取一次
         /// </summary>
-        /// <param name="inputPath"></param>
-        public virtual void Revert(string inputPath)
+        public virtual void Revert()
         {
-            var excels = ExcelByBase.Data.ImportToDataTable(inputPath, false)
-                .Select(ExcelByBase.Data.ConvertToJson)
-                .ToList();
-
             var list = new List<string>();
-
-            foreach (JsonData jsonData in excels)
+            var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
-                var lookup = jsonData.Cast<JsonData>().ToList().ToLookup(p => p["文件名"].ToString(), q => q);
-                Dictionary<string, List<JsonData>> cache = lookup.ToDictionary(p => p.Key, q => q.ToList());
+                Console.WriteLine(" from : " + file);
+                return ExcelByBase.Data.ImportToDataTable(file);
+            }).Select(table =>
+            {
+                var cache =
+                    ExcelByBase.Data.ConvertToListTable(table)
+                        .List
+                        .ToLookup(p => p.First())
+                        .ToDictionary(p => p.Key.ToString(), q => q.ToList());
+                cache.Remove("文件名");
+                return new {dic = cache, file = table.FullName};
+            }).ToList();
 
+            foreach (var cach in caches)
+            {
                 int i = 0;
-                foreach (KeyValuePair<string, List<JsonData>> kv in cache)
+                foreach (KeyValuePair<string, List<List<object>>> pair in cach.dic)
                 {
-                    string temp = kv.Key;
-                    Console.WriteLine("还原中...请稍后" + ((float)(++i) / cache.Count).ToString("p1") + "\t" + temp);
-                    string path = (Path.GetDirectoryName(inputPath) + temp).Replace("\\", "/");
+                    string temp = pair.Key;
+                    Console.WriteLine("还原中...请稍后" + ((float)(++i) / cach.dic.Count).ToString("p1") + "\t" + temp);
+                    string path = (Path.GetDirectoryName(InputPath) + temp).Replace("\\", "/");
 
                     if (File.Exists(path))
                     {
                         string[] content = File.ReadAllLines(path);
-                        foreach (var data in kv.Value)
+                        foreach (var data in pair.Value)
                         {
-                            int line = data["行号"].ToString().AsInt();
-                            string oldStr = data["原文"].ToString();
-                            //string oldStr2 = data["需翻译"].ToString();
-                            string newStr = data["译文"].ToString();
+                            int line = data[Convert["行号"]].ToString().AsInt();
+                            string oldStr = data[Convert["原文"]].ToString();
+                            //string oldStr2 = data[convert["需翻译"]].ToString();
+                            string newStr = data[Convert["译文"]].ToString();
                             //if (content[line] == oldStr)
 
                             var linec = content[line - 1];
@@ -184,15 +205,16 @@ namespace findText
                                 list.Add("替换失败：" + temp + "/" + line + "/" + oldStr + "/" + newStr);
                             }
                         }
-                        File.WriteAllLines(path, content);
+                        File.WriteAllLines(path, content, new UTF8Encoding(false));
                     }
                     else
                     {
                         list.Add("不存在的文件：" + path);
                     }
-                    File.WriteAllLines(inputPath + ".txt", list.ToArray());
                 }
             }
+
+            File.WriteAllLines(InputPath + ".txt", list.ToArray());
         }
     }
 }

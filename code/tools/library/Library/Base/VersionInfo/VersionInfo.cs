@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Library.Extensions;
 
 namespace FileVersion
@@ -39,6 +38,11 @@ namespace FileVersion
             return string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", is_delete, version, revision, content_hash,
                 content_size, encrypt_hash, encrypt_size, path);
         }
+
+        public static implicit operator string(FileDetailInfo info)
+        {
+            return info.ToString();
+        }
     }
 
     public class FilePatchInfo : BaseFileInfo
@@ -60,6 +64,11 @@ namespace FileVersion
             return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}", group, firstVersion, lastVersion, path,
                 content_hash,
                 content_size, encrypt_hash, encrypt_size, zip_hash, zip_size);
+        }
+
+        public static implicit operator string(FilePatchInfo info)
+        {
+            return info.ToString();
         }
     }
 

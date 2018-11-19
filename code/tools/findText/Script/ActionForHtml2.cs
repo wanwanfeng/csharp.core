@@ -49,7 +49,7 @@ namespace findText.Script
         //    }
         //}
 
-        //protected override void OpenRun(string[] input)
+        //protected override void OpenRun(string file)
         //{
         //    Dictionary<string, string> dic = new Dictionary<string, string>();
 
@@ -73,10 +73,10 @@ namespace findText.Script
         //    }
         //}
 
-        protected override void OpenRun(string[] input)
+        protected override void OpenRun(string file)
         {
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(string.Join("", input));
+            doc.LoadHtml(File.ReadAllText(file));
             var childs = doc.DocumentNode.Descendants()
                 .Where(p => !p.HasChildNodes)
                 .Where(node => !string.IsNullOrEmpty(node.InnerText.Trim()))
@@ -85,7 +85,7 @@ namespace findText.Script
                 .Where(node => regex.Matches(node.InnerText).Count != 0).ToList();
             foreach (HtmlNode node in childs)
             {
-                GetJsonValue(node.InnerText, node.XPath, node.InnerText);
+                GetJsonValue(node.InnerText, file, node.XPath, node.InnerText);
             }
         }
 
@@ -104,7 +104,7 @@ namespace findText.Script
                         .ToLookup(p => p.First())
                         .ToDictionary(p => p.Key.ToString(), q => q.ToList());
                 cache.Remove("文件名");
-                return new {dic = cache, file = table.FullName};
+                return new { dic = cache, file = table.FullName };
             }).ToList();
 
             foreach (var cach in caches)
@@ -113,7 +113,7 @@ namespace findText.Script
                 foreach (KeyValuePair<string, List<List<object>>> valuePair in cach.dic)
                 {
                     string temp = valuePair.Key;
-                    Console.WriteLine("还原中...请稍后" + ((float) (++i)/cach.dic.Count).ToString("p1") + "\t" + temp);
+                    Console.WriteLine("还原中...请稍后" + ((float)(++i) / cach.dic.Count).ToString("p1") + "\t" + temp);
 
                     string path = (Path.GetDirectoryName(InputPath) + temp).Replace("\\", "/");
                     string content = File.ReadAllText(path);

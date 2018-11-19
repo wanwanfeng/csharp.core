@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.IO;
+using System.Text.RegularExpressions;
 
 namespace findText.Script
 {
@@ -14,8 +15,10 @@ namespace findText.Script
             get { return ".java"; }
         }
 
-        protected override void OpenRun(string[] input)
+        protected override void OpenRun(string file)
         {
+            string[] input = File.ReadAllLines(file);
+
             //bool isTrue = false;
 
             for (int k = 0; k < input.Length; k++)
@@ -73,7 +76,7 @@ namespace findText.Script
                 //{
                 //    val = val.Substring(index + 1);
                 //}
-                GetJsonValue(val, k, input);
+                GetJsonValue(val, file, k, input);
             }
         }
     }

@@ -89,4 +89,38 @@ namespace checkcard.Scripts
             WriteError(res.Select(p => p.Replace("/", "\\")));
         }
     }
+
+    public class CopyJson : BaseSystemConsole
+    {
+        public CopyJson()
+        {
+            var res = new List<string>();
+            Action<string> action = file =>
+            {
+                Console.WriteLine(" is now : " + file);
+                try
+                {
+                    string oldFolder = Path.GetDirectoryName(InputPath) + "/";
+                    string newFolder = Path.GetDirectoryName(InputPath).TrimEnd('\\') + "_new/";
+                    File.ReadAllLines(file).ForEach(p =>
+                    {
+                        var oldpath = oldFolder + p.TrimStart('/');
+                        var newpath = newFolder + p.TrimStart('/');
+                        DirectoryHelper.CreateDirectory(newpath);
+                        if (File.Exists(oldpath))
+                            File.Copy(oldpath, newpath, true);
+                    });
+                }
+                catch (Exception)
+                {
+                    res.Add(file);
+                }
+            };
+            //Parallel.ForEach(CheckPath(".json", SelectType.Folder), action);//并行操作
+            CheckPath(".txt", SelectType.File).AsParallel().ForAll(action); //并行操作
+            //CheckPath(".json", SelectType.Folder).ForEach(action);//线性操作
+
+            WriteError(res.Select(p => p.Replace("/", "\\")));
+        }
+    }
 }

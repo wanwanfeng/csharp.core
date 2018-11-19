@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace findText.Script
 {
@@ -14,8 +16,10 @@ namespace findText.Script
             get { return "*.js"; }
         }
 
-        protected override void OpenRun(string[] input)
+        protected override void OpenRun(string file)
         {
+            string[] input = File.ReadAllLines(file);
+
             //////bool isTrue = false;
 
             for (int k = 0; k < input.Length; k++)
@@ -35,18 +39,19 @@ namespace findText.Script
                 ////////        isTrue = false;
                 ////////    continue;
                 ////////}
-                ////////MatchCollection mc = regex.Matches(val);
-                ////////if (mc.Count == 0) continue;
+ 
+                MatchCollection mc = regex.Matches(val);
+                if (mc.Count == 0) continue;
 
-                ////////if (val.TrimStart().StartsWith("//")) continue;
-                //////////去除中间有//
-                ////////var index = val.IndexOf("//", StringComparison.Ordinal);
-                ////////if (index >= 0)
-                ////////{
-                ////////    val = val.Substring(0, index);
-                ////////    mc = regex.Matches(val);
-                ////////    if (mc.Count == 0) continue;
-                ////////}
+                if (val.TrimStart().StartsWith("//")) continue;
+                //去除中间有//
+                var index = val.IndexOf("//", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(0, index);
+                    mc = regex.Matches(val);
+                    if (mc.Count == 0) continue;
+                }
                 ////去除中间有/**
                 //index = val.IndexOf("/**", StringComparison.Ordinal);
                 //if (index >= 0)
@@ -67,7 +72,8 @@ namespace findText.Script
                 //{
                 //    val = val.Substring(index + 1);
                 //}
-                GetJsonValue(val, k, input);
+
+                GetJsonValue(val, file, k, input);
             }
         }
     }

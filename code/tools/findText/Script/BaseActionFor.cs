@@ -28,14 +28,14 @@ namespace findText
 
         protected Regex regex { get; set; }
 
-        public virtual string regexStr { get;
+        public virtual string regexStr { get; set;
+            //get
             //{
-            //    //return
-            //    //    // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
-            //    //    "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
+            //    return
+            //        // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
+            //        "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
             //}
-            set;
-            //{ }
+            //set { }
         }
 
         public virtual ListTable GetJsonDataArray(string content)
@@ -98,12 +98,8 @@ namespace findText
             regex = new Regex(regexStr);
             CheckPath(exName.Replace("*.", "."), SelectType.Folder).ForEach((file, i, count) =>
             {
-                if (Path.GetFileName(file) == "UserStatusView.js")
-                {
-                    Console.WriteLine();
-                }
                 Console.WriteLine("搜索中...请稍后" + ((float) i/count).ToString("p") + "\t" + file);
-                OpenRun(File.ReadAllLines(file));
+                OpenRun(file);
             });
 
             var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
@@ -113,15 +109,15 @@ namespace findText
                 return;
             }
             Console.WriteLine("正在写入Excel...");
-            string outpath = string.Format("{0}[{1}].xlsx", InputPath, exName.Replace("*", "").Replace("|", ""));
+            string outpath = string.Format("{0}[{1}].xlsx", InputPath, exName.Replace("*", "").Replace("*", ""));
             ExcelByBase.Data.ExportToExcel(vals, outpath);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);
         }
 
-        protected abstract void OpenRun(string[] input);
+        protected abstract void OpenRun(string file);
 
-        protected void GetJsonValue(string val, string k, string input)
+        protected void GetJsonValue(string val, string file, string k, string input)
         {
             var dir = Path.GetDirectoryName(InputPath).Replace("\\", "/");
             if (string.IsNullOrEmpty(val.Trim())) return;
@@ -133,7 +129,7 @@ namespace findText
             resJsonData.Add(jsonData);
         }
 
-        protected void GetJsonValue(string val, int k, string[] input)
+        protected void GetJsonValue(string val, string file, int k, string[] input)
         {
             var dir = Path.GetDirectoryName(InputPath).Replace("\\", "/");
             if (string.IsNullOrEmpty(val.Trim())) return;

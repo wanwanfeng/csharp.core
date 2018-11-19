@@ -2,6 +2,7 @@
 using System.IO;
 using DataTable = Library.Excel.DataTable;
 using Library.Excel;
+using Library.Extensions;
 using Library.Helper;
 using LitJson;
 
@@ -59,9 +60,10 @@ namespace Script
         {
             public KvExcelTo()
             {
+                var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool();
                 KvExcelToFromListTable(
                     loadAction: ExcelByBase.Json.ImportToListTable,
-                    saveAction: ExcelByBase.Data.ExportToJson,
+                    saveAction: (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); },
                     isCustomAction: (fullpath, list) =>
                     {
                         Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
@@ -77,7 +79,7 @@ namespace Script
 
                         JsonData jsonData = JsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
                         JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
-                        return JsonHelper.ToJson(jsonData, indentLevel: 2);
+                        return isIndent ? JsonHelper.ToJson(jsonData, indentLevel: 2) : JsonHelper.ToJson(jsonData);
                     }
                     );
             }

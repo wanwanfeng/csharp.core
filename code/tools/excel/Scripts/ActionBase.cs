@@ -126,7 +126,8 @@ namespace Script
 
         public static void ToJson(string exs, Func<string, IEnumerable<DataTable>> import)
         {
-            ToCommon(exs, import, ExcelByBase.Data.ExportToJson);
+            var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool();
+            ToCommon(exs, import, (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
         }
 
         public static void ToExcel(string exs, Func<string, IEnumerable<DataTable>> import)
@@ -166,6 +167,21 @@ namespace Script
                 SystemConsole.Run(config: new Dictionary<string, Action>()
                 {
                     {
+                        "不筛选", () =>
+                        {
+                            ToKvExcel(exs, import);
+                        }
+                    },
+                     {
+                        "筛选声音路径", () =>
+                        {
+                            ToKvExcel(exs, import,
+                                p =>
+                                    p.Contains("bgm/") || p.Contains("fullvoice/") || p.Contains("jingle/") ||
+                                    p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/"));
+                        }
+                    },
+                    {
                         "匹配中文与日文",
                         () =>
                         {
@@ -177,7 +193,7 @@ namespace Script
                         {
                             ToKvExcel(exs, import,
                                 p => Regex.IsMatch(p, str)
-                                ,s => Regex.IsMatch(s, cache[MyEnum.中文])
+                                , s => Regex.IsMatch(s, cache[MyEnum.中文])
                                 //,s => !Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
                                 );
                         }
@@ -191,7 +207,8 @@ namespace Script
                                 {
                                     var val = Regex.Replace(p, "[a-z]", "", RegexOptions.IgnoreCase);
                                     val = Regex.Replace(val, "[0-9]", "", RegexOptions.IgnoreCase);
-                                    val = Regex.Replace(val, "[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”-]", "");
+                                    val = Regex.Replace(val,
+                                        "[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”-]", "");
                                     return Regex.IsMatch(val, str);
                                 }
                                 //,s => Regex.IsMatch(s,string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
@@ -200,7 +217,7 @@ namespace Script
                         }
                     }
                 });
-           }
+            }
         }
 
         /// <summary>
@@ -223,7 +240,7 @@ namespace Script
                     {
                         var list = ExcelByBase.Data.ConvertToRowsList(dt)
                             .Select(p => string.Join("|", p.Cast<string>().ToArray()))
-                            .Select(p => predicate == null || predicate.First()(p))
+                            .Select(p => predicate.Length==0  || predicate.First()(p))
                             .ToList();
                         //返回符合正则表达式的列
                         var header = ExcelByBase.Data.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
@@ -241,9 +258,9 @@ namespace Script
                         var lt = ExcelByBase.Data.ConvertToListTable(dt);
                         lt.List = lt.List
                             .ToDictionary(p => p, p => string.Join("", p.Cast<string>().ToArray()))
-                            .Where(p => predicate == null || predicate.First()(p.Value))
+                            .Where(p => predicate.Length == 0 || predicate.First()(p.Value))
                             .ToList()
-                            .Where(p => predicate == null || predicate.Last()(p.Value))
+                            .Where(p => predicate.Length == 0 || predicate.Last()(p.Value))
                             .Select(p => p.Key)
                             .ToList();
                         //返回符合正则表达式的行

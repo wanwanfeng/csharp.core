@@ -23,12 +23,14 @@ namespace Library.Excel
                 return JsonHelper.ConvertListTableToJson(list);
             }
 
-            public static void ExportToJson(ListTable list, string file)
+            public static void ExportToJson(ListTable list, string file, bool isIndent = true)
             {
                 JsonData resJsonDatas = ConvertToJson(list);
                 string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? list.FullName : file, ".json");
                 FileHelper.CreateDirectory(newPath);
-                File.WriteAllText(newPath, JsonHelper.ToJson(resJsonDatas, indentLevel: 2), new UTF8Encoding(false));
+                File.WriteAllText(newPath,
+                    isIndent ? JsonHelper.ToJson(resJsonDatas, indentLevel: 2) : JsonHelper.ToJson(resJsonDatas),
+                    new UTF8Encoding(false));
             }
 
             #endregion

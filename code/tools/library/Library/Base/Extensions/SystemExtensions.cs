@@ -12,9 +12,9 @@ namespace Library.Extensions
     {
         public enum SelectType
         {
-            [Description("请拖入文件：")] File,
-            [Description("请拖入文件夹：")] Folder,
-            [Description("请拖入文件夹或文件：")] All
+            [Description("请拖入文件({0})：")] File,
+            [Description("请拖入文件夹({0})：")] Folder,
+            [Description("请拖入文件夹或文件({0})：")] All
         }
 
         public static IDictionary<SelectType, string> CacheSelect;
@@ -29,7 +29,9 @@ namespace Library.Extensions
         public static List<string> CheckPath(string selectExtension, SelectType selectType = SelectType.All)
         {
             List<string> files = new List<string>();
-            string path = SystemConsole.GetInputStr(beforeTip: CacheSelect[selectType], afterTip: "您选择的文件夹或文件：");
+            string path = SystemConsole.GetInputStr(
+                beforeTip: string.Format(CacheSelect[selectType], selectExtension),
+                afterTip: "您选择的文件夹或文件：");
             if (string.IsNullOrEmpty(path))
                 return files;
 

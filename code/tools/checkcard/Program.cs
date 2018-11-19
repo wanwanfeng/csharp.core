@@ -10,6 +10,8 @@ namespace checkcard
     {
         private enum MyEnum
         {
+            [Description("文件拷贝"), TypeValue(typeof (CopyJson))] CopyJson,
+
             [Description("Json文件检测"), TypeValue(typeof (CheckJson))] CheckJson,
             [Description("Json文件缩进"), TypeValue(typeof (IndentJson))] IndentJson,
             [Description("Json文件取消缩进"), TypeValue(typeof (CancelIndentJson))] CancelIndentJson,

@@ -38,29 +38,6 @@ namespace Library.Excel
             #region   Convert ListTable and DataTable
 
             /// <summary>
-            /// 行集合转换为DataTable
-            /// </summary>
-            /// <param name="list"></param>
-            /// <returns></returns>
-            public static DataTable ConvertToDataTable(ListTable list)
-            {
-                var dt = new DataTable()
-                {
-                    TableName = string.IsNullOrEmpty(list.TableName) ? "Sheet1" : list.TableName,
-                    FullName = list.FullName,
-                    IsArray = list.IsArray,
-                };
-
-                foreach (object o in list.Columns)
-                    dt.Columns.Add(o.ToString(), typeof(string));
-
-                foreach (List<object> objects in list.Rows)
-                    dt.Rows.Add(objects.ToArray());
-
-                return dt;
-            }
-
-            /// <summary>
             /// 列集合转换为DataTable
             /// </summary>
             /// <param name="vals"></param>
@@ -93,28 +70,6 @@ namespace Library.Excel
         public partial class Data
         {
             /// <summary>
-            /// 行集合
-            /// </summary>
-            /// <param name="dt"></param>
-            /// <returns></returns>
-            public static ListTable ConvertToListTable(DataTable dt)
-            {
-                var vals = new List<List<object>>();
-                foreach (DataRow dr in dt.Rows)
-                {
-                    vals.Add(dr.ItemArray.ToList());
-                }
-                return new ListTable()
-                {
-                    TableName = dt.TableName,
-                    FullName = dt.FullName,
-                    IsArray = dt.IsArray,
-                    Columns = GetHeaderList(dt),
-                    Rows = vals,
-                };
-            }
-
-            /// <summary>
             /// 列集合
             /// </summary>
             /// <param name="dt"></param>
@@ -123,17 +78,16 @@ namespace Library.Excel
             {
                 var vals = new List<List<object>>();
 
-                GetHeaderList(dt)
-                    .ForEach(p =>
+                dt.GetHeaderList().ForEach(p =>
+                {
+                    List<object> val = new List<object> {p};
+                    foreach (DataRow dr in dt.Rows)
                     {
-                        List<object> val = new List<object> { p };
-                        foreach (DataRow dr in dt.Rows)
-                        {
-                            var obj = (dr[p] is System.DBNull) ? "" : dr[p];
-                            val.Add(obj);
-                        }
-                        vals.Add(val);
-                    });
+                        var obj = (dr[p] is System.DBNull) ? "" : dr[p];
+                        val.Add(obj);
+                    }
+                    vals.Add(val);
+                });
                 return vals;
             }
 
@@ -146,27 +100,16 @@ namespace Library.Excel
             {
                 var vals = new Dictionary<string, List<object>>();
 
-                GetHeaderList(dt)
-                    .ForEach(p =>
-                    {
-                        List<object> val = new List<object> { p };
-                        foreach (DataRow dr in dt.Rows)
-                        {
-                            var obj = (dr[p] is System.DBNull) ? "" : dr[p];
-                            val.Add(obj);
-                        }
-                        vals.Add(p, val);
-                    });
-                return vals;
-            }
-
-            public static List<string> GetHeaderList(System.Data.DataTable dt)
-            {
-                var vals = new List<string>();
-                foreach (DataColumn dc in dt.Columns)
+                dt.GetHeaderList().ForEach(p =>
                 {
-                    vals.Add(dc.ColumnName);
-                }
+                    List<object> val = new List<object> {p};
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        var obj = (dr[p] is System.DBNull) ? "" : dr[p];
+                        val.Add(obj);
+                    }
+                    vals.Add(p, val);
+                });
                 return vals;
             }
         }

@@ -16,11 +16,6 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByReader : ExcelByBase
     {
-        public override List<ListTable> ImportExcelToListTable(string filename)
-        {
-            return ImportExcelToDataTable(filename).Select(Data.ConvertToListTable).ToList();
-        }
-
         /// <summary>
         /// 获取dataset
         /// http://www.jb51.net/article/52681.htm

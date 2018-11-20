@@ -5,33 +5,6 @@ namespace Library.Excel
 {
     public abstract partial class ExcelByBase
     {
-        public enum LineType
-        {
-            FieldName,
-            FieldType,
-            FieldValue,
-        }
-
-        #region virtual
-
-
-        public virtual List<ListTable> ImportExcelToListTable(string filename)
-        {
-            return null;
-        }
-
-        public virtual void ExportToExcel(string filename, ListTable list)
-        {
-
-        }
-
-        public virtual void ExportToOneExcel(string fileName, List<ListTable> list)
-        {
-
-        }
-
-        #endregion
-
         public static readonly List<string> zimu = GetList();
 
         public static List<string> GetList()

@@ -16,7 +16,7 @@ namespace Library.Excel
             return CheckPath(".xlsx", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return ExcelByBase.Data.ImportToListTable(file);
+                return ExcelByBase.Data.ImportToDataTable(file, false).Select(p => (ListTable) p);
             }).Select(table =>
             {
                 var cache = table.Rows

@@ -11,12 +11,11 @@ namespace Library.Excel
     {
         public partial class Data
         {
-
             private static string CheckExport(DataTable dt, string file, string extension)
             {
                 file = string.IsNullOrEmpty(file) ? dt.FullName : file;
                 string newPath = Path.ChangeExtension(file, extension);
-                FileHelper.CreateDirectory(newPath);
+                DirectoryHelper.CreateDirectory(newPath);
                 return newPath;
             }
 
@@ -41,7 +40,6 @@ namespace Library.Excel
                 return ExcelByNpoi.ImportExcelToDataTable(file);
             }
 
-
             public static void ExportToExcel(DataTable dt, string file)
             {
                 string newPath = CheckExport(dt, file, ".xlsx");
@@ -54,39 +52,11 @@ namespace Library.Excel
                 FileHelper.CreateDirectory(newPath);
                 ExcelByNpoi.ExportDataTableToExcel(newPath, dts.ToArray());
             }
-
-            #region ListTable
-
-            private static string CheckExport(ListTable lt, string file, string extension)
-            {
-                file = string.IsNullOrEmpty(file) ? lt.FullName : file;
-                string newPath = Path.ChangeExtension(file, extension);
-                FileHelper.CreateDirectory(newPath);
-                return newPath;
-            }
-
-            public static IEnumerable<ListTable> ImportToListTable(string file)
-            {
-                return ImportToDataTable(file, false).Select(ConvertToListTable);
-            }
-
-            public static void ExportToExcel(ListTable lt, string file)
-            {
-                ExportToExcel(List.ConvertToDataTable(lt), file);
-            }
-
-            public static void ExportToOneExcel(IEnumerable<ListTable> dts, string file)
-            {
-                ExportToOneExcel(dts.Select(List.ConvertToDataTable), file);
-            }
-
-            #endregion
         }
-
 
         public void HaHa(DataTable dt)
         {
-            var headers = Data.GetHeaderList(dt);
+            var headers = dt.GetHeaderList();
 
             //DataTable dataTable = (DataTable) dt.Clone();
             //dataTable.DefaultView.ToTable()

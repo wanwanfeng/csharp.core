@@ -24,7 +24,7 @@ namespace checkcard.Scripts
             CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return (ExcelByBase.Data.ImportToListTable(file));
+                return ExcelByBase.Data.ImportToDataTable(file, false);
             }).ForAll(lt =>
             {
                 Console.WriteLine(" is now : " + lt.FullName);
@@ -47,7 +47,7 @@ namespace checkcard.Scripts
             var dts = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return ExcelByBase.Data.ImportToListTable(file);
+                return ExcelByBase.Data.ImportToDataTable(file, false).Select(p => (ListTable) p);
             }).ToList();
 
             if (dts.Count == 0)

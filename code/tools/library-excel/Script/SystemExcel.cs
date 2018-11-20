@@ -13,11 +13,7 @@ namespace Library.Excel
         /// <returns></returns>
         protected static List<Dictionary<string, List<List<object>>>> GetFileCaches()
         {
-            return CheckPath(".xlsx", SelectType.File).SelectMany(file =>
-            {
-                Console.WriteLine(" from : " + file);
-                return ExcelByBase.Data.ImportToDataTable(file, false).Select(p => (ListTable) p);
-            }).Select(table =>
+            return GetListTables().Select(table =>
             {
                 var cache = table.Rows
                     .GroupBy(p => p.First())
@@ -25,6 +21,19 @@ namespace Library.Excel
                 cache.Remove(table.Columns.First());
                 return cache;
             }).ToList();
+        }
+
+        /// <summary>
+        /// 已首列分组形成字典
+        /// </summary>
+        /// <returns></returns>
+        protected static IEnumerable<ListTable> GetListTables()
+        {
+            return CheckPath(".xlsx", SelectType.File).SelectMany(file =>
+            {
+                Console.WriteLine(" from : " + file);
+                return ExcelByBase.Data.ImportToDataTable(file, false).Select(p => (ListTable) p);
+            });
         }
     }
 }

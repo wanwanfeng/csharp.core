@@ -19,10 +19,10 @@ namespace Library.Excel
                 return ExcelByBase.Data.ImportToListTable(file);
             }).Select(table =>
             {
-                var cache = table.List
+                var cache = table.Rows
                     .GroupBy(p => p.First())
                     .ToDictionary(p => p.Key.ToString(), q => q.ToList());
-                cache.Remove(table.Key.First());
+                cache.Remove(table.Columns.First());
                 return cache;
             }).ToList();
         }

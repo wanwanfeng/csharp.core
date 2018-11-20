@@ -257,7 +257,7 @@ namespace Script
                     else
                     {
                         var lt = ExcelByBase.Data.ConvertToListTable(dt);
-                        lt.List = lt.List
+                        lt.Rows = lt.Rows
                             .ToDictionary(p => p, p => string.Join("", p.Cast<string>().ToArray()))
                             .Where(p => predicate.Length == 0 || predicate.First()(p.Value))
                             .ToList()
@@ -335,10 +335,10 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var dt = loadAction(fullpath);
-                        var columns = dt.Columns;
+                        var data = loadAction(fullpath);
+                        var columns = data.Columns;
 
-                        if (dt.IsArray)
+                        if (data.IsArray)
                         {
                             foreach (List<object> objects in pair.Value)
                             {
@@ -347,7 +347,7 @@ namespace Script
                                 object value = objects[3];
                                 string value_zh_cn = objects[4].ToString();
 
-                                foreach (DataRow dtr in dt.Rows)
+                                foreach (DataRow dtr in data.Rows)
                                 {
                                     if (columns.Contains(key))
                                     {
@@ -368,7 +368,7 @@ namespace Script
                             if (!isSave) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            saveAction.Invoke(dt, fullpath);
+                            saveAction.Invoke(data, fullpath);
                         }
                         else
                         {
@@ -421,9 +421,10 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var lt = loadAction(fullpath);
-                        var columns = lt.Key;
-                        if (lt.IsArray)
+                        var data = loadAction(fullpath);
+                        var columns = data.Columns;
+
+                        if (data.IsArray)
                         {
                             foreach (List<object> objects in pair.Value)
                             {
@@ -432,15 +433,15 @@ namespace Script
                                 object value = objects[3];
                                 string value_zh_cn = objects[4].ToString();
 
-                                foreach (List<object> dtr in lt.List)
+                                foreach (List<object> dtr in data.Rows)
                                 {
                                     if (columns.Contains(key))
                                     {
                                         var idTemp = dtr[0].ToString();
-                                        var keyTemp = dtr[lt.Key.IndexOf(key)];
+                                        var keyTemp = dtr[data.Columns.IndexOf(key)];
                                         if (idTemp.Equals(id) /*&& keyTemp.Equals(value)*/)
                                         {
-                                            dtr[lt.Key.IndexOf(key)] = value_zh_cn;
+                                            dtr[data.Columns.IndexOf(key)] = value_zh_cn;
                                             isSave = true;
                                         }
                                     }
@@ -453,7 +454,7 @@ namespace Script
                             if (!isSave) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            saveAction.Invoke(lt, fullpath);
+                            saveAction.Invoke(data, fullpath);
                         }
                         else
                         {

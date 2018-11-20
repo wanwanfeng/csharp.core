@@ -99,18 +99,23 @@ namespace Library
         public string TableName = "";
         public string FullName = "";
         public bool IsArray = true;
-        public List<string> Key = new List<string>();
-        public List<List<object>> List = new List<List<object>>();
+        /// <summary>
+        /// key列表
+        /// </summary>
+        public List<string> Columns = new List<string>();
+        /// <summary>
+        /// 值列表
+        /// </summary>
+        public List<List<object>> Rows = new List<List<object>>();
 
         public object this[int hang, int lie]
         {
-            get { return List[hang][lie]; }
+            get { return Rows[hang][lie]; }
         }
 
         public object this[int hang, string key]
         {
-            get { return List[hang][Key.IndexOf(key)]; }
+            get { return Rows[hang][Columns.IndexOf(key)]; }
         }
-
     }
 }

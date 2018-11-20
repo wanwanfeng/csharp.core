@@ -31,7 +31,7 @@ namespace checkcard.Scripts
                 if (!lt.IsArray) return;
                 List<string> res = new List<string>();
 
-                foreach (List<object> list in lt.List)
+                foreach (List<object> list in lt.Rows)
                 {
                     string haha = list[4].ToString();
                     if (haha.Count(p => p.Equals('[') || p.Equals(']'))%2 == 0) continue;
@@ -62,7 +62,7 @@ namespace checkcard.Scripts
 
             foreach (List<string> list in res)
             {
-                var row = dts[0].List.FirstOrDefault(q =>
+                var row = dts[0].Rows.FirstOrDefault(q =>
                 {
                     string[] p = q.Cast<string>().ToArray();
                     return p[0] == list[0] && p[1] == list[1] && p[2] == list[2] && p[3] == list[3];

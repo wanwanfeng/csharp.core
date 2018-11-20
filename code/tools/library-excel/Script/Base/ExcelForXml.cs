@@ -109,11 +109,11 @@ namespace Library.Excel
                         doc.AppendChild(docNode);
 
                         ListTable list = ConvertToListTable(dt);
-                        foreach (List<object> objects in list.List)
+                        foreach (List<object> objects in list.Rows)
                         {
                             var node = doc.CreateElement("RECORD");
                             docNode.AppendChild(node);
-                            var keys = new Queue<string>(list.Key);
+                            var keys = new Queue<string>(list.Columns);
                             foreach (object o in objects)
                             {
                                 var element = doc.CreateElement(keys.Dequeue());

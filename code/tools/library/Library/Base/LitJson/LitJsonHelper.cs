@@ -227,7 +227,7 @@ namespace Library.LitJson
                     }
                     list.Add(val);
                 }
-                return new ListTable {IsArray = true, Key = keys, List = list};
+                return new ListTable {IsArray = true, Columns = keys, Rows = list};
             }
             if (data.IsObject)
             {
@@ -237,7 +237,7 @@ namespace Library.LitJson
                         p.Key,
                         func == null ? p.Value : func(p.Value)
                     }).ToList();
-                return new ListTable { IsArray = false, Key = new List<string> { "key", "value" }, List = list };
+                return new ListTable { IsArray = false, Columns = new List<string> { "key", "value" }, Rows = list };
             }
             return new ListTable();
         }
@@ -251,11 +251,11 @@ namespace Library.LitJson
             JsonData resJsonDatas = new JsonData();
             resJsonDatas.SetJsonType(JsonType.Array);
 
-            foreach (List<object> objects in list.List)
+            foreach (List<object> objects in list.Rows)
             {
                 Queue<object> queueVal = new Queue<object>(objects);
                 JsonData jsonData = new JsonData();
-                foreach (string o in list.Key)
+                foreach (string o in list.Columns)
                 {
                     var val = queueVal.Dequeue();
                     jsonData[o] = (val is JsonData) ? (JsonData) val : new JsonData(val);

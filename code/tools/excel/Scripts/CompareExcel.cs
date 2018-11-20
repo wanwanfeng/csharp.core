@@ -29,21 +29,21 @@ namespace Script
                 ListTable lst;
                 if (listTables2.TryGetValue(keyValuePair.Key, out lst))
                 {
-                    var intersectList = keyValuePair.Value.List.AsParallel().AsOrdered()
+                    var intersectList = keyValuePair.Value.Rows.AsParallel().AsOrdered()
                         .Where((objects, i) =>
                         {
                             Console.WriteLine(i);
-                            return lst.List.Any(objects.SequenceEqual);
+                            return lst.Rows.Any(objects.SequenceEqual);
                         }).ToList();
-                    var exceptList = keyValuePair.Value.List.Except(intersectList);
+                    var exceptList = keyValuePair.Value.Rows.Except(intersectList);
 
                     //var exceptList = keyValuePair.Value.List.Except(lst.List).ToList();
                     //var intersectList = keyValuePair.Value.List.Intersect(lst.List).ToList();
                     // ReSharper disable once PossibleNullReferenceException
                     var newName = Path.ChangeExtension(dir1, "").Trim('.') + "-" + Path.GetFileNameWithoutExtension(dir2);
-                    keyValuePair.Value.List = exceptList.ToList();
+                    keyValuePair.Value.Rows = exceptList.ToList();
                     ExcelByBase.Data.ExportToExcel(keyValuePair.Value, string.Format("{0}-except.xlsx", newName));
-                    keyValuePair.Value.List = intersectList.ToList();
+                    keyValuePair.Value.Rows = intersectList.ToList();
                     ExcelByBase.Data.ExportToExcel(keyValuePair.Value, string.Format("{0}-intersect.xlsx", newName));
                 }
                 else

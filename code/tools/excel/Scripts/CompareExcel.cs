@@ -14,7 +14,7 @@ namespace Script
     /// <summary>
     /// 比较Excel找出差异并导出到文件
     /// </summary>
-    public class CompareExcel
+    public class CompareExcel : BaseSystemExcel
     {
         public CompareExcel()
         {

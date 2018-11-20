@@ -8,7 +8,7 @@ using Library.Extensions;
 
 namespace checkcard.Scripts
 {
-    public class CheckScenario : BaseSystemConsole
+    public class CheckScenario : BaseSystemExcel
     {
         public CheckScenario()
         {
@@ -21,11 +21,7 @@ namespace checkcard.Scripts
 
         public void Read()
         {
-            CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
-            {
-                Console.WriteLine(" from : " + file);
-                return ExcelByBase.Data.ImportToDataTable(file, false);
-            }).ForAll(lt =>
+            GetListTables().AsParallel().ForAll(lt =>
             {
                 Console.WriteLine(" is now : " + lt.FullName);
                 if (!lt.IsArray) return;
@@ -44,11 +40,7 @@ namespace checkcard.Scripts
 
         public void Write()
         {
-            var dts = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
-            {
-                Console.WriteLine(" from : " + file);
-                return ExcelByBase.Data.ImportToDataTable(file, false).Select(p => (ListTable) p);
-            }).ToList();
+            var dts = GetListTables().ToList();
 
             if (dts.Count == 0)
                 return;

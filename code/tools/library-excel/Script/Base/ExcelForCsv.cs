@@ -63,8 +63,8 @@ namespace Library.Excel
                     TableName = Path.GetFileNameWithoutExtension(path),
                     FullName = path,
                     IsArray = true,
-                    Key = list.First().Cast<string>().ToList(),
-                    List = list.Skip(1).ToList()
+                    Columns = list.First().Cast<string>().ToList(),
+                    Rows = list.Skip(1).ToList()
                 });
             }
         }
@@ -80,15 +80,15 @@ namespace Library.Excel
                 {
                     case CsvMode.CsvHelp:
                     {
-                        var res = new List<List<object>>(list.List);
-                        res.Insert(0, list.Key.Cast<object>().ToList());
+                        var res = new List<List<object>>(list.Rows);
+                        res.Insert(0, list.Columns.Cast<object>().ToList());
                         CsvHelper.SaveCSV(res, newPath);
                     }
                         break;
                     case CsvMode.Normal:
                     {
 
-                        var contents = list.List.Select(p => string.Join(",", p.Select(q =>
+                        var contents = list.Rows.Select(p => string.Join(",", p.Select(q =>
                                 {
                                     //var str = q.ToString().Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
                                     //if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))

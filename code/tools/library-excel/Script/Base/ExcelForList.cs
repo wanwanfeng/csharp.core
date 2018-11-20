@@ -51,10 +51,10 @@ namespace Library.Excel
                     IsArray = list.IsArray,
                 };
 
-                foreach (object o in list.Key)
+                foreach (object o in list.Columns)
                     dt.Columns.Add(o.ToString(), typeof(string));
 
-                foreach (List<object> objects in list.List)
+                foreach (List<object> objects in list.Rows)
                     dt.Rows.Add(objects.ToArray());
 
                 return dt;
@@ -109,8 +109,8 @@ namespace Library.Excel
                     TableName = dt.TableName,
                     FullName = dt.FullName,
                     IsArray = dt.IsArray,
-                    Key = GetHeaderList(dt),
-                    List = vals,
+                    Columns = GetHeaderList(dt),
+                    Rows = vals,
                 };
             }
 

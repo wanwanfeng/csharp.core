@@ -103,7 +103,7 @@ namespace findText
             });
 
             var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
-            if (vals.List.Count == 0)
+            if (vals.Rows.Count == 0)
             {
                 Console.WriteLine("未搜索到结果！");
                 return;

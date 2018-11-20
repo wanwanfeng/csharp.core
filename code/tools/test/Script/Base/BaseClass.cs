@@ -54,8 +54,8 @@ namespace Script
             //直接写入excel
             var listTable = new ListTable()
             {
-                List = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
-                Key = new List<string>() {"key", "value"}
+                Rows = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
+                Columns = new List<string>() {"key", "value"}
             };
             ExcelByBase.Data.ExportToExcel(listTable, root + ".xlsx");
         }

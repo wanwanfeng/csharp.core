@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using DataTable = Library.Excel.DataTable;
+using System.Linq;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -10,60 +11,69 @@ namespace Script
 {
     public class ActionJson : ActionBase
     {
-        public class ToXml
+        public override string selectExtension
+        {
+            get { return ".json"; }
+        }
+
+        public override Func<string, IEnumerable<DataTable>> import
+        {
+            get { return file => new[] {ExcelByBase.Json.ImportToDataTable(file)}; }
+        }
+
+        public class ToXml : ActionJson
         {
             public ToXml()
             {
-                ToXml(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
+                ToXml();
             }
         }
 
-        public class ToCsv
+        public class ToCsv : ActionJson
         {
             public ToCsv()
             {
-                ToCsv(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
+                ToCsv();
             }
         }
 
-        public class ToExcel
+        public class ToExcel : ActionJson
         {
             public ToExcel()
             {
-                ToExcel(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
+                ToExcel();
             }
         }
 
-        public class ToOneExcel
+        public class ToOneExcel : ActionJson
         {
             public ToOneExcel()
             {
-                ToOneExcel(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
+                ToOneExcel();
             }
         }
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ToKvExcel
+        public class ToKvExcel : ActionJson
         {
             public ToKvExcel()
             {
-                ToKvExcelAll(".json", file => new List<DataTable>() {ExcelByBase.Json.ImportToDataTable(file)});
+                ToKvExcelAll();
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class KvExcelTo
+        public sealed class KvExcelTo : ActionJson
         {
             public KvExcelTo()
             {
                 var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
-                KvExcelToFromDataTable(
-                    loadAction: ExcelByBase.Json.ImportToDataTable,
-                    saveAction: (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); },
+                export = (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); };
+                KvExcelTo(
                     isCustomAction: (fullpath, list) =>
                     {
                         Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();

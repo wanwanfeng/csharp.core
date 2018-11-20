@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Library.Excel;
 
@@ -6,70 +8,82 @@ namespace Script
 {
     public class ActionExcel : ActionBase
     {
-        public class ToXml
+        public override string selectExtension
+        {
+            get { return ".xlsx|.xls"; }
+        }
+
+        public override Func<string, IEnumerable<DataTable>> import
+        {
+            get { return ExcelByBase.Data.ImportToDataTable; }
+        }
+
+        public override Action<DataTable, string> export
+        {
+            get { return ExcelByBase.Data.ExportToExcel; }
+        }
+
+        public class ToXml : ActionExcel
         {
             public ToXml()
             {
-                ToXml(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToXml();
             }
         }
 
-        public class ToCsv
+        public class ToCsv : ActionExcel
         {
             public ToCsv()
             {
-                ToCsv(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToCsv();
             }
         }
 
-        public class ToJson
+        public class ToJson : ActionExcel
         {
             public ToJson()
             {
-                ToJson(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToJson();
             }
         }
 
         [Description("读取多个Excel文件分解每一个文件的sheet到一个Excel文件")]
-        public class ToExcel
+        public class ToExcel : ActionExcel
         {
             public ToExcel()
             {
-                ToExcel(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToExcel();
             }
         }
 
         [Description("读取多个Excel文件的多个sheet合并到一个Excel文件")]
-        public class ToOneExcel
+        public class ToOneExcel : ActionExcel
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToOneExcel();
             }
         }
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ToKvExcel
+        public class ToKvExcel : ActionExcel
         {
             public ToKvExcel()
             {
-                ToKvExcelAll(".xlsx|.xls", ExcelByBase.Data.ImportToDataTable);
+                ToKvExcelAll();
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class KvExcelTo
+        public class KvExcelTo : ActionExcel
         {
             public KvExcelTo()
             {
-                KvExcelToFromDataTable(
-                    loadAction: (file) => ExcelByBase.Data.ImportToDataTable(file).FirstOrDefault(),
-                    saveAction: ExcelByBase.Data.ExportToExcel
-                    );
+                KvExcelTo();
             }
         }
     }

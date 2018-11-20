@@ -66,11 +66,6 @@ public static class DataTableExtensions
 {
     public static List<string> GetHeaderList(this System.Data.DataTable dt)
     {
-        var vals = new List<string>();
-        foreach (DataColumn dc in dt.Columns)
-        {
-            vals.Add(dc.ColumnName);
-        }
-        return vals;
+        return (from DataColumn dc in dt.Columns select dc.ColumnName).ToList();
     }
 }

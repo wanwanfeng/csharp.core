@@ -1,66 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
-using DataTable = Library.Excel.DataTable;
 using Library.Excel;
 
 namespace Script
 {
     public class ActionXml : ActionBase
     {
-        public class ToCsv
+        public override string selectExtension
+        {
+            get { return ".xml"; }
+        }
+
+        public override Func<string, IEnumerable<DataTable>> import
+        {
+            get { return file => new[] {ExcelByBase.Xml.ImportToDataTable(file)}; }
+        }
+
+        public override Action<DataTable, string> export
+        {
+            get { return ExcelByBase.Data.ExportToXml; }
+        }
+
+        public class ToCsv : ActionXml
         {
             public ToCsv()
             {
-                ToCsv(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
+                ToCsv();
             }
         }
 
-        public class ToJson
+        public class ToJson : ActionXml
         {
             public ToJson()
             {
-                ToJson(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
+                ToJson();
             }
         }
 
-        public class ToExcel
+        public class ToExcel : ActionXml
         {
             public ToExcel()
             {
-                ToExcel(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
+                ToExcel();
             }
         }
 
-        public class ToOneExcel
+        public class ToOneExcel : ActionXml
         {
             public ToOneExcel()
             {
-                ToOneExcel(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
+                ToOneExcel();
             }
         }
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ToKvExcel
+        public class ToKvExcel : ActionXml
         {
             public ToKvExcel()
             {
-                ToKvExcelAll(".xml", file => new List<DataTable>() {ExcelByBase.Xml.ImportToDataTable(file)});
+                ToKvExcelAll();
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class KvExcelTo
+        public class KvExcelTo : ActionXml
         {
             public KvExcelTo()
             {
-                KvExcelToFromDataTable(
-                    loadAction: ExcelByBase.Xml.ImportToDataTable,
-                    saveAction: ExcelByBase.Data.ExportToXml
-                    );
+                KvExcelTo();
             }
         }
     }

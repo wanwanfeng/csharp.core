@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using FileVersion;
 using Library.Extensions;
-using Library.Helper;
 using Script;
 
 namespace Library.Excel

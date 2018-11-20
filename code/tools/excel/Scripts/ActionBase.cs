@@ -26,72 +26,11 @@ namespace Script
             [Description("中文"), StringValue("([\u4E00-\u9FA5])")] 中文 = 10
         }
 
-        protected ActionBase()
-        {
-            //Func<DataTable, DataTable> onSheetBeforeAction = (dt) =>
-            //{
-            //    var cache = ExcelByBase.Data.ConvertToRowsDictionary(dt)
-            //        .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
-            //        .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
-            //    if (cache.Values.All(p => p == false))
-            //    {
-            //        //忽略掉不匹配正则的
-            //        return null;
-            //    }
+        public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
+        public virtual Action<DataTable, string> export { get; set; }
+        public virtual string selectExtension { get; set; }
 
-            //    int i = 0;
-            //    foreach (KeyValuePair<string, bool> pair in cache)
-            //    {
-            //        var show = pair.Value;
-            //        if (show)
-            //        {
-            //            var o = pair.Key + "_zh_cn";
-            //            if (!dt.Columns.Contains(o))
-            //            {
-            //                //增加列
-            //                dt.Columns.Add(o.ToString(), typeof(string));
-            //                dt.Columns[o].SetOrdinal(i + 1);
-            //                i++;
-            //                //列复制
-            //                foreach (DataRow dr in dt.Rows)
-            //                    dr[o] = dr[pair.Key];
-            //            }
-            //        }
-            //        i++;
-            //    }
-            //    return dt;
-            //};
-
-            //Func<ISheet, DataTable, DataTable> onSheetAction = (sheet, dt) =>
-            //{
-            //    var cache = ExcelByBase.Data.ConvertToRowsDictionary(dt)
-            //        .ToDictionary(p => p.Key, q => string.Join("|", q.Value.Cast<string>().ToArray()))
-            //        .ToDictionary(p => p.Key, q => Regex.IsMatch(q.Value, regex));
-            //    if (cache.Values.All(p => p == false))
-            //    {
-            //        //忽略掉不匹配正则的
-            //        return null;
-            //    }
-
-            //    int i = 0;
-            //    foreach (KeyValuePair<string, bool> pair in cache)
-            //    {
-            //        var show = pair.Value;
-
-            //        var style = sheet.GetColumnStyle(i);
-            //        style.IsLocked = !pair.Key.Contains("_zh_cn");
-            //        sheet.SetColumnHidden(i, !show);
-            //        sheet.SetDefaultColumnStyle(i, style);
-            //        if (show)
-            //            sheet.AutoSizeColumn(i);
-            //        i++;
-            //    }
-            //    return dt;
-            //};
-        }
-
-        private static void ToCommon(string exs, Func<string, IEnumerable<DataTable>> import,
-            Action<DataTable, string> export)
+        private void ToCommon(Action<DataTable, string> export)
         {
             Action<string> action = file =>
             {
@@ -109,40 +48,38 @@ namespace Script
                 });
             };
 
-            //Parallel.ForEach(CheckPath(exs), action);//并行操作
-            CheckPath(exs).AsParallel().ForAll(action); //并行操作
-            //CheckPath(exs).ForEach(action);//线性操作
+            //Parallel.ForEach(CheckPath(selectExtension), action);//并行操作
+            CheckPath(selectExtension).AsParallel().ForAll(action); //并行操作
+            //CheckPath(selectExtension).ForEach(action);//线性操作
         }
 
-        public static void ToXml(string exs, Func<string, IEnumerable<DataTable>> import)
+        public void ToXml()
         {
-            ToCommon(exs, import, ExcelByBase.Data.ExportToXml);
+            ToCommon(ExcelByBase.Data.ExportToXml);
         }
 
-        public static void ToCsv(string exs, Func<string, IEnumerable<DataTable>> import)
+        public void ToCsv()
         {
-            ToCommon(exs, import, ExcelByBase.Data.ExportToCsv);
+            ToCommon(ExcelByBase.Data.ExportToCsv);
         }
 
-        public static void ToJson(string exs, Func<string, IEnumerable<DataTable>> import)
+        public void ToJson()
         {
             var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool();
-            ToCommon(exs, import, (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
+            ToCommon((table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
         }
 
-        public static void ToExcel(string exs, Func<string, IEnumerable<DataTable>> import)
+        public void ToExcel()
         {
-            ToCommon(exs, import, ExcelByBase.Data.ExportToExcel);
+            ToCommon(ExcelByBase.Data.ExportToExcel);
         }
 
         /// <summary>
         /// 多个DataTable保存在同一文件
         /// </summary>
-        /// <param name="exs"></param>
-        /// <param name="import"></param>
-        public static void ToOneExcel(string exs, Func<string, IEnumerable<DataTable>> import)
+        public void ToOneExcel()
         {
-            var dts = CheckPath(exs, SelectType.Folder).AsParallel().SelectMany(file =>
+            var dts = CheckPath(selectExtension, SelectType.Folder).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 return import(file).Where(p => p != null).Select(p =>
@@ -159,7 +96,7 @@ namespace Script
 
         #region 键值对
 
-        public static void ToKvExcelAll(string exs, Func<string, IEnumerable<DataTable>> import)
+        public void ToKvExcelAll()
         {
             var cache = AttributeHelper.GetCacheStringValue<MyEnum>();
             var str = string.Join("|", cache.Values);
@@ -169,13 +106,13 @@ namespace Script
                     {
                         "不筛选", () =>
                         {
-                            ToKvExcel(exs, import);
+                            ToKvExcel();
                         }
                     },
                     {
                         "筛选声音路径", () =>
                         {
-                            ToKvExcel(exs, import,
+                            ToKvExcel(
                                 p =>
                                     p.Contains("bgm/") || p.Contains("fullvoice/") || p.Contains("jingle/") ||
                                     p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/"));
@@ -185,13 +122,13 @@ namespace Script
                         "匹配中文与日文",
                         () =>
                         {
-                            ToKvExcel(exs, import, p => Regex.IsMatch(p, str));
+                            ToKvExcel(p => Regex.IsMatch(p, str));
                         }
                     },
                     {
                         "只匹配中文", () =>
                         {
-                            ToKvExcel(exs, import,
+                            ToKvExcel(
                                 p => Regex.IsMatch(p, str)
                                 , s => Regex.IsMatch(s, cache[MyEnum.中文])
                                 //,s => !Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
@@ -201,7 +138,7 @@ namespace Script
                     {
                         "只匹配日文", () =>
                         {
-                            ToKvExcel(exs, import,
+                            ToKvExcel(
                                 p => Regex.IsMatch(p, str),
                                 p =>
                                 {
@@ -223,13 +160,12 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        private static void ToKvExcel(string exs, Func<string, IEnumerable<DataTable>> import,
-            params Func<string, bool>[] predicate)
+        private void ToKvExcel(params Func<string, bool>[] predicate)
         {
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
-            CheckPath(exs).ForEach((file, index, count) =>
+            CheckPath(selectExtension).ForEach((file, index, count) =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import(file).Where(p => p != null).ToList();
@@ -256,7 +192,7 @@ namespace Script
                     }
                     else
                     {
-                        var lt = (ListTable)dt;
+                        var lt = (ListTable) dt;
                         lt.Rows = lt.Rows
                             .ToDictionary(p => p, p => string.Join("", p.Cast<string>().ToArray()))
                             .Where(p => predicate.Length == 0 || predicate.First()(p.Value))
@@ -313,17 +249,13 @@ namespace Script
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public static void KvExcelToFromDataTable(
-            Func<string, DataTable> loadAction,
-            Action<DataTable, string> saveAction,
-            Func<string, List<List<object>>, string> isCustomAction = null
-            )
+        public void KvExcelTo(Func<string, List<List<object>>, string> isCustomAction = null)
         {
             var caches = GetFileCaches();
             if (caches.Count == 0) return;
 
             string root = InputPath.Replace(".xlsx", "");
-            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool(false);
             List<List<string>> error = new List<List<string>>();
 
             foreach (var table in caches)
@@ -335,7 +267,7 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var data = ExcelByBase.Data.ImportToDataTable(fullpath).FirstOrDefault();
+                        var data = import(fullpath).FirstOrDefault();
                         var columns = data.Columns;
 
                         if (data.IsArray)
@@ -368,7 +300,7 @@ namespace Script
                             if (!isSave) continue;
                             if (isBak)
                                 File.Copy(fullpath, fullpath + ".bak", true);
-                            saveAction.Invoke(data, fullpath);
+                            export.Invoke(data, fullpath);
                         }
                         else
                         {

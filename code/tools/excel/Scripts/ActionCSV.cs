@@ -11,19 +11,34 @@ namespace Script
 {
     public class ActionCSV : ActionBase
     {
-        public class ToXml
+        public override string selectExtension
+        {
+            get { return ".csv"; }
+        }
+
+        public override Func<string, IEnumerable<DataTable>> import
+        {
+            get { return file => new[] { ExcelByBase.Csv.ImportToDataTable(file) }; }
+        }
+
+        public override Action<DataTable, string> export
+        {
+            get { return ExcelByBase.Data.ExportToCsv; }
+        }
+
+        public class ToXml : ActionCSV
         {
             public ToXml()
             {
-                ToXml(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
+                ToXml();
             }
         }
 
-        public class ToJson
+        public class ToJson : ActionCSV
         {
             public ToJson()
             {
-                ToJson(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
+                ToJson();
             }
         }
 
@@ -31,40 +46,37 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
+                ToExcel();
             }
         }
 
-        public class ToOneExcel
+        public class ToOneExcel : ActionCSV
         {
             public ToOneExcel()
             {
-                ToOneExcel(".csv", file => new List<DataTable> { ExcelByBase.Csv.ImportToDataTable(file) });
+                ToOneExcel();
             }
         }
 
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        public class ToKvExcel
+        public class ToKvExcel : ActionCSV
         {
             public ToKvExcel()
             {
-                ToKvExcelAll(".csv", file => new List<DataTable> {ExcelByBase.Csv.ImportToDataTable(file)});
+                ToKvExcelAll();
             }
         }
 
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public class KvExcelTo
+        public class KvExcelTo : ActionCSV
         {
             public KvExcelTo()
             {
-                KvExcelToFromDataTable(
-                    loadAction: ExcelByBase.Csv.ImportToDataTable,
-                    saveAction: ExcelByBase.Data.ExportToCsv
-                    );
+                KvExcelTo();
             }
         }
 

@@ -13,7 +13,7 @@ using LitJson;
 
 namespace findText
 {
-    public abstract class BaseActionFor : BaseSystemConsole
+    public abstract class BaseActionFor : BaseSystemExcel
     {
         [Description("https://www.cnblogs.com/csguo/p/7401874.html")]
         public enum MyEnum
@@ -155,29 +155,17 @@ namespace findText
         /// </summary>
         public virtual void Revert()
         {
-            var list = new List<string>();
-            var caches = CheckPath(".xlsx", SelectType.File).AsParallel().SelectMany(file =>
-            {
-                Console.WriteLine(" from : " + file);
-                return ExcelByBase.Data.ImportToDataTable(file);
-            }).Select(table =>
-            {
-                var cache =
-                    ExcelByBase.Data.ConvertToListTable(table)
-                        .List
-                        .ToLookup(p => p.First())
-                        .ToDictionary(p => p.Key.ToString(), q => q.ToList());
-                cache.Remove("文件名");
-                return new {dic = cache, file = table.FullName};
-            }).ToList();
+            var caches = GetFileCaches();
+            if (caches.Count == 0) return;
 
-            foreach (var cach in caches)
+            var list = new List<string>();
+            foreach (var dic in caches)
             {
                 int i = 0;
-                foreach (KeyValuePair<string, List<List<object>>> pair in cach.dic)
+                foreach (KeyValuePair<string, List<List<object>>> pair in dic)
                 {
                     string temp = pair.Key;
-                    Console.WriteLine("还原中...请稍后" + ((float)(++i) / cach.dic.Count).ToString("p1") + "\t" + temp);
+                    Console.WriteLine("还原中...请稍后" + ((float) (++i)/dic.Count).ToString("p1") + "\t" + temp);
                     string path = (Path.GetDirectoryName(InputPath) + temp).Replace("\\", "/");
 
                     if (File.Exists(path))

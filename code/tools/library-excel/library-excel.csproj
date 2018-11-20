@@ -76,6 +76,7 @@
     <Compile Include="Script\ExcelByOleDb.cs" />
     <Compile Include="Script\ExcelByReader.cs" />
     <Compile Include="Script\ExcelByStream.cs" />
+    <Compile Include="Script\SystemExcel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\library\library.csproj">

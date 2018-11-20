@@ -61,8 +61,8 @@ namespace Script
             public KvExcelTo()
             {
                 var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
-                KvExcelToFromListTable(
-                    loadAction: ExcelByBase.Json.ImportToListTable,
+                KvExcelToFromDataTable(
+                    loadAction: ExcelByBase.Json.ImportToDataTable,
                     saveAction: (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); },
                     isCustomAction: (fullpath, list) =>
                     {

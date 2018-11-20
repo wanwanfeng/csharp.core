@@ -23,21 +23,6 @@ namespace Library.Excel
     /// </summary>
     internal class ExcelByNpoi : ExcelByBase
     {
-        public override List<ListTable> ImportExcelToListTable(string filename)
-        {
-            return ImportExcelToDataTable(filename).Select(Data.ConvertToListTable).ToList();
-        }
-
-        public override void ExportToExcel(string filename, ListTable list)
-        {
-            ExportDataTableToExcel(filename, List.ConvertToDataTable(list));
-        }
-
-        public override void ExportToOneExcel(string fileName, List<ListTable> list)
-        {
-            ExportDataTableToExcel(fileName, list.Select(List.ConvertToDataTable).ToArray());
-        }
-
         /// <summary>
         /// Excel导入成Datable
         /// </summary>

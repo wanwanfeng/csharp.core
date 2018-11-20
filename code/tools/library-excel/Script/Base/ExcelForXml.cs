@@ -108,7 +108,7 @@ namespace Library.Excel
                         XmlNode docNode = doc.CreateElement("RECORDS");
                         doc.AppendChild(docNode);
 
-                        ListTable list = ConvertToListTable(dt);
+                        ListTable list = (ListTable)dt;
                         foreach (List<object> objects in list.Rows)
                         {
                             var node = doc.CreateElement("RECORD");

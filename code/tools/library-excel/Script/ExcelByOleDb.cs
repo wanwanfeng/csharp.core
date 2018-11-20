@@ -13,22 +13,6 @@ namespace Library.Excel
     /// </summary>
     public class ExcelByOleDb : ExcelByBase
     {
-        public override List<ListTable> ImportExcelToListTable(string filename)
-        {
-            return ImportExcelToDataTable(filename).Select(Data.ConvertToListTable).ToList();
-        }
-
-        public override void ExportToExcel(string filename, ListTable list)
-        {
-            var dt = List.ConvertToDataTable(list);
-            ExportDataTableToExcel(filename, dt);
-        }
-
-        public override void ExportToOneExcel(string fileName, List<ListTable> list)
-        {
-            ExportDataTableToExcel(fileName, list.Select(List.ConvertToDataTable).ToArray());
-        }
-
         /// <summary>
         /// 获取dataset
         /// http://www.jb51.net/article/52681.htm

@@ -244,7 +244,7 @@ namespace Script
                             .Select(p => predicate.Length == 0 || predicate.First()(p))
                             .ToList();
                         //返回符合正则表达式的列
-                        var header = ExcelByBase.Data.GetHeaderList(dt).Where((p, i) => (i == 0 || list[i])).ToList();
+                        var header = dt.GetHeaderList().Where((p, i) => (i == 0 || list[i])).ToList();
 
                         var resdt = dt.DefaultView.ToTable(false, header.ToArray());
 
@@ -256,7 +256,7 @@ namespace Script
                     }
                     else
                     {
-                        var lt = ExcelByBase.Data.ConvertToListTable(dt);
+                        var lt = (ListTable)dt;
                         lt.Rows = lt.Rows
                             .ToDictionary(p => p, p => string.Join("", p.Cast<string>().ToArray()))
                             .Where(p => predicate.Length == 0 || predicate.First()(p.Value))
@@ -265,7 +265,7 @@ namespace Script
                             .Select(p => p.Key)
                             .ToList();
                         //返回符合正则表达式的行
-                        dtObject.Add(ExcelByBase.List.ConvertToDataTable(lt));
+                        dtObject.Add(lt);
                     }
                 });
             });
@@ -283,7 +283,7 @@ namespace Script
             {
                 foreach (System.Data.DataTable dataTable in dtArray)
                 {
-                    var header = ExcelByBase.Data.GetHeaderList(dataTable);
+                    var header = dataTable.GetHeaderList();
                     foreach (DataRow dr in dataTable.Rows)
                     {
                         foreach (string s in header.Skip(1))
@@ -335,7 +335,7 @@ namespace Script
                     {
                         bool isSave = false;
                         Console.WriteLine(" is now : " + fullpath);
-                        var data = loadAction(fullpath);
+                        var data = ExcelByBase.Data.ImportToDataTable(fullpath).FirstOrDefault();
                         var columns = data.Columns;
 
                         if (data.IsArray)
@@ -356,92 +356,6 @@ namespace Script
                                         if (idTemp.Equals(id) /*&& keyTemp.Equals(value)*/)
                                         {
                                             dtr[key] = value_zh_cn;
-                                            isSave = true;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("不包含列 !\t" + fullpath + "\t" + key);
-                                    }
-                                }
-                            }
-                            if (!isSave) continue;
-                            if (isBak)
-                                File.Copy(fullpath, fullpath + ".bak", true);
-                            saveAction.Invoke(data, fullpath);
-                        }
-                        else
-                        {
-                            if (isCustomAction == null) continue;
-                            if (isBak)
-                                File.Copy(fullpath, fullpath + ".bak", true);
-                            File.WriteAllText(fullpath, isCustomAction.Invoke(fullpath, pair.Value));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        error.Add(new List<string>()
-                        {
-                            error.Count + Enumerable.Repeat("-", 100).Aggregate("", (a, b) => a + b),
-                            fullpath,
-                            e.Message,
-                            e.StackTrace,
-                            ""
-                        });
-                        Console.WriteLine(fullpath + "\t" + e.Message);
-                    }
-                }
-            }
-            WriteError("export-file", error.Select(p => p.Skip(1).First()));
-            WriteError("export-message", error.SelectMany(p => p));
-        }
-
-        /// <summary>
-        /// 还原键值对
-        /// </summary>
-        public static void KvExcelToFromListTable(
-            Func<string, ListTable> loadAction,
-            Action<ListTable, string> saveAction,
-            Func<string, List<List<object>>, string> isCustomAction = null
-            )
-        {
-            var caches = GetFileCaches();
-            if (caches.Count == 0) return;
-
-            string root = InputPath.Replace(".xlsx", "");
-            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool();
-            List<List<string>> error = new List<List<string>>();
-
-            foreach (var table in caches)
-            {
-                foreach (KeyValuePair<string, List<List<object>>> pair in table)
-                {
-                    string fullpath = root + pair.Key;
-                    try
-                    {
-                        bool isSave = false;
-                        Console.WriteLine(" is now : " + fullpath);
-                        var data = loadAction(fullpath);
-                        var columns = data.Columns;
-
-                        if (data.IsArray)
-                        {
-                            foreach (List<object> objects in pair.Value)
-                            {
-                                object id = objects[1];
-                                string key = objects[2].ToString();
-                                object value = objects[3];
-                                string value_zh_cn = objects[4].ToString();
-
-                                foreach (List<object> dtr in data.Rows)
-                                {
-                                    if (columns.Contains(key))
-                                    {
-                                        var idTemp = dtr[0].ToString();
-                                        var keyTemp = dtr[data.Columns.IndexOf(key)];
-                                        if (idTemp.Equals(id) /*&& keyTemp.Equals(value)*/)
-                                        {
-                                            dtr[data.Columns.IndexOf(key)] = value_zh_cn;
                                             isSave = true;
                                         }
                                     }

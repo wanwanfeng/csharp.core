@@ -44,13 +44,13 @@ namespace Library.Excel
                     {
                         string[] content = File.ReadAllLines(path);
                         list = content.Select(
-                                q =>
-                                {
-                                    return q.Split(',')
-                                        .Select(p => p.StartsWith("\"") ? p.Substring(1, p.Length - 2) : p)
-                                        .Cast<object>()
-                                        .ToList();
-                                })
+                            q =>
+                            {
+                                return q.Split(',')
+                                    .Select(p => p.StartsWith("\"") ? p.Substring(1, p.Length - 2) : p)
+                                    .Cast<object>()
+                                    .ToList();
+                            })
                             .ToList();
                     }
                         break;
@@ -58,14 +58,14 @@ namespace Library.Excel
                         throw new ArgumentOutOfRangeException();
                 }
                 if (list.Count == 0) return null;
-                return List.ConvertToDataTable(new ListTable()
+                return new ListTable()
                 {
                     TableName = Path.GetFileNameWithoutExtension(path),
                     FullName = path,
                     IsArray = true,
                     Columns = list.First().Cast<string>().ToList(),
                     Rows = list.Skip(1).ToList()
-                });
+                };
             }
         }
 
@@ -75,7 +75,7 @@ namespace Library.Excel
             {
                 string newPath = CheckExport(dt, file, ".csv");
 
-                var list = ConvertToListTable(dt);
+                var list = (ListTable) dt;
                 switch (CurCsvMode)
                 {
                     case CsvMode.CsvHelp:

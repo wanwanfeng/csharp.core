@@ -55,7 +55,7 @@ namespace SvnVersion
                 svnUrl += svnUrl.EndsWith("/") ? "" : "/";
                 Console.WriteLine("库地址：" + svnUrl);
 
-                SaveDir = Path.GetDirectoryName(svnUrl).AsStringArray('\\').Last() + "/";
+                SaveDir = Path.GetDirectoryName(svnUrl).SplitString('\\').Last() + "/";
 
                 Console.WriteLine("");
                 highVersion = CmdReadAll("svn info --show-item last-changed-revision " + svnUrl).Last().AsInt();

@@ -22,7 +22,7 @@ namespace fontConvert
             }
             else
             {
-                var exName = ex.AsStringArray('|', ',').ToList().Select(p => p.StartsWith(".") ? p : "." + p).ToList();
+                var exName = ex.SplitString('|', ',').Select(p => p.StartsWith(".") ? p : "." + p).ToList();
                 all =
                     Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories)
                         .Where(p => exName.Contains(Path.GetExtension(p)))

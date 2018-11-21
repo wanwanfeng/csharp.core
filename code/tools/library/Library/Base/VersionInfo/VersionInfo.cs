@@ -99,8 +99,8 @@ namespace FileVersion
             //} while (runIt.Current != null || remoteIt.Current != null);
             //return false;
 
-            var runArray = new Queue<int>(oldV.AsIntArray(separator));
-            var remoteArray = new Queue<int>(newV.AsIntArray(separator));
+            var runArray = new Queue<int>(oldV.SplitInt(separator));
+            var remoteArray = new Queue<int>(newV.SplitInt(separator));
             while (runArray.Count > 0 || remoteArray.Count > 0)
             {
                 var run = runArray.Count == 0 ? 0 : runArray.Dequeue();

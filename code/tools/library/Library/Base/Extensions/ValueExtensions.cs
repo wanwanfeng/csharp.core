@@ -147,9 +147,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static int[] AsIntArray(this string[] value, int def = 0)
+        public static IEnumerable<int> AsInt(this IEnumerable<string> value, int def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsInt(def));
+            return value.Select(p => p.AsInt(def));
         }
 
         /// <summary>
@@ -158,9 +158,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static float[] AsFloatArray(this string[] value, float def = 0)
+        public static IEnumerable<float> AsFloat(this IEnumerable<string> value, float def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsFloat(def));
+            return value.Select(p => p.AsFloat(def));
         }
 
         /// <summary>
@@ -169,9 +169,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static double[] AsDoubleArray(this string[] value, double def = 0)
+        public static IEnumerable<double> AsDouble(this IEnumerable<string> value, double def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsDouble(def));
+            return value.Select(p => p.AsDouble(def));
         }
 
         /// <summary>
@@ -180,9 +180,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static long[] AsLongArray(this string[] value, long def = 0)
+        public static IEnumerable<long> AsLong(this IEnumerable<string> value, long def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsLong(def));
+            return value.Select(p => p.AsLong(def));
         }
 
         /// <summary>
@@ -191,9 +191,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static decimal[] AsDecimalArray(this string[] value, decimal def = 0)
+        public static IEnumerable<decimal>AsDecimal(this IEnumerable<string> value, decimal def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsDecimal(def));
+            return value.Select(p => p.AsDecimal(def));
         }
 
         /// <summary>
@@ -202,9 +202,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static byte[] AsByteArray(this string[] value, byte def = 0)
+        public static IEnumerable<byte> AsByte(this IEnumerable<string> value, byte def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsByte(def));
+            return value.Select(p => p.AsByte(def));
         }
 
         /// <summary>
@@ -213,9 +213,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static short[] AsShortArray(this string[] value, short def = 0)
+        public static IEnumerable<short> AsShort(this IEnumerable<string> value, short def = 0)
         {
-            return Array.ConvertAll(value, p => p.AsShort(def));
+            return value.Select(p => p.AsShort(def));
         }
 
         /// <summary>
@@ -224,9 +224,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="def">默认值</param>
         /// <returns></returns>
-        public static bool[] AsBoolArray(this string[] value, bool def = false)
+        public static IEnumerable<bool> AsBool(this IEnumerable<string> value, bool def = false)
         {
-            return Array.ConvertAll(value, p => p.AsBool(def));
+            return value.Select(p => p.AsBool(def));
         }
 
         /// <summary>
@@ -235,9 +235,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static int[] AsIntArray(this string value, params char[] separator)
+        public static IEnumerable<int> SplitInt(this string value, params char[] separator)
         {
-            return value.AsStringArray(separator).AsIntArray();
+            return value.SplitString(separator).AsInt();
         }
 
         /// <summary>
@@ -246,9 +246,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static float[] AsFloatArray(this string value, params char[] separator)
+        public static IEnumerable<float> SplitFloat(this string value, params char[] separator)
         {
-            return value.AsStringArray(separator).AsFloatArray();
+            return value.SplitString(separator).AsFloat();
         }
 
         /// <summary>
@@ -257,9 +257,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static double[] AsDoubleArray(this string value, params char[] separator)
+        public static IEnumerable<double> SplitDouble(this string value, params char[] separator)
         {
-            return value.AsStringArray(separator).AsDoubleArray();
+            return value.SplitString(separator).AsDouble();
         }
 
         /// <summary>
@@ -268,9 +268,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static bool[] AsBoolArray(this string value, params char[] separator)
+        public static IEnumerable<bool> SplitBool(this string value, params char[] separator)
         {
-            return value.AsStringArray(separator).AsBoolArray();
+            return value.SplitString(separator).AsBool();
         }
 
         /// <summary>
@@ -279,12 +279,11 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static string[] AsStringArray(this string value, params char[] separator)
+        public static IEnumerable<string> SplitString(this string value, params char[] separator)
         {
             try
             {
-                var result = value.Split(separator.Length == 0 ? new[] {','} : separator);
-                return result;
+                return value.Split(separator.Length == 0 ? new[] {','} : separator);
             }
             catch (Exception)
             {
@@ -302,9 +301,9 @@ namespace Library.Extensions
         {
             try
             {
-                return content + string.Join(content, value.ToCharArray().AsStringArray());
+                return content + string.Join(content, value.ToCharArray().Select(p => p.ToString()).ToArray());
 
-                //char[] source = value.ToCharArray();
+                //char[] source = value.ToChar();
                 //StringBuilder sbBuilder = new StringBuilder(value.Length + (content.Length)*value.Length);
                 //foreach (var item in source)
                 //{
@@ -328,18 +327,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static string Join<T>(this IEnumerable<T> value, string separator = null)
         {
-            return string.Join(separator ?? Environment.NewLine, value.AsStringArray());
-        }
-
-        /// <summary>
-        /// 值类型数组转为string[]型
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string[] AsStringArray<T>(this IEnumerable<T> value)
-        {
-            return Array.ConvertAll(value.ToArray(), p => p.ToString());
+            return string.Join(separator ?? Environment.NewLine, value.Select(p => p.ToString()).ToArray());
         }
     }
 }

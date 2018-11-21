@@ -186,7 +186,7 @@ namespace checkcard.Scripts
             return sheet.Rows[row + 1][ColumIndex.second].ToString() == ""; //右移
         }
 
-        void add_single_param(object k, object v, JsonData turn)
+        private void add_single_param(object k, object v, JsonData turn)
         {
             string key = k.ToString();
             string value = v.ToString();
@@ -200,17 +200,13 @@ namespace checkcard.Scripts
             }
             else if (turn_param_list.Contains(key))
             {
-                var list = value.Split(',').ToList();
-                JsonData temp = new JsonData();
-                list.ForEach(p => temp.Add(p));
-                turn[key] = temp;
+                turn[key] = new JsonData();
+                value.Split(',').ToList().ForEach(p => turn[key].Add(p));
             }
             else if (turn_param_int_list.Contains(key))
             {
-                var list = value.Split(',').AsIntArray().ToList();
-                JsonData temp = new JsonData();
-                list.ForEach(p => temp.Add(p));
-                turn[key] = temp;
+                turn[key] = new JsonData();
+                value.SplitInt(',').ToList().ForEach(p => turn[key].Add(p));
             }
             else
             {

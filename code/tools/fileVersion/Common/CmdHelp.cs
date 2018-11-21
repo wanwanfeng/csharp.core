@@ -77,7 +77,7 @@ namespace FileVersion
             process.StandardInput.AutoFlush = true;
 
             string output = process.StandardOutput.ReadToEnd();
-            var res = new List<string>(output.AsStringArray('\r', '\n'));
+            var res = output.SplitString('\r', '\n').ToList();
 
             process.WaitForExit();
 

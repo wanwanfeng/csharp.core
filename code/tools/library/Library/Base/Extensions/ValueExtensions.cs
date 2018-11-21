@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Library.Extensions
 {
@@ -281,7 +283,7 @@ namespace Library.Extensions
         {
             try
             {
-                var result = value.Split(separator.Length == 0 ? new [] {','} : separator);
+                var result = value.Split(separator.Length == 0 ? new[] {','} : separator);
                 return result;
             }
             catch (Exception)
@@ -324,9 +326,9 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static string JoinToString<T>(this T[] value, string separator = "\r\n")
+        public static string Join<T>(this IEnumerable<T> value, string separator = null)
         {
-            return string.Join(separator, value.AsStringArray());
+            return string.Join(separator ?? Environment.NewLine, value.AsStringArray());
         }
 
         /// <summary>
@@ -335,9 +337,9 @@ namespace Library.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string[] AsStringArray<T>(this T[] value)
+        public static string[] AsStringArray<T>(this IEnumerable<T> value)
         {
-            return Array.ConvertAll(value, p => p.ToString());
+            return Array.ConvertAll(value.ToArray(), p => p.ToString());
         }
     }
 }

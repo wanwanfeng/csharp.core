@@ -40,7 +40,7 @@ namespace FileVersion
             foreach (string s in targetList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
-                string last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
+                string last = res.Skip(1).Join(" ").Replace("\\", "/").Trim();
                 FileDetailInfo svnFileInfo = new FileDetailInfo()
                 {
                     is_delete = res.First().Trim() == "D",

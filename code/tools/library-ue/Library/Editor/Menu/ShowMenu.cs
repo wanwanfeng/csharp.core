@@ -31,14 +31,14 @@ namespace UnityEditor
         public static void GetObjectPaths()
         {
             var go = Selection.GetFiltered(typeof (Object), SelectionMode.TopLevel);
-            EditorUtils.CopyToClipboard((go.Select(item => AssetDatabase.GetAssetPath(item)).ToArray().JoinToString()));
+            EditorUtils.CopyToClipboard((go.Select(item => AssetDatabase.GetAssetPath(item)).Join()));
         }
 
         [MenuItem("GameObject/将路径复制到剪帖板", false, 0)]
         public static void GetGameObjectsPath()
         {
             var go = Selection.GetFiltered(typeof (GameObject), SelectionMode.Editable);
-            EditorUtils.CopyToClipboard(go.Select(item => ((GameObject)item).transform.GetFullPath()).ToArray().JoinToString());
+            EditorUtils.CopyToClipboard(go.Select(item => ((GameObject)item).transform.GetFullPath()).Join());
         }
 
         [MenuItem("CONTEXT/Transform/Copy LocalPosition")]

@@ -103,7 +103,8 @@ namespace Script
                             ToKvExcel(
                                 p =>
                                     p.Contains("bgm/") || p.Contains("fullvoice/") || p.Contains("jingle/") ||
-                                    p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/"));
+                                    p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/") ||
+                                    p.Contains("vo_kyube_") || p.Contains("vo_char_") || p.Contains("vo_game_"));
                         }
                     },
                     {

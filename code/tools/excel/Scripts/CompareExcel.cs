@@ -21,14 +21,8 @@ namespace Script
             var dir1 = SystemConsole.GetInputStr("请拖入目标文件(.xls|xlsx):", "您选择的文件：");
             var dir2 = SystemConsole.GetInputStr("请拖入比较文件(.xls|xlsx):", "您选择的文件：");
 
-            var listTables =
-                ExcelByBase.Data.ImportToDataTable(dir1, false)
-                    .Select(p => (ListTable) p)
-                    .ToDictionary(p => p.TableName);
-            var listTables2 =
-                ExcelByBase.Data.ImportToDataTable(dir2, false)
-                    .Select(p => (ListTable) p)
-                    .ToDictionary(p => p.TableName);
+            var listTables = ExcelByBase.Data.ImportToDataTable(dir1, false).Select(p => (ListTable) p).ToDictionary(p => p.TableName);
+            var listTables2 = ExcelByBase.Data.ImportToDataTable(dir2, false).Select(p => (ListTable) p).ToDictionary(p => p.TableName);
 
             foreach (var keyValuePair in listTables)
             {

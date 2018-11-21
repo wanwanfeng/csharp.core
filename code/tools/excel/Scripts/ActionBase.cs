@@ -65,7 +65,7 @@ namespace Script
 
         public void ToJson()
         {
-            var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool();
+            var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
             ToCommon((table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
         }
 

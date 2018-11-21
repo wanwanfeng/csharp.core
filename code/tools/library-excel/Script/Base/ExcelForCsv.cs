@@ -22,7 +22,7 @@ namespace Library.Excel
 
         public static CsvMode CurCsvMode = CsvMode.CsvHelp;
 
-        public partial class Csv
+        public class Csv
         {
             public static DataTable ImportToDataTable(string path)
             {

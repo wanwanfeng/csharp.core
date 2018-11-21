@@ -29,7 +29,7 @@ namespace Library.Excel
         /// <returns></returns>
         protected static IEnumerable<ListTable> GetListTables()
         {
-            return CheckPath(".xlsx", SelectType.File).SelectMany(file =>
+            return CheckPath(".xlsx|.xls", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
                 return ExcelByBase.Data.ImportToDataTable(file, false).Select(p => (ListTable) p);

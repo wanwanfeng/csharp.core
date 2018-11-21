@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Library.Helper;
+using LitJson;
 
 namespace Library.Excel
 {
@@ -18,6 +20,8 @@ namespace Library.Excel
         {
 
         }
+
+        #region ListTable DataTable
 
 
         public static implicit operator ListTable(DataTable dt)
@@ -52,13 +56,30 @@ namespace Library.Excel
             };
 
             foreach (object o in lt.Columns)
-                dt.Columns.Add(o.ToString(), typeof(string));
+                dt.Columns.Add(o.ToString(), typeof (string));
 
             foreach (List<object> objects in lt.Rows)
                 dt.Rows.Add(objects.ToArray());
 
             return dt;
         }
+
+        #endregion
+
+        #region JsonData DataTable
+
+
+        public static implicit operator JsonData(DataTable dt)
+        {
+            return JsonHelper.ConvertListTableToJson(dt);
+        }
+
+        public static implicit operator DataTable(JsonData jsonData)
+        {
+            return JsonHelper.ConvertJsonToListTable(JsonHelper.ToJson(jsonData));
+        }
+
+        #endregion
     }
 }
 

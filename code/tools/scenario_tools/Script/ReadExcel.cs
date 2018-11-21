@@ -14,7 +14,7 @@ namespace scenario_tools
         public ReadExcel()
         {
             var filePath = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：", def: @"D:\Work\yuege\www\assets\res\scenario.xls");
-            var listJson = ExcelByBase.Data.ImportToDataTable(filePath, false).Select(ExcelByBase.Data.ConvertToJson).ToList();
+            var listJson = ExcelByBase.Data.ImportToDataTable(filePath, false).Select(p => (JsonData) p).ToList();
 
             foreach (JsonData data in listJson)
             {

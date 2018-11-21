@@ -40,8 +40,7 @@ namespace scenario_tools
             File.WriteAllText("scenario.txt", JsonHelper.ToJson(res));
 
             string outpath = Environment.CurrentDirectory + "/scenario.xlsx";
-            var listTable = ExcelByBase.Json.ConvertToDataTable(JsonHelper.ToJson(res));
-            ExcelByBase.Data.ExportToExcel(listTable, outpath);
+            ExcelByBase.Data.ExportToExcel(res, outpath);
         }
 
         /// <summary>

@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Text;
-using Library.Helper;
-using LitJson;
 
 namespace Library.Excel
 {
@@ -15,26 +11,6 @@ namespace Library.Excel
     {
         public class List
         {
-            #region  Convert ListTable and Json
-
-            public static JsonData ConvertToJson(ListTable list)
-            {
-                Ldebug.Log(" is now sheet: " + list.TableName);
-                return JsonHelper.ConvertListTableToJson(list);
-            }
-
-            public static void ExportToJson(ListTable list, string file, bool isIndent = true)
-            {
-                JsonData resJsonDatas = ConvertToJson(list);
-                string newPath = Path.ChangeExtension(string.IsNullOrEmpty(file) ? list.FullName : file, ".json");
-                FileHelper.CreateDirectory(newPath);
-                File.WriteAllText(newPath,
-                    isIndent ? JsonHelper.ToJson(resJsonDatas, indentLevel: 2) : JsonHelper.ToJson(resJsonDatas),
-                    new UTF8Encoding(false));
-            }
-
-            #endregion
-
             #region   Convert ListTable and DataTable
 
             /// <summary>

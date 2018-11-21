@@ -1,4 +1,6 @@
-﻿using Library.Helper;
+﻿using System.IO;
+using System.Text;
+using Library.Helper;
 using LitJson;
 
 namespace Library.Excel
@@ -12,11 +14,6 @@ namespace Library.Excel
 
         public class Json
         {
-            public static DataTable ConvertToDataTable(string content)
-            {
-                return JsonHelper.ConvertJsonToListTable(content);
-            }
-
             public static DataTable ImportToDataTable(string path)
             {
                 return JsonHelper.ImportJsonToListTable(path);
@@ -25,15 +22,13 @@ namespace Library.Excel
 
         public partial class Data
         {
-            public static JsonData ConvertToJson(DataTable dt)
+            public static void ExportToJson(DataTable list, string file, bool isIndent = true)
             {
-                return List.ConvertToJson(dt);
-            }
-
-            public static void ExportToJson(DataTable dt, string file, bool isIndent = true)
-            {
-                string newPath = CheckExport(dt, file, ".json");
-                List.ExportToJson(dt, newPath);
+                string newPath = CheckExport(list, file, ".json");
+                JsonData resJsonDatas = (DataTable) list;
+                File.WriteAllText(newPath,
+                    isIndent ? JsonHelper.ToJson(resJsonDatas, indentLevel: 2) : JsonHelper.ToJson(resJsonDatas),
+                    new UTF8Encoding(false));
             }
         }
 

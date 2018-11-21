@@ -21,6 +21,17 @@ namespace Script
             get { return file => new[] {ExcelByBase.Json.ImportToDataTable(file)}; }
         }
 
+        public override Action<DataTable, string> export
+        {
+            get { return (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); }; }
+        }
+
+        /// <summary>
+        /// Json是否缩进
+        /// </summary>
+        public bool isIndent { get; set; }
+
+
         public class ToXml : ActionJson
         {
             public ToXml()
@@ -71,8 +82,7 @@ namespace Script
         {
             public KvExcelTo()
             {
-                var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
-                export = (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); };
+                isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
                 KvExcelTo(
                     isCustomAction: (fullpath, list) =>
                     {
@@ -94,5 +104,6 @@ namespace Script
                     );
             }
         }
+
     }
 }

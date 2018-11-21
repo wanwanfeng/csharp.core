@@ -74,7 +74,7 @@ namespace Library.Excel
                         }
                         if (jsonData.Count == 0)
                             return null;
-                        return Json.ConvertToDataTable(JsonHelper.ToJson(jsonData));
+                        return (DataTable) jsonData;
                     }
                     default:
                         throw new ArgumentOutOfRangeException();

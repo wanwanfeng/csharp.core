@@ -99,7 +99,7 @@ namespace FileVersion
             foreach (string s in targetList)
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
-                var last = res.Skip(6).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
+                var last = res.Skip(6).Join(" ").Replace("\\", "/").Trim();
                 FileDetailInfo svnFileInfo = new FileDetailInfo()
                 {
                     is_delete = false,

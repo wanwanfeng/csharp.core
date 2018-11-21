@@ -90,9 +90,9 @@ namespace checkcard.Scripts
         }
     }
 
-    public class CopyJson : BaseSystemConsole
+    public class CopyFile : BaseSystemConsole
     {
-        public CopyJson()
+        public CopyFile()
         {
             var res = new List<string>();
             Action<string> action = file =>

@@ -52,7 +52,7 @@ namespace Library.Helper
         public static string ToJson<T>(T t, bool isUnicode = false, int indentLevel = 0, bool validate = true)
         {
             var value = Helper.ToJson(t, indentLevel, validate);
-            return isUnicode ? value : StringHelper.Unicode2String(value);
+            return (isUnicode ? value : StringHelper.Unicode2String(value)).Replace(@"\r\n", @"\n");
         }
 
         public static JsonData ConvertListTableToJson(ListTable list)

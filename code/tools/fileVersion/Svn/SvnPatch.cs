@@ -38,25 +38,24 @@ namespace FileVersion
                     .ToArray(); //去除文件夹
 
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
-            int index = 0;
-            foreach (string s in targetList)
+            targetList.ForEach((s, i) =>
             {
                 List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
-                var last = res.Skip(1).ToArray().JoinToString(" ").Replace("\\", "/").Trim();
+                var last = res.Skip(1).Join(" ").Replace("\\", "/").Trim();
                 FileDetailInfo svnFileInfo = new FileDetailInfo()
                 {
                     is_delete = res.First().Trim() == "D",
                     path = last,
                 };
                 cache[svnFileInfo.path] = svnFileInfo;
-                Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
-            }
+                Console.WriteLine("{0:D5}\t{1}", i, svnFileInfo);
+            });
             ExcludeFile(cache);
 
             string targetDir = string.Format(Name, folder, startVersion, endVersion);
             WriteToTxt(targetDir, cache);
             List<string> del = new List<string>();
-            index = 0;
+            var index = 0;
             foreach (var s in cache)
             {
                 Console.Clear();

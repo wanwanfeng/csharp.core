@@ -13,19 +13,26 @@ namespace scenario_tools
     {
         public ReadExcel()
         {
-            var filePath = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：", def: @"D:\Work\yuege\www\assets\res\scenario.xls");
-            var listJson = ExcelByBase.Data.ImportToDataTable(filePath, false).Select(p => (JsonData) p).ToList();
+            var filePath = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：",
+                def: @"D:\Work\yuege\www\assets\res\scenario.xls");
 
-            foreach (JsonData data in listJson)
+            var cache = ExcelByBase.Data.ImportToDataTable(filePath, false).Select(p => (JsonData) p).Select(
+                data =>
+                {
+                    var dic = data.Cast<JsonData>()
+                        .GroupBy(p => p["file"].ToString())
+                        .ToDictionary(p => p.Key, q => q.ToList());
+                    dic.Remove("file");
+                    return dic;
+                }).ToList();
+
+            foreach (Dictionary<string, List<JsonData>> dic in cache)
             {
-                var lookup = data.Cast<JsonData>().ToLookup(p => p["file"].ToString(), q => q);
-                Dictionary<string, List<JsonData>> cache = lookup.ToDictionary(p => p.Key, q => q.ToList());
-
                 var index = 0;
-                foreach (KeyValuePair<string, List<JsonData>> pair in cache)
+                foreach (KeyValuePair<string, List<JsonData>> pair in dic)
                 {
                     var res = new JsonData();
-                    Console.WriteLine("剧情文件({1})：{0}", pair.Key, (++index) / (float) cache.Count);
+                    Console.WriteLine("剧情文件({1})：{0}", pair.Key, (++index)/(float) cache.Count);
                     foreach (JsonData jsonData in pair.Value)
                     {
                         var xx = new JsonData();

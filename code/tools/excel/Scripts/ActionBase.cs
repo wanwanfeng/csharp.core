@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -15,17 +14,6 @@ namespace Script
 {
     public class ActionBase : BaseSystemExcel
     {
-
-        [Description("https://www.cnblogs.com/csguo/p/7401874.html")]
-        public enum MyEnum
-        {
-            [Description("日文"), StringValue("([\u0800-\u4E00])")] 日文 = 1,
-            [Description("日文平假名"), StringValue("([\u3040-\u309F])")] 日文平假名,
-            [Description("日文片假名"), StringValue("([\u30A0-\u30FF])")] 日文片假名,
-            [Description("日文片假名语音扩展"), StringValue("([\u31F0-\u31FF])")] 日文片假名语音扩展,
-            [Description("中文"), StringValue("([\u4E00-\u9FA5])")] 中文 = 10
-        }
-
         public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
@@ -98,7 +86,7 @@ namespace Script
 
         public void ToKvExcelAll()
         {
-            var cache = AttributeHelper.GetCacheStringValue<MyEnum>();
+            var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
             var str = string.Join("|", cache.Values);
             {
                 SystemConsole.Run(config: new Dictionary<string, Action>()
@@ -130,7 +118,7 @@ namespace Script
                         {
                             ToKvExcel(
                                 p => Regex.IsMatch(p, str)
-                                , s => Regex.IsMatch(s, cache[MyEnum.中文])
+                                , s => Regex.IsMatch(s, cache[RegexLanguaheEnum.中文])
                                 //,s => !Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
                                 );
                         }

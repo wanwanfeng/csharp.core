@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,28 +14,9 @@ namespace findText
 {
     public abstract class BaseActionFor : BaseSystemExcel
     {
-        [Description("https://www.cnblogs.com/csguo/p/7401874.html")]
-        public enum MyEnum
-        {
-            [Description("日文"), StringValue("([\u0800-\u4E00])")] 日文 = 1,
-            [Description("日文平假名"), StringValue("([\u3040-\u309F])")] 日文平假名,
-            [Description("日文片假名"), StringValue("([\u30A0-\u30FF])")] 日文片假名,
-            [Description("日文片假名语音扩展"), StringValue("([\u31F0-\u31FF])")] 日文片假名语音扩展,
-            [Description("中文"), StringValue("([\u4E00-\u9FA5])")] 中文 = 10
-        }
-
-
         protected Regex regex { get; set; }
 
-        public virtual string regexStr { get; set;
-            //get
-            //{
-            //    return
-            //        // "([\u4E00-\u9FA5]+)|([\u30A0-\u30FF])";
-            //        "([\u0800-\u4E00]+)|([\u4E00-\u9FA5])|([\u30A0-\u30FF])";
-            //}
-            //set { }
-        }
+        public virtual string regexStr { get; set; }
 
         public virtual ListTable GetJsonDataArray(string content)
         {
@@ -61,7 +41,7 @@ namespace findText
 
         public void Open()
         {
-            var cache = AttributeHelper.GetCacheStringValue<MyEnum>();
+            var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
             var str = string.Join("|", cache.Values);
             {
                 SystemConsole.Run(config: new Dictionary<string, Action>()
@@ -77,14 +57,14 @@ namespace findText
                     {
                         "只匹配中文", () =>
                         {
-                            regexStr = cache[MyEnum.中文];
+                            regexStr = cache[RegexLanguaheEnum.中文];
                             GetValue();
                         }
                     },
                     {
                         "只匹配日文", () =>
                         {
-                            regexStr = string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value));
+                            regexStr = string.Join("|", cache.Where(p => p.Key < RegexLanguaheEnum.中文).Select(p => p.Value));
                             GetValue();
                         }
                     }

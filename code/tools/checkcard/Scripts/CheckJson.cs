@@ -20,8 +20,7 @@ namespace checkcard.Scripts
                 try
                 {
                     JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
-                    string jsonStr = JsonHelper.ToJson(json, false);
-                    //File.WriteAllText(file, jsonStr, new UTF8Encoding(true));
+                    JsonHelper.ToJson(json, false);
                 }
                 catch (Exception)
                 {
@@ -48,7 +47,7 @@ namespace checkcard.Scripts
                 {
                     JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
                     string jsonStr = JsonHelper.ToJson(json, indentLevel: 2);
-                    File.WriteAllText(file, jsonStr, new UTF8Encoding(true));
+                    File.WriteAllText(file, jsonStr, new UTF8Encoding(false));
                 }
                 catch (Exception)
                 {
@@ -75,7 +74,7 @@ namespace checkcard.Scripts
                 {
                     JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
                     string jsonStr = JsonHelper.ToJson(json, isUnicode: false);
-                    File.WriteAllText(file, jsonStr, new UTF8Encoding(true));
+                    File.WriteAllText(file, jsonStr, new UTF8Encoding(false));
                 }
                 catch (Exception)
                 {

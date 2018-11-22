@@ -21,7 +21,7 @@ namespace Library.Excel
 
         }
 
-        #region ListTable DataTable
+        #region ListTable DataTable 隐式转换
 
 
         public static implicit operator ListTable(DataTable dt)
@@ -66,17 +66,17 @@ namespace Library.Excel
 
         #endregion
 
-        #region JsonData DataTable
+        #region JsonData DataTable 显示转换（需强制）
 
 
-        public static implicit operator JsonData(DataTable dt)
+        public static explicit operator JsonData(DataTable dt)
         {
-            return JsonHelper.ConvertListTableToJson(dt);
+            return JsonHelper.ConvertListTableToJson((ListTable)dt);
         }
 
-        public static implicit operator DataTable(JsonData jsonData)
+        public static explicit operator DataTable(JsonData jsonData)
         {
-            return JsonHelper.ConvertJsonToListTable(JsonHelper.ToJson(jsonData));
+            return (DataTable) JsonHelper.ConvertJsonToListTable(JsonHelper.ToJson(jsonData));
         }
 
         #endregion

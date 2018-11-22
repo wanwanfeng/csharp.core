@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using Library.Extensions;
 using Library.Helper;
 using LitJson;
@@ -141,6 +141,33 @@ namespace LitJson
                 inst_array.RemoveAt(i);
         }
     }
+
+
+    public static class JsonDataExtensions
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jsonData"></param>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="validate">错误校验输出</param>
+        /// <returns></returns>
+        public static string ToJson(this JsonData jsonData, int indentLevel = 0, bool validate = true)
+        {
+            if (indentLevel == 0 && validate)
+                return jsonData.ToJson();
+
+            StringWriter sw = new StringWriter();
+            JsonWriter jsonWriter = new JsonWriter(sw)
+            {
+                PrettyPrint = true,
+                IndentValue = indentLevel,
+                Validate = validate,
+            };
+            jsonData.ToJson(jsonWriter);
+            return sw.ToString().Trim('\r', '\n');
+        }
+    }
 }
 
 namespace Library.LitJson
@@ -184,15 +211,15 @@ namespace Library.LitJson
             if (indentLevel == 0 && validate)
                 return JsonMapper.ToJson(t);
 
-            StringBuilder stringBuilder = new StringBuilder();
-            JsonWriter jsonWriter = new JsonWriter(stringBuilder)
+            StringWriter sw = new StringWriter();
+            JsonWriter jsonWriter = new JsonWriter(sw)
             {
                 PrettyPrint = true,
                 IndentValue = indentLevel,
                 Validate = validate,
             };
             JsonMapper.ToJson(t, jsonWriter);
-            return stringBuilder.ToString().Trim('\r', '\n');
+            return sw.ToString().Trim('\r', '\n');
         }
 
         /// <summary>

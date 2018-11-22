@@ -41,7 +41,7 @@ namespace Library.Excel
             FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate);
             foreach (var table in list)
             {
-                var value = ExportExcelByMemoryStream(table);
+                var value = ExportExcelByMemoryStream((DataTable)table);
                 fs.Write(value, 0, value.Length);
                 fs.Flush();
             }

@@ -58,7 +58,7 @@ namespace Library.Excel
                         throw new ArgumentOutOfRangeException();
                 }
                 if (list.Count == 0) return null;
-                return new ListTable()
+                return (DataTable) new ListTable()
                 {
                     TableName = Path.GetFileNameWithoutExtension(path),
                     FullName = path,

@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script\ActionForCss.cs" />
     <Compile Include="Script\ActionForCpp.cs" />
     <Compile Include="Script\ActionForHtml2.cs" />
     <Compile Include="Script\ActionForJavaScript.cs" />

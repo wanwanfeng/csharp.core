@@ -99,8 +99,8 @@ namespace checkcard.Scripts
                 Console.WriteLine(" is now : " + file);
                 try
                 {
-                    string oldFolder = Path.GetDirectoryName(InputPath) + "/";
-                    string newFolder = Path.GetDirectoryName(InputPath).TrimEnd('\\') + "_new/";
+                    string oldFolder = (Path.GetDirectoryName(InputPath) + "/").Replace("\\", "/"); ;
+                    string newFolder = (Path.GetDirectoryName(InputPath).TrimEnd('\\') + "_new/").Replace("\\", "/");
                     File.ReadAllLines(file).ForEach(p =>
                     {
                         var oldpath = oldFolder + p.TrimStart('/');

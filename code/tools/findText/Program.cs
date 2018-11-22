@@ -11,6 +11,7 @@ namespace findText
     {
         public enum ConvertType
         {
+            [TypeValue(typeof (ActionForCss))] css,
             [TypeValue(typeof (ActionForCpp))] cpp,
             [TypeValue(typeof (ActionForCSharp))] csharp,
             [TypeValue(typeof (ActionForPhp))] php,

@@ -20,27 +20,27 @@ namespace findText.Script
         {
             string[] input = File.ReadAllLines(file);
 
-            bool isTrue = false;
+            bool isDouble = false;
 
             for (int k = 0; k < input.Length; k++)
             {
-                if (isTrue) continue;
+                if (isDouble) continue;
                 var val = input[k];
-                if (val.TrimStart().StartsWith("#") && !val.TrimStart().StartsWith("#define")) continue;
-                if (val.TrimStart().StartsWith("@brief ")) continue;
-                if (val.TrimStart().StartsWith("///")) continue;
+                //if (val.TrimStart().StartsWith("#") && !val.TrimStart().StartsWith("#define")) continue;
+                //if (val.TrimStart().StartsWith("@brief ")) continue;
+                //if (val.TrimStart().StartsWith("///")) continue;
                 if (val.TrimStart().StartsWith("//")) continue;
                 //跨行注释
                 if (val.TrimStart().StartsWith("/*"))
                 {
                     if (!val.Contains("*/"))
-                        isTrue = true;
+                        isDouble = true;
                     continue;
                 }
-                if (val.TrimStart().EndsWith("*/"))
+                if (val.TrimEnd().EndsWith("*/"))
                 {
                     if (!val.Contains("/*"))
-                        isTrue = false;
+                        isDouble = false;
                     continue;
                 }
                 if (val.TrimStart().StartsWith("*")) continue;
@@ -55,26 +55,26 @@ namespace findText.Script
                     mc = regex.Matches(val);
                     if (mc.Count == 0) continue;
                 }
-                //去除中间有/**
-                index = val.IndexOf("/**", StringComparison.Ordinal);
-                if (index >= 0)
-                {
-                    val = val.Substring(0, index);
-                    mc = regex.Matches(val);
-                    if (mc.Count == 0) continue;
-                }
-                //去除最后一个双引号后的
-                index = val.LastIndexOf("\"", StringComparison.Ordinal);
-                if (index >= 0)
-                {
-                    val = val.Substring(0, index);
-                }
-                //去除第一个双引号前的
-                index = val.IndexOf("\"", StringComparison.Ordinal);
-                if (index >= 0)
-                {
-                    val = val.Substring(index + 1);
-                }
+                ////去除中间有/**
+                //index = val.IndexOf("/**", StringComparison.Ordinal);
+                //if (index >= 0)
+                //{
+                //    val = val.Substring(0, index);
+                //    mc = regex.Matches(val);
+                //    if (mc.Count == 0) continue;
+                //}
+                ////去除最后一个双引号后的
+                //index = val.LastIndexOf("\"", StringComparison.Ordinal);
+                //if (index >= 0)
+                //{
+                //    val = val.Substring(0, index);
+                //}
+                ////去除第一个双引号前的
+                //index = val.IndexOf("\"", StringComparison.Ordinal);
+                //if (index >= 0)
+                //{
+                //    val = val.Substring(index + 1);
+                //}
                 GetJsonValue(val, file, k, input);
             }
         }

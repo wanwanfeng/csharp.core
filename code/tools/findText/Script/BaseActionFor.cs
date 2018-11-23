@@ -89,7 +89,7 @@ namespace findText
                 return;
             }
             Console.WriteLine("正在写入Excel...");
-            string outpath = string.Format("{0}[{1}].xlsx", InputPath, exName.Replace("*", "").Replace("|", "-"));
+            string outpath = string.Format("{0}[{1}].xlsx", InputPath, exName.Replace("*", "").Replace("|", ""));
             ExcelByBase.Data.ExportToExcel(vals, outpath);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);

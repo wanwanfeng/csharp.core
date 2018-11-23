@@ -20,7 +20,7 @@ namespace findText.Script
 
         protected override string exName
         {
-            get { return "*.html|*.htm|*.tpl"; }
+            get { return "*.html|*.htm|*.tpl|*.xml"; }
         }
 
         public override ListTable GetJsonDataArray(string content)

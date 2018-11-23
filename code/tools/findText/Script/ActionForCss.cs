@@ -20,11 +20,37 @@ namespace findText.Script
         {
             string[] input = File.ReadAllLines(file);
 
+            bool isDouble = false;
+
             for (int k = 0; k < input.Length; k++)
             {
+                if (isDouble) continue;
                 var val = input[k];
+                if (val.TrimStart().StartsWith("//")) continue;
+                //跨行注释
+                if (val.TrimStart().StartsWith("/*"))
+                {
+                    if (!val.Contains("*/"))
+                        isDouble = true;
+                    continue;
+                }
+                if (val.TrimEnd().EndsWith("*/"))
+                {
+                    if (!val.Contains("/*"))
+                        isDouble = false;
+                    continue;
+                }
+                if (val.TrimStart().StartsWith("*")) continue;
                 MatchCollection mc = regex.Matches(val);
                 if (mc.Count == 0) continue;
+                //去除中间有//
+                var index = val.IndexOf("//", StringComparison.Ordinal);
+                if (index >= 0)
+                {
+                    val = val.Substring(0, index);
+                    mc = regex.Matches(val);
+                    if (mc.Count == 0) continue;
+                }
                 GetJsonValue(val, file, k, input);
             }
         }

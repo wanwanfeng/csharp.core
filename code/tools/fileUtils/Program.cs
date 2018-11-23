@@ -58,18 +58,18 @@ namespace fileUtils
                     int start = url.Replace(qianzhui, "").AsInt();
                     Enumerable.Range(start, 500)
                         .Select(p => string.Format(url, qianzhui + p))
-                        //.Select(p =>
-                        //{
-                        //    DownLoad(p);
-                        //    return p;
-                        //}).ToList();
-                    .AsParallel()
-                    .WithDegreeOfParallelism(4)
-                    .ForAll(DownLoad);
+                        .ToList()
+                        .ForEach(DownLoad);
                 };
 
-                //singleFile(SystemConsole.GetInputStr("输入下载地址："));
-                File.ReadAllLines("task.txt").AsParallel().ForAll(singleFile);
+                CheckPath(".txt", SelectType.File)
+                    .SelectMany(File.ReadAllLines)
+                    .Distinct()
+                    .Where(Path.HasExtension)
+                    .ToList()
+                    .AsParallel()
+                    .WithDegreeOfParallelism(4)
+                    .ForAll(singleFile);
             }
 
             public void DownLoad(string url)

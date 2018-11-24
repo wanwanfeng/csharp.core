@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Library.Extensions;
@@ -10,27 +9,23 @@ namespace Script
     /// <summary>
     /// 比较文件夹并复制出不同文件
     /// </summary>
-    public class CompareFolder : BaseClass
+    public class CompareFolder : CreateExcelCell
     {
-
-        private string dir1, dir2;
-
-        public CompareFolder()
+        protected override void CreateExcel()
         {
-            dir1 = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
-            dir2 = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
+            var dir1 = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
+            var dir2 = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
             var last1 = Directory.GetFiles(dir1, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir1, ""));
             var last2 = Directory.GetFiles(dir2, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir2, ""));
-            var last = last1.Except(last2).Select(p => dir1 + p).ToList();
-            RunList(last);
-            new CreateExcelCell(dir1 + "res");
-        }
+            last1.Except(last2).Distinct().Select(p => dir1 + p).ToList().ForEachPaths(re =>
+            {
+                var newName = re.Replace(dir1, dir1 + "res");
+                DirectoryHelper.CreateDirectory(newName);
+                File.Copy(re, newName, true);
+            });
 
-        public override void RunListOne(string re)
-        {
-            var newName = re.Replace(dir1, dir1 + "res");
-            FileHelper.CreateDirectory(newName);
-            File.Copy(re, newName, true);
+            var root = dir1 + "res";
+            RunList(Directory.GetFiles(root, "*.*", SearchOption.AllDirectories), root);
         }
     }
 }

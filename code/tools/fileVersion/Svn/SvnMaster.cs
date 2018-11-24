@@ -53,8 +53,7 @@ namespace FileVersion
             if (yes)
             {
                 List<string> del = new List<string>();
-                int index = 0;
-                foreach (var s in cache)
+                cache.ForEach((s, index) =>
                 {
                     Console.Clear();
                     Console.WriteLine("\n正在导出文件...");
@@ -66,7 +65,8 @@ namespace FileVersion
                     FileHelper.CreateDirectory(fullPath);
 
                     //拉取的文件版本号不会小于所在目录版本号，如若小于，说明文件所在目录曾经被移动过
-                    CmdReadAll(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key, fullPath));
+                    CmdReadAll(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", endVersion, svnUrl, s.Key,
+                        fullPath));
                     //RunCmd(string.Format("svn cat -r {0} \"{1}/{2}@{0}\">\"{3}\"", s.Value.version, svnUrl, s.Key, fullPath));
 
                     if (File.Exists(fullPath))
@@ -78,7 +78,7 @@ namespace FileVersion
                     {
                         del.Add(s.Key);
                     }
-                }
+                });
                 foreach (string s in del)
                     cache.Remove(s);
             }
@@ -89,29 +89,26 @@ namespace FileVersion
         {
             Console.WriteLine("\n正在获取目标版本号{0}文件详细信息...", version);
 
-            var targetList =
-                CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", version, svnUrl))
-                    .Where(s => !s.EndsWith("/"))
-                    .ToArray(); //去除文件夹
-
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
-            int index = 0;
-            foreach (string s in targetList)
-            {
-                List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
-                var last = res.Skip(6).Join(" ").Replace("\\", "/").Trim();
-                FileDetailInfo svnFileInfo = new FileDetailInfo()
+
+            CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", version, svnUrl))
+                .Where(s => !s.EndsWith("/"))
+                .ToArray()
+                .ForEach((s, index) =>
                 {
-                    is_delete = false,
-                    version = res.First().Trim().AsLong(),
-                    content_size = res.Skip(2).First().Trim().AsLong(),
-                    revision = version,
-                    path = last,
-                };
-                cache[svnFileInfo.path] = svnFileInfo;
-                Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
-            }
-            ExcludeFile(cache);
+                    List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
+                    var last = res.Skip(6).Join(" ").Replace("\\", "/").Trim();
+                    FileDetailInfo svnFileInfo = new FileDetailInfo()
+                    {
+                        is_delete = false,
+                        version = res.First().Trim().AsLong(),
+                        content_size = res.Skip(2).First().Trim().AsLong(),
+                        revision = version,
+                        path = last,
+                    };
+                    cache[svnFileInfo.path] = svnFileInfo;
+                    Console.WriteLine("{0:D5}\t{1}", index, svnFileInfo);
+                });
             return cache;
         }
     }

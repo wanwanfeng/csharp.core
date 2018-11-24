@@ -10,69 +10,81 @@ namespace Script
 {
     public class SpliteAtlas : BaseClass
     {
-        private string cmd;
-        public override string root { get; set; }
-
-
         /// <summary>
         /// 筛选过滤已存在图片
         /// </summary>
         public SpliteAtlas()
         {
-            cmd = SystemConsole.GetInputStr("图集拆解(y)，图集合并(n)，文件夹删除(d):", def: "y");
-            root = SystemConsole.GetInputStr("请拖入选定（文件夹或文件）:");
+            SystemConsole.Run(config: new Dictionary<string, Action>()
+            {
+                {
+                    "图集拆解", () =>
+                    {
+                        GetPaths().ForEachPaths(re =>
+                        {
+                            PList plist = new PList();
+                            plist.Load(re);
+                            TextureInfo textureInfo = new TextureInfo(plist, re);
+                            if (!textureInfo.voild) return;
+                            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+                            if (File.Exists(imagePath))
+                                HaveImageAndRead(imagePath, textureInfo);
+                        });
+                    }
+                },
+                {
+                    "图集合并", () =>
+                    {
+                        GetPaths().ForEachPaths(re =>
+                        {
+                            PList plist = new PList();
+                            plist.Load(re);
+                            TextureInfo textureInfo = new TextureInfo(plist, re);
+                            if (!textureInfo.voild) return;
+                            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+                            if (File.Exists(imagePath))
+                                HaveImageAndWrite(imagePath, textureInfo);
+                        });
+                    }
+                },
+                {
+                    "文件夹删除", () =>
+                    {
+                        GetPaths().ForEachPaths(re =>
+                        {
+                            PList plist = new PList();
+                            plist.Load(re);
+                            TextureInfo textureInfo = new TextureInfo(plist, re);
+                            if (!textureInfo.voild) return;
+                            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+                            string dir = Path.GetDirectoryName(imagePath) + "/" +
+                                         Path.GetFileNameWithoutExtension(imagePath);
+                            if (Directory.Exists(dir))
+                                Directory.Delete(dir, true);
+                        });
+                    }
+                },
+            });
+        }
+
+        private List<string> GetPaths()
+        {
+            var path = SystemConsole.GetInputStr("请拖入选定（文件夹或文件）:");
 
             List<string> res = new List<string>();
-            if (Directory.Exists(root))
+            if (Directory.Exists(path))
             {
-                if (File.Exists(root + ".plist"))
-                    res.Add(root + ".plist");
+                if (File.Exists(path + ".plist"))
+                    res.Add(path + ".plist");
                 else
-                    res.AddRange(Directory.GetFiles(root, "*.plist", SearchOption.AllDirectories));                      
+                    res.AddRange(Directory.GetFiles(path, "*.plist", SearchOption.AllDirectories));
             }
             else
             {
-                //文件路径
-                if (File.Exists(root) && Path.GetExtension(root) == ".plist")
-                    res.Add(root);
+                if (File.Exists(path) && Path.GetExtension(path) == ".plist")
+                    res.Add(path);
             }
-            if (res.Count == 0) return;
-            res.Sort();
-            RunList(res);
-        }
-
-        public override void RunListOne(string re)
-        {
-            PList plist = new PList();
-            plist.Load(re);
-            TextureInfo textureInfo = new TextureInfo(plist, re);
-            if (!textureInfo.voild) return;
-
-            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
-
-            switch (cmd)
-            {
-                case "y":
-                {
-                    if (File.Exists(imagePath))
-                        HaveImageAndRead(imagePath, textureInfo);
-                    break;
-                }
-                case "n":
-                {
-                    if (File.Exists(imagePath))
-                        HaveImageAndWrite(imagePath, textureInfo);
-                    break;
-                }
-   
-                case "d": 
-                {
-                    string dir = Path.GetDirectoryName(imagePath) + "/" + Path.GetFileNameWithoutExtension(imagePath);
-                    if (Directory.Exists(dir))
-                        Directory.Delete(dir, true);
-                    break;
-                }
-            }
+            return res;
         }
 
         private static void HaveImageAndRead(string re, TextureInfo textureInfo)

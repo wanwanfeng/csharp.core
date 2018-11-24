@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Library.Helper;
 
 namespace Script
 {
@@ -10,20 +9,15 @@ namespace Script
     /// </summary>
     public class ImageFind : BaseClass
     {
-        private Dictionary<string, string> dic = new Dictionary<string, string>();
-
         public ImageFind()
         {
-            var res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories).ToList();
-            if (res.Count == 0) return;
-            res.Sort();
-            RunList(res);
-            WriteAllLines(dic);
-        }
-
-        public override void RunListOne(string re)
-        {
-            dic[re.Replace(root, "")] = GetExcelCell(re);
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
+                .OrderBy(p => p).ToList().ForEachPaths((re) =>
+                {
+                    dic[re.Replace(InputPath, "")] = GetExcelCell(re);
+                });
+            WriteAllLines(dic, InputPath);
         }
     }
 }

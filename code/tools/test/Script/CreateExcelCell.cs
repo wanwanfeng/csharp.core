@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Script
@@ -11,49 +12,49 @@ namespace Script
     /// </summary>
     public class CreateExcelCell : BaseClass
     {
-        private Dictionary<string, string> dic = new Dictionary<string, string>();
-
         public CreateExcelCell()
         {
-            //root = "D:/Work/mfxy/资料/小圆/xy/mfxy/res/";
-            //root = "D:/Work/yuege/res/app/assets/app/daifanyi/";
-            //root = "D:/Work/yuege/res/app/assets/app/daifanyi/image_new/";
-
-            {
-                //root = @"D:\Work\mfxy\ron_mfsn2\banshu\madomagi_native\Resources\package".Replace("\\", "/");
-                var newarray = ReadAllLines("new");
-                var oldarray = ReadAllLines("old");
-                var res = newarray.Except(oldarray).Where(p => !string.IsNullOrEmpty(p)).Select(p => root + p).ToList();
-                res.Sort();
-                RunList(res);
-            }
-
-            WriteAllLines(dic);
+            CreateExcel();
         }
 
-        public CreateExcelCell(string root)
+        protected virtual void CreateExcel()
         {
-            this.root = root;
-            var res = Directory.GetFiles(root, "*.*", SearchOption.AllDirectories).Where(p => !string.IsNullOrEmpty(p)).ToList();
-            res.Sort();
-            RunList(res);
-            WriteAllLines(dic);
+            var dir1 = SystemConsole.GetInputStr("请拖入选定文件:", "您选择的文件：", def: "new.txt");
+            var dir2 = SystemConsole.GetInputStr("请拖入选定文件:", "您选择的文件：", def: "old.txt");
+            var last1 = File.ReadAllLines(dir1);
+            var last2 = File.ReadAllLines(dir2);
+            last1.Except(last2).Distinct().Select(p => dir1 + p).ToList().ForEachPaths(re =>
+            {
+                var newName = re.Replace(dir1, dir1 + "res");
+                DirectoryHelper.CreateDirectory(newName);
+                File.Copy(re, newName, true);
+            });
+
+            var root = dir1 + "res";
+            RunList(Directory.GetFiles(root, "*.*", SearchOption.AllDirectories), root);
         }
 
-
-        public override void RunListOne(string re)
+        protected void RunList(IEnumerable<string> res, string root)
         {
-            try
-            {
-                dic[re.Replace(root, "")] = GetExcelCell(re);
-                //var newName = @"D:\Work\mfxy\资料\小圆\xy\mfxy\res" + re.Replace(root, "");
-                //FileHelper.CreateDirectory(newName);
-                //File.Copy(re, newName);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(re + "\t" + e.Message);
-            }
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            res.Where(p => !string.IsNullOrEmpty(p))
+                .OrderBy(p => p)
+                .ToList()
+                .ForEachPaths(re =>
+                {
+                    try
+                    {
+                        dic[re.Replace(root, "")] = GetExcelCell(re);
+                        //var newName = @"D:\Work\mfxy\资料\小圆\xy\mfxy\res" + re.Replace(root, "");
+                        //FileHelper.CreateDirectory(newName);
+                        //File.Copy(re, newName);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(re + "\t" + e.Message);
+                    }
+                });
+            WriteAllLines(dic, root);
         }
     }
 }

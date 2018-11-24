@@ -26,36 +26,34 @@ namespace Script
         }
 #endif
 
-        Dictionary<string, string> dic = new Dictionary<string, string>();
-
         public ImageFindOrc()
         {
-            var res = DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories).ToList();
-            if (res.Count == 0) return;
-            res.Sort();
-            RunList(res);
-            WriteAllLines(dic);
-        }
+            Dictionary<string, string> dic = new Dictionary<string, string>();
 
-        public override void RunListOne(string re)
-        {
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
+                .OrderBy(p => p)
+                .ToList()
+                .ForEachPaths(
+                    re =>
+                    {
 #if imageOrc
-            var imageOrc = File.ReadAllBytes(re);
-            // 调用通用文字识别, 图片参数为本地图片，可能会抛出网络等异常，请使用try/catch捕获
-            var str = client.GeneralBasic(imageOrc).ToString();
-            Console.WriteLine(str);
-            var result = JsonMapper.ToObject(str);
-            if (result.Keys.Contains("error_code"))
-            {
-                Console.ReadKey();
-                return;
-            }
-            if (result["words_result_num"].ToInt() <= 0)
-                return;
+                        var imageOrc = File.ReadAllBytes(re);
+                        // 调用通用文字识别, 图片参数为本地图片，可能会抛出网络等异常，请使用try/catch捕获
+                        var str = client.GeneralBasic(imageOrc).ToString();
+                        Console.WriteLine(str);
+                        var result = JsonMapper.ToObject(str);
+                        if (result.Keys.Contains("error_code"))
+                        {
+                            Console.ReadKey();
+                            return;
+                        }
+                        if (result["words_result_num"].ToInt() <= 0)
+                            return;
 #endif
-            dic[re.Replace(root, "")] = GetExcelCell(re);
+                        dic[re.Replace(InputPath, "")] = GetExcelCell(re);
+                    });
+            WriteAllLines(dic, InputPath);
         }
-
 
 #if imageOrc
         public void GeneralBasicDemo()

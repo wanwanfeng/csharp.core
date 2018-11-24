@@ -44,15 +44,18 @@ namespace FileVersion
 
         public CommonBase()
         {
-            Console.WriteLine("--------------------------------------");
-            Console.WriteLine("KeyMd5:" + KeyMd5);
-            Console.WriteLine("AES.Key:" + AESKey);
-            Console.WriteLine("AES.Head:" + AESHead);
-            Console.WriteLine("Exclude:" + Exclude);
-            Console.WriteLine("Platform:" + Platform);
-            Console.WriteLine("EncryptExclude:" + EncryptExclude);
-            Console.WriteLine("EncryptRootDir:" + EncryptRootDir);
-            Console.WriteLine("--------------------------------------");
+            new[]
+            {
+                "--------------------------------------",
+                "KeyMd5:" + KeyMd5,
+                "AES.Key:" + AESKey,
+                "AES.Head:" + AESHead,
+                "Exclude:" + Exclude,
+                "Platform:" + Platform,
+                "EncryptExclude:" + EncryptExclude,
+                "EncryptRootDir:" + EncryptRootDir,
+                "--------------------------------------",
+            }.ForEach(p => Console.WriteLine(p));
         }
 
         public string SaveDir

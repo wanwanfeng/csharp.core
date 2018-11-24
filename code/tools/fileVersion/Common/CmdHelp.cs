@@ -77,14 +77,12 @@ namespace FileVersion
             process.StandardInput.AutoFlush = true;
 
             string output = process.StandardOutput.ReadToEnd();
-            var res = output.SplitString('\r', '\n').ToList();
+            var res = output.SplitString('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).ToList();
 
             process.WaitForExit();
 
-            res = res.Where(p => !string.IsNullOrEmpty(p)).ToList();
             Console.WriteLine(res[2].Replace("&exit", ""));
-            res = res.Skip(3).ToList();
-            return res.ToArray();
+            return res.Skip(3).ToArray();
         }
 
         public virtual string[] CmdReadLine(string input)
@@ -104,8 +102,7 @@ namespace FileVersion
 
             res = res.Where(p => !string.IsNullOrEmpty(p)).ToList();
             Console.WriteLine(res[2].Replace("&exit", ""));
-            res = res.Skip(3).ToList();
-            return res.ToArray();
+            return res.Skip(3).ToArray();
         }
     }
 }

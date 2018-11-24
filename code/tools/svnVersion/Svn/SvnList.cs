@@ -39,7 +39,6 @@ namespace SvnVersion
             Console.WriteLine("password:" + svnPassword);
             Console.WriteLine("--------------------------------------");
 
-            StartCmd();
             softwareVersion = CmdReadAll("svn --version --quiet").Last();
             isInstall = softwareVersion.Replace(".", "").AsInt() != 0;
             if (isInstall)
@@ -105,7 +104,6 @@ namespace SvnVersion
                 PathToMd5(cache);
                 WriteToTxt(newCache);
             }
-            EndCmd();
         }
 
         protected bool OutUpdate(Dictionary<string, FileDetailInfo> cache)
@@ -117,11 +115,8 @@ namespace SvnVersion
                 SystemConsole.QuitReadKey();
                 return false;
             }
-            else
-            {
-                Console.WriteLine("可更新文件数目为{0}！", count);
-                SystemConsole.ContinueReadKey();
-            }
+            Console.WriteLine("可更新文件数目为{0}！", count);
+            SystemConsole.ContinueReadKey();
             return true;
         }
 

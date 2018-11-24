@@ -65,6 +65,7 @@
     <Compile Include="Library\Base\Extensions\ObjectExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ValueExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ICollectionExtensions.cs" />
+    <Compile Include="Library\Base\Helper\CmdHelper.cs" />
     <Compile Include="Library\Base\Helper\CsvHelper.cs" />
     <Compile Include="Library\Base\Helper\DirectoryHelper.cs" />
     <Compile Include="Library\Base\Helper\FileHelper.cs" />

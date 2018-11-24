@@ -6,11 +6,10 @@ using System.Text;
 using Library;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
 
 namespace FileVersion
 {
-    public class CommonBase : CmdHelp
+    public class CommonBase : CmdHelper
     {
         /// <summary>
         /// 是否已经安装svn或git
@@ -99,7 +98,6 @@ namespace FileVersion
             WriteToTxt(targetDir, cache);
             MakeFolder(folder, targetDir);
             WriteToTxt(targetDir, cache);
-            EndCmd();
         }
 
         /// <summary>
@@ -111,28 +109,17 @@ namespace FileVersion
             Console.WriteLine("");
 
             //排除预定义的后缀
-            var array = Exclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-            if (array.Length > 0)
-            {
-                var deleteKey = new List<string>();
-                foreach (var s in cache)
-                {
-                    foreach (var s1 in array)
-                    {
-                        string extension = Path.GetExtension(s.Key);
-                        if (string.IsNullOrEmpty(extension) || extension == s1)
-                            deleteKey.Add(s.Key);
-                    }
-                }
-                foreach (var key in deleteKey)
-                {
-                    cache.Remove(key);
-                }
-            }
+            var array =
+                Exclude.Split(',')
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .Select(p => p.StartsWith(".") ? p : "." + p)
+                    .ToList();
+            if (array.Count > 0)
+                cache.Keys.Where(p => array.Contains(Path.GetExtension(p))).ToList().ForEach(p => cache.Remove(p));
 
             //排除非选择的平台
-            array = Platform.Split('|', ',');
-            if (array.Length > 1)
+            array = Platform.Split('|', ',').ToList();
+            if (array.Count > 1)
             {
                 var deleteKey = new List<string>();
                 foreach (var s in cache)
@@ -216,7 +203,7 @@ namespace FileVersion
                 string fullPath = targetDir + "/" + s.Key;
                 string targetFullPath = targetMd5Dir + "/" + GetPathHash(s.Key);
                 if (!File.Exists(fullPath)) continue;
-                FileHelper.CreateDirectory(targetFullPath);
+                DirectoryHelper.CreateDirectory(targetFullPath);
                 File.Copy(fullPath, targetFullPath, true);
             }
 

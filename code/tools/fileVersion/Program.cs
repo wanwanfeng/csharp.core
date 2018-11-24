@@ -1,13 +1,26 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Library;
 using Library.Extensions;
 
 namespace FileVersion
 {
     internal class Program
     {
+        public enum MyEnum
+        {
+            [Category("Svn命令")] [TypeValue(typeof (SvnList))] SvnList,
+            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof (SvnMaster))] SvnMaster,
+            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof (SvnPatch))] SvnPatch,
+            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof (SvnUpdate))] SvnUpdate,
+            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof (GitMaster))] GitMaster,
+            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof (GitPatch))] GitPatch,
+            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof (GitUpdate))] GitUpdate,
+        }
+
         private static bool isRuning = true;
 
         private static void Main(string[] args)
@@ -15,55 +28,13 @@ namespace FileVersion
             // 添加程序集解析事件
             AppDomain.CurrentDomain.AssemblyResolve += (sender, assembly) => LoadFromResource(assembly.Name);
 
-            string msg =
-                @"
-------------第一种----------
-步骤1,SvnMaster [输入sm]
-步骤2,SvnPatch [输入sp]
-步骤3,SvnUpdate [输入su]
-
-------------第二种----------
-SvnList [输入sl]
-";
-//1,GitMaster [输入gm]
-//2,GitPatch [输入gp]
-//3,GitUpdate [输入gl]
-//";
-            do
+            SystemConsole.Run<MyEnum>(columnsCount: 4, callAction: delegate(object o)
             {
-                Console.WriteLine(msg);
-                CommonBase commonBase = null;
-                switch (SystemConsole.GetInputStr("请输入选择，然后回车："))
-                {
-                    case "sm":
-                        commonBase = new SvnMaster();
-                        break;
-                    case "sp":
-                        commonBase = new SvnPatch();
-                        break;
-                    case "su":
-                        commonBase = new SvnUpdate();
-                        break;
-                    case "sl":
-                        commonBase = new SvnList();
-                        break;
-                    case "gm":
-                        commonBase = new GitMaster();
-                        break;
-                    case "gp":
-                        commonBase = new GitPatch();
-                        break;
-                    case "gu":
-                        commonBase = new GitUpdate();
-                        break;
-                }
-
+                var commonBase = (CommonBase) o;
                 if (commonBase == null) return;
                 if (commonBase.isInstall)
                     commonBase.Run();
-
-                Console.Clear();
-            } while (SystemConsole.ContinueY("按y键继续,按其余键退出......"));
+            });
         }
 
 

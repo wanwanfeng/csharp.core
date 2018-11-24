@@ -10,7 +10,7 @@ using Library.Helper;
 
 namespace SvnVersion
 {
-    public class CommonBase : CmdHelp
+    public class CommonBase : CmdHelper
     {
         /// <summary>
         /// 是否已经安装svn或git
@@ -44,15 +44,18 @@ namespace SvnVersion
 
         public CommonBase()
         {
-            Console.WriteLine("--------------------------------------");
-            Console.WriteLine("KeyMd5:" + KeyMd5);
-            Console.WriteLine("AES.Key:" + AESKey);
-            Console.WriteLine("AES.Head:" + AESHead);
-            Console.WriteLine("Exclude:" + Exclude);
-            Console.WriteLine("Platform:" + Platform);
-            Console.WriteLine("EncryptExclude:" + EncryptExclude);
-            Console.WriteLine("EncryptRootDir:" + EncryptRootDir);
-            Console.WriteLine("--------------------------------------");
+            new[]
+            {
+                "--------------------------------------",
+                "KeyMd5:" + KeyMd5,
+                "AES.Key:" + AESKey,
+                "AES.Head:" + AESHead,
+                "Exclude:" + Exclude,
+                "Platform:" + Platform,
+                "EncryptExclude:" + EncryptExclude,
+                "EncryptRootDir:" + EncryptRootDir,
+                "--------------------------------------",
+            }.ForEach(p => Console.WriteLine(p));
         }
 
         public string SaveDir { get; set; }
@@ -93,28 +96,17 @@ namespace SvnVersion
             Console.WriteLine("");
 
             //排除预定义的后缀
-            var array = Exclude.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
-            if (array.Length > 0)
-            {
-                var deleteKey = new List<string>();
-                foreach (var s in cache)
-                {
-                    foreach (var s1 in array)
-                    {
-                        string extension = Path.GetExtension(s.Key);
-                        if (string.IsNullOrEmpty(extension) || extension == s1)
-                            deleteKey.Add(s.Key);
-                    }
-                }
-                foreach (var key in deleteKey)
-                {
-                    cache.Remove(key);
-                }
-            }
+            var array =
+                Exclude.Split(',')
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .Select(p => p.StartsWith(".") ? p : "." + p)
+                    .ToList();
+            if (array.Count > 0)
+                cache.Keys.Where(p => array.Contains(Path.GetExtension(p))).ToList().ForEach(p => cache.Remove(p));
 
             //排除非选择的平台
-            array = Platform.Split('|', ',');
-            if (array.Length > 1)
+            array = Platform.Split('|', ',').ToList();
+            if (array.Count > 1)
             {
                 var deleteKey = new List<string>();
                 foreach (var s in cache)

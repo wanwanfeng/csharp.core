@@ -70,7 +70,6 @@
     <Compile Include="Svn\SvnUpdate.cs" />
     <Compile Include="Svn\SvnPatch.cs" />
     <Compile Include="Svn\SvnMaster.cs" />
-    <Compile Include="Common\CmdHelp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

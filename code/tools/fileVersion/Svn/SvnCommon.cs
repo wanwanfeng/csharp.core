@@ -35,7 +35,6 @@ namespace FileVersion
             Console.WriteLine("password:" + svnPassword);
             Console.WriteLine("--------------------------------------");
 
-            StartCmd();
             softwareVersion = CmdReadAll("svn --version --quiet").Last();
             isInstall = softwareVersion.Replace(".", "").AsInt() != 0;
             if (isInstall)

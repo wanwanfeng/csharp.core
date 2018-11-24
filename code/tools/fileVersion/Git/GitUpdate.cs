@@ -9,7 +9,6 @@
 
         public override void Run()
         {
-            EndCmd();
             UpdatePathList();
         }
     }

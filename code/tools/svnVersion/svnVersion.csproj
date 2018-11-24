@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Common\CommonBase.cs" />
     <Compile Include="Svn\SvnList.cs" />
-    <Compile Include="Common\CmdHelp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

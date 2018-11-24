@@ -36,7 +36,6 @@ namespace FileVersion
             Console.WriteLine("password:" + gitPassword);
             Console.WriteLine("--------------------------------------");
 
-            StartCmd();
             softwareVersion = CmdReadAll("git --version").Last();
             isInstall = softwareVersion.StartsWith("git");
             if (isInstall)

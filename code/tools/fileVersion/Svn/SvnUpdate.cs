@@ -10,7 +10,6 @@ namespace FileVersion
 
         public override void Run()
         {
-            EndCmd();
             UpdatePathList();
         }
     }

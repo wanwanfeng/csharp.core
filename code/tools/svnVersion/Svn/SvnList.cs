@@ -163,38 +163,38 @@ namespace SvnVersion
         {
             Console.WriteLine("\n正在获取目标版本号{0}文件详细信息...", version);
 
-            var targetList =
-                CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", version, svnUrl))
-                    .Where(s => !s.EndsWith("/"))
-                    .ToArray(); //去除文件夹
-
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
-            int index = 0;
-            foreach (string s in targetList)
-            {
-                List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
-                var last = res.Skip(6).Join(" ").Replace("\\", "/").Trim();
-                FileDetailInfo svnFileInfo = new FileDetailInfo()
+
+            CmdReadAll(string.Format("svn list -r {0} {1}@{0} -R -v", version, svnUrl))
+                .Where(s => !s.EndsWith("/"))
+                .ToArray()
+                .ForEach((s, index) =>
                 {
-                    is_delete = false,
-                    version = res.First().Trim().AsLong(),
-                    content_size = res.Skip(2).First().Trim().AsLong(),
-                    revision = version,
-                    path = last,
-                };
-                cache[svnFileInfo.path] = svnFileInfo;
-                Console.WriteLine("{0:D5}\t{1}", ++index, svnFileInfo);
-            }
+                    List<string> res = s.Split(' ').Where(s1 => !string.IsNullOrEmpty(s1)).ToList();
+                    var last = res.Skip(6).Join(" ").Replace("\\", "/").Trim();
+                    FileDetailInfo svnFileInfo = new FileDetailInfo()
+                    {
+                        is_delete = false,
+                        version = res.First().Trim().AsLong(),
+                        content_size = res.Skip(2).First().Trim().AsLong(),
+                        revision = version,
+                        path = last,
+                    };
+                    cache[svnFileInfo.path] = svnFileInfo;
+                    Console.WriteLine("{0:D5}\t{1}", index, svnFileInfo);
+                });
+
             ExcludeFile(cache);
             return cache;
         }
 
-        private static Dictionary<string, FileDetailInfo> CompareCache(Dictionary<string, FileDetailInfo> newCache, Dictionary<string, FileDetailInfo> oldCache)
+        private static Dictionary<string, FileDetailInfo> CompareCache(Dictionary<string, FileDetailInfo> newCache,
+            Dictionary<string, FileDetailInfo> oldCache)
         {
             //变动列表
             Dictionary<string, FileDetailInfo> cache = new Dictionary<string, FileDetailInfo>();
-            int index = 0;
-            foreach (KeyValuePair<string, FileDetailInfo> pair in newCache)
+
+            newCache.ForEach((pair, index) =>
             {
                 FileDetailInfo oldFileDetailInfo = null;
                 if (oldCache.TryGetValue(pair.Key, out oldFileDetailInfo))
@@ -215,8 +215,8 @@ namespace SvnVersion
                     //增加的
                     cache[pair.Key] = pair.Value;
                 }
-                Console.WriteLine("{0:D5}\t{1}", ++index, pair.Value);
-            }
+                Console.WriteLine("{0:D5}\t{1}", index, pair.Value);
+            });
             return cache;
         }
     }

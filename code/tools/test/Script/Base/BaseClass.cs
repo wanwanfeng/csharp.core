@@ -9,47 +9,9 @@ using Library.Helper;
 
 namespace Script
 {
-    public class BaseClass
+    public class BaseClass : BaseSystemConsole
     {
-        //public BaseClass()
-        //{
-        //    Console.WriteLine("操作类：" + GetType().Name);
-        //    SystemExtensions.GetInputStr("是否继续操作（y/e）:");
-        //}
-
-        private string _root;
-
-        public virtual string root
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_root)) return _root;
-                _root = SystemConsole.GetInputStr("请拖入选定文件夹:", "您选择的文件夹：");
-                if (!string.IsNullOrEmpty(_root)) _root = _root.Replace("\\", "/");
-                return _root;
-            }
-            set { _root = value; }
-        }
-
-        protected string Folder
-        {
-            get { return GetType().Name + "/"; }
-            set { }
-        }
-
-        public string[] ReadAllLines(string name)
-        {
-            var path = Folder + name + ".txt";
-            if (!File.Exists(path))
-            {
-                Console.WriteLine(path + " is not exist !");
-                Console.ReadKey();
-                return new string[0];
-            }
-            return File.ReadAllLines(path);
-        }
-
-        public void WriteAllLines(Dictionary<string, string> dic)
+        public void WriteAllLines(Dictionary<string, string> dic, string path)
         {
             //直接写入excel
             var listTable = new ListTable()
@@ -57,15 +19,14 @@ namespace Script
                 Rows = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
                 Columns = new List<string>() {"key", "value"}
             };
-            ExcelByBase.Data.ExportToExcel(listTable, root + ".xlsx");
+            ExcelByBase.Data.ExportToExcel(listTable, Path.ChangeExtension(path, ".xlsx"));
         }
 
         public void CreateDirectory(string name)
         {
             var path = GetType().Name + "/" + name;
-            FileHelper.CreateDirectory(path);
+            DirectoryHelper.CreateDirectory(path);
         }
-
 
         public string GetExcelCell(string path)
         {
@@ -81,7 +42,7 @@ namespace Script
                 {
                     if (max > 350)
                     {
-                        height = 350 * height / width;
+                        height = 350*height/width;
                         width = 350;
                     }
                 }
@@ -89,32 +50,25 @@ namespace Script
                 {
                     if (max > 350)
                     {
-                        width = 350 * width / height;
+                        width = 350*width/height;
                         height = 350;
                     }
                 }
                 return string.Format("<table><img src='{0}' width='{1}' height='{2}'>", path, width, height);
             }
         }
+    }
 
-        protected void RunList(List<string> res)
+    public static class BaseClassE
+    {
+        public static void ForEachPaths(this List<string> paths, Action<string> callAction)
         {
-            res = res.Select(p => p.Replace("\\", "/")).ToList();
-            res.ForEach((p, i, count) =>
+            paths = paths.Select(p => p.Replace("\\", "/")).ToList();
+            paths.ForEach((p, i, count) =>
             {
-                Console.WriteLine((((float) i)/count).ToString("p") + "\t" + p);
-                if (File.Exists(p)) RunListOne(p);
+                Console.WriteLine("is now : " + (((float) i)/count).ToString("p") + "\t" + p);
+                if (File.Exists(p)) callAction(p);
             });
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="re">全路径包含root</param>
-        public virtual void RunListOne(string re)
-        {
-            
         }
     }
 }

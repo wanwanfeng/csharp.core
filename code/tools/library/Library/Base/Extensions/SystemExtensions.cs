@@ -26,7 +26,8 @@ namespace Library.Extensions
 
         public static string InputPath { get; set; }
 
-        public static List<string> CheckPath(string selectExtension, SelectType selectType = SelectType.All)
+        public static List<string> CheckPath(string selectExtension, SelectType selectType = SelectType.All,
+            SearchOption searchOption = SearchOption.AllDirectories)
         {
             List<string> files = new List<string>();
             string path = SystemConsole.GetInputStr(
@@ -35,28 +36,34 @@ namespace Library.Extensions
             if (string.IsNullOrEmpty(path))
                 return files;
 
+            var selectExtensions = string.IsNullOrEmpty(selectExtension) ? new string[0] : selectExtension.Split('|');
             switch (selectType)
             {
                 case SelectType.File:
                     if (File.Exists(path))
                     {
-                        files.Add(path);
+                        if (selectExtensions.Contains(Path.GetExtension(path)))
+                            files.Add(path);
+                        if (selectExtensions.Length == 0)
+                            files.Add(path);
                     }
                     break;
                 case SelectType.Folder:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension.Split('|')).ToList();
+                        files = DirectoryHelper.GetFiles(path, selectExtensions, searchOption).ToList();
                     }
                     break;
                 case SelectType.All:
                     if (Directory.Exists(path))
                     {
-                        files = DirectoryHelper.GetFiles(path, selectExtension.Split('|')).ToList();
+                        files = DirectoryHelper.GetFiles(path, selectExtensions, searchOption).ToList();
                     }
                     else if (File.Exists(path))
                     {
-                        if (selectExtension.Split('|').Contains(Path.GetExtension(path)))
+                        if (selectExtensions.Contains(Path.GetExtension(path)))
+                            files.Add(path);
+                        if (selectExtensions.Length == 0)
                             files.Add(path);
                     }
                     break;

@@ -9,6 +9,8 @@ namespace Library.Extensions
     /// </summary>
     public static class LinqExtensions
     {
+        public static Action<string> WriteFunc = p => { Console.WriteLine(p); };
+
         public static void ForEach<T>(this T[] source, Action<T> action)
         {
             for (int index = 0; index < source.Length; ++index)
@@ -27,17 +29,12 @@ namespace Library.Extensions
                 action(source[index], index, source.Length);
         }
 
-        //public static void ForEach<T>(this T[] source, Action<T, float> action)
-        //{
-        //    for (int index = 0; index < source.Length; ++index)
-        //        action(source[index], (float) index/source.Length);
-        //}
-
-        //public static void ForEach<T>(this T[] source, Action<T, string> action)
-        //{
-        //    for (int index = 0; index < source.Length; ++index)
-        //        action(source[index], index + "/" + source.Length);
-        //}
+        public static void ForEach<T>(this T[] source, Func<T, bool> action)
+        {
+            for (int index = 0; index < source.Length; ++index)
+                if (action(source[index]))
+                    WriteFunc(string.Format("is now : {0} \t{1}", index + "/" + source.Length, source[index]));
+        }
 
         public static void ForEach<T>(this List<T> source, Action<T> action)
         {
@@ -57,22 +54,47 @@ namespace Library.Extensions
                 action(source[index], index, source.Count);
         }
 
-        //public static void ForEach<T>(this List<T> source, Action<T, float> action)
-        //{
-        //    for (int index = 0; index < source.Count; ++index)
-        //        action(source[index], ((float) index/source.Count));
-        //}
-
-        //public static void ForEach<T>(this List<T> source, Action<T, string> action)
-        //{
-        //    for (int index = 0; index < source.Count; ++index)
-        //        action(source[index], index + "/" + source.Count);
-        //}
-
-
-        public static void Parallel<T>(this List<T> value, Action<T> callAction)
+        public static void ForEach<T>(this List<T> source, Func<T, bool> action)
         {
-            // Parallel.ForEach(CheckPath(exs), p => { });
+            for (int index = 0; index < source.Count; ++index)
+                if (action(source[index]))
+                    WriteFunc(string.Format("is now : {0} \t{1}", index + "/" + source.Count, source[index]));
+        }
+
+        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>> action)
+        {
+            foreach (KeyValuePair<T, TV> pair in source)
+            {
+                action(pair);
+            }
+        }
+
+        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>, int> action)
+        {
+            var index = 0;
+            foreach (KeyValuePair<T, TV> pair in source)
+            {
+                action(pair, ++index);
+            }
+        }
+
+        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>, int, int> action)
+        {
+            var index = 0;
+            foreach (KeyValuePair<T, TV> pair in source)
+            {
+                action(pair, ++index, source.Count);
+            }
+        }
+
+        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Func<KeyValuePair<T, TV>, bool> func)
+        {
+            var index = 0;
+            foreach (KeyValuePair<T, TV> pair in source)
+            {
+                if (func(pair))
+                    WriteFunc(string.Format("is now : {0} \t{1}", ++index + "/" + source.Count, pair.Key));
+            }
         }
     }
 }

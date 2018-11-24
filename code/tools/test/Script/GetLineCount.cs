@@ -23,10 +23,7 @@ namespace test
 
                 var files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories).ToList();
                 var res = new List<string>();
-                foreach (var s in ex.Split(',').ToList())
-                {
-                    res.AddRange(files.Where(p => Path.GetExtension(p) == s));
-                }
+                ex.Split(',').ToList().ForEach(s => res.AddRange(files.Where(p => Path.GetExtension(p) == s)));
                 File.WriteAllLines(ex + ".txt", res.ToArray());
                 Console.WriteLine("总行数：" + res.Sum(p => File.Exists(p) ? File.ReadAllLines(p).Length : 0));
             } while (SystemConsole.ContinueY());

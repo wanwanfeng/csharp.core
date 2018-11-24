@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Script
@@ -10,64 +12,38 @@ namespace Script
     /// </summary>
     public class CopyToOneFolder : BaseClass
     {
-        /// <summary>
-        /// true 归一到一个文件夹下
-        /// false 还原
-        /// </summary>
-        private bool guiyi = false;
-
         public CopyToOneFolder()
         {
-            List<string> res = new List<string>();
-
-            Console.WriteLine("----------------------");
-            Console.WriteLine("1:归一到一个文件夹下");
-            Console.WriteLine("2:还原");
-            Console.WriteLine("----------------------");
-            var y = Console.ReadLine();
-
-            switch (y)
+            SystemConsole.Run(config: new Dictionary<string, Action>()
             {
-                case "1":
                 {
-                    guiyi = true;
-                    res.AddRange(DirectoryHelper.GetFiles(root, ".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SearchOption.AllDirectories));
-                    break;
-                }
-                case "2":
+                    "递归搜索文件重命名并复制到同一文件夹下", () =>
+                    {
+                        CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SelectType.Folder,
+                            searchOption: SearchOption.AllDirectories)
+                            .OrderBy(p => p)
+                            .ToList()
+                            .ForEachPaths(CopyToOne);
+                    }
+                },
                 {
-                    guiyi = false;
-                    res.AddRange(DirectoryHelper.GetFiles(root, "*", SearchOption.TopDirectoryOnly));
-                    break;
-                }
-            }
-            if (res.Count == 0) return;
-            res.Sort();
-            RunList(res);
-        }
-
-        public override void RunListOne(string re)
-        {
-            if (guiyi)
-            {
-                CopyToOne(re);
-            }
-            else
-            {
-                RevertCopyToOne(re);
-            }
+                    "还原", () =>
+                    {
+                        CheckPath("", SelectType.Folder, searchOption: SearchOption.TopDirectoryOnly)
+                            .OrderBy(p => p)
+                            .ToList()
+                            .ForEachPaths(RevertCopyToOne);
+                    }
+                },
+            });
         }
 
         private void CopyToOne(string re)
         {
-            string haha = re;
-            if (haha.StartsWith(root))
-                haha = haha.Replace(root, "");
-
-            //唯一文件夹路径
-            string newPath = root + "_merge/" + haha.Replace("/", "..");
-            FileHelper.CreateDirectory(newPath);
-            File.Copy(root + haha, newPath, true);
+            var input = InputPath;
+            string newPath = input + "_merge/" + re.Replace(input, "").TrimStart('/').Replace("/", "..");
+            DirectoryHelper.CreateDirectory(newPath);
+            File.Copy(re, newPath, true);
         }
 
         /// <summary>
@@ -76,12 +52,8 @@ namespace Script
         /// <param name="re"></param>
         private void RevertCopyToOne(string re)
         {
-            string haha = re;
-            if (haha.StartsWith(root))
-                haha = haha.Replace(root + "/", "");
-
-            string newPath = root.Replace("_merge", "_new") + haha.Replace("..", "/");
-            FileHelper.CreateDirectory(newPath);
+            string newPath = re.Replace("_merge", "_new").Replace("..", "/");
+            DirectoryHelper.CreateDirectory(newPath);
             File.Copy(re, newPath, true);
         }
     }

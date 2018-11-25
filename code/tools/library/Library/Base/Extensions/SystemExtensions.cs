@@ -26,9 +26,12 @@ namespace Library.Extensions
 
         public static string InputPath { get; set; }
 
-        public static List<string> CheckPath(string selectExtension, SelectType selectType = SelectType.All,
+        public static List<string> CheckPath(string selectExtension = "*.*", SelectType selectType = SelectType.All,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
+            if (string.IsNullOrEmpty(selectExtension))
+                selectExtension = SystemConsole.GetInputStr("请输入文件后缀 ('.cs'):");
+
             List<string> files = new List<string>();
             string path = SystemConsole.GetInputStr(
                 beforeTip: string.Format(CacheSelect[selectType], selectExtension),
@@ -36,7 +39,11 @@ namespace Library.Extensions
             if (string.IsNullOrEmpty(path))
                 return files;
 
-            var selectExtensions = string.IsNullOrEmpty(selectExtension) ? new string[0] : selectExtension.Split('|');
+            InputPath = path.Replace("\\", "/");
+
+            var selectExtensions = string.IsNullOrEmpty(selectExtension) || selectExtension == "*.*"
+                ? new string[0]
+                : selectExtension.Split(',', '|').Select(p => "." + p.TrimStart('*').TrimStart('.')).ToArray();
             switch (selectType)
             {
                 case SelectType.File:
@@ -50,15 +57,11 @@ namespace Library.Extensions
                     break;
                 case SelectType.Folder:
                     if (Directory.Exists(path))
-                    {
-                        files = DirectoryHelper.GetFiles(path, selectExtensions, searchOption).ToList();
-                    }
+                        files.AddRange(DirectoryHelper.GetFiles(path, selectExtensions, searchOption));
                     break;
                 case SelectType.All:
                     if (Directory.Exists(path))
-                    {
-                        files = DirectoryHelper.GetFiles(path, selectExtensions, searchOption).ToList();
-                    }
+                        files.AddRange(DirectoryHelper.GetFiles(path, selectExtensions, searchOption));
                     else if (File.Exists(path))
                     {
                         if (selectExtensions.Contains(Path.GetExtension(path)))
@@ -72,7 +75,6 @@ namespace Library.Extensions
                     return files;
             }
 
-            InputPath = path.Replace("\\", "/");
             files.Sort();
             return files;
         }

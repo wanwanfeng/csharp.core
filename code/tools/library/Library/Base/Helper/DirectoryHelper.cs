@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 
 namespace Library.Helper
 {
@@ -26,7 +27,7 @@ namespace Library.Helper
         {
             return (selectExtensions == null || selectExtensions.Length == 0
                 ? files
-                : files.Where(p => selectExtensions.Contains(Path.GetExtension(p))))
+                : files.Where(p => selectExtensions.Select(q => "." + q.TrimStart('.')).Contains(Path.GetExtension(p))))
                 .Select(p => p.Replace("\\", "/"));
         }
 
@@ -55,7 +56,9 @@ namespace Library.Helper
             SearchOption searchOption = SearchOption.AllDirectories, params char[] separator)
         {
             return PredicateFiles(Directory.GetFiles(rootPath, "*.*", searchOption),
-                selectExtension.Split(separator.Length == 0 ? new[] {'|'} : separator));
+                string.IsNullOrEmpty(selectExtension)
+                    ? new string[0]
+                    : selectExtension.Split(separator.Length == 0 ? new[] {'|'} : separator));
         }
 
         /// <summary>
@@ -84,7 +87,9 @@ namespace Library.Helper
             SearchOption searchOption = SearchOption.AllDirectories, params char[] separator)
         {
             return PredicateFiles(rootPaths.SelectMany(p => Directory.GetFiles(p, "*.*", searchOption)),
-                selectExtension.Split(separator.Length == 0 ? new[] {'|'} : separator));
+                string.IsNullOrEmpty(selectExtension)
+                    ? new string[0]
+                    : selectExtension.Split(separator.Length == 0 ? new[] {'|'} : separator));
         }
     }
 }

@@ -1,58 +1,33 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Library.Extensions;
 
 namespace fontConvert
 {
-    public abstract class BaseActionBy
+    public abstract class BaseActionBy : BaseSystemConsole
     {
-        protected string inputPath = "";
-        protected List<string> all = new List<string>();
-
-        public void Open(string input, string ex)
+        public void Open()
         {
-            inputPath = input;
-
-            if (!Directory.Exists(inputPath))
+            CheckPath("*.*", SelectType.All).ForEach((p, i, count) =>
             {
-                Console.WriteLine("文件夹路径不存在!");
-            }
-            else
-            {
-                var exName = ex.SplitString('|', ',').Select(p => p.StartsWith(".") ? p : "." + p).ToList();
-                all =
-                    Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories)
-                        .Where(p => exName.Contains(Path.GetExtension(p)))
-                        .Select(p => p.Replace("\\", "/"))
-                        .ToList();
-                all.Sort();
-                OpenRun();
-            }
+                Console.WriteLine("替换中...请稍后" + ((float) i/count).ToString("p") + "\t" + p);
+                OpenRun(p);
+            });
         }
 
-        protected virtual void OpenRun()
+        protected virtual void OpenRun(string path)
         {
-            for (int i = 0; i < all.Count; i++)
+            string[] input = File.ReadAllLines(path);
+
+            bool isSave = false;
+            for (int i = 0; i < input.Length; i++)
             {
-                Console.WriteLine("替换中...请稍后" + ((float) i/all.Count).ToString("p") + "\t" + all[i]);
-
-                string[] input = File.ReadAllLines(all[i]);
-
-                bool isSave = false;
-                for (int j = 0; j < input.Length; j++)
-                {
-                    string value = input[j];
-                    input[j] = OpenRunLine(value);
-                    isSave = value == input[j];
-                }
-                if (isSave)
-                {
-                    File.WriteAllLines(all[i], input);
-                }
+                string value = input[i];
+                input[i] = OpenRunLine(value);
+                isSave = value == input[i];
             }
+            if (isSave)
+                File.WriteAllLines(path, input);
         }
 
         protected virtual string OpenRunLine(string value)

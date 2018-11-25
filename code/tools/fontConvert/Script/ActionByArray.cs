@@ -58,45 +58,26 @@ namespace fontConvert.Script
 
         public class ToTraditional : ActionByArray
         {
-            protected override void OpenRun()
+            protected override void OpenRun(string path)
             {
-                for (int i = 0; i < all.Count; i++)
-                {
-                    Console.WriteLine("替换中...请稍后" + ((float)i / all.Count).ToString("f") + "\t" + all[i]);
-                    string content = File.ReadAllText(all[i]);
-
-                    bool isSave = false;
-
-                    string result = Base.ToTraditional(content, ref isSave);
-
-                    if (isSave)
-                    {
-                        File.WriteAllText(all[i], result, Encoding.UTF8);
-                    }
-                }
+                string content = File.ReadAllText(path);
+                bool isSave = false;
+                string result = Base.ToTraditional(content, ref isSave);
+                if (isSave)
+                    File.WriteAllText(path, result);
             }
         }
 
         public class ToSimplified : ActionByArray
         {
-            protected override void OpenRun()
+            protected override void OpenRun(string path)
             {
-                for (int i = 0; i < all.Count; i++)
-                {
-                    Console.WriteLine("替换中...请稍后" + ((float)i / all.Count).ToString("f") + "\t" + all[i]);
-                    string content = File.ReadAllText(all[i]);
-
-                    bool isSave = false;
-
-                    string result = Base.ToSimplified(content, ref isSave);
-
-                    if (isSave)
-                    {
-                        File.WriteAllText(all[i], result, Encoding.UTF8);
-                    }
-                }
+                string content = File.ReadAllText(path);
+                bool isSave = false;
+                string result = Base.ToSimplified(content, ref isSave);
+                if (isSave)
+                    File.WriteAllText(path, result);
             }
         }
-
     }
 }

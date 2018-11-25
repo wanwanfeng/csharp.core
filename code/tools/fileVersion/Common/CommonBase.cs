@@ -112,7 +112,7 @@ namespace FileVersion
             var array =
                 Exclude.Split(',')
                     .Where(p => !string.IsNullOrEmpty(p))
-                    .Select(p => p.StartsWith(".") ? p : "." + p)
+                    .Select(p => "." + p.TrimStart('.'))
                     .ToList();
             if (array.Count > 0)
                 cache.Keys.Where(p => array.Contains(Path.GetExtension(p))).ToList().ForEach(p => cache.Remove(p));

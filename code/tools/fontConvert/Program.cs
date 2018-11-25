@@ -23,9 +23,7 @@ namespace fontConvert
             Action<object> callAction = delegate(object o)
             {
                 BaseActionBy baseActionFor = (BaseActionBy) o;
-                var path = SystemConsole.GetInputStr("input dir path:");
-                var ex = SystemConsole.GetInputStr("input file extension ('.cs'):");
-                baseActionFor.Open(path, ex);
+                baseActionFor.Open();
             };
             SystemConsole.Run<ConvertType>(callAction);
         }

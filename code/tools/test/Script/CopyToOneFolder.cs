@@ -16,45 +16,37 @@ namespace Script
         {
             SystemConsole.Run(config: new Dictionary<string, Action>()
             {
-                {
-                    "递归搜索文件重命名并复制到同一文件夹下", () =>
-                    {
-                        CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SelectType.Folder,
-                            searchOption: SearchOption.AllDirectories)
-                            .OrderBy(p => p)
-                            .ToList()
-                            .ForEachPaths(CopyToOne);
-                    }
-                },
-                {
-                    "还原", () =>
-                    {
-                        CheckPath("", SelectType.Folder, searchOption: SearchOption.TopDirectoryOnly)
-                            .OrderBy(p => p)
-                            .ToList()
-                            .ForEachPaths(RevertCopyToOne);
-                    }
-                },
+                {"递归搜索文件重命名并复制到同一文件夹下", CopyToOne},
+                {"还原", RevertCopyToOne},
             });
         }
 
-        private void CopyToOne(string re)
+        private void CopyToOne()
         {
-            var input = InputPath;
-            string newPath = input + "_merge/" + re.Replace(input, "").TrimStart('/').Replace("/", "..");
-            DirectoryHelper.CreateDirectory(newPath);
-            File.Copy(re, newPath, true);
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SelectType.Folder,
+                searchOption: SearchOption.AllDirectories)
+                .ForEachPaths(re =>
+                {
+                    var input = InputPath;
+                    string newPath = input + "_merge/" + re.Replace(input, "").TrimStart('/').Replace("/", "..");
+                    DirectoryHelper.CreateDirectory(newPath);
+                    File.Copy(re, newPath, true);
+                });
         }
 
         /// <summary>
         /// 全路径
         /// </summary>
         /// <param name="re"></param>
-        private void RevertCopyToOne(string re)
+        private void RevertCopyToOne()
         {
-            string newPath = re.Replace("_merge", "_new").Replace("..", "/");
-            DirectoryHelper.CreateDirectory(newPath);
-            File.Copy(re, newPath, true);
+            CheckPath("*.*", SelectType.Folder, searchOption: SearchOption.TopDirectoryOnly)
+                .ForEachPaths(re =>
+                {
+                    string newPath = re.Replace("_merge", "_new").Replace("..", "/");
+                    DirectoryHelper.CreateDirectory(newPath);
+                    File.Copy(re, newPath, true);
+                });
         }
     }
 }

@@ -63,8 +63,7 @@ namespace Script
     {
         public static void ForEachPaths(this List<string> paths, Action<string> callAction)
         {
-            paths = paths.Select(p => p.Replace("\\", "/")).ToList();
-            paths.ForEach((p, i, count) =>
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, count) =>
             {
                 Console.WriteLine("is now : " + (((float) i)/count).ToString("p") + "\t" + p);
                 if (File.Exists(p)) callAction(p);

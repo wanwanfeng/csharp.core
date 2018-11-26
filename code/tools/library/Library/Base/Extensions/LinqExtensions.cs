@@ -29,11 +29,13 @@ namespace Library.Extensions
                 action(source[index], index, source.Length);
         }
 
-        public static void ForEach<T>(this T[] source, Func<T, bool> action)
+        public static void ForEach<T>(this T[] source, Action<T> action, string tip)
         {
             for (int index = 0; index < source.Length; ++index)
-                if (action(source[index]))
-                    WriteFunc(string.Format("is now : {0} \t{1}", index + "/" + source.Length, source[index]));
+            {
+                action(source[index]);
+                WriteFunc(string.Format("{2} : {0} \t{1}", index + "/" + source.Length, source[index], tip ?? "is now"));
+            }
         }
 
         public static void ForEach<T>(this List<T> source, Action<T> action)
@@ -54,11 +56,13 @@ namespace Library.Extensions
                 action(source[index], index, source.Count);
         }
 
-        public static void ForEach<T>(this List<T> source, Func<T, bool> action)
+        public static void ForEach<T>(this List<T> source, Action<T> action, string tip)
         {
             for (int index = 0; index < source.Count; ++index)
-                if (action(source[index]))
-                    WriteFunc(string.Format("is now : {0} \t{1}", index + "/" + source.Count, source[index]));
+            {
+                action(source[index]);
+                WriteFunc(string.Format("{2} : {0} \t{1}", index + "/" + source.Count, source[index], tip ?? "is now"));
+            }
         }
 
         public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>> action)
@@ -87,13 +91,13 @@ namespace Library.Extensions
             }
         }
 
-        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Func<KeyValuePair<T, TV>, bool> func)
+        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>> action, string tip)
         {
             var index = 0;
             foreach (KeyValuePair<T, TV> pair in source)
             {
-                if (func(pair))
-                    WriteFunc(string.Format("is now : {0} \t{1}", ++index + "/" + source.Count, pair.Key));
+                action(pair);
+                WriteFunc(string.Format("{2} : {0} \t{1}", ++index + "/" + source.Count, pair.Key, tip ?? "is now"));
             }
         }
     }

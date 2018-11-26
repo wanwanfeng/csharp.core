@@ -31,27 +31,24 @@ namespace Script
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
             CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
-                .OrderBy(p => p)
-                .ToList()
-                .ForEachPaths(
-                    re =>
-                    {
+                .ForEachPaths(re =>
+                {
 #if imageOrc
-                        var imageOrc = File.ReadAllBytes(re);
-                        // 调用通用文字识别, 图片参数为本地图片，可能会抛出网络等异常，请使用try/catch捕获
-                        var str = client.GeneralBasic(imageOrc).ToString();
-                        Console.WriteLine(str);
-                        var result = JsonMapper.ToObject(str);
-                        if (result.Keys.Contains("error_code"))
-                        {
-                            Console.ReadKey();
-                            return;
-                        }
-                        if (result["words_result_num"].ToInt() <= 0)
-                            return;
+                    var imageOrc = File.ReadAllBytes(re);
+                    // 调用通用文字识别, 图片参数为本地图片，可能会抛出网络等异常，请使用try/catch捕获
+                    var str = client.GeneralBasic(imageOrc).ToString();
+                    Console.WriteLine(str);
+                    var result = JsonMapper.ToObject(str);
+                    if (result.Keys.Contains("error_code"))
+                    {
+                        Console.ReadKey();
+                        return;
+                    }
+                    if (result["words_result_num"].ToInt() <= 0)
+                        return;
 #endif
-                        dic[re.Replace(InputPath, "")] = GetExcelCell(re);
-                    });
+                    dic[re.Replace(InputPath, "")] = GetExcelCell(re);
+                });
             WriteAllLines(dic, InputPath);
         }
 

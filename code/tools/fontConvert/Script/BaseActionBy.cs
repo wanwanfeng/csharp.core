@@ -8,11 +8,7 @@ namespace fontConvert
     {
         public void Open()
         {
-            CheckPath("*.*", SelectType.All).ForEach((p, i, count) =>
-            {
-                Console.WriteLine("替换中...请稍后" + ((float) i/count).ToString("p") + "\t" + p);
-                OpenRun(p);
-            });
+            CheckPath("*.*", SelectType.All).ForEach(OpenRun, "替换中...请稍后");
         }
 
         protected virtual void OpenRun(string path)

@@ -38,7 +38,6 @@ namespace Script
 
             //Parallel.ForEach(CheckPath(selectExtension), action);//并行操作
             CheckPath(selectExtension).AsParallel().ForAll(action); //并行操作
-            //CheckPath(selectExtension).ForEach(action);//线性操作
         }
 
         public void ToXml()

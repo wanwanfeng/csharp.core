@@ -39,7 +39,7 @@ namespace Library.Extensions
             if (string.IsNullOrEmpty(path))
                 return files;
 
-            InputPath = path.Replace("\\", "/");
+            InputPath = path.Replace("\\", "/").TrimEnd('/');
 
             var selectExtensions = string.IsNullOrEmpty(selectExtension) || selectExtension == "*.*"
                 ? new string[0]
@@ -106,10 +106,10 @@ namespace Library.Extensions
             //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
 
             var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
-                .ToLookup(p => p.Value == null ? "" : p.Value.Category)
+                .GroupBy(p => p.Value == null ? "" : p.Value.Category)
                 .ToDictionary(p => p.Key, p => p.ToDictionary(q => (int) q.Key, q => (T) q.Key));
-
-            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>().ToDictionary(p => (int) p.Key);
+            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>()
+                .ToDictionary(p => (int) p.Key);
             var cacheDesc = AttributeHelper.GetCacheDescription<T>()
                 .ToDictionary(p => p.Key, q => string.IsNullOrEmpty(q.Value) ? q.Key.ToString() : q.Value);
 
@@ -128,7 +128,7 @@ namespace Library.Extensions
 
                     var lineNum = (pair.Value.Count/columnsCount + 1);
                     var cache = pair.Value
-                        .ToLookup(p => p.Key%lineNum, q => q)
+                        .GroupBy(p => p.Key%lineNum, q => q)
                         .ToDictionary(p => p.Key, q => q.ToList());
 
                     foreach (var value in cache.Values)

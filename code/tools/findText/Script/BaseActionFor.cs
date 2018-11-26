@@ -76,11 +76,7 @@ namespace findText
         {
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
-            CheckPath(exName, SelectType.Folder).ForEach((file, i, count) =>
-            {
-                Console.WriteLine("搜索中...请稍后" + ((float) i/count).ToString("p") + "\t" + file);
-                OpenRun(file);
-            });
+            CheckPath(exName, SelectType.Folder).ForEach(OpenRun, "搜索中...请稍后");
 
             var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
             if (vals.Rows.Count == 0)

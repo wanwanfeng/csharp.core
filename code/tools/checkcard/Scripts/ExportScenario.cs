@@ -14,8 +14,7 @@ namespace checkcard.Scripts
     {
         public ExportScenario()
         {
-            var faied = new ConcurrentBag<string>();
-            faied.Add(DateTime.Now.ToString("yy-MM-dd hh:mm:ss"));
+            var faied = new ConcurrentBag<string> {DateTime.Now.ToString("yy-MM-dd hh:mm:ss")};
             CheckPath(".xlsx").AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);

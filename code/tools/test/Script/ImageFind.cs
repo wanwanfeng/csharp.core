@@ -13,7 +13,7 @@ namespace Script
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
-                .OrderBy(p => p).ToList().ForEachPaths((re) =>
+                .ForEachPaths((re) =>
                 {
                     dic[re.Replace(InputPath, "")] = GetExcelCell(re);
                 });

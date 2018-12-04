@@ -14,11 +14,15 @@ namespace Script
 {
     public class ActionBase : BaseSystemExcel
     {
+        /// <summary>
+        /// Json是否缩进
+        /// </summary>
+        protected bool isIndent { get; set; }
         public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
 
-        private void ToCommon(Action<DataTable, string> export)
+        protected void ToCommon()
         {
             Action<string> action = file =>
             {
@@ -38,27 +42,6 @@ namespace Script
 
             //Parallel.ForEach(CheckPath(selectExtension), action);//并行操作
             CheckPath(selectExtension).AsParallel().ForAll(action); //并行操作
-        }
-
-        public void ToXml()
-        {
-            ToCommon(ExcelByBase.Data.ExportToXml);
-        }
-
-        public void ToCsv()
-        {
-            ToCommon(ExcelByBase.Data.ExportToCsv);
-        }
-
-        public void ToJson()
-        {
-            var isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
-            ToCommon((table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
-        }
-
-        public void ToExcel()
-        {
-            ToCommon(ExcelByBase.Data.ExportToExcel);
         }
 
         /// <summary>
@@ -164,7 +147,7 @@ namespace Script
                     if (dt.IsArray)
                     {
                         var list = ExcelByBase.Data.ConvertToRowsList(dt)
-                            .Select(p => string.Join("|", p.Cast<string>().ToArray()))
+                            .Select(p => string.Join("|", p.Select(q => q.ToString()).ToArray()))
                             .Select(p => predicate.Length == 0 || predicate.First()(p))
                             .ToList();
                         //返回符合正则表达式的列
@@ -182,7 +165,7 @@ namespace Script
                     {
                         var lt = (ListTable) dt;
                         lt.Rows = lt.Rows
-                            .ToDictionary(p => p, p => string.Join("", p.Cast<string>().ToArray()))
+                            .ToDictionary(p => p, p => string.Join("", p.Select(q => q.ToString()).ToArray()))
                             .Where(p => predicate.Length == 0 || predicate.First()(p.Value))
                             .ToList()
                             .Where(p => predicate.Length == 0 || predicate.Last()(p.Value))

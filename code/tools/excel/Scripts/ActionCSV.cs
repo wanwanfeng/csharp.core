@@ -30,7 +30,7 @@ namespace Script
         {
             public ToXml()
             {
-                ToXml();
+                ToCommon();
             }
         }
 
@@ -38,7 +38,7 @@ namespace Script
         {
             public ToJson()
             {
-                ToJson();
+                ToCommon();
             }
         }
 
@@ -46,7 +46,7 @@ namespace Script
         {
             public ToExcel()
             {
-                ToExcel();
+                ToCommon();
             }
         }
 

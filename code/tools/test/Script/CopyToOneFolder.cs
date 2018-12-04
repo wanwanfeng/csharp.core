@@ -30,6 +30,9 @@ namespace Script
                     string newPath = input + "_merge/" + re.Replace(input, "").TrimStart('/').Replace("/", "..");
                     DirectoryHelper.CreateDirectory(newPath);
                     File.Copy(re, newPath, true);
+                    var xxx = Path.ChangeExtension(re, ".plist");
+                    if (File.Exists(xxx))
+                        File.Copy(xxx, Path.ChangeExtension(newPath, ".plist"), true);
                 });
         }
 

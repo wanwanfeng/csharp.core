@@ -57,7 +57,7 @@ namespace Library.Excel
             };
 
             foreach (object o in lt.Columns)
-                dt.Columns.Add(o.ToString(), typeof (string));
+                dt.Columns.Add(o.ToString(), typeof (object));
 
             foreach (List<object> objects in lt.Rows)
                 dt.Rows.Add(objects.ToArray());

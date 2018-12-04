@@ -251,6 +251,7 @@ namespace Script
                 foreach (KeyValuePair<string, List<List<object>>> pair in table)
                 {
                     string fullpath = root + pair.Key;
+
                     try
                     {
                         bool isSave = false;
@@ -265,7 +266,7 @@ namespace Script
                                 object id = objects[1];
                                 string key = objects[2].ToString();
                                 object value = objects[3];
-                                string value_zh_cn = objects[4].ToString();
+                                object value_zh_cn = objects[4];
 
                                 foreach (DataRow dtr in data.Rows)
                                 {

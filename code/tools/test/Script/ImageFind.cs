@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using Library.Extensions;
 
 namespace Script
 {
@@ -18,6 +21,110 @@ namespace Script
                     dic[re.Replace(InputPath, "")] = GetExcelCell(re);
                 });
             WriteAllLines(dic, InputPath);
+        }
+    }
+
+
+    /// <summary>
+    /// 渐进式jpeg(progressive jpeg)图片
+    /// </summary>
+    public class ImageProgressiveJpeg : BaseClass
+    {
+        public ImageProgressiveJpeg()
+        {
+            CheckPath(".jpg", searchOption: SearchOption.AllDirectories)
+                .ForEachPaths(re =>
+                {
+                    if (new FileInfo(re).Length < 10 * 1024) return;
+                    using (Image source = Image.FromFile(re))
+                    {
+                        ImageCodecInfo codec = ImageCodecInfo.GetImageEncoders().First(c => c.MimeType == "image/jpeg");
+
+                        EncoderParameters parameters = new EncoderParameters(3);
+                        parameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+                        parameters.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.ScanMethod, (int)EncoderValue.ScanMethodInterlaced);
+                        parameters.Param[2] = new EncoderParameter(System.Drawing.Imaging.Encoder.RenderMethod, (int)EncoderValue.RenderProgressive);
+
+                        source.Save(re + ".temp", codec, parameters);
+                    }
+
+                    File.Delete(re);
+                    File.Move(re + ".temp", re);
+                });
+        }
+    }
+
+    /// <summary>
+    /// 渐进式jpeg(progressive jpeg)图片
+    /// </summary>
+    public class ImageCmdProgressiveJpeg : BaseClass
+    {
+        public ImageCmdProgressiveJpeg()
+        {
+            CheckPath(".jpg", searchOption: SearchOption.AllDirectories)
+                .ForEachPaths(re =>
+                {
+                    if (new FileInfo(re).Length < 10*1024) return;
+
+                    CmdReadLine(string.Format("jpegtran -copy none -progressive {0} {0}.temp", re));
+                    File.Delete(re);
+                    File.Move(re + ".temp", re);
+                });
+        }
+    }
+
+
+    /// <summary>
+    /// 交错png图片
+    /// </summary>
+    public class ImageProgressivePng : BaseClass
+    {
+        public ImageProgressivePng()
+        {
+            CheckPath(".png", searchOption: SearchOption.AllDirectories)
+                .ForEachPaths(re =>
+                {
+                    if (new FileInfo(re).Length < 10 * 1024) return;
+                    using (Image source = Image.FromFile(re))
+                    {
+                        ImageCodecInfo codec = ImageCodecInfo.GetImageEncoders().First(c => c.MimeType == "image/jpeg");
+
+                        EncoderParameters parameters = new EncoderParameters(3);
+                        parameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
+                        parameters.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.ScanMethod, (int)EncoderValue.ScanMethodInterlaced);
+                        parameters.Param[2] = new EncoderParameter(System.Drawing.Imaging.Encoder.RenderMethod, (int)EncoderValue.RenderProgressive);
+
+                        source.Save(re + ".temp", codec, parameters);
+                    }
+
+                    File.Delete(re);
+                    File.Move(re + ".temp", re);
+                });
+        }
+    }
+
+
+
+    /// <summary>
+    /// 删除文件
+    /// </summary>
+    public class DeleteFiles : BaseClass
+    {
+        public DeleteFiles()
+        {
+
+            var path = SystemConsole.GetInputStr("请拖入选定文件:", "您选择的文件：", def: "new.txt");
+            if (!File.Exists(path)) return;
+
+            var files = File.ReadAllLines(path);
+
+            CheckPath("*.*", searchOption: SearchOption.AllDirectories)
+                .ForEachPaths(re =>
+                {
+                    var xx = re.Replace(InputPath, "").TrimStart('/');
+                    if (files.Contains(xx)) return;
+                    File.Delete(re);
+                });
         }
     }
 }

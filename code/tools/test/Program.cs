@@ -12,22 +12,18 @@ namespace test
     {
         private enum MyEnum
         {
-            [Description("CompareFolder"), TypeValue(typeof(CompareFolder))]
-            CompareFolder = 1,
-            [Description("ImageFind"), TypeValue(typeof(ImageFind))]
-            ImageFind,
-            [Description("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))]
-            ImageFindOrc,
-            [Description("CopyToOneFolder"), TypeValue(typeof(CopyToOneFolder))]
-            CopyToOneFolder,
-            [Description("CreatePhotoDir"), TypeValue(typeof(CreatePhotoDir))]
-            CreatePhotoDir,
-            [Description("CreateExcelCell"), TypeValue(typeof(CreateExcelCell))]
-            CreateExcelCell,
-            [Description("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))]
-            SpliteAtlas,
-            [Description("GetLineCount"), TypeValue(typeof(GetLineCount))]
-            GetLineCount,
+            [Description("CompareFolder"), TypeValue(typeof (CompareFolder))] CompareFolder = 1,
+            [Description("CopyToOneFolder"), TypeValue(typeof (CopyToOneFolder))] CopyToOneFolder,
+            [Description("CreatePhotoDir"), TypeValue(typeof (CreatePhotoDir))] CreatePhotoDir,
+            [Description("CreateExcelCell"), TypeValue(typeof (CreateExcelCell))] CreateExcelCell,
+            [Description("GetLineCount"), TypeValue(typeof (GetLineCount))] GetLineCount,
+            [Description("DeleteFiles"), TypeValue(typeof (DeleteFiles))] DeleteFiles,
+
+            [Category("Image"), Description("SpliteAtlas"), TypeValue(typeof (SpliteAtlas))] SpliteAtlas,
+            [Category("Image"), Description("ImageProgressiveJpeg"), TypeValue(typeof (ImageProgressiveJpeg))] ImageProgressiveJpeg,
+            [Category("Image"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof (ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,
+            [Category("Image"), Description("ImageFind"), TypeValue(typeof (ImageFind))] ImageFind,
+            [Category("Image"), Description("ImageFindOrc(图像识别)"), TypeValue(typeof (ImageFindOrc))] ImageFindOrc,
         }
 
         private static void Main(string[] args)

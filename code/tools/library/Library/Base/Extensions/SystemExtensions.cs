@@ -8,7 +8,7 @@ using Library.Helper;
 
 namespace Library.Extensions
 {
-    public abstract class BaseSystemConsole
+    public abstract class BaseSystemConsole : CmdHelper
     {
         public enum SelectType
         {

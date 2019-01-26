@@ -263,6 +263,50 @@ namespace Library.Extensions
         }
 
         /// <summary>
+        /// 转为long[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<long> SplitLong(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsLong();
+        }
+
+        /// <summary>
+        /// 转为decimal[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<decimal> SplitDecimal(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDecimal();
+        }
+
+        /// <summary>
+        /// 转为decimal[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<byte> SplitByte(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsByte();
+        }
+
+        /// <summary>
+        /// 转为decimal[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<short> SplitShort(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsShort();
+        }
+
+        /// <summary>
         /// 转为bool[]型数组
         /// </summary>
         /// <param name="value"></param>
@@ -279,7 +323,7 @@ namespace Library.Extensions
         /// <param name="value"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        public static IEnumerable<string> SplitString(this string value, params char[] separator)
+        public static string[] SplitString(this string value, params char[] separator)
         {
             try
             {

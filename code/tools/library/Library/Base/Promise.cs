@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Library.Extensions;
 
 namespace Core
@@ -33,9 +35,24 @@ namespace Core
 
         private object successArg, errorArg, processArg;
 
+        protected bool isProtected = false;
+
+        /// <summary>
+        /// 无参数由外部改变状态
+        /// </summary>
         public Promise()
         {
             state = State.init;
+            isProtected = false;
+        }
+
+        /// <summary>
+        /// 有参数自动改变状态
+        /// </summary>
+        /// <param name="arg"></param>
+        public Promise(object arg) : this()
+        {
+            this.Resolve(arg);
         }
 
         public IPromise Process(params Action<object>[] process)
@@ -48,11 +65,11 @@ namespace Core
 
         public void Notify(object obj)
         {
+            if (isProtected) return;
             if (state == State.success || state == State.error)
                 throw new Exception("this state is " + state);
             state = State.process;
-            processArg = obj;
-            processAction.Invoke(obj);
+            processAction.Invoke(processArg = obj);
         }
 
         public IPromise Done(params Action<object>[] success)
@@ -65,10 +82,10 @@ namespace Core
 
         public void Resolve(object obj)
         {
+            if (isProtected) return;
             if (state == State.success) return;
             state = State.success;
-            successArg = obj;
-            successAction.Invoke(obj);
+            successAction.Invoke(successArg = obj);
         }
 
         public IPromise Fail(params Action<object>[] error)
@@ -81,10 +98,10 @@ namespace Core
 
         public void Reject(object obj)
         {
+            if (isProtected) return;
             if (state == State.error) return;
             state = State.error;
-            errorArg = obj;
-            errorAction.Invoke(obj);
+            errorAction.Invoke(errorArg = obj);
         }
 
         public IPromise Then(Action<object> success = null, Action<object> error = null, Action<object> process = null)
@@ -102,10 +119,37 @@ namespace Core
             processAction = null;
             successAction = null;
             errorAction = null;
+
+            successArg = null;
+            errorArg = null;
+            processArg = null;
         }
 
+        /// <summary>
+        /// 不已受保护的，状态允许外部更改
+        ///  允许调用
+        ///  void Notify(object obj);
+        ///  void Resolve(object obj);
+        ///  void Reject(object obj);    
+        /// </summary>
+        /// <returns></returns>
+        public IPromise GetPromise()
+        {
+            isProtected = false;   
+            return this;
+        }
+
+        /// <summary>
+        /// 已受保护的，状态不允许外部更改
+        ///  不允许调用以下方法(调用无效)
+        ///  void Notify(object obj);
+        ///  void Resolve(object obj);
+        ///  void Reject(object obj);   
+        /// </summary>
+        /// <returns></returns>
         public IPromise GetProtected()
         {
+            isProtected = true;
             return this;
         }
 
@@ -113,10 +157,44 @@ namespace Core
         {
             get { return new Promise(); }
         }
+    }
 
-        public static IPromise When(params IPromise[] promises)
+    public class When : Promise
+    {
+        private int successCount, errorSuccess;
+        private Dictionary<IPromise, object> cacheObjects;
+
+        public IPromise Run(params IPromise[] promises)
         {
-            return Promise.New;
+            isProtected = true;
+            cacheObjects = new Dictionary<IPromise, object>();
+            successCount = promises.Length;
+            errorSuccess = 0;
+            promises.ForEach(p =>
+            {
+                p.GetProtected().Done(q =>
+                {
+                    successCount--;
+                    cacheObjects[p] = q;
+                    if (successCount <= 0) this.Resolve(cacheObjects);
+                }).Fail(q =>
+                {
+                    errorSuccess++;
+                    cacheObjects[p] = q;
+                    if (errorSuccess > 0) this.Reject(cacheObjects);
+                }).Process(q => { this.Notify(q); });
+            });
+            return this;
+        }
+
+        public When(params object[] args)
+        {
+            Run(args.Select(p => (p is IPromise) ? (IPromise) p : new Promise(args)).ToArray());
+        }
+
+        public When(params IPromise[] promises)
+        {
+            Run(promises);
         }
     }
 }

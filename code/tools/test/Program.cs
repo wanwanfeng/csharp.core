@@ -19,6 +19,9 @@ namespace test
             [Description("GetLineCount"), TypeValue(typeof (GetLineCount))] GetLineCount,
             [Description("DeleteFiles"), TypeValue(typeof (DeleteFiles))] DeleteFiles,
 
+            [Category("Image"), Description("ImageConvertToBase64"), TypeValue(typeof (ImageConvertToBase64))] ImageConvertToBase64,
+            [Category("Image"), Description("Base64ConvertToImage"), TypeValue(typeof (Base64ConvertToImage))] Base64ConvertToImage,
+
             [Category("Image"), Description("SpliteAtlas"), TypeValue(typeof (SpliteAtlas))] SpliteAtlas,
             [Category("Image"), Description("ImageProgressiveJpeg"), TypeValue(typeof (ImageProgressiveJpeg))] ImageProgressiveJpeg,
             [Category("Image"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof (ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,

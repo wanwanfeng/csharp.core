@@ -84,6 +84,7 @@
     <Compile Include="Library\Base\LitJson\LitJson\Netstandard15Polyfill.cs" />
     <Compile Include="Library\Base\LitJson\LitJson\ParserToken.cs" />
     <Compile Include="Library\Base\Helper\EnumHelper.cs" />
+    <Compile Include="Library\Base\Promise.cs" />
     <Compile Include="Library\Base\SimpleLogger.cs" />
     <Compile Include="Library\Base\Singleton\Singleton.cs" />
     <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />

@@ -27,6 +27,7 @@ namespace Script
                             TextureInfo textureInfo = new TextureInfo(plist, re);
                             if (!textureInfo.voild) return;
                             var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+
                             if (File.Exists(imagePath))
                                 HaveImageAndRead(imagePath, textureInfo);
                         });
@@ -42,6 +43,7 @@ namespace Script
                             TextureInfo textureInfo = new TextureInfo(plist, re);
                             if (!textureInfo.voild) return;
                             var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+
                             if (File.Exists(imagePath))
                                 HaveImageAndWrite(imagePath, textureInfo);
                         });
@@ -57,6 +59,7 @@ namespace Script
                             TextureInfo textureInfo = new TextureInfo(plist, re);
                             if (!textureInfo.voild) return;
                             var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+
                             string dir = Path.GetDirectoryName(imagePath) + "/" +
                                          Path.GetFileNameWithoutExtension(imagePath);
                             if (Directory.Exists(dir))

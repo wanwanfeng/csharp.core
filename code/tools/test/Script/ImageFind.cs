@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -103,7 +104,41 @@ namespace Script
         }
     }
 
+    /// <summary>
+    /// 图片转为Base64
+    /// </summary>
+    public class ImageConvertToBase64 : BaseClass
+    {
+        public ImageConvertToBase64()
+        {
+            BaseClassE.ForEachPaths(CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+            {
+                var content = Convert.ToBase64String(File.ReadAllBytes(re));
+                File.WriteAllText(re, "data:image/png;base64," + content);
+            });
+        }
+    }
 
+    /// <summary>
+    /// Base64转为图片
+    /// </summary>
+    public class Base64ConvertToImage : BaseClass
+    {
+        public Base64ConvertToImage()
+        {
+            var tag = "data:image/png;base64,";
+            BaseClassE.ForEachPaths(
+                CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+                {
+                    var content = File.ReadAllText(re);
+                    var index = content.IndexOf(tag, StringComparison.Ordinal);
+                    if (index >= 0)
+                        content = content.Substring(index + tag.Length);
+                    var bts = Convert.FromBase64String(content);
+                    File.WriteAllBytes(re, bts);
+                });
+        }
+    }
 
     /// <summary>
     /// 删除文件

@@ -23,12 +23,16 @@ namespace Script
             var dir2 = SystemConsole.GetInputStr("请拖入选定文件:", "您选择的文件：", def: "old.txt");
             var last1 = File.ReadAllLines(dir1);
             var last2 = File.ReadAllLines(dir2);
-            last1.Except(last2).Distinct().Select(p => dir1 + p).ToList().ForEachPaths(re =>
-            {
-                var newName = re.Replace(dir1, dir1 + "res");
-                DirectoryHelper.CreateDirectory(newName);
-                File.Copy(re, newName, true);
-            });
+            last1.Except(last2)
+                .Distinct()
+                .Select(p => dir1 + p)
+                .ToList()
+                .ForEachPaths(re =>
+                {
+                    var newName = re.Replace(dir1, dir1 + "res");
+                    DirectoryHelper.CreateDirectory(newName);
+                    File.Copy(re, newName, true);
+                });
 
             var root = dir1 + "res";
             RunList(Directory.GetFiles(root, "*.*", SearchOption.AllDirectories), root);
@@ -38,7 +42,6 @@ namespace Script
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             res.Where(p => !string.IsNullOrEmpty(p))
-                .OrderBy(p => p)
                 .ToList()
                 .ForEachPaths(re =>
                 {

@@ -226,7 +226,7 @@ namespace Script
             if (caches.Count == 0) return;
 
             string root = InputPath.Replace(".xlsx", "");
-            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)").AsBool(false);
+            var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)", def: "false").AsBool(false);
             List<List<string>> error = new List<List<string>>();
 
             foreach (var table in caches)

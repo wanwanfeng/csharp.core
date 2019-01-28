@@ -4,7 +4,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using Core;
 using Library.Extensions;
+using Library.Helper;
 
 namespace Script
 {
@@ -105,17 +107,61 @@ namespace Script
     }
 
     /// <summary>
+    /// 图片转为雪碧图
+    /// </summary>
+    public class ImageConvertToSprite : BaseClass
+    {
+        private class Info
+        {
+            public float width, height;
+            public string background_image, background_repeat, background_position;
+        }
+
+        public ImageConvertToSprite()
+        {
+            bool isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)", def: "true").AsBool(false);
+            Dictionary<string, Info> cache = new Dictionary<string, Info>();
+            BaseClassE.ForEachPaths(
+                CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+                {
+                    var key = re.Replace(InputPath, "");
+                    using (Image source = Image.FromFile(re))
+                    {
+                        cache[key] = new Info
+                        {
+                            width = source.Width,
+                            height = source.Height,
+                            background_image = key,
+                            background_position = ""
+                        };
+                    }
+                });
+            File.WriteAllText(Path.ChangeExtension(InputPath, ".json"), JsonHelper.ToJson(cache, indentLevel: 2));
+        }
+    }
+
+    /// <summary>
     /// 图片转为Base64
     /// </summary>
     public class ImageConvertToBase64 : BaseClass
     {
         public ImageConvertToBase64()
         {
-            BaseClassE.ForEachPaths(CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
-            {
-                var content = Convert.ToBase64String(File.ReadAllBytes(re));
-                File.WriteAllText(re, "data:image/png;base64," + content);
-            });
+            bool createFile = SystemConsole.GetInputStr("是否生成碎文件？(true:false)", def: "false").AsBool(true);
+            bool isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)", def: "true").AsBool(false);
+            Dictionary<string, string> cache = new Dictionary<string, string>();
+            BaseClassE.ForEachPaths(
+                CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+                {
+                    var content = Convert.ToBase64String(File.ReadAllBytes(re));
+                    cache[re.Replace(InputPath, "")] = content;
+                    if (createFile)
+                    {
+                        re = Path.ChangeExtension(re, "txt");
+                        File.WriteAllText(re, content);
+                    }
+                });
+            File.WriteAllText(Path.ChangeExtension(InputPath, ".json"), JsonHelper.ToJson(cache, indentLevel: 2));
         }
     }
 

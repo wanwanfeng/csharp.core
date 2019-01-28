@@ -28,7 +28,7 @@ namespace Script
 
         public ActionJson()
         {
-            isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)").AsBool(true);
+            isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)", def: "true").AsBool(true);
         }
 
         public class ToXml : ActionJson

@@ -27,6 +27,12 @@ namespace test
             [Category("Image"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof (ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,
             [Category("Image"), Description("ImageFind"), TypeValue(typeof (ImageFind))] ImageFind,
             [Category("Image"), Description("ImageFindOrc(图像识别)"), TypeValue(typeof (ImageFindOrc))] ImageFindOrc,
+
+            [Category("dos2"), Description("dos2unix"), TypeValue(typeof (dos2unix))] dos2unix,
+            [Category("dos2"), Description("unix2dos"), TypeValue(typeof (unix2dos))] unix2dos,
+            [Category("dos2"), Description("mac2unix"), TypeValue(typeof (mac2unix))] mac2unix,
+            [Category("dos2"), Description("unix2mac"), TypeValue(typeof (unix2mac))] unix2mac,
+
         }
 
         private static void Main(string[] args)

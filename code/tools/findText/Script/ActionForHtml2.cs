@@ -107,8 +107,7 @@ namespace findText.Script
 
                     HtmlDocument doc = new HtmlDocument();
                     doc.LoadHtml(content);
-                    HtmlNode rootnode = doc.DocumentNode;
-                    var childs = rootnode.Descendants().Where(p => !p.HasChildNodes).ToList();
+                    var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).ToDictionary(p => p.XPath);
 
                     bool isSave = false;
 
@@ -117,7 +116,8 @@ namespace findText.Script
                         string xPath = data[Convert["行号"]].ToString();
                         string oldStr = data[Convert["原文"]].ToString();
                         string newStr = data[Convert["译文"]].ToString();
-                        HtmlNode oldNode = childs.FirstOrDefault(p => p.XPath == xPath);
+                        HtmlNode oldNode = null;
+                        childs.TryGetValue(xPath, out oldNode);
                         if (oldNode == null) continue;
                         HtmlNode newNode = HtmlNode.CreateNode(newStr);
                         if (oldNode.InnerText == oldStr)

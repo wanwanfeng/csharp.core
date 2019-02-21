@@ -22,7 +22,7 @@ namespace Script
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
 
-        protected void ToCommon()
+        private void ToCommon(Action<DataTable, string> exp)
         {
             Action<string> action = file =>
             {
@@ -30,18 +30,39 @@ namespace Script
                 var dts = import.Invoke(file).Where(p => p != null).ToList();
                 if (dts.Count == 1)
                 {
-                    export.Invoke(dts.First(), file);
+                    exp.Invoke(dts.First(), file);
                     return;
                 }
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "/" + dt.TableName.Trim('$'));
-                    export.Invoke(dt, newPath);
+                    exp.Invoke(dt, newPath);
                 });
             };
 
             //Parallel.ForEach(CheckPath(selectExtension), action);//并行操作
             CheckPath(selectExtension).AsParallel().ForAll(action); //并行操作
+            //CheckPath(selectExtension).ForEach(action); //并行操作
+        }
+
+        protected void ToCsv()
+        {
+            ToCommon(ExcelByBase.Data.ExportToCsv);
+        }
+
+        protected void ToJson()
+        {
+            ToCommon((table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
+        }
+
+        protected void ToXml()
+        {
+            ToCommon(ExcelByBase.Data.ExportToXml);
+        }
+
+        protected void ToExcel()
+        {
+            ToCommon(ExcelByBase.Data.ExportToExcel);
         }
 
         /// <summary>

@@ -18,6 +18,12 @@ namespace Script
         /// Json是否缩进
         /// </summary>
         protected bool isIndent { get; set; }
+
+        /// <summary>
+        /// excel导入时首行是否是Key
+        /// </summary>
+        protected bool firstIsKey { get; set; }
+
         public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }

@@ -30,7 +30,7 @@ namespace Library.Excel
             var vals = new List<List<object>>();
             foreach (DataRow dr in dt.Rows)
             {
-                vals.Add(dr.ItemArray.ToList());
+                vals.Add(dr.ItemArray.Select(p => (p is System.DBNull) ? "" : p).ToList());
             }
             return new ListTable()
             {

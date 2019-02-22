@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Library.Excel;
+using Library.Extensions;
 
 namespace Script
 {
@@ -14,12 +15,26 @@ namespace Script
 
         public override Func<string, IEnumerable<DataTable>> import
         {
-            get { return ExcelByBase.Data.ImportToDataTable; }
+            get
+            {
+                if (firstIsKey)
+                {
+                    //自定义的输出（首行为key）
+                    return (file) => ExcelByBase.Data.ImportToDataTable(file, false);
+                }
+                //未经过滤原样输出
+                return (file) => ExcelByBase.Data.ImportToDataTable(file);
+            }
         }
 
         public override Action<DataTable, string> export
         {
             get { return ExcelByBase.Data.ExportToExcel; }
+        }
+
+        public ActionExcel()
+        {
+            firstIsKey = SystemConsole.GetInputStr("Excel文件导入时首行作为Key还是内容？(true:false)", def: "true").AsBool(true);
         }
 
         public class ToXml : ActionExcel

@@ -260,11 +260,11 @@ namespace Library.LitJson
             {
                 Dictionary<string, JsonData> cache = ConvertJsonToDictionary(data);
                 var list = cache.Select(p => new List<object>()
-                    {
-                        p.Key,
-                        func == null ? p.Value : func(p.Value)
-                    }).ToList();
-                return new ListTable { IsArray = false, Columns = new List<string> { "key", "value" }, Rows = list };
+                {
+                    p.Key,
+                    func == null ? p.Value : func(p.Value)
+                }).ToList();
+                return new ListTable {IsArray = false, Columns = new List<string> {"key", "value"}, Rows = list};
             }
             return new ListTable();
         }
@@ -371,6 +371,82 @@ namespace Library.LitJson
                 } while (keys.Count != 0);
             }
             return data;
+        }
+
+        /// <summary>
+        /// 按路径读取data值(数组索引作为key)
+        /// </summary>
+        /// <param name="data">原始data</param>
+        /// <param name="vals"></param>
+        public Dictionary<string, object> ReadJsonByPathToDictionary(JsonData data, Dictionary<string, JsonData> vals)
+        {
+            Dictionary<string, object> cache = new Dictionary<string, object>();
+            foreach (KeyValuePair<string, JsonData> keyValuePair in vals)
+            {
+                Queue<string> keys = new Queue<string>(keyValuePair.Key.Trim('/').Split('/'));
+                JsonData temp = data;
+                do
+                {
+                    var key = keys.Dequeue();
+                    if (keys.Count == 0)
+                    {
+                        if (temp.IsObject && temp.ContainsKey(key))
+                            cache[keyValuePair.Key] = temp[key]; //= keyValuePair.Value;
+                        else if (temp.IsArray)
+                            cache[keyValuePair.Key] = temp[key.AsInt()]; // = keyValuePair.Value;
+                        else
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        if (temp.IsObject && temp.ContainsKey(key))
+                            temp = temp[key];
+                        else if (temp.IsArray)
+                            temp = temp[key.AsInt()];
+                        else
+                        {
+
+                        }
+                    }
+                } while (keys.Count != 0);
+            }
+            return cache;
+        }
+
+        public object ReadValueByKeyPath(JsonData data, string keyPath)
+        {
+            Queue<string> keys = new Queue<string>(keyPath.Trim('/').Split('/'));
+            object obj = null;
+            JsonData temp = data;
+            do
+            {
+                var key = keys.Dequeue();
+                if (keys.Count == 0)
+                {
+                    if (temp.IsObject && temp.ContainsKey(key))
+                        obj = temp[key];
+                    else if (temp.IsArray)
+                        obj = temp[key.AsInt()];
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+                    if (temp.IsObject && temp.ContainsKey(key))
+                        temp = temp[key];
+                    else if (temp.IsArray)
+                        temp = temp[key.AsInt()];
+                    else
+                    {
+
+                    }
+                }
+            } while (keys.Count != 0);
+            return obj;
         }
     }
 }

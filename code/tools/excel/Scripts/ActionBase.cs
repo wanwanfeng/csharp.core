@@ -28,21 +28,25 @@ namespace Script
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
 
-        private void ToCommon(Action<DataTable, string> exp)
+        protected void ToCommon(Action<DataTable, string> expAction, Func<DataTable, DataTable> runAction = null)
         {
             Action<string> action = file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dts = import.Invoke(file).Where(p => p != null).ToList();
+                var dts =
+                    import.Invoke(file)
+                        .Where(p => p != null)
+                        .Select(p => runAction == null ? p : runAction.Invoke(p))
+                        .ToList();
                 if (dts.Count == 1)
                 {
-                    exp.Invoke(dts.First(), file);
+                    expAction.Invoke(dts.First(), file);
                     return;
                 }
                 dts.ForEach(dt =>
                 {
                     string newPath = file.Replace(Path.GetExtension(file), "/" + dt.TableName.Trim('$'));
-                    exp.Invoke(dt, newPath);
+                    expAction.Invoke(dt, newPath);
                 });
             };
 

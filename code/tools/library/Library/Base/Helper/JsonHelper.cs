@@ -14,6 +14,8 @@ namespace Library.Helper
         ListTable ConvertJsonToListTable(string content, Func<object, object> func = null);
         JsonData ConvertListTableToJson(ListTable list);
         JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals);
+        Dictionary<string, object> ReadJsonByPathToDictionary(JsonData data, Dictionary<string, JsonData> vals);
+        object ReadValueByKeyPath(JsonData data, string keyPath);
     }
 
     public class JsonHelper
@@ -63,6 +65,16 @@ namespace Library.Helper
         public static JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals)
         {
             return Helper.RevertDictionaryToJson(data, vals);
+        }
+
+        public static Dictionary<string, object> ReadJsonByPathToDictionary(JsonData data, Dictionary<string, JsonData> vals)
+        {
+            return Helper.ReadJsonByPathToDictionary(data, vals);
+        }
+
+        public static object ReadValueByKeyPath(JsonData data, string keyPath)
+        {
+            return Helper.ReadValueByKeyPath(data, keyPath);
         }
 
         public static ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)

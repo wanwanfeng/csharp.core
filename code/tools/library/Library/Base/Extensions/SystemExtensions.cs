@@ -126,7 +126,7 @@ namespace Library.Extensions
                 {
                     showList.Add(pair.Key);
 
-                    var lineNum = (pair.Value.Count/columnsCount + 1);
+                    var lineNum = (int)Math.Ceiling((float)pair.Value.Count/columnsCount);
                     var cache = pair.Value
                         .GroupBy(p => p.Key%lineNum, q => q)
                         .ToDictionary(p => p.Key, q => q.ToList());

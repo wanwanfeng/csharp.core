@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using Library;
 using Library.Excel;
 using Library.Extensions;
+using Library.Helper;
 
 namespace Script
 {
@@ -69,6 +72,32 @@ namespace Script
                 ToExcel();
             }
         }
+
+        public class FixExcel : ActionExcel
+        {
+            public FixExcel()
+            {
+                ToCommon(ExcelByBase.Data.ExportToExcel, data =>
+                {
+                    if (data == null) return null;
+                    var path = Path.ChangeExtension(InputPath, "").TrimEnd('.');
+                    var list = (ListTable) data;
+                    foreach (List<object> objects in list.Rows)
+                    {
+                        var temp = path + objects[0].ToString();
+                        Console.WriteLine("is now:" + temp);
+                        var json = JsonHelper.ToObject(File.ReadAllText(temp).Trim().Trim('\0'));
+                        object id = objects[1];
+                        string key = objects[2].ToString();
+                        string value = objects[3].ToString();
+                        string value_zh_cn = objects[4].ToString();
+                        objects[3] = JsonHelper.ReadValueByKeyPath(json, id.ToString());
+                    }
+                    return (DataTable) list;
+                });
+            }
+        }
+
 
         [Description("读取多个Excel文件的多个sheet合并到一个Excel文件")]
         public class ToOneExcel : ActionExcel

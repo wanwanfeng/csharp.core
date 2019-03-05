@@ -7,7 +7,7 @@ using Library.Extensions;
 using Library.Helper;
 using LitJson;
 
-namespace checkcard.Scripts
+namespace Script
 {
     public class BaseCheck : BaseSystemConsole
     {

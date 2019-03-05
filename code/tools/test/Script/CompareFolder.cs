@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using Library.Extensions;
@@ -30,6 +32,32 @@ namespace Script
 
             var root = dir1 + "res";
             RunList(Directory.GetFiles(root, "*.*", SearchOption.AllDirectories), root);
+        }
+    }
+
+    public class CheckImage : BaseClass
+    {
+        public CheckImage()
+        {
+            //var dir1 = SystemConsole.GetInputStr("请拖入源文件夹:", "您选择的文件夹：");
+            //var dir2 = SystemConsole.GetInputStr("请拖入目标文件夹:", "您选择的文件夹：");
+            //var last1 = Directory.GetFiles(dir1, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir1, ""));
+            //var last2 = Directory.GetFiles(dir2, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(dir2, ""));
+
+            //Dictionary<string, string> dic = new Dictionary<string, string>();
+            //CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
+            //    .ForEachPaths((re) =>
+            //    {
+            //        using (Image source = Image.FromFile(re))
+            //        {
+            //            using (Image source2 = Image.FromFile(re))
+            //            {
+
+            //            }
+            //            source.Width
+            //        }
+            //    });
+            //WriteAllLines(dic, InputPath);
         }
     }
 }

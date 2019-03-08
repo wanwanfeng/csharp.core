@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Library.Excel.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Excel, Version=2.1.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -63,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Json2Excel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\ActionBase.cs" />
@@ -71,6 +75,7 @@
     <Compile Include="Scripts\ActionJson.cs" />
     <Compile Include="Scripts\ActionExcel.cs" />
     <Compile Include="Scripts\CompareExcel.cs" />
+    <Compile Include="Scripts\JsonUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

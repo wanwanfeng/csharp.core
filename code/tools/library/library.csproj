@@ -55,6 +55,7 @@
     <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
     <Compile Include="Library\Base\Config.cs" />
     <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
+    <Compile Include="Library\Base\Extensions\DateExtensions.cs" />
     <Compile Include="Library\Base\Extensions\EventsExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ExceptionExtensions.cs" />
     <Compile Include="Library\Base\Extensions\LinqExtensions.cs" />

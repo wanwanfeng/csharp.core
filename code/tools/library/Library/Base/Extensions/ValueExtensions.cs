@@ -9,6 +9,8 @@ namespace Library.Extensions
     /// </summary>
     public static class ValueExtensions
     {
+        #region string
+
         /// <summary>
         /// 转为byte型
         /// </summary>
@@ -141,6 +143,10 @@ namespace Library.Extensions
             return bool.TryParse(value.ToLower(), out v) ? v : def;
         }
 
+        #endregion
+
+        #region IEnumerable<string>
+
         /// <summary>
         /// 转为int[]型数组
         /// </summary>
@@ -229,93 +235,7 @@ namespace Library.Extensions
             return value.Select(p => p.AsBool(def));
         }
 
-        /// <summary>
-        /// 转为int[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<int> SplitInt(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsInt();
-        }
-
-        /// <summary>
-        /// 转为float[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<float> SplitFloat(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsFloat();
-        }
-
-        /// <summary>
-        /// 转为double[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<double> SplitDouble(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsDouble();
-        }
-
-        /// <summary>
-        /// 转为long[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<long> SplitLong(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsLong();
-        }
-
-        /// <summary>
-        /// 转为decimal[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<decimal> SplitDecimal(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsDecimal();
-        }
-
-        /// <summary>
-        /// 转为decimal[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<byte> SplitByte(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsByte();
-        }
-
-        /// <summary>
-        /// 转为decimal[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<short> SplitShort(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsShort();
-        }
-
-        /// <summary>
-        /// 转为bool[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static IEnumerable<bool> SplitBool(this string value, params char[] separator)
-        {
-            return value.SplitString(separator).AsBool();
-        }
+        #endregion
 
         /// <summary>
         /// 转为string[]型
@@ -327,13 +247,291 @@ namespace Library.Extensions
         {
             try
             {
-                return value.Split(separator.Length == 0 ? new[] {','} : separator);
+                return value.Split(separator.Length == 0 ? new[] { ',' } : separator);
             }
             catch (Exception)
             {
                 return new string[0];
             }
         }
+
+        #region  split string
+
+        /// <summary>
+        /// 转为IEnumerable<int/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<int> SplitInt(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsInt();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<float/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<float> SplitFloat(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsFloat();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<double/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<double> SplitDouble(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDouble();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<long/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<long> SplitLong(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsLong();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<decimal/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<decimal> SplitDecimal(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDecimal();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<decimal/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<byte> SplitByte(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsByte();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<decimal/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<short> SplitShort(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsShort();
+        }
+
+        /// <summary>
+        /// 转为IEnumerable<bool/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static IEnumerable<bool> SplitBool(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsBool();
+        }
+
+        #endregion
+
+        #region  string toArray
+
+        /// <summary>
+        /// 转为int[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static int[] ToIntArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsInt().ToArray();
+        }
+
+        /// <summary>
+        /// 转为float[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static float[] ToFloatArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsFloat().ToArray();
+        }
+
+        /// <summary>
+        /// 转为double[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static double[] ToDoubleArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDouble().ToArray();
+        }
+
+        /// <summary>
+        /// 转为long[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static long[] ToLongArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsLong().ToArray();
+        }
+
+        /// <summary>
+        /// 转为decimal[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static decimal[] ToDecimalArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDecimal().ToArray();
+        }
+
+        /// <summary>
+        /// 转为decimal[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static byte[] ToByteArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsByte().ToArray();
+        }
+
+        /// <summary>
+        /// 转为decimal[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static short[] ToShortArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsShort().ToArray();
+        }
+
+        /// <summary>
+        /// 转为bool[]型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static bool[] ToBoolArray(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsBool().ToArray();
+        }
+
+        #endregion
+
+        #region  string toList
+
+        /// <summary>
+        /// 转为List<int/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<int> ToIntList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsInt().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<float/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<float> ToFloatList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsFloat().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<double/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<double> ToDoubleList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDouble().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<long/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<long> ToLongList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsLong().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<decimal/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<decimal> ToDecimalList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsDecimal().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<decimal/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<byte> ToByteList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsByte().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<decimal/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<short> ToShortList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsShort().ToList();
+        }
+
+        /// <summary>
+        /// 转为List<bool/>型数组
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static  List<bool> ToBoolList(this string value, params char[] separator)
+        {
+            return value.SplitString(separator).AsBool().ToList();
+        }
+
+        #endregion
+
+        #region string other
 
         /// <summary>
         /// string型每个char均匀插入同一字符串
@@ -373,5 +571,7 @@ namespace Library.Extensions
         {
             return string.Join(separator ?? Environment.NewLine, value.Select(p => p.ToString()).ToArray());
         }
+
+        #endregion
     }
 }

@@ -44,5 +44,33 @@ namespace Library.Extensions
 
             return format;
         }
+
+        public static string Format(this TimeSpan timeSpan, string format = "DD hh:mm:ss SSS")
+        {
+            new Dictionary<string, string>()
+            {
+                {"DD", timeSpan.Days.ToString("00")},
+                {"D", timeSpan.Days.ToString()},
+                {"dd", timeSpan.Days.ToString("00")},
+                {"d", timeSpan.Days.ToString()},
+
+                {"hh", timeSpan.Hours.ToString("00")},
+                {"h", timeSpan.Hours.ToString()},
+
+                {"mm", timeSpan.Minutes.ToString("00")},
+                {"m", timeSpan.Minutes.ToString()},
+
+                {"ss", timeSpan.Seconds.ToString("00")},
+                {"s", timeSpan.Seconds.ToString()},
+
+                {"SSS", timeSpan.Milliseconds.ToString("000")},
+                {"S", timeSpan.Milliseconds.ToString()},
+            }.ForEach(p =>
+            {
+                format = format.Replace(p.Key, p.Value);
+            });
+
+            return format;
+        }
     }
 }

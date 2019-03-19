@@ -12,7 +12,7 @@ namespace findText.Script
 
         protected override string exName
         {
-            get { return "*.html|*.htm|*.tpl"; }
+            get { return "*.html|*.htm|*.tpl|*.plist"; }
         }
 
         protected override void OpenRun(string file)

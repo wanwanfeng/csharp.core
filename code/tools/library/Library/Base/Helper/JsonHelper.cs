@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Library.Helper;
 using Library.LitJson;
 using LitJson;
 
@@ -129,5 +130,22 @@ namespace Library
         {
             get { return Rows[hang][Columns.IndexOf(key)]; }
         }
+
+
+        #region JsonData ListTable 显示转换（需强制）
+
+
+        public static explicit operator JsonData(ListTable lt)
+        {
+            return JsonHelper.ConvertListTableToJson(lt);
+        }
+
+        public static explicit operator ListTable(JsonData jsonData)
+        {
+            return JsonHelper.ConvertJsonToListTable(JsonHelper.ToJson(jsonData));
+        }
+
+        #endregion
+
     }
 }

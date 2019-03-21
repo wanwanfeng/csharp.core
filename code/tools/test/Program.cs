@@ -12,18 +12,18 @@ namespace test
     {
         private enum MyEnum
         {
-            [Description("CompareFolder"), TypeValue(typeof (CompareFolder))] CompareFolder = 1,
+            //[Description("CompareFolder"), TypeValue(typeof (CompareFolder))] CompareFolder = 1,
             [Description("CopyToOneFolder"), TypeValue(typeof (CopyToOneFolder))] CopyToOneFolder,
-            [Description("CreatePhotoDir"), TypeValue(typeof (CreatePhotoDir))] CreatePhotoDir,
-            [Description("CreateExcelCell"), TypeValue(typeof (CreateExcelCell))] CreateExcelCell,
+            //[Description("CreatePhotoDir"), TypeValue(typeof (CreatePhotoDir))] CreatePhotoDir,
+            //[Description("CreateExcelCell"), TypeValue(typeof (CreateExcelCell))] CreateExcelCell,
             [Description("GetLineCount"), TypeValue(typeof (GetLineCount))] GetLineCount,
-            [Description("DeleteFiles"), TypeValue(typeof (DeleteFiles))] DeleteFiles,
+            //[Description("DeleteFiles"), TypeValue(typeof (DeleteFiles))] DeleteFiles,
 
             [Category("Image"), Description("ImageConvertToBase64"), TypeValue(typeof (ImageConvertToBase64))] ImageConvertToBase64,
             [Category("Image"), Description("Base64ConvertToImage"), TypeValue(typeof (Base64ConvertToImage))] Base64ConvertToImage,
 
             [Category("Image"), Description("SpliteAtlas"), TypeValue(typeof (SpliteAtlas))] SpliteAtlas,
-            [Category("Image"), Description("CheckImage"), TypeValue(typeof (CheckImage))] CheckImage,
+            //[Category("Image"), Description("CheckImage"), TypeValue(typeof (CheckImage))] CheckImage,
             [Category("Image"), Description("ImageProgressiveJpeg"), TypeValue(typeof (ImageProgressiveJpeg))] ImageProgressiveJpeg,
             [Category("Image"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof (ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,
             [Category("Image"), Description("ImageFind"), TypeValue(typeof (ImageFind))] ImageFind,

@@ -72,12 +72,12 @@ namespace Library.Excel
 
         public static explicit operator JsonData(DataTable dt)
         {
-            return JsonHelper.ConvertListTableToJson((ListTable)dt);
+            return (JsonData)(ListTable)dt;
         }
 
         public static explicit operator DataTable(JsonData jsonData)
         {
-            return (DataTable) JsonHelper.ConvertJsonToListTable(JsonHelper.ToJson(jsonData));
+            return (DataTable) (ListTable) jsonData;
         }
 
         #endregion

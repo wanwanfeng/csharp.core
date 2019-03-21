@@ -21,6 +21,10 @@ namespace Script
             CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
                 .ForEachPaths((re) =>
                 {
+                    //var newPatn = re.Replace(InputPath, InputPath + "_new");
+                    //FileHelper.CreateDirectory(newPatn);
+                    //File.WriteAllBytes(newPatn, File.ReadAllBytes(re));
+
                     dic[re.Replace(InputPath, "")] = GetExcelCell(re);
                 });
             WriteAllLines(dic, InputPath);

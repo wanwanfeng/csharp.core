@@ -58,6 +58,7 @@
     <Compile Include="Script\ActionForHtml.cs" />
     <Compile Include="Script\ActionForCSharp.cs" />
     <Compile Include="Script\BaseActionFor.cs" />
+    <Compile Include="Script\GetIPList.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

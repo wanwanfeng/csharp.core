@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{32127943-C42D-4BD5-B9D3-989B9A16851A}</ProjectGuid>
+    <ProjectGuid>{5CDB9969-16AF-4FA4-BF72-5AB1A5AD041F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>findText</RootNamespace>
-    <AssemblyName>findText</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>search</RootNamespace>
+    <AssemblyName>search</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,58 +31,25 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\bin\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Script\ActionForCss.cs" />
-    <Compile Include="Script\ActionForCpp.cs" />
-    <Compile Include="Script\ActionForHtml2.cs" />
-    <Compile Include="Script\ActionForJavaScript.cs" />
-    <Compile Include="Script\ActionForPhp.cs" />
-    <Compile Include="Script\ActionForJava.cs" />
-    <Compile Include="Script\ActionForHtml.cs" />
-    <Compile Include="Script\ActionForCSharp.cs" />
-    <Compile Include="Script\BaseActionFor.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <Compile Include="Script\BaseSearch.cs" />
+    <Compile Include="Script\SearchIP.cs" />
+    <Compile Include="Script\SearchMovie.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\library-excel\library-excel.csproj">
-      <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
-      <Name>library-excel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\library\library.csproj">
       <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
       <Name>library</Name>

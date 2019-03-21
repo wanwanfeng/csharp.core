@@ -62,11 +62,11 @@ namespace Library.Extensions
                 action(source[index], index, max);
         }
 
-        public static void ForEach<T>(this List<T> source, Action<T, int, List<T>> action)
-        {
-            for (int index = 0, max = source.Count; index < max; ++index)
-                action(source[index], index, source);
-        }
+        //public static void ForEach<T>(this List<T> source, Action<T, int, List<T>> action)
+        //{
+        //    for (int index = 0, max = source.Count; index < max; ++index)
+        //        action(source[index], index, source);
+        //}
 
         public static void ForEach<T>(this List<T> source, Action<T> action, string tip)
         {

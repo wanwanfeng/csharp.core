@@ -47,6 +47,10 @@ namespace Script
                     if (result["words_result_num"].ToInt() <= 0)
                         return;
 #endif
+
+                    var newPatn = re.Replace(InputPath, InputPath + "_new");
+                    FileHelper.CreateDirectory(newPatn);
+                    File.WriteAllBytes(newPatn, File.ReadAllBytes(re));
                     dic[re.Replace(InputPath, "")] = GetExcelCell(re);
                 });
             WriteAllLines(dic, InputPath);

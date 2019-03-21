@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using HtmlAgilityPack;
+using System.Xml;
+using System.Text;
 using Library.Excel;
 
 namespace Script
@@ -71,7 +76,46 @@ namespace Script
         {
             public KvExcelTo()
             {
-                KvExcelTo();
+                KvExcelTo(isCustomAction: (fullpath, list) =>
+                {
+                    //Dictionary<string, object> dictionary = new Dictionary<string, object>();
+                    //foreach (List<object> objects in list)
+                    //{
+                    //    object id = objects[1];
+                    //    string key = objects[2].ToString();
+                    //    object value = objects[3];
+                    //    string value_zh_cn = objects[4].ToString();
+
+                    //    dictionary[id.ToString()] = value_zh_cn;
+                    //}
+
+                    //HtmlDocument doc = new HtmlDocument();
+                    //string content = File.ReadAllText(fullpath);
+                    //doc.LoadHtml(content);
+
+                    //var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).ToDictionary(p => p.XPath);
+
+                    //bool isSave = false;
+
+                    //foreach (KeyValuePair<string, object> pair in dictionary)
+                    //{
+                    //    HtmlNode oldNode = null;
+                    //    childs.TryGetValue(pair.Key, out oldNode);
+                    //    if (oldNode == null) continue;
+                    //    HtmlNode newNode = HtmlNode.CreateNode(newStr);
+                    //    if (oldNode.InnerText == oldStr)
+                    //        continue;
+                    //    oldNode.ParentNode.ReplaceChild(newNode, oldNode);
+                    //    isSave = true;
+                    //}
+
+                    //if (isSave)
+                    //    doc.Save(path, new UTF8Encoding(false));
+
+                    //JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
+                    //return isIndent ? JsonHelper.ToJson(jsonData, indentLevel: 2) : JsonHelper.ToJson(jsonData);
+                    return "";
+                });
             }
         }
     }

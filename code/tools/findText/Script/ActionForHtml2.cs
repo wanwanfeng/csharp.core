@@ -5,9 +5,7 @@ using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
 using Library;
-using Library.Excel;
 using Library.Helper;
-using LitJson;
 
 namespace findText.Script
 {

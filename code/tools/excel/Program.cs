@@ -61,6 +61,10 @@ namespace Library.Excel
 
         private static void Main(string[] args)
         {
+            //Console.WriteLine(DateTime.Now.Format("yy/M/D"));
+            //Console.WriteLine(new TimeSpan(5000, 5, 15).Format("d天h时m分s秒"));
+            //Console.ReadKey();
+
             SystemConsole.Run<CaoType>(columnsCount: 4);
         }
     }

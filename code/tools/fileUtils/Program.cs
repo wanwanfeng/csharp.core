@@ -19,7 +19,7 @@ namespace fileUtils
             {
                 {"Merge", new Merge().Run},
                 {"Down", new Down().Run},
-                {"Copy", new Copy().Run},
+                //{"Copy", new Copy().Run},
             });
         }
 

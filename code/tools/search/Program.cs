@@ -1,5 +1,10 @@
 ﻿
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using Library;
 using Library.Extensions;
 using search.Script;
@@ -11,12 +16,26 @@ namespace search
         public enum ConvertType
         {
             [TypeValue(typeof (SearchIP))] [Description("获取代理IP")] SearchIP,
-            [TypeValue(typeof (SearchMovie))] [Description("获取代理IP")] SearchMovie,
+            [TypeValue(typeof (SearchMovie))] [Description("SearchMovie")] SearchMovie,
         }
 
         private static void Main(string[] args)
         {
             SystemConsole.Run<ConvertType>();
+        }
+    }
+
+
+    public static class BaseClassE
+    {
+        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
+        {
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, count) =>
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine("is now : " + (((float) i)/count).ToString("p") + "\t" + p);
+                callAction(p);
+            });
         }
     }
 }

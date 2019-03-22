@@ -1,31 +1,37 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using HtmlAgilityPack;
-using LitJson;
 
 namespace search.Script
 {
     public class BaseSearch
     {
-        protected virtual string[] url { get; set; }
+        protected virtual string[] urls { get; set; }
 
-        public BaseSearch()
-        {
-            if (url.Length > 1) return;
-            string path = Path.GetTempFileName();
-            path = HttpDownloadFile(url[0], path);
-            HtmlDocument doc = new HtmlDocument();
-            string content = File.ReadAllText(path);
-            doc.LoadHtml(content);
-            Run(doc);
-        }
+        //public BaseSearch()
+        //{
+        //    if (urls.Length > 1) return;
+
+        //    //string path = Path.GetTempFileName();
+        //    //path = HttpDownloadFile(s, path);
+        //    //HtmlDocument doc = new HtmlDocument();
+        //    //string content = File.ReadAllText(path);
+        //    //doc.LoadHtml(content);
 
 
-        public virtual void Run(HtmlDocument doc)
-        {
+        //    HtmlWeb webClient = new HtmlWeb();
+        //    HtmlDocument doc = webClient.Load(urls.First()); 
+
+        //    Run(doc);
+        //}
+
+
+        //public virtual void Run(HtmlDocument doc)
+        //{
             
-        }
+        //}
 
         /// <summary>
         /// Http下载文件

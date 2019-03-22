@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using HtmlAgilityPack;
 using Library;
 using Library.Helper;
@@ -9,33 +10,48 @@ namespace search.Script
 {
     public class SearchMovie : BaseSearch
     {
-        protected override string[] url
+        protected override string[] urls
         {
-            get { return new[] {"http://www.7dds.com/?m=vod-type-id-2.html"}; }
+            get
+            {
+                return
+                    Enumerable.Range(1, 100)
+                        .Select(p => p == 1
+                            ? "http://www.7dds.com/?m=vod-type-id-2.html"
+                            : "http://www.7dds.com/?m=vod-type-id-2-pg-" + p + ".html")
+                        .ToArray();
+            }
         }
 
-        public override void Run(HtmlDocument doc)
+        public SearchMovie()
         {
-            HtmlNodeCollection valueList = doc.DocumentNode.SelectNodes("/html/body/div[2]/div/div/div/div[2]/ul/li");
-
             var res = new ListTable();
 
-            foreach (HtmlNode node in valueList)
+            urls.ForEachPaths(url =>
             {
-                var temp = new List<object>();
-                foreach (HtmlNode child in node.SelectNodes("div/div/h4/a"))
+                HtmlWeb webClient = new HtmlWeb();
+                HtmlDocument doc = webClient.Load(url);
+                //HtmlNodeCollection headList = doc.DocumentNode.SelectNodes("//*[@id=\"list\"]/table/thead/tr/th");
+                HtmlNodeCollection valueList = doc.DocumentNode.SelectNodes("/html/body/div[2]/div/div/div/div[2]/ul/li");
+
+                //if (res.Columns.Count == 0)
+                //    foreach (HtmlNode node in headList)
+                //    {
+                //        res.Columns.Add(node.InnerText);
+                //    }
+
+                foreach (HtmlNode node in valueList)
                 {
-                    temp.Add(child.InnerText);
+                    var temp = new List<object>();
+                    foreach (HtmlNode child in node.SelectNodes("div/div/h4/a"))
+                    {
+                        temp.Add(child.InnerText);
+                    }
+                    res.Rows.Add(temp);
                 }
-                res.Rows.Add(temp);
-            }
+            });
 
-            //var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).Where(p => p.XPath.Contains("tbody")).ToDictionary(p => p.XPath);
-            //string xPath = "//*[@id=\"list\"]/table/tbody";
-            //HtmlNode oldNode = null;
-            //childs.TryGetValue(xPath, out oldNode);
-
-            File.WriteAllText("temp.txt", JsonHelper.ToJson(res.Rows, indentLevel: 2));
+            File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData) res, indentLevel: 2));
         }
     }
 }

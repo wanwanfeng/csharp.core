@@ -2,39 +2,34 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using HtmlAgilityPack;
 using Library;
-using Library.Helper;
-using LitJson;
-
+using Library.Excel;
 namespace search.Script
 {
     public class SearchIP : BaseSearch
     {
-        protected override string[] url
+        protected override string[] urls
         {
-            get { return Enumerable.Range(1, 100).Select(p => "https://www.kuaidaili.com/free/inha/" + p + "/").ToArray(); }
+            get
+            {
+                return Enumerable.Range(1, 100).Select(p => "https://www.kuaidaili.com/free/inha/" + p + "/").ToArray();
+            }
         }
 
         public SearchIP()
         {
             var res = new ListTable();
 
-
-            foreach (string s in url)
+            urls.ForEachPaths(url =>
             {
-                Thread.Sleep(1000);
-                string path = Path.GetTempFileName();
-                path = HttpDownloadFile(s, path);
-                HtmlDocument doc = new HtmlDocument();
-                string content = File.ReadAllText(path);
-                doc.LoadHtml(content);
+                HtmlWeb webClient = new HtmlWeb();
+                HtmlDocument doc = webClient.Load(url);
 
                 HtmlNodeCollection headList = doc.DocumentNode.SelectNodes("//*[@id=\"list\"]/table/thead/tr/th");
                 HtmlNodeCollection valueList = doc.DocumentNode.SelectNodes("//*[@id=\"list\"]/table/tbody/tr");
 
-                if (res.Columns.Count==0)
+                if (res.Columns.Count == 0)
                     foreach (HtmlNode node in headList)
                     {
                         res.Columns.Add(node.InnerText);
@@ -49,14 +44,11 @@ namespace search.Script
                     }
                     res.Rows.Add(temp);
                 }
-            }
+            });
 
-            //var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).Where(p => p.XPath.Contains("tbody")).ToDictionary(p => p.XPath);
-            //string xPath = "//*[@id=\"list\"]/table/tbody";
-            //HtmlNode oldNode = null;
-            //childs.TryGetValue(xPath, out oldNode);
+            ExcelByBase.Data.ExportToExcel(res, "temp.xlsx");
 
-            File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData) res, indentLevel: 2));
+            //File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData) res, indentLevel: 2));
         }
     }
 }

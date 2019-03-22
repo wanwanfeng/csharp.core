@@ -50,6 +50,10 @@
     <Compile Include="Script\SearchMovie.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\library-excel\library-excel.csproj">
+      <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
+      <Name>library-excel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\library\library.csproj">
       <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
       <Name>library</Name>

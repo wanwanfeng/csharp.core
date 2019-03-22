@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using findText.Script;
 using Library;
 using Library.Extensions;
@@ -33,6 +35,18 @@ namespace findText
                 });
             };
             SystemConsole.Run<ConvertType>(callFunc);
+        }
+    }
+
+    public static class BaseClassE
+    {
+        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
+        {
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, count) =>
+            {
+                Console.WriteLine("is now : " + (((float)i) / count).ToString("p") + "\t" + p);
+                if (File.Exists(p)) callAction(p);
+            });
         }
     }
 }

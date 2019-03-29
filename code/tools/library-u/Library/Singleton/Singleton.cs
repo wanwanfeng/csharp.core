@@ -45,7 +45,6 @@ namespace UnityEngine.Library
         {
             if (Instance != null) return;
             Instance = this as T;
-            DontDestroyOnLoad(gameObject);
         }
 
 

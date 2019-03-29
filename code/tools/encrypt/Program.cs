@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Library.Extensions;
 
 namespace encrypt
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
@@ -36,7 +37,17 @@ namespace encrypt
             {
                 test.GetValue(s.Split(','));
             }
+
             Console.ReadKey();
+        }
+
+        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
+        {
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
+            {
+                Console.WriteLine("is now : " + (((float) i) / target.Count).ToString("p") + "\t" + p);
+                if (File.Exists(p)) callAction(p);
+            });
         }
     }
 }

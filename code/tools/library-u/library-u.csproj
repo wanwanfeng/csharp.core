@@ -54,6 +54,7 @@
     <Compile Include="Library\Base\BaseMonoBehaviour.cs" />
     <Compile Include="Library\Extensions\ExtensionsForMathf.cs" />
     <Compile Include="Library\Extensions\ExtensionsForUnity.cs" />
+    <Compile Include="Library\Extensions\UnityExtensions\MonoBehaviourExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\TransformExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\ComponentExtensions.cs" />
     <Compile Include="Library\LitJson\LitJsonHelper.cs" />

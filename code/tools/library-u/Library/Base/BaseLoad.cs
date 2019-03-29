@@ -18,7 +18,7 @@ namespace UnityEngine.Library
         /// <summary>
         /// 加载资源委托注入
         /// </summary>
-        public static Func<string, bool, Action<Object>, Object> OnFuncLoad { private get; set; }
+        public static Func<string, Action<Object>, Object> OnFuncLoad { private get; set; }
 
         /// <summary>
         /// 资源存在与否接口
@@ -38,16 +38,16 @@ namespace UnityEngine.Library
         /// <param name="instance"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
-        public T Load<T>(string filePath, bool instance = false, Action<T> callAction = null) where T : Object
+        public T Load<T>(string filePath, Action<T> callAction = null) where T : Object
         {
             if (OnFuncLoad != null)
             {
-                return OnFuncLoad(filePath, instance, obj =>
+                return OnFuncLoad(filePath, obj =>
                 {
                     if (callAction != null) callAction(obj as T);
                 }) as T;
             }
-            var t = (instance ? Object.Instantiate(Resources.Load<T>(filePath)) : Resources.Load<T>(filePath)) as T;
+            var t = Resources.Load<T>(filePath) as T;
             if (callAction != null) callAction(t as T);
             return t;
         }

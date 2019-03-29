@@ -9,7 +9,7 @@ namespace UnityEngine.Library
     public interface ILoad
     {
         bool HasPath(string path);
-        T Load<T>(string filePath, bool instance = false, Action<T> callAction = null) where T : Object;
+        T Load<T>(string filePath, Action<T> callAction = null) where T : Object;
     }
 
     #endregion

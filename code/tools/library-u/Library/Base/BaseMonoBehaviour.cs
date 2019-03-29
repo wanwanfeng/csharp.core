@@ -30,9 +30,9 @@ namespace UnityEngine.Library
         /// <param name="instance"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
-        public T Load<T>(string filePath, bool instance = false, Action<T> callAction = null) where T : Object
+        public T Load<T>(string filePath, Action<T> callAction = null) where T : Object
         {
-            return BaseLoad.Load(filePath, instance, callAction);
+            return BaseLoad.Load(filePath, callAction);
         }
 
         #endregion

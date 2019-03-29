@@ -13,14 +13,18 @@ namespace findText
     {
         public enum ConvertType
         {
-            [TypeValue(typeof (ActionForCss))] css,
-            [TypeValue(typeof (ActionForCpp))] cpp,
-            [TypeValue(typeof (ActionForCSharp))] csharp,
-            [TypeValue(typeof (ActionForPhp))] php,
-            [TypeValue(typeof (ActionForJava))] java,
-            [TypeValue(typeof (ActionForJavaScript))] javascript,
-            [TypeValue(typeof (ActionForHtml))] html,
-            [TypeValue(typeof (ActionForHtml2))] [Description("html 插件")] html2
+            [TypeValue(typeof(ActionForCss))] css,
+            [TypeValue(typeof(ActionForCpp))] cpp,
+            [TypeValue(typeof(ActionForCSharp))] csharp,
+            [TypeValue(typeof(ActionForPhp))] php,
+            [TypeValue(typeof(ActionForJava))] java,
+
+            [TypeValue(typeof(ActionForJavaScript))]
+            javascript,
+            [TypeValue(typeof(ActionForHtml))] html,
+
+            [TypeValue(typeof(ActionForHtml2))] [Description("html 插件")]
+            html2
         }
 
         private static void Main(string[] args)
@@ -36,15 +40,12 @@ namespace findText
             };
             SystemConsole.Run<ConvertType>(callFunc);
         }
-    }
 
-    public static class BaseClassE
-    {
         public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
         {
-            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, count) =>
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
             {
-                Console.WriteLine("is now : " + (((float)i) / count).ToString("p") + "\t" + p);
+                Console.WriteLine("is now : " + (((float)i) / target.Count).ToString("p") + "\t" + p);
                 if (File.Exists(p)) callAction(p);
             });
         }

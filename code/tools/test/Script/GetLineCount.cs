@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Media;
 using Library.Extensions;
 
-namespace test
+namespace Script
 {
     internal class GetLineCount
     {

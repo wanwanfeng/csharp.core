@@ -38,7 +38,7 @@ namespace UnityEngine.Library
     /// <summary>
     /// Math扩展
     /// </summary>
-    public static class ExtensionsForMathf
+    public static class MathfExtensions
     {
         /// <summary>
         /// 默认保留小数点后两位

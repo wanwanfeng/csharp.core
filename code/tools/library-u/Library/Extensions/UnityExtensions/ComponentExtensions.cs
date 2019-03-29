@@ -24,6 +24,34 @@ namespace UnityEngine.Library
             return haveRoot ? path : path.Replace(component.transform.root.name + "/", "");
         }
 
+
+        /// <summary>
+        /// 获取组件(没有时自动添加)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        public static Component GetOrAddComponent(this Component component, Type type)
+        {
+            if (component == null) return null;
+            return component.gameObject.GetOrAddComponent(type);
+        }
+
+        /// <summary>
+        /// 获取组件(没有时自动添加)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        public static T GetOrAddComponent<T>(this Component component) where T : Component
+        {
+            if (component == null)
+                return default(T);
+            T t = component.GetComponent<T>();
+            if (t == null) t = component.gameObject.AddComponent<T>();
+            return t;
+        }
+
         /// <summary>
         /// 查找组件,若果没有，则自动添加一个
         /// </summary>

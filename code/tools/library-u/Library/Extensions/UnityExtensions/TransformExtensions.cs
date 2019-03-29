@@ -4,7 +4,7 @@ using System.Linq;
 namespace UnityEngine.Library
 {
     /// <summary>
-    /// Component扩展
+    /// Transform扩展
     /// </summary>
     public static class TransformExtensions
     {

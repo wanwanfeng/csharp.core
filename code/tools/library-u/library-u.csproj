@@ -52,9 +52,10 @@
     <Compile Include="Library\Base\ILoad.cs" />
     <Compile Include="Library\Base\BaseLoad.cs" />
     <Compile Include="Library\Base\BaseMonoBehaviour.cs" />
-    <Compile Include="Library\Extensions\ExtensionsForMathf.cs" />
-    <Compile Include="Library\Extensions\ExtensionsForUnity.cs" />
+    <Compile Include="Library\Extensions\MathfExtensions.cs" />
+    <Compile Include="Library\Extensions\UnityExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\MonoBehaviourExtensions.cs" />
+    <Compile Include="Library\Extensions\UnityExtensions\GameObjectExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\TransformExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\ComponentExtensions.cs" />
     <Compile Include="Library\LitJson\LitJsonHelper.cs" />

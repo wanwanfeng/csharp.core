@@ -205,7 +205,7 @@ namespace checkcard.Scripts
             else if (turn_param_int_list.Contains(key))
             {
                 turn[key] = new JsonData();
-                value.SplitInt(',').ToList().ForEach(p => turn[key].Add(p));
+                value.ToIntArray(',').ForEach(p => turn[key].Add(p));
             }
             else
             {

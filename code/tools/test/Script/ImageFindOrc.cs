@@ -30,8 +30,8 @@ namespace Script
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
 
-            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
-                .ForEachPaths(re =>
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories).ForEachPaths(
+                re =>
                 {
 #if imageOrc
                     var imageOrc = File.ReadAllBytes(re);
@@ -44,6 +44,7 @@ namespace Script
                         Console.ReadKey();
                         return;
                     }
+
                     if (result["words_result_num"].ToInt() <= 0)
                         return;
 #endif

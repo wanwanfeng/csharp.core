@@ -11,7 +11,7 @@ using search.Script;
 
 namespace search
 {
-    internal class Program
+    internal static class Program
     {
         public enum ConvertType
         {
@@ -23,17 +23,13 @@ namespace search
         {
             SystemConsole.Run<ConvertType>();
         }
-    }
 
-
-    public static class BaseClassE
-    {
         public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
         {
-            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, count) =>
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
             {
                 Thread.Sleep(1000);
-                Console.WriteLine("is now : " + (((float) i)/count).ToString("p") + "\t" + p);
+                Console.WriteLine("is now : " + (((float)i) / target.Count).ToString("p") + "\t" + p);
                 callAction(p);
             });
         }

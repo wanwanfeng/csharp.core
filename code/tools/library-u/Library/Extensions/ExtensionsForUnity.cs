@@ -137,6 +137,44 @@ namespace UnityEngine.Library
         }
 
         /// <summary>
+        /// 获取组件,若果没有，则自动添加一个
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="type"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static Component Find(this Component target, Type type, string path = null)
+        {
+            var trans = target.transform;
+            if (!string.IsNullOrEmpty(path))
+            {
+                trans = target.transform.Find(path);
+            }
+            if (trans)
+            {
+                var component = trans.GetComponent(type);
+                if (component == null)
+                {
+                    component = trans.gameObject.AddComponent(type);
+                }
+                return component;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获取组件,若果没有，则自动添加一个
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="type"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static Component Find(this GameObject target, Type type, string path = null)
+        {
+            return Find(target.transform, type, path);
+        }
+
+        /// <summary>
         /// 判断路径下组件是否存在
         /// </summary>
         /// <param name="target"></param>

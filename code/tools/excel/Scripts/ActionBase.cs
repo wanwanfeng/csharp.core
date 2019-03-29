@@ -167,7 +167,7 @@ namespace Script
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
-            CheckPath(selectExtension).ForEach((file, index, count) =>
+            CheckPath(selectExtension).ForEach((file, index) =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import(file).Where(p => p != null).ToList();

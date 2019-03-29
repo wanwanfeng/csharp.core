@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using Library;
 using Library.Extensions;
-using Script;
 
-namespace test
+namespace Script
 {
-    internal class Program
+    internal static class Program
     {
         private enum MyEnum
         {
@@ -33,6 +33,16 @@ namespace test
             [Category("dos2"), Description("unix2dos"), TypeValue(typeof (unix2dos))] unix2dos,
             [Category("dos2"), Description("mac2unix"), TypeValue(typeof (mac2unix))] mac2unix,
             [Category("dos2"), Description("unix2mac"), TypeValue(typeof (unix2mac))] unix2mac,
+        }
+
+
+        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
+        {
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
+            {
+                Console.WriteLine("is now : " + (((float)i) / target.Count).ToString("p") + "\t" + p);
+                if (File.Exists(p)) callAction(p);
+            });
         }
 
         private static void Main(string[] args)

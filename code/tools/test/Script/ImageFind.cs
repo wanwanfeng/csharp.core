@@ -125,8 +125,8 @@ namespace Script
         {
             bool isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)", def: "true").AsBool(false);
             Dictionary<string, Info> cache = new Dictionary<string, Info>();
-            BaseClassE.ForEachPaths(
-                CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories).ForEachPaths(
+                re =>
                 {
                     var key = re.Replace(InputPath, "");
                     using (Image source = Image.FromFile(re))
@@ -154,8 +154,8 @@ namespace Script
             bool createFile = SystemConsole.GetInputStr("是否生成碎文件？(true:false)", def: "false").AsBool(true);
             bool isIndent = SystemConsole.GetInputStr("json文件是否进行格式化？(true:false)", def: "true").AsBool(false);
             Dictionary<string, string> cache = new Dictionary<string, string>();
-            BaseClassE.ForEachPaths(
-                CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories).ForEachPaths(
+                re =>
                 {
                     var content = Convert.ToBase64String(File.ReadAllBytes(re));
                     cache[re.Replace(InputPath, "")] = content;
@@ -177,8 +177,8 @@ namespace Script
         public Base64ConvertToImage()
         {
             var tag = "data:image/png;base64,";
-            BaseClassE.ForEachPaths(
-                CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories), re =>
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories).ForEachPaths(
+                re =>
                 {
                     var content = File.ReadAllText(re);
                     var index = content.IndexOf(tag, StringComparison.Ordinal);

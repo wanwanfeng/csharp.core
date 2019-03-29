@@ -33,7 +33,7 @@ namespace Library.Helper
             try
             {
                 string output = process.StandardOutput.ReadToEnd();
-                var res = output.SplitString('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).ToList();
+                var res = output.ToStringArray('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).ToList();
 
                 process.WaitForExit();
 

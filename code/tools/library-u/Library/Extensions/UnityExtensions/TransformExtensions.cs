@@ -56,7 +56,7 @@ namespace UnityEngine.Library
             return obj;
         }
 
-        public static void SetPosition(this Transform target, float? x, float? y, float? z)
+        public static void SetPosition(this Transform target, float? x = null, float? y = null, float? z = null)
         {
             target.position = new Vector3(x ?? target.position.x, y ?? target.position.y, z ?? target.position.z);
         }
@@ -66,10 +66,29 @@ namespace UnityEngine.Library
             target.localPosition = new Vector3(x, y, z);
         }
 
-        public static void SetLocalScale(this Transform target, float? x, float? y, float? z)
+        public static void SetLocalScale(this Transform target, float? x = null, float? y = null, float? z = null)
         {
             target.localScale = new Vector3(x ?? target.localScale.x, y ?? target.localScale.y, z ?? target.localScale.z);
         }
 
+        public static void SetLocalEulerAngles(this Transform target, float? x = null, float? y = null, float? z = null)
+        {
+            target.localEulerAngles = new Vector3(x ?? target.localEulerAngles.x, y ?? target.localEulerAngles.y,
+                z ?? target.localEulerAngles.z);
+        }
+
+        public static void SetRotation(this Transform target, float? x = null, float? y = null, float? z = null,
+            float? w = null)
+        {
+            target.rotation = new Quaternion(x ?? target.rotation.x, y ?? target.rotation.y, z ?? target.rotation.z,
+                w ?? target.rotation.w);
+        }
+
+        public static void SetLocalRotation(this Transform target, float? x = null, float? y = null, float? z = null,
+            float? w = null)
+        {
+            target.localRotation = new Quaternion(x ?? target.localRotation.x, y ?? target.localRotation.y,
+                z ?? target.localRotation.z, w ?? target.localRotation.w);
+        }
     }
 }

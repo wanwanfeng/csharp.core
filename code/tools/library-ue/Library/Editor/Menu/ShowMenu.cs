@@ -27,47 +27,61 @@ namespace UnityEditor
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.Where(p => p.enabled).Skip(2).First().path);
         }
 
-        [MenuItem("Assets/将路径复制到剪帖板")]
+        [MenuItem("Assets/CopyToClipboard/Path")]
         public static void GetObjectPaths()
         {
             var go = Selection.GetFiltered(typeof (Object), SelectionMode.TopLevel);
-            EditorUtils.CopyToClipboard((go.Select(item => AssetDatabase.GetAssetPath(item)).Join()));
+            EditorUtils.CopyStringToClipboard((go.Select(item => AssetDatabase.GetAssetPath(item)).Join()));
         }
 
-        [MenuItem("GameObject/将路径复制到剪帖板", false, 0)]
+        [MenuItem("Assets/CopyToClipboard/Name")]
+        public static void GetObjecNames()
+        {
+            var go = Selection.GetFiltered(typeof(Object), SelectionMode.TopLevel);
+            EditorUtils.CopyStringToClipboard((go.Select(item => item.name).Join()));
+        }
+
+        [MenuItem("GameObject/CopyToClipboard/Path", false, 0)]
         public static void GetGameObjectsPath()
         {
             var go = Selection.GetFiltered(typeof (GameObject), SelectionMode.Editable);
-            EditorUtils.CopyToClipboard(go.Select(item => ((GameObject)item).transform.GetFullPath()).Join());
+            EditorUtils.CopyStringToClipboard(go.Select(item => ((GameObject)item).transform.GetFullPath()).Join());
         }
 
-        [MenuItem("CONTEXT/Transform/Copy LocalPosition")]
+        [MenuItem("GameObject/CopyToClipboard/Name", false, 0)]
+        public static void GetGameObjectsName()
+        {
+            var go = Selection.GetFiltered(typeof(GameObject), SelectionMode.Editable);
+            EditorUtils.CopyStringToClipboard(go.Select(item => ((GameObject)item).name).Join());
+        }
+
+        [MenuItem("CONTEXT/Transform/CopyToClipboard/LocalPosition")]
         public static void CopyPosition()
         {
             Vector3 pos = Selection.activeTransform.localPosition;
-            EditorUtils.CopyToClipboard(string.Format("{0},{1},{2}", pos.x, pos.y, pos.z));
+            EditorUtils.CopyStringToClipboard(string.Format("{0},{1},{2}", pos.x, pos.y, pos.z));
         }
 
-        [MenuItem("CONTEXT/Transform/Copy LocalEulerAngles")]
+        [MenuItem("CONTEXT/Transform/CopyToClipboard/LocalEulerAngles")]
         public static void CopyLocalEulerAngles()
         {
             Vector3 pos = Selection.activeTransform.localEulerAngles;
-            EditorUtils.CopyToClipboard(string.Format("{0},{1},{2}", pos.x, pos.y, pos.z));
+            EditorUtils.CopyStringToClipboard(string.Format("{0},{1},{2}", pos.x, pos.y, pos.z));
         }
 
-        [MenuItem("CONTEXT/Transform/Copy LocalScale")]
+        [MenuItem("CONTEXT/Transform/CopyToClipboard/LocalScale")]
         public static void CopyScale()
         {
             Vector3 pos = Selection.activeTransform.localScale;
-            EditorUtils.CopyToClipboard(string.Format("{0},{1},{2}", pos.x, pos.y, pos.z));
+            EditorUtils.CopyStringToClipboard(string.Format("{0},{1},{2}", pos.x, pos.y, pos.z));
         }
 
-        [MenuItem("CONTEXT/Transform/Copy LocalPosition and LocalEulerAngles")]
+        [MenuItem("CONTEXT/Transform/CopyToClipboard/LocalPosition and LocalEulerAngles")]
         public static void CopyPositionAndLocalEulerAngles()
         {
             Vector3 pos = Selection.activeTransform.localPosition;
             Vector3 angle = Selection.activeTransform.localEulerAngles;
-            EditorUtils.CopyToClipboard(string.Format("{0},{1},{2};{3},{4},{5}", pos.x, pos.y, pos.z, angle.x, angle.y, angle.z));
+            EditorUtils.CopyStringToClipboard(string.Format("{0},{1},{2};{3},{4},{5}", pos.x, pos.y, pos.z, angle.x, angle.y, angle.z));
         }
 
     }

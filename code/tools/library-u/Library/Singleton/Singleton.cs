@@ -9,7 +9,7 @@ namespace UnityEngine.Library
     /// 场景单例(自动生成物体并挂载)
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBehaviourAuto<T> : BaseMonoBehaviour where T : MonoBehaviour
+    public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 
@@ -38,17 +38,17 @@ namespace UnityEngine.Library
     /// base.Awake();
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBehaviour<T> : BaseMonoBehaviour where T : MonoBehaviour
+    public abstract partial class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {
         public static T Instance { get; private set; }
-        public override void Awake()
+        public virtual void Awake()
         {
             if (Instance != null) return;
             Instance = this as T;
         }
 
 
-        public override void OnDestroy()
+        public virtual void OnDestroy()
         {
             Instance = null;
         }

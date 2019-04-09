@@ -10,15 +10,18 @@ namespace UnityEditor.Library
 {
     public partial class EditorUtils
     {
+        //static partial void CopyToClipboard(string content);
+
         /// <summary>
         /// 内容复制到剪切板
         /// </summary>
         /// <param name="content"></param>
-        public static void CopyToClipboard(string content)
+        public static void CopyStringToClipboard(string content)
         {
             Debug.Log(content);
+            //CopyToClipboard(content);
             TextEditor te = new TextEditor();
-#if UNITY_5_3||UNITY_5_4||UNITY_5_5
+#if UNITY_5_3_OR_NEWER
             te.text = content;
 #else
             te.content = new GUIContent()

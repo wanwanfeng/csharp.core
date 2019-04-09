@@ -6,7 +6,7 @@ namespace UnityEngine.Library
     /// <summary>
     /// Component扩展
     /// </summary>
-    public static class MonoBehaviourExtensions
+    public  static partial class MonoBehaviourExtensions
     {
         #region 延迟
 

@@ -51,7 +51,7 @@
     <Compile Include="Library\Attribute\EnumFlagsAttribute.cs" />
     <Compile Include="Library\Base\ILoad.cs" />
     <Compile Include="Library\Base\BaseLoad.cs" />
-    <Compile Include="Library\Base\BaseMonoBehaviour.cs" />
+    <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />
     <Compile Include="Library\Extensions\MathfExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\MonoBehaviourExtensions.cs" />

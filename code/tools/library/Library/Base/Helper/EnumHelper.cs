@@ -11,9 +11,9 @@ namespace Library.Helper
             if (type.IsEnum)
             {
                 var list = Enum.GetValues(type);
-                foreach (var array in list)
+                foreach (var it in list)
                 {
-                    yield return array;
+                    yield return it;
                 }
                 yield break;
             }

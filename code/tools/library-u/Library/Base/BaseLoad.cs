@@ -35,7 +35,6 @@ namespace UnityEngine.Library
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath"></param>
-        /// <param name="instance"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
         public T Load<T>(string filePath, Action<T> callAction = null) where T : Object

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Library.Helper;
@@ -9,27 +10,31 @@ namespace UnityEditor.Library
 {
     public partial class EditorUtils
     {
-        //static partial void CopyToClipboard(string content);
-
         /// <summary>
         /// 内容复制到剪切板
         /// </summary>
         /// <param name="content"></param>
-        public static void CopyStringToClipboard(string content)
+        public static void CopyToClipboard(string content)
         {
             Debug.Log(content);
-            //CopyToClipboard(content);
-            TextEditor te = new TextEditor();
+            try
+            {
+                TextEditor te = new TextEditor();
 #if UNITY_5_3_OR_NEWER
             te.text = content;
 #else
-            te.content = new GUIContent()
-            {
-                text = content
-            };
+                te.content = new GUIContent()
+                {
+                    text = content
+                };
 #endif
-            te.SelectAll();
-            te.Copy();
+                te.SelectAll();
+                te.Copy();
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         #region File

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Library.Extensions;
 
 namespace Library.Helper
 {
@@ -36,7 +37,9 @@ namespace Library.Helper
         /// <returns></returns>
         public static Dictionary<string, object> Path2Dictionary(string path, Func<string, string, object> func = null)
         {
-            return String2Dictionary(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(path, "")), func);
+            return
+                String2Dictionary(
+                    Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Select(p => p.Replace(path, "")), func);
         }
 
         /// <summary>
@@ -84,7 +87,7 @@ namespace Library.Helper
         /// <param name="path"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public IEnumerable<string> ReadAllLines(string path, Encoding encoding = null)
+        public static IEnumerable<string> ReadAllLines(string path, Encoding encoding = null)
         {
             if (!File.Exists(path))
                 throw new Exception("file not exist!");
@@ -108,7 +111,8 @@ namespace Library.Helper
         /// <param name="content"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
-        public IEnumerable<string> WriteAllLines(string path, IEnumerable<string> content, Encoding encoding = null)
+        public static IEnumerable<string> WriteAllLines(string path, IEnumerable<string> content,
+            Encoding encoding = null)
         {
             using (var fileStream = File.OpenWrite(path))
             {
@@ -118,6 +122,20 @@ namespace Library.Helper
                     {
                         write.WriteLine(line);
                         yield return line;
+                    }
+                }
+            }
+        }
+
+        public static void FileMerge(string[] paths, string outFile)
+        {
+            foreach (var path in paths)
+            {
+                using (var fileStream = File.Open(outFile, FileMode.Append))
+                {
+                    using (var readStream = File.Open(path, FileMode.Open))
+                    {
+                        readStream.CopyTo(fileStream);
                     }
                 }
             }

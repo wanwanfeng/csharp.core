@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.RegularExpressions;
 using Library.Extensions;
 using Library.Helper;
 
@@ -17,14 +13,24 @@ namespace fileUtils
         {
             SystemConsole.Run(config: new Dictionary<string, Action>()
             {
-                {"Merge", new Merge().Run},
-                {"Down", new Down().Run},
+                {"FileDown", new FileDown().Run},
+                {"FileMerge", new FileMerge().Run},
+                {"DownM3U8", new DownM3U8().Run}
             });
         }
 
-        public class Merge : BaseSystemConsole
+        public class FileDown : Down
         {
-            public void Run()
+            public override void Run()
+            {
+                Console.Write("请输入文件url:");
+                DownLoad(Console.ReadLine() ?? "");
+            }
+        }
+
+        public class FileMerge : Down
+        {
+            public override void Run()
             {
                 var files = CheckPath(".ts", SelectType.Folder);
                 var outFile = Path.ChangeExtension(InputPath.Trim('.'), ".ts");
@@ -32,107 +38,30 @@ namespace fileUtils
             }
         }
 
-        public class Down : BaseSystemConsole
+        public class DownM3U8 : Down
         {
-            public void Run()
+            public override void Run()
             {
-                Action<string> singleFile = url =>
-                {
-                    var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(url);
-                    if (string.IsNullOrEmpty(fileNameWithoutExtension)) return;
-                    url = url.Replace(fileNameWithoutExtension, "{0}");
-                    string qianzhui = fileNameWithoutExtension
-                        .Reverse()
-                        .SkipWhile(char.IsDigit)
-                        .Aggregate("", (b, a) => a + b);
-                    int start = url.Replace(qianzhui, "").AsInt();
-                    Enumerable.Range(start, 500)
-                        .Select(p => string.Format(url, qianzhui + p))
-                        .ToList()
-                        .ForEach(DownLoad);
-                };
+                Console.Write("请输入m3u8文件url:");
+                var url = Console.ReadLine() ?? "";
 
-                CheckPath(".txt", SelectType.File)
-                    .SelectMany(File.ReadAllLines)
-                    .Distinct()
-                    .Where(Path.HasExtension)
-                    .ToList()
-                    .AsParallel()
-                    .WithDegreeOfParallelism(4)
-                    .ForAll(singleFile);
-            }
-
-            public void DownLoad(string url)
-            {
                 var uri = new Uri(url);
-                string newName = uri.LocalPath.TrimStart('/');
-                if (File.Exists(newName)) return;
-                string tempName = Path.ChangeExtension(newName, "temp");
-                if (File.Exists(tempName)) File.Delete(tempName);
-                FileHelper.CreateDirectory(newName);               
+                Console.WriteLine(uri.AbsoluteUri);
+                Console.WriteLine(uri.AbsolutePath);
 
-                HttpWebRequest request;
-                HttpWebResponse response;
-                try
+                var path = DownLoad(url);
+
+                var fileList =
+                    File.ReadAllLines(path)
+                        .Where(p => !p.StartsWith("#"))
+                        .ToList();
+
+                //fileList.AsParallel().ForAll(p =>
+                fileList.ForEach(p =>
                 {
-                    Console.WriteLine(url);
-                    if (url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
-                    {
-                        ServicePointManager.ServerCertificateValidationCallback =
-                            new RemoteCertificateValidationCallback(CheckValidationResult);
-                        //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
-                        request = WebRequest.Create(url) as HttpWebRequest;
-                        request.ProtocolVersion = HttpVersion.Version10;
-                        //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
-                        //request.Method = "GET";
-                        //发送请求并获取相应回应数据
-                        response = request.GetResponse() as HttpWebResponse;
-                        string cookieString = response.Headers["Set-Cookie"];
-                        CookieCollection cookies = new CookieCollection();
-                        Regex re = new Regex("([^;,]+)=([^;,]+); path=([^;,]+); expires=([^;,]+)",
-                            RegexOptions.IgnoreCase);
-                        //视具体内容进行调整
-                        foreach (Match m in re.Matches(cookieString))
-                        {
-                            Cookie c = new Cookie(m.Groups[1].Value, m.Groups[2].Value);
-                            c.Domain = uri.Authority; //放你要访问网站的域名
-                            cookies.Add(c);
-                        }
-                    }
-                    else
-                    {
-                        request = WebRequest.Create(url) as HttpWebRequest;
-                        //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
-                        //request.Method = "GET";
-
-                        //发送请求并获取相应回应数据
-                        response = request.GetResponse() as HttpWebResponse;
-                    }
-
-                    //直到request.GetResponse()程序才开始向目标网页发送Post请求
-                    if (response == null) return;
-                    using (var fs = new FileStream(tempName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
-                    {
-                        using (var responseStream = response.GetResponseStream())
-                        {
-                            if (responseStream != null) responseStream.CopyTo(fs);
-                        }
-                    }
-                    File.Move(tempName, newName);
-                }
-                catch (Exception ex)
-                {
-                    if (File.Exists(tempName))
-                        File.Delete(tempName); //存在则删除
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-                }
-            }
-
-            private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain,
-                SslPolicyErrors errors)
-            {
-                return true; //总是接受
+                    DownLoad(uri.AbsoluteUri.Replace(uri.AbsolutePath, p));
+                });
+                FileHelper.FileMerge(fileList.ToArray(), Path.ChangeExtension(path, ".mp4"));
             }
         }
     }

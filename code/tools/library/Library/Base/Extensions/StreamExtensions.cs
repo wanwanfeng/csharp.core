@@ -12,6 +12,8 @@ namespace Library.Extensions
             {
                 destination.Write(bytes, 0, length);
             }
+
+            //.net 4.0
             //fileStream.CopyTo(destination);
         }
     }

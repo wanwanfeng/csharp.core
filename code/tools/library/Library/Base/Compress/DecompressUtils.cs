@@ -4,6 +4,7 @@ using System.Linq;
 using ICSharpCode;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Zip;
+using Library.Extensions;
 
 namespace Library.Compress
 {
@@ -45,21 +46,21 @@ namespace Library.Compress
         /// </summary>
         /// <param name="inFile"></param>
         /// <param name="outFile"></param>
-        public static string CompressFile(string inFile, string outFile)
+        /// <param name="runAction"></param>
+        public static string CompressFile(string inFile, string outFile, Action<string, float> runAction)
         {
-            return ICSharpGzipCode.CompressFileGzip(inFile, outFile);
+            return ICSharpGzipCode.CompressFileGzip(inFile, outFile, runAction);
         }
 
         /// <summary>
         /// 压缩文件
         /// </summary>
         /// <param name="inFile"></param>
-        public static string CompressFile(string inFile)
+        /// <param name="runAction"></param>
+        public static string CompressFile(string inFile, Action<string, float> runAction)
         {
-            string outFile = inFile + "temp";
-            if (File.Exists(outFile))
-                File.Delete(outFile);
-            var ret = CompressFile(inFile, outFile);
+            string outFile = Path.GetTempFileName();
+            var ret = CompressFile(inFile, outFile, runAction);
             if (string.IsNullOrEmpty(ret))
             {
                 try
@@ -214,34 +215,57 @@ namespace ICSharpCode
         /// </summary>
         /// <param name="inFile"></param>
         /// <param name="outFile"></param>
-        public static string CompressFileGzip(string inFile, string outFile)
+        /// <param name="runAction"></param>
+        public static string CompressFileGzip(string inFile, string outFile, Action<string, float> runAction)
         {
             try
             {
-                using (Stream input = new FileStream(inFile, FileMode.Open))
+                using (var fw = new FileStream(outFile, FileMode.OpenOrCreate))
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    using (var gzip = new GZipOutputStream(fw))
                     {
-                        using (GZipOutputStream gzip = new GZipOutputStream(ms))
+                        using (var fr = new FileStream(inFile, FileMode.Open))
                         {
-
-                            byte[] binary = new byte[gzip.Length];
-                            gzip.Read(binary, 0, binary.Length);
-                            // 设置当前流的位置为流的开始
-                            gzip.Seek(0, SeekOrigin.Begin);
-                            gzip.Write(binary, 0, binary.Length);
-                            gzip.Close();
-                            ms.Close();
-                            input.Close();
-                            File.WriteAllBytes(outFile, ms.ToArray());
-                            return "";
+                            fr.CopyTo(gzip, p => { runAction(outFile, p); });
                         }
+                    }
+                }
+                return "";
+            }
+            catch (Exception e)
+            {
+                return "CompressFileGzip：" + e.Message + "\n" + outFile;
+            }
+        }
+
+        /// <summary>
+        /// 先解压到内存在统一写入（可能出现内存不足情况）
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="outFile"></param>
+        /// <param name="runAction"></param>
+        /// <returns></returns>
+        private static string DecompressMemoryGzip2(Stream input, string outFile, Action<string, float> runAction)
+        {
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var gzip = new GZipInputStream(input))
+                    {
+                        gzip.CopyTo(ms, p => { runAction(outFile, p); });
+                        File.WriteAllBytes(outFile, ms.ToArray());
+                        return "";
                     }
                 }
             }
             catch (Exception e)
             {
-                return "CompressFileGzip：" + e.Message + "\n" + outFile;
+                return ("DecompressMemoryGzip：" + e.Message + "\n" + outFile);
+            }
+            finally
+            {
+                runAction(outFile, 1);
             }
         }
 
@@ -257,18 +281,11 @@ namespace ICSharpCode
             runAction(outFile, 0);
             try
             {
-                using (GZipInputStream gzip = new GZipInputStream(input))
+                using (var fw = new FileStream(outFile, FileMode.Create))
                 {
-                    using (FileStream fsWrite = new FileStream(outFile, FileMode.Create))
+                    using (var gzip = new GZipInputStream(input))
                     {
-                        int bufferSize = 4096;
-                        int bytesRead = 0;
-                        byte[] buffer = new byte[bufferSize];
-                        while ((bytesRead = gzip.Read(buffer, 0, buffer.Length)) != 0)
-                        {
-                            fsWrite.Write(buffer, 0, bytesRead);
-                            runAction(outFile, (float) input.Position/input.Length);
-                        }
+                        gzip.CopyTo(fw, p => { runAction(outFile, p); });
                         return "";
                     }
                 }
@@ -369,43 +386,43 @@ namespace ICSharpCode
                 //    File.Delete(zipedfiledname);
                 //    return "压缩文件的路径有误!";
                 //}
+
                 //创建ZipFileOutPutStream
-                ZipOutputStream newzipstream = new ZipOutputStream(File.Open(zipedfiledname, FileMode.OpenOrCreate));
 
-                //判断Password
-                if (!string.IsNullOrEmpty(password))
-                    newzipstream.Password = password;
-                if (!string.IsNullOrEmpty(comment))
-                    newzipstream.SetComment(comment);
-                //设置CompressionLevel
-                newzipstream.SetLevel(compressionLevel); //-查看0 - means store only to 9 - means best compression 
-
-                //执行压缩
-                foreach (string filename in filenameToZip)
+                var tempPath = Path.GetTempFileName();
+                using (var zs = new ZipOutputStream(File.Open(tempPath, FileMode.OpenOrCreate)))
                 {
-                    FileStream newstream = string.IsNullOrEmpty(fileNameRoot)
-                        ? File.OpenRead(filename)
-                        : File.OpenRead(fileNameRoot + "\\" + filename); //打开预压缩文件
-                    byte[] setbuffer = new byte[newstream.Length];
-                    newstream.Read(setbuffer, 0, setbuffer.Length); //读入文件
-                    //新建ZipEntrity//设置时间-长度
-                    ZipEntry newEntry = new ZipEntry(filename)
+                    //判断Password
+                    if (!string.IsNullOrEmpty(password))
+                        zs.Password = password;
+                    if (!string.IsNullOrEmpty(comment))
+                        zs.SetComment(comment);
+                    //设置CompressionLevel
+                    zs.SetLevel(compressionLevel); //-查看0 - means store only to 9 - means best compression 
+                    //执行压缩
+                    foreach (string filename in filenameToZip)
                     {
-                        DateTime = DateTime.Now,
-                        Size = newstream.Length
-                    };
-                    newstream.Close();
-                    newzipstream.PutNextEntry(newEntry); //压入
-                    newzipstream.Write(setbuffer, 0, setbuffer.Length);
+                        //打开预压缩文件
+                        using (FileStream fw = string.IsNullOrEmpty(fileNameRoot)
+                            ? File.OpenRead(filename)
+                            : File.OpenRead(fileNameRoot + "\\" + filename))
+                        {
+                            //新建ZipEntrity//设置时间-长度
+                            ZipEntry newEntry = new ZipEntry(filename)
+                            {
+                                DateTime = DateTime.Now,
+                                Size = fw.Length
+                            };
+                            zs.PutNextEntry(newEntry); //压入
+                            fw.CopyTo(zs);
+                        }
+                    }
                 }
-                //重复压入操作
-                newzipstream.Finish();
-                newzipstream.Close();
+                if (File.Exists(zipedfiledname)) File.Delete(zipedfiledname);
+                if (File.Exists(tempPath)) File.Move(tempPath, zipedfiledname);
             }
             catch (Exception e)
             {
-                //出现异常
-                File.Delete(zipedfiledname);
                 return e.Message;
             }
             return "";
@@ -427,46 +444,33 @@ namespace ICSharpCode
             }
 
             //创建ZipInputStream
-            ZipInputStream newinStream = new ZipInputStream(File.OpenRead(zipfilename));
-            //判断Password
-            if (!string.IsNullOrEmpty(password))
-                newinStream.Password = password;
-            //执行解压操作
-            try
+            var targetDir = unZipDir;
+            using (ZipInputStream zs = new ZipInputStream(File.OpenRead(zipfilename)))
             {
-                ZipEntry theEntry;
+                //判断Password
+                if (!string.IsNullOrEmpty(password))
+                    zs.Password = password;
+
                 //获取Zip中单个File
-                while ((theEntry = newinStream.GetNextEntry()) != null)
+                ZipEntry theEntry;
+
+                while ((theEntry = zs.GetNextEntry()) != null)
                 {
-                    string pathname = Path.GetDirectoryName(theEntry.Name); //获得子级目录
                     string filename = Path.GetFileName(theEntry.Name); //获得子集文件名
+                    if (filename == string.Empty) continue;
+
+                    string pathname = Path.GetDirectoryName(theEntry.Name); //获得子级目录
                     pathname = pathname.Replace(":", "$"); //处理当前压缩出现盘符问题                  
-                    string driectoryname = unZipDir + "\\" + pathname; //获得目的目录信息           
+                    string driectoryname = targetDir + "\\" + pathname; //获得目的目录信息           
                     if (!Directory.Exists(driectoryname))
                         Directory.CreateDirectory(driectoryname); //创建
-                    if (filename == string.Empty) continue;
-                    FileStream newstream = File.Create(driectoryname + "\\" + filename); //解压指定子目录
-                    int size = 2048;
-                    byte[] newbyte = new byte[size];
-                    while (true)
+
+                    //解压指定子目录
+                    using (var fw = File.Create(driectoryname + "\\" + filename))
                     {
-                        size = newinStream.Read(newbyte, 0, newbyte.Length);
-                        if (size <= 0)
-                            break;
-                        newstream.Write(newbyte, 0, size); //写入数据
+                        fw.CopyTo(zs);
                     }
-                    newstream.Close();
                 }
-            }
-            catch (Exception se)
-            {
-                if (Directory.Exists(unZipDir))
-                    Directory.Delete(unZipDir, true);
-                return se.Message;
-            }
-            finally
-            {
-                newinStream.Close();
             }
             return "";
         }

@@ -129,13 +129,15 @@ namespace Library.Helper
 
         public static void FileMerge(string[] paths, string outFile)
         {
-            using (var fileStream = File.Open(outFile, FileMode.Append))
+            outFile = outFile.TrimStart('\\').TrimStart('/');
+            CreateDirectory(outFile);
+            using (var sw = File.Open(outFile, FileMode.Append))
             {
                 foreach (var path in paths)
                 {
-                    using (var readStream = File.Open(path.TrimStart('\\').TrimStart('/'), FileMode.Open))
+                    using (var sr = File.Open(path.TrimStart('\\').TrimStart('/'), FileMode.Open))
                     {
-                        readStream.CopyTo(fileStream);
+                        sr.CopyTo(sw);
                     }
                 }
             }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -144,11 +143,6 @@ namespace fileDownload
             var houzhui = revision + "/" + hashname;
             string newname = root + "/app/" + houzhui;
 
-            string tempFile = newname + ".temp"; //临时文件
-            FileHelper.CreateDirectory(tempFile);
-            if (File.Exists(tempFile))
-                File.Delete(tempFile); //存在则删除
-
             if (File.Exists(newname))
             {
                 //var hash = UtilSecurity.GetMD5Value(File.ReadAllText(newname));
@@ -156,47 +150,27 @@ namespace fileDownload
                     return true;
             }
 
-
             //return false;
-
-            FileStream fs = new FileStream(tempFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
 
             try
             {
-                // 设置参数
-
                 Console.WriteLine(url + houzhui);
                 HttpWebRequest request = WebRequest.Create(url + houzhui) as HttpWebRequest;
-
-                //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
-                //request.Method = "GET";
-
-                //发送请求并获取相应回应数据
                 HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                //直到request.GetResponse()程序才开始向目标网页发送Post请求
-                Stream responseStream = response.GetResponseStream();
-                //创建本地文件写入流
-                //Stream stream = new FileStream(tempFile, FileMode.Create);
-                byte[] bArr = new byte[1024];
-                int size = responseStream.Read(bArr, 0, (int) bArr.Length);
-                while (size > 0)
+                string tempFile = Path.GetTempFileName();
+                using (var fs = new FileStream(tempFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    //stream.Write(bArr, 0, size);
-                    fs.Write(bArr, 0, size);
-                    size = responseStream.Read(bArr, 0, (int) bArr.Length);
+                    //直到request.GetResponse()程序才开始向目标网页发送Post请求
+                    using (var responseStream = response.GetResponseStream())
+                    {
+                        if (responseStream != null) responseStream.CopyTo(fs);
+                    }
                 }
-                //stream.Close();
-                fs.Close();
-                responseStream.Close();
-
                 File.Move(tempFile, newname);
                 return true;
             }
             catch (Exception ex)
             {
-                fs.Close();
-                if (File.Exists(tempFile))
-                    File.Delete(tempFile); //存在则删除
                 Console.WriteLine(ex.Message);
                 return false;
             }
@@ -213,7 +187,7 @@ namespace fileDownload
             var houzhui = revision + "/" + hashname;
             var source = (root + "app/" + houzhui).Replace("/", "\\");
             string newname = (root + "res/" + filename).Replace("/", "\\");
-            FileHelper.CreateDirectory(newname);
+            DirectoryHelper.CreateDirectory(newname);
             try
             {
                 if (File.Exists(source))

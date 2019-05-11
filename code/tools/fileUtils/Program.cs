@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Compress;
 using Library.Extensions;
 using Library.Helper;
 
@@ -15,7 +16,8 @@ namespace fileUtils
             {
                 {"FileDown", new FileDown().Run},
                 {"FileMerge", new FileMerge().Run},
-                {"DownM3U8", new DownM3U8().Run}
+                {"DownM3U8", new DownM3U8().Run},
+                //{"Test", new Test().Run}
             });
         }
 
@@ -56,12 +58,35 @@ namespace fileUtils
                         .Where(p => !p.StartsWith("#"))
                         .ToList();
 
+                var dic = FileHelper.String2Dictionary(fileList);
                 //fileList.AsParallel().ForAll(p =>
+
                 fileList.ForEach(p =>
                 {
                     DownLoad(uri.AbsoluteUri.Replace(uri.AbsolutePath, p));
                 });
+
                 FileHelper.FileMerge(fileList.ToArray(), Path.ChangeExtension(path, ".mp4"));
+
+                dic.Keys.ToList().ForEach(p =>
+                {
+                    Directory.Delete(p, true);
+                });
+            }
+
+        }
+
+        public class Test : Down
+        {
+            public override void Run()
+            {
+                var xxx = Console.ReadLine() ?? "";
+                //DecompressUtils.CompressFile(xxx, Path.ChangeExtension(xxx, ".zip"), (p, q) =>
+                //{
+                //    Console.WriteLine(p, q);
+                //});
+
+                DecompressUtils.UnMakeZipFile(xxx);
             }
         }
     }

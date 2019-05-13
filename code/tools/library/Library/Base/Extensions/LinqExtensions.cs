@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Library.Extensions
 {
@@ -39,7 +40,8 @@ namespace Library.Extensions
             for (int index = 0, max = source.Length; index < max; ++index)
             {
                 action(source[index]);
-                LogAction(string.Format("{2} : {0} \t{1}", index + "/" + source.Length, source[index], tip ?? "is now"));
+                LogAction(string.Format("{2} : {0} \t{1}", index + "/" + source.Length, source[index],
+                    tip ?? "is now"));
             }
         }
 
@@ -112,7 +114,8 @@ namespace Library.Extensions
             }
         }
 
-        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>> action, string tip)
+        public static void ForEach<T, TV>(this IDictionary<T, TV> source, Action<KeyValuePair<T, TV>> action,
+            string tip)
         {
             var index = 0;
             foreach (var pair in source)
@@ -120,6 +123,19 @@ namespace Library.Extensions
                 action(pair);
                 LogAction(string.Format("{2} : {0} \t{1}", ++index + "/" + source.Count, pair.Key, tip ?? "is now"));
             }
+        }
+
+        /// <summary>
+        /// 拾取集合中后几个元素
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static IEnumerable<TSource> TakeLast<TSource>(this IEnumerable<TSource> source, int count)
+        {
+            var array = source.ToArray();
+            return array.ToArray().Skip(Math.Max(0, array.Length - count));
         }
     }
 }

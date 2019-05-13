@@ -89,7 +89,7 @@ namespace Library.Extensions
                 File.Delete(newPath);
                 return;
             }
-            File.WriteAllLines(newPath,enumerable.ToArray());
+            File.WriteAllLines(newPath, enumerable.ToArray());
         }
 
         protected void WriteError(IEnumerable<string> resList)
@@ -126,7 +126,7 @@ namespace Library.Extensions
                 {
                     showList.Add(pair.Key);
 
-                    var lineNum = (int)Math.Ceiling((float)pair.Value.Count/columnsCount);
+                    var lineNum = (int) Math.Ceiling((float) pair.Value.Count/columnsCount);
                     var cache = pair.Value
                         .GroupBy(p => p.Key%lineNum, q => q)
                         .ToDictionary(p => p.Key, q => q.ToList());
@@ -158,9 +158,9 @@ namespace Library.Extensions
                         Console.WriteLine("当前的选择：" + index);
                         //do
                         //{
-                            var obj = Activator.CreateInstance(cacheType[index].Value.value);
-                            if (callAction != null)
-                                callAction.Invoke(obj);
+                        var obj = Activator.CreateInstance(cacheType[index].Value.value);
+                        if (callAction != null)
+                            callAction.Invoke(obj);
                         //} while (ContinueY());
                     }
                     //goto resetInput;
@@ -270,15 +270,12 @@ namespace Library.Extensions
             Environment.Exit(0);
         }
 
-        public static void SetProgress(int left, int top, float progress, string info = "")
+        public static void SetInfo(string info = "", float progress = 0.0f)
         {
-            Console.SetCursorPosition(left, top);
-            Console.WriteLine("[{0}] {1}", progress.ToString("p0"), info);
-        }
-
-        public static void SetProgress(int top, float progress, string info = "")
-        {
-            SetProgress(0, top, progress, info);
+            Console.WriteLine("".PadRight(Console.CursorLeft));
+            Console.SetCursorPosition(0, Math.Max(0, Console.CursorTop - 1));
+            Console.Write("[{0}] {1} {2}", "*".PadRight((int) Math.Floor(15*progress), '*').PadRight(15, '-'),
+                progress.ToString("p2"), info);
         }
     }
 }

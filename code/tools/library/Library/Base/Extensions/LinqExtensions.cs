@@ -134,8 +134,9 @@ namespace Library.Extensions
         /// <returns></returns>
         public static IEnumerable<TSource> TakeLast<TSource>(this IEnumerable<TSource> source, int count)
         {
+            return source.Reverse().Skip(count);
             var array = source.ToArray();
-            return array.ToArray().Skip(Math.Max(0, array.Length - count));
+            return array.Skip(Math.Max(0, array.Length - count));
         }
     }
 }

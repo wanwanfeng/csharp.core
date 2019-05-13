@@ -92,6 +92,7 @@
     <Compile Include="Library\Base\Singleton\Singleton.cs" />
     <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
+    <Compile Include="Library\Base\Web\Web.cs" />
     <Compile Include="Library\Ldebug.cs" />
     <Compile Include="Library\Base\Helper\AttributeHelper.cs" />
     <Compile Include="Library\LocalEvent.cs" />

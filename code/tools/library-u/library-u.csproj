@@ -48,12 +48,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Library\Attribute\EnumFlagsAttribute.cs" />
+    <Compile Include="Library\Attribute\Attribute.cs" />
     <Compile Include="Library\Base\ILoad.cs" />
     <Compile Include="Library\Base\BaseLoad.cs" />
     <Compile Include="Library\Base\IMonoBehaviour.cs" />
     <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />
     <Compile Include="Library\Extensions\MathfExtensions.cs" />
+    <Compile Include="Library\Extensions\LinqExtensions.cs" />
     <Compile Include="Library\Extensions\RandomExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\MonoBehaviourExtensions.cs" />
@@ -61,6 +62,8 @@
     <Compile Include="Library\Extensions\UnityExtensions\TransformExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\ComponentExtensions.cs" />
     <Compile Include="Library\LitJson\LitJsonHelper.cs" />
+    <Compile Include="Library\Serialization\HashTable.cs" />
+    <Compile Include="Library\Serialization\Dictionary.cs" />
     <Compile Include="Library\Singleton\Singleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

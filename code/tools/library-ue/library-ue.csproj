@@ -43,7 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Library\Editor\Attribute\EnumFlagsAttributeDrawer.cs" />
+    <Compile Include="Library\Editor\Attribute\AttributeDrawer.cs" />
     <Compile Include="Library\Editor\EditorUtils.cs" />
     <Compile Include="Library\Editor\Menu\ShowMenu.cs" />
     <Compile Include="Library\Editor\Window\BaseDoubleWindow.cs" />

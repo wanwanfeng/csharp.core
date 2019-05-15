@@ -40,14 +40,5 @@ namespace findText
             };
             SystemConsole.Run<ConvertType>(callFunc);
         }
-
-        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
-        {
-            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
-            {
-                Console.WriteLine("is now : " + (((float)i) / target.Count).ToString("p") + "\t" + p);
-                if (File.Exists(p)) callAction(p);
-            });
-        }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using Library.Compress;
 using Library.Extensions;
 using Library.Helper;
+using Library;
 
 namespace fileUtils
 {
@@ -38,8 +39,9 @@ namespace fileUtils
         {
             public override void Run()
             {
-                var files = CheckPath(".ts", SelectType.Folder);
-                var outFile = Path.ChangeExtension(InputPath.Trim('.'), ".ts");
+                var ex = SystemConsole.GetInputStr("请输入文件后缀(如\"cs,cpp\"：");
+                var files = CheckPath("*.*", SelectType.Folder).Where(p => p.EndsWith(ex)).ToArray();
+                var outFile = Path.ChangeExtension(InputPath.Trim('.'), ex);
                 FileHelper.FileMerge(files.ToArray(), outFile);
             }
         }
@@ -72,23 +74,21 @@ namespace fileUtils
                 Console.WriteLine(uri.AbsoluteUri);
                 Console.WriteLine(uri.AbsolutePath);
 
-                var fileList = GetM3U8(url);
+                var fileList = GetM3U8(url).ToList();
 
-                fileList.AsParallel().ForAll(p =>
+                //fileList.AsParallel().ForAll(p =>
+                fileList.ForEach((p, i, count) =>
                 {
-                    if (p.StartsWith("http"))
-                    {
-                        GetWebFile(p);
-                    }
-                    else
-                    {
-                        GetWebFile(uri.AbsoluteUri.Replace(uri.AbsolutePath, p));
-                    }
+                    //http://v1.benbi123.com/20190409/yzqObCmT/index.m3u8
+                    var temp = p.StartsWith("http") ? p : uri.AbsoluteUri.Replace(uri.AbsolutePath, p);
+                    SystemConsole.SetProgress(temp, ((float) i/count));
+                    GetWebFile(temp);
                 });
+                SystemConsole.ClearProgress();
 
                 mergePath = string.IsNullOrEmpty(mergePath) ? uri.AbsolutePath : mergePath;
 
-                FileHelper.FileMerge(fileList.Select(p => new Uri(p).AbsolutePath).ToArray(),
+                FileHelper.FileMerge(fileList.Select(p => p.StartsWith("http") ? new Uri(p).AbsolutePath : p).ToArray(),
                     Path.ChangeExtension(mergePath, ".mp4"));
 
                 var dic = FileHelper.String2Dictionary(fileList);

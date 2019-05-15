@@ -98,7 +98,20 @@ namespace Library.Extensions
         }
     }
 
-    public class SystemConsole
+    public static class BaseSystemConsoleExtensions
+    {
+        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
+        {
+            paths.Select(p => p.Replace("\\", "/").TrimStart('/')).ToList().ForEach((p, i, target) =>
+            {
+                SystemConsole.SetProgress(string.Format("is now : {0} {1}", (((float) i)/target.Count).ToString("p"), p));
+                //Console.WriteLine("is now : " + (((float) i)/target.Count).ToString("p") + "\t" + p);
+                if (File.Exists(p)) callAction(p);
+            });
+        }
+    }
+
+    public static class SystemConsole
     {
         public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
         {
@@ -270,12 +283,18 @@ namespace Library.Extensions
             Environment.Exit(0);
         }
 
-        public static void SetInfo(string info = "", float progress = 0.0f)
+        private static int _lastOffset = 0;
+        public static void SetProgress(string info = "", float progress = 0.0f)
         {
-            Console.WriteLine("".PadRight(Console.CursorLeft));
-            Console.SetCursorPosition(0, Math.Max(0, Console.CursorTop - 1));
-            Console.Write("[{0}] {1} {2}", "*".PadRight((int) Math.Floor(15*progress), '*').PadRight(15, '-'),
-                progress.ToString("p2"), info);
+            var msg = string.Format("[{0}] {1} {2}", "*".PadRight((int) Math.Floor(15*progress), '*').PadRight(15, '-'), progress.ToString("p2"), info);
+            Console.WriteLine(msg);
+            _lastOffset = msg.Length / Console.WindowWidth + 1;
+            Console.SetCursorPosition(0, Math.Max(0, Console.CursorTop - _lastOffset));
+        }
+
+        public static void ClearProgress()
+        {
+            Console.SetCursorPosition(0, Math.Max(0, Console.CursorTop + _lastOffset));
         }
     }
 }

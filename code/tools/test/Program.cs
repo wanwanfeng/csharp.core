@@ -35,16 +35,6 @@ namespace Script
             [Category("dos2"), Description("unix2mac"), TypeValue(typeof (unix2mac))] unix2mac,
         }
 
-
-        public static void ForEachPaths(this IEnumerable<string> paths, Action<string> callAction)
-        {
-            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
-            {
-                Console.WriteLine("is now : " + (((float)i) / target.Count).ToString("p") + "\t" + p);
-                if (File.Exists(p)) callAction(p);
-            });
-        }
-
         private static void Main(string[] args)
         {
             SystemConsole.Run<MyEnum>(columnsCount:3);

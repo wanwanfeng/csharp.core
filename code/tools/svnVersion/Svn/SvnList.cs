@@ -6,7 +6,6 @@ using FileVersion;
 using Library;
 using Library.Extensions;
 using Library.Helper;
-using Library.LitJson;
 
 namespace SvnVersion
 {

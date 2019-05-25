@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Library
+namespace Library.Helper
 {
-    public static class Utils
+    public static class TypeHelper
     {
         private static Dictionary<string, string> _typeCache = new Dictionary<string, string>()
         {
@@ -25,7 +25,7 @@ namespace Library
         };
 
 
-        static Utils()
+        static TypeHelper()
         {
         }
     }

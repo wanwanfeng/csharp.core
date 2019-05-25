@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HtmlAgilityPack;
@@ -51,7 +52,48 @@ namespace search.Script
                 }
             });
 
-            File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData) res, indentLevel: 2));
+            File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData)res, indentLevel: 2));
+        }
+    }
+    public class SearchIndexM3U8 : BaseSearch
+    {
+        protected override string[] urls
+        {
+            get { return new[] { "https://m.1024e.cc/?inviteCode=VNWRQM&channelCode=VNWRQM" }; }
+        }
+
+        public SearchIndexM3U8()
+        {
+            var res = new ListTable();
+
+            urls.ForEachPaths(url =>
+            {
+                HtmlWeb webClient = new HtmlWeb();
+                HtmlDocument doc = webClient.Load(url);
+                HtmlNodeCollection headList = doc.DocumentNode.SelectNodes("//*[@id=\"changelike-box\"]/li");
+                //HtmlNodeCollection headList = doc.DocumentNode.SelectNodes("//*[@id=\"list\"]/table/thead/tr/th");
+                //HtmlNodeCollection valueList = doc.DocumentNode.SelectNodes("/html/body/div[2]/div/div/div/div[2]/ul/li");
+
+                if (res.Columns.Count == 0)
+                    foreach (HtmlNode node in headList)
+                    {
+                        var xx = node.SelectNodes("a/@href");
+                        Console.WriteLine(node.InnerHtml);
+                        res.Columns.Add(node.InnerText);
+                    }
+
+                //foreach (HtmlNode node in valueList)
+                //{
+                //    var temp = new List<object>();
+                //    foreach (HtmlNode child in node.SelectNodes("div/div/h4/a"))
+                //    {
+                //        temp.Add(child.InnerText);
+                //    }
+                //    res.Rows.Add(temp);
+                //}
+            });
+
+            File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData)res, indentLevel: 2));
         }
     }
 }

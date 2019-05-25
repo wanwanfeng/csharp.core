@@ -17,6 +17,7 @@ namespace search
         {
             [TypeValue(typeof (SearchIP))] [Description("获取代理IP")] SearchIP,
             [TypeValue(typeof (SearchMovie))] [Description("SearchMovie")] SearchMovie,
+            [TypeValue(typeof (SearchIndexM3U8))] [Description("SearchIndexM3U8")] SearchIndexM3U8,
         }
 
         private static void Main(string[] args)
@@ -29,9 +30,10 @@ namespace search
             paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
             {
                 Thread.Sleep(1000);
-                Console.WriteLine("is now : " + (((float)i) / target.Count).ToString("p") + "\t" + p);
+                SystemConsole.SetProgress(p, ((float)i) / target.Count);
                 callAction(p);
             });
+            SystemConsole.ClearProgress();
         }
     }
 }

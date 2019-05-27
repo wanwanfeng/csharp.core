@@ -74,6 +74,8 @@
     <Compile Include="Library\Base\Helper\FileHelper.cs" />
     <Compile Include="Library\Base\Helper\JsonHelper.cs" />
     <Compile Include="Library\Base\Helper\StringHelper.cs" />
+    <Compile Include="Library\Base\Helper\TypeHelper.cs" />
+    <Compile Include="Library\Base\Helper\WebHelper.cs" />
     <Compile Include="Library\Base\LitJson\LitJsonHelper.cs" />
     <Compile Include="Library\Base\Helper\XmlHelper.cs" />
     <Compile Include="Library\Base\LitJson\LitJson\IJsonWrapper.cs" />
@@ -92,11 +94,9 @@
     <Compile Include="Library\Base\Singleton\Singleton.cs" />
     <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />
     <Compile Include="Library\Base\Thread\ThreadAction.cs" />
-    <Compile Include="Library\Base\Web\Web.cs" />
     <Compile Include="Library\Ldebug.cs" />
     <Compile Include="Library\Base\Helper\AttributeHelper.cs" />
     <Compile Include="Library\LocalEvent.cs" />
-    <Compile Include="Library\Base\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

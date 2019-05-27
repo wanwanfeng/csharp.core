@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using Library.Extensions;
 
 namespace Library.Helper
 {
@@ -10,13 +11,13 @@ namespace Library.Helper
     /// </summary>
     public class WebHelper
     {
-        public class Base
+        public class Request
         {
             public static CookieContainer cookie;
             public static string Host = "";
             public Action<bool, string> OnComplete;
 
-            protected void Callback(HttpWebRequest request)
+            public void GetResponseValue(HttpWebRequest request)
             {
                 try
                 {
@@ -47,7 +48,43 @@ namespace Library.Helper
                 }
             }
 
-            public void Post(string url, string args)
+            public string GetResponsePath(HttpWebRequest request)
+            {
+                try
+                {
+                    var path = Path.GetTempFileName();
+                    using (var response = (HttpWebResponse) request.GetResponse())
+                    {
+                        response.Cookies = cookie.GetCookies(response.ResponseUri);
+                        using (var myResponseStream = response.GetResponseStream())
+                        {
+                            if (myResponseStream == null)
+                            {
+                                OnComplete.Invoke(false, null);
+                                return null;
+                            }
+                            using (var fw = new FileStream(path, FileMode.OpenOrCreate))
+                            {
+                                myResponseStream.CopyTo(fw);
+                            }
+                        }
+                    }
+                    OnComplete.Invoke(false, path);
+                    return path;
+                }
+                catch (WebException e)
+                {
+                    OnComplete.Invoke(false, e.Message);
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    OnComplete.Invoke(false, e.Message);
+                    return null;
+                }
+            }
+
+            public HttpWebRequest Post(string url, string args = "")
             {
                 var uri = new Uri(Host + url);
                 var request = (HttpWebRequest) WebRequest.Create(uri);
@@ -62,35 +99,44 @@ namespace Library.Helper
                     sw.Write(args);
                 }
 
-                Callback(request);
+                return request;
             }
 
-            public void Get(string url, string args)
+            public HttpWebRequest Get(string url, string args = "")
             {
                 var uri = new Uri(Host + url + (args == "" ? "" : "?") + args);
                 var request = (HttpWebRequest) WebRequest.Create(uri);
                 request.Method = "GET";
                 request.ContentType = "text/html;charset=UTF-8";
-                request.CookieContainer = cookie; 
+                request.CookieContainer = cookie;
 
-                Callback(request);
+                return request;
             }
         }
 
         public static void Post(string url, string args, Action<bool, string> callAction)
         {
-            new Base()
+            var request = new Request()
             {
                 OnComplete = callAction
-            }.Post(url, args);
+            };
+            request.GetResponseValue(request.Post(url, args));
+
         }
 
         public static void Get(string url, string args, Action<bool, string> callAction)
         {
-            new Base()
+            var request = new Request()
             {
                 OnComplete = callAction
-            }.Get(url, args);
+            };
+            request.GetResponseValue(request.Get(url, args));
+        }
+
+        public static string GetFile(string url)
+        {
+            var request = new Request();
+            return request.GetResponsePath(request.Get(url));
         }
     }
 }

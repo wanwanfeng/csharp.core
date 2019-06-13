@@ -24,52 +24,57 @@ namespace Library.Extensions
 
         public static Dictionary<object, int> ToIntDic(this Enum type)
         {
-            return type.GetEnumerator().ToDictionary(p => p, q => (int)q);
+            return type.GetEnumerator().ToDictionary(p => p, q => (int) q);
         }
 
         public static Dictionary<string, int> ToDictionary(this Enum type)
         {
-            return type.GetEnumerator().ToDictionary(p => p.ToString(), q => (int)q);
+            return type.GetEnumerator().ToDictionary(p => p.ToString(), q => (int) q);
         }
 
         #region enum
 
-        public static IDictionary<object, T> GetCache<T>(this Enum type) where T : Attribute
+        public static T Get<T>(this Enum type) where T : Attribute
         {
-            return type.GetEnumerator().ToDictionary(p => p, q => type.GetType().GetField(q.ToString()).GetFirstCustomAttribute<T>());
+            return type.GetType().GetField(type.ToString()).GetFirstCustomAttribute<T>();
         }
 
-        public static IDictionary<T, Type> GetCacheTypeValue<T>(this Enum type) where T : struct
+        public static Type GetTypeValue(this Enum type)
         {
-            return type.GetCache<TypeValueAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : null);
+            var v = type.Get<TypeValueAttribute>();
+            return v != null ? v.value : null;
         }
 
-        public static IDictionary<T, TK> GetCacheDefaultValue<T, TK>(this Enum type) where T : struct
+        public static object GetDefaultValue(this Enum type)
         {
-            return type.GetCache<DefaultValueAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? (TK)v.Value.Value : default(TK));
+            var v = type.Get<DefaultValueAttribute>();
+            return v != null ? v.Value : null;
         }
 
-        public static IDictionary<T, string> GetCacheDescription<T>(this Enum type) where T : struct
+        public static string GetDescription(this Enum type)
         {
-            return type.GetCache<DescriptionAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.Description : "");
+            var v = type.Get<DescriptionAttribute>();
+            return v != null ? v.Description : "";
         }
 
-        public static IDictionary<T, string> GetCacheStringValue<T>(this Enum type) where T : struct
+        public static string GetStringValue(this Enum type)
         {
-            return type.GetCache<StringValueAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : "");
+            var v = type.Get<StringValueAttribute>();
+            return v != null ? v.value : "";
         }
 
-        public static IDictionary<T, string> GetCacheHookValue<T>(this Enum type) where T : struct
+        public static string GetHookValue(this Enum type)
         {
-            return type.GetCache<HookValueAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : "");
+            var v = type.Get<HookValueAttribute>();
+            return v != null ? v.value : "";
         }
 
-        public static IDictionary<T, int> GetCacheIntValue<T>(this Enum type) where T : struct
+        public static int GetIntValue(this Enum type)
         {
-            return type.GetCache<IntValueAttribute>().ToDictionary(k => (T)k.Key, v => v.Value != null ? v.Value.value : 0);
+            var v = type.Get<IntValueAttribute>();
+            return v != null ? v.value : 0;
         }
 
         #endregion
-
     }
 }

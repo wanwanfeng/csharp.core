@@ -26,11 +26,24 @@ namespace Library.Extensions
 
         public static string InputPath { get; set; }
 
+        public static string CheckExtension()
+        {
+            var selectExtension = SystemConsole.GetInputStr("请输入文件后缀[如\"cs,cpp\"]:");
+            return (string.IsNullOrEmpty(selectExtension) || selectExtension == "*.*")
+                ? "*.*"
+                : string.Join("|",
+                    selectExtension.Split(',', '|').Select(p => "." + p.TrimStart('*').TrimStart('.')).ToArray());
+        }
+
         public static List<string> CheckPath(string selectExtension = "*.*", SelectType selectType = SelectType.All,
             SearchOption searchOption = SearchOption.AllDirectories)
         {
             if (string.IsNullOrEmpty(selectExtension))
                 selectExtension = SystemConsole.GetInputStr("请输入文件后缀 ('.cs'):");
+
+            var selectExtensions = (string.IsNullOrEmpty(selectExtension) || selectExtension == "*.*")
+                ? new string[0]
+                : selectExtension.Split(',', '|').Select(p => "." + p.TrimStart('*').TrimStart('.')).ToArray();
 
             List<string> files = new List<string>();
             string path = SystemConsole.GetInputStr(
@@ -41,9 +54,6 @@ namespace Library.Extensions
 
             InputPath = path.Replace("\\", "/").TrimEnd('/');
 
-            var selectExtensions = string.IsNullOrEmpty(selectExtension) || selectExtension == "*.*"
-                ? new string[0]
-                : selectExtension.Split(',', '|').Select(p => "." + p.TrimStart('*').TrimStart('.')).ToArray();
             switch (selectType)
             {
                 case SelectType.File:

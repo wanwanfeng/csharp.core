@@ -21,20 +21,23 @@ namespace Library.Helper
             {
                 try
                 {
-                    var response = (HttpWebResponse) request.GetResponse();
-                    response.Cookies = cookie.GetCookies(response.ResponseUri);
-                    using (var rs = response.GetResponseStream())
+                    using (var response = (HttpWebResponse) request.GetResponse())
                     {
-                        if (response.StatusCode == HttpStatusCode.OK)
+                        if (cookie != null)
+                            response.Cookies = cookie.GetCookies(response.ResponseUri);
+                        using (var rs = response.GetResponseStream())
                         {
-                            using (var sr = new StreamReader(rs, Encoding.GetEncoding("utf-8")))
+                            if (response.StatusCode == HttpStatusCode.OK)
                             {
-                                OnComplete.Invoke(true, sr.ReadToEnd());
+                                using (var sr = new StreamReader(rs, Encoding.GetEncoding("utf-8")))
+                                {
+                                    OnComplete.Invoke(true, sr.ReadToEnd());
+                                }
                             }
-                        }
-                        else
-                        {
-                            OnComplete.Invoke(false, response.StatusDescription);
+                            else
+                            {
+                                OnComplete.Invoke(false, response.StatusDescription);
+                            }
                         }
                     }
                 }
@@ -55,7 +58,8 @@ namespace Library.Helper
                     var path = Path.GetTempFileName();
                     using (var response = (HttpWebResponse) request.GetResponse())
                     {
-                        response.Cookies = cookie.GetCookies(response.ResponseUri);
+                        if (cookie != null)
+                            response.Cookies = cookie.GetCookies(response.ResponseUri);
                         using (var myResponseStream = response.GetResponseStream())
                         {
                             if (myResponseStream == null)
@@ -135,7 +139,10 @@ namespace Library.Helper
 
         public static string GetFile(string url)
         {
-            var request = new Request();
+            var request = new Request()
+            {
+                OnComplete = (state, res) => { }
+            };
             return request.GetResponsePath(request.Get(url));
         }
     }

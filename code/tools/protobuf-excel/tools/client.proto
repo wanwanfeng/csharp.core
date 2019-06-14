@@ -1,0 +1,121 @@
+package SProtoSpace;
+
+message userInfo
+{
+	required string username = 1;
+	required string password = 2;
+}
+
+message user_create_req
+{
+	
+}
+
+message user_login_req
+{
+	
+}
+
+message user_logout_req
+{
+	
+}
+message create_room_req
+{
+	required string room_name = 1;
+}
+
+message create_room_ack
+{
+	required int32 ret = 1;     // 0 succ, else fail
+	required int32 room_id = 2;
+	required string room_name = 3;
+	required int32 owner_id = 4;
+	required uint64 jointime = 5;
+}
+
+message room_player_info
+{
+	required int32 id = 1;
+	optional string name = 2;
+	required uint64 jointime = 3;
+}
+
+message room_add_player_ntf
+{
+	required room_player_info member = 1;
+}
+
+
+message room_list_req
+{
+}
+
+message room_info
+{
+	required int32 id = 1;
+	required string name = 2;
+	required int32 owner_id = 3;
+}
+
+message room_list_ack
+{
+	repeated room_info roo_list = 1;
+}
+
+
+message player_leave_room_req
+{
+
+}
+
+message player_leave_room_ack
+{
+	required int32 ret = 1;
+}
+
+message player_leave_room_ntf
+{
+	required room_player_info member = 1; 
+} 
+
+message join_room_req
+{
+	required int32 room_id = 1;
+}
+
+message join_room_ack
+{
+	required int32 ret = 1;
+	required int32 owner_id = 2;
+	repeated room_player_info members = 3;
+}
+
+/*
+message role_room_event_broadcast
+{
+	required bool  cache = 1;
+	required bytes event_data = 2; 
+}
+
+message room_event_broadcast
+{
+	required int32 role_id = 1;
+	required bytes event_data = 2;
+}
+*/
+
+// msg protocol id
+enum eMsgId
+{
+	create_room_req_id = 1;
+	create_room_ack_id = 2;
+	room_add_member_ntf_id = 3;
+	room_list_req_id = 4;
+	room_list_ack_id = 5;
+	player_leave_room_req_id = 6;
+	player_leave_room_ack_id = 7;
+	player_leave_room_ntf_id = 8;
+	join_room_req_id = 9;
+	join_room_ack_id = 10;
+} 

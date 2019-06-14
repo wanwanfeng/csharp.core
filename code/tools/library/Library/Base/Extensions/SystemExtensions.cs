@@ -106,6 +106,23 @@ namespace Library.Extensions
         {
             WriteError(GetType().Name, resList);
         }
+
+
+        public virtual string WriteAllLines(string path, string[] contents)
+        {
+            path = GetType() + "/" + path;
+            DirectoryHelper.CreateDirectory(path);
+            File.WriteAllLines(path, contents);
+            return path;
+        }
+
+        public virtual string WriteAllText(string path, string content)
+        {
+            path = GetType() + "/" + path;
+            DirectoryHelper.CreateDirectory(path);
+            File.WriteAllText(path, content);
+            return path;
+        }
     }
 
     public static class BaseSystemConsoleExtensions

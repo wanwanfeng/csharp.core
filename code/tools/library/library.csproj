@@ -59,6 +59,7 @@
     <Compile Include="Library\Base\Extensions\EventsExtensions.cs" />
     <Compile Include="Library\Base\Extensions\ExceptionExtensions.cs" />
     <Compile Include="Library\Base\Extensions\EnumExtensions.cs" />
+    <Compile Include="Library\Base\Extensions\DataTableExtensions.cs" />
     <Compile Include="Library\Base\Extensions\StreamExtensions.cs" />
     <Compile Include="Library\Base\Extensions\RandomExtensions.cs" />
     <Compile Include="Library\Base\Extensions\LinqExtensions.cs" />

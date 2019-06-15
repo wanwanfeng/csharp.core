@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Text;
-using Library.Extensions;
 
 namespace Library.Helper
 {
@@ -11,33 +10,30 @@ namespace Library.Helper
     /// </summary>
     public class WebHelper
     {
-        public class Request
+        public class Base
         {
             public static CookieContainer cookie;
             public static string Host = "";
             public Action<bool, string> OnComplete;
 
-            public void GetResponseValue(HttpWebRequest request)
+            protected void Callback(HttpWebRequest request)
             {
                 try
                 {
-                    using (var response = (HttpWebResponse) request.GetResponse())
+                    var response = (HttpWebResponse) request.GetResponse();
+                    response.Cookies = cookie.GetCookies(response.ResponseUri);
+                    using (var rs = response.GetResponseStream())
                     {
-                        if (cookie != null)
-                            response.Cookies = cookie.GetCookies(response.ResponseUri);
-                        using (var rs = response.GetResponseStream())
+                        if (response.StatusCode == HttpStatusCode.OK)
                         {
-                            if (response.StatusCode == HttpStatusCode.OK)
+                            using (var sr = new StreamReader(rs, Encoding.GetEncoding("utf-8")))
                             {
-                                using (var sr = new StreamReader(rs, Encoding.GetEncoding("utf-8")))
-                                {
-                                    OnComplete.Invoke(true, sr.ReadToEnd());
-                                }
+                                OnComplete.Invoke(true, sr.ReadToEnd());
                             }
-                            else
-                            {
-                                OnComplete.Invoke(false, response.StatusDescription);
-                            }
+                        }
+                        else
+                        {
+                            OnComplete.Invoke(false, response.StatusDescription);
                         }
                     }
                 }
@@ -51,44 +47,7 @@ namespace Library.Helper
                 }
             }
 
-            public string GetResponsePath(HttpWebRequest request)
-            {
-                try
-                {
-                    var path = Path.GetTempFileName();
-                    using (var response = (HttpWebResponse) request.GetResponse())
-                    {
-                        if (cookie != null)
-                            response.Cookies = cookie.GetCookies(response.ResponseUri);
-                        using (var myResponseStream = response.GetResponseStream())
-                        {
-                            if (myResponseStream == null)
-                            {
-                                OnComplete.Invoke(false, null);
-                                return null;
-                            }
-                            using (var fw = new FileStream(path, FileMode.OpenOrCreate))
-                            {
-                                myResponseStream.CopyTo(fw);
-                            }
-                        }
-                    }
-                    OnComplete.Invoke(false, path);
-                    return path;
-                }
-                catch (WebException e)
-                {
-                    OnComplete.Invoke(false, e.Message);
-                    return null;
-                }
-                catch (Exception e)
-                {
-                    OnComplete.Invoke(false, e.Message);
-                    return null;
-                }
-            }
-
-            public HttpWebRequest Post(string url, string args = "")
+            public void Post(string url, string args)
             {
                 var uri = new Uri(Host + url);
                 var request = (HttpWebRequest) WebRequest.Create(uri);
@@ -103,47 +62,35 @@ namespace Library.Helper
                     sw.Write(args);
                 }
 
-                return request;
+                Callback(request);
             }
 
-            public HttpWebRequest Get(string url, string args = "")
+            public void Get(string url, string args)
             {
                 var uri = new Uri(Host + url + (args == "" ? "" : "?") + args);
                 var request = (HttpWebRequest) WebRequest.Create(uri);
                 request.Method = "GET";
                 request.ContentType = "text/html;charset=UTF-8";
-                request.CookieContainer = cookie;
+                request.CookieContainer = cookie; 
 
-                return request;
+                Callback(request);
             }
         }
 
-        public static void Post(string url, string args, Action<bool, string> callAction)
+        public static void Post(string url, string args = null, Action<bool, string> callAction = null)
         {
-            var request = new Request()
+            new Base()
             {
                 OnComplete = callAction
-            };
-            request.GetResponseValue(request.Post(url, args));
-
+            }.Post(url, args);
         }
 
-        public static void Get(string url, string args, Action<bool, string> callAction)
+        public static void Get(string url, string args = null, Action<bool, string> callAction = null)
         {
-            var request = new Request()
+            new Base()
             {
                 OnComplete = callAction
-            };
-            request.GetResponseValue(request.Get(url, args));
-        }
-
-        public static string GetFile(string url)
-        {
-            var request = new Request()
-            {
-                OnComplete = (state, res) => { }
-            };
-            return request.GetResponsePath(request.Get(url));
+            }.Get(url, args);
         }
     }
 }

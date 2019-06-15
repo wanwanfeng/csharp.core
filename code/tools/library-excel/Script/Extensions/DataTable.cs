@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using Library.Helper;
+using Library.Extensions;
 using LitJson;
 
 namespace Library.Excel
@@ -81,13 +80,5 @@ namespace Library.Excel
         }
 
         #endregion
-    }
-}
-
-public static class DataTableExtensions
-{
-    public static List<string> GetHeaderList(this System.Data.DataTable dt)
-    {
-        return (from DataColumn dc in dt.Columns select dc.ColumnName).ToList();
     }
 }

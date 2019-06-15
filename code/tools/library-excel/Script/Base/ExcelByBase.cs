@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Library.Excel
@@ -34,10 +35,11 @@ namespace Library.Excel
             /// 未经过滤原样输出
             /// </summary>
             /// <param name="file"></param>
+            /// <param name="lineCount"></param>
             /// <returns></returns>
-            public static IEnumerable<DataTable> ImportToDataTable(string file)
+            public static IEnumerable<DataTable> ImportToDataTable(string file, int lineCount = int.MaxValue)
             {
-                return ExcelByNpoi.ImportExcelToDataTable(file);
+                return ExcelByNpoi.ImportExcelToDataTable(file, lineCount);
             }
 
             public static void ExportToExcel(DataTable dt, string file)

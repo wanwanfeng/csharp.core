@@ -71,6 +71,7 @@
     <Compile Include="Script\Extensions\DataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Script\Extensions\DataTableExtensions.cs" />
     <Compile Include="Script\Extensions\ExcelByNpoiExtensions.cs" />
     <Compile Include="Script\ExcelByOffice.cs" />
     <Compile Include="Script\ExcelByOleDb.cs" />

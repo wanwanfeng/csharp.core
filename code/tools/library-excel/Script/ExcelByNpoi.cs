@@ -113,24 +113,26 @@ namespace Library.Excel
 
                 //表头  
                 IRow header = sheet.GetRow(sheet.FirstRowNum);
-                for (int i = 0; i < header.LastCellNum; i++)
-                {
-                    object obj = GetValueType(header.GetCell(i));
-                    if (obj == null || obj.ToString() == string.Empty)
-                        dt.Columns.Add(new DataColumn("Columns" + i));
-                    else
-                        dt.Columns.Add(new DataColumn(obj.ToString()));
-                }
-                //数据  
-                //for (int i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)//不包括第一行
-                //for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)包括第一行
-
+                //数据
                 var srartLine = sheet.FirstRowNum + (containsFirstLine ? 0 : 1);
                 for (int i = srartLine; i <= sheet.LastRowNum; i++)
                 {
                     IRow row = sheet.GetRow(i);
                     if (row == null) continue;
                     if (row.Cells.Count == 0) continue;
+
+                    //创建列
+                    var cha = row.Cells.Count - dt.Columns.Count;
+                    for (; cha > 0; cha--)
+                    {
+                        object obj = GetValueType(header.GetCell(dt.Columns.Count));
+                        if (obj == null || obj.ToString() == string.Empty)
+                            dt.Columns.Add(new DataColumn("Columns" + dt.Columns.Count));
+                        else
+                            dt.Columns.Add(new DataColumn(obj.ToString()));
+                    }
+
+                    //创建行
                     DataRow dr = dt.NewRow();
                     for (int j = 0; j < dt.Columns.Count; j++)
                         dr[j] = GetValueType(row.GetCell(j));
@@ -228,8 +230,9 @@ namespace Library.Excel
         /// Excel导入成Datable
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
+        /// <param name="lineCount">读取的行数</param>
         /// <returns></returns>
-        public static List<DataTable> ImportExcelToDataTable(string file)
+        public static List<DataTable> ImportExcelToDataTable(string file, int lineCount = int.MaxValue)
         {
             var list = new List<DataTable>();
             ImportExcel(file, (fileName, sheet) =>
@@ -241,25 +244,20 @@ namespace Library.Excel
                     TableName = sheet.SheetName,
                 };
 
-                //表头  
-                var maxColumsNum = 0;
-                for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)
-                {
-                    IRow row = sheet.GetRow(i);
-                    if (row == null) continue;
-                    if (row.Cells.Count == 0) continue;
-                    maxColumsNum = Math.Max(sheet.GetRow(i).LastCellNum, maxColumsNum);
-                }
-                for (int i = 0; i < maxColumsNum; i++)
-                    dt.Columns.Add(new DataColumn("Columns" + i));
-
                 //数据  
-                for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)
+                int readCount = Math.Max(0, Math.Min(lineCount, sheet.LastRowNum - sheet.FirstRowNum));
+                for (int i = sheet.FirstRowNum; i < sheet.FirstRowNum + readCount; i++)
                 {
                     IRow row = sheet.GetRow(i);
                     if (row == null) continue;
                     if (row.Cells.Count == 0) continue;
 
+                    //创建列
+                    var cha = row.Cells.Count - dt.Columns.Count;
+                    for (; cha > 0; cha--)
+                        dt.Columns.Add(new DataColumn("Columns" + dt.Columns.Count));
+
+                    //创建行
                     DataRow dr = dt.NewRow();
                     for (int j = 0; j < dt.Columns.Count; j++)
                         dr[j] = GetValueType(row.GetCell(j));

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library.Excel;
 using Library.Extensions;
 using protobuf_excel;
 
@@ -64,7 +65,7 @@ public class CreateProto20 : CreateProto
                 return new
                 {
                     file = p,
-                    dts = ExportExcel.ImportExcelToDataTable(p, table.lines.Count(c => c >= 0)).Where(q => q != null)
+                    dts = ExcelByBase.Data.ImportToDataTable(p, table.lines.Count(c => c >= 0)).Where(q => q != null)
                         .ToList()
                 };
             }).Select((p, index) =>

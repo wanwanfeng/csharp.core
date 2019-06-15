@@ -80,82 +80,123 @@ public class CreateProto20 : CreateProto
 
                 var dt = p.dts.First();
 
-                if (dt.Rows.Count == 1)
+                try
                 {
-                    //字段名
-                    for (int i = 0; i < dt.Columns.Count; i++)
+                    if (dt.Rows.Count == 1)
                     {
-                        var name = dt.Rows[table.nameline][i].ToString();
-                        if (name.StartsWith("#")) continue;
-                        list.Add(string.Format("{0}	{1} = {2};", "	optional string", name, i + 1));
-                    }
-                }
-                else if (dt.Rows.Count == 2)
-                {
-                    //字段名
-                    //类型
-                    for (int i = 0; i < dt.Columns.Count; i++)
-                    {
-                        var name = dt.Rows[table.nameline][i].ToString();
-                        if (name.StartsWith("#")) continue;
-                        var type = dt.Rows[table.typeline][i].ToString();
-                        if (type.StartsWith("#")) continue;
-                        if (cacheProto.ContainsKey(type))
-                            list.Add(string.Format("{0} {1} = {2};", cacheProto[type], name, i + 1));
-                        else
-                            list.Add(string.Format("{0} {1} = {2};", "	optional string", name, i + 1));
-                    }
-                }
-                else if (dt.Rows.Count == 3)
-                {
-                    //描述
-                    //字段名
-                    //类型
-                    for (int i = 0; i < dt.Columns.Count; i++)
-                    {
-                        var remark = dt.Rows[table.descline][i].ToString().Replace("\r", ";").Replace("\n", ";");
-                        if (remark.StartsWith("#")) continue;
-                        var name = dt.Rows[table.nameline][i].ToString();
-                        if (name.StartsWith("#")) continue;
-                        var type = dt.Rows[table.typeline][i].ToString();
-                        if (type.StartsWith("#")) continue;
-                        if (cacheProto.ContainsKey(type))
-                            list.Add(string.Format("{0} {1} = {2}; // {3}", cacheProto[type], name, i + 1, remark));
-                        else
-                            list.Add(string.Format("{0} {1} = {2}; // {3}", "	optional string", name, i + 1, remark));
-                    }
-                }
-                else if (dt.Rows.Count == 4)
-                {
-                    //键标注
-                    //描述
-                    //字段名
-                    //类型
-                    for (int i = 0; i < dt.Columns.Count; i++)
-                    {
-                        var remark = dt.Rows[table.descline][i].ToString().Replace("\r", ";").Replace("\n", ";");
-                        if (remark.StartsWith("#")) continue;
-                        var name = dt.Rows[table.nameline][i].ToString();
-                        if (name.StartsWith("#")) continue;
-                        var type = dt.Rows[table.typeline][i].ToString();
-                        if (type.StartsWith("#")) continue;
-                        if (cacheProto.ContainsKey(type))
-                            list.Add(string.Format("{0} {1} = {2}; // {3}", cacheProto[type], name, i + 1, remark));
-                        else
-                            list.Add(string.Format("{0} {1} = {2}; // {3}", "	optional string", name, i + 1, remark));
+                        //字段名
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            var name = dt.Rows[table.nameline][i].ToString();
+                            if (string.IsNullOrEmpty(name))
+                                throw new Exception("字段名称未设置！");
+                            if (name.StartsWith("#")) continue;
 
-                        var key = dt.Rows[table.keysline][i].ToString();
-                        if (string.IsNullOrEmpty(key)) continue;
-                        if (key.StartsWith("#")) continue;
+                            list.Add(string.Format("{0}	{1} = {2};", "	optional string", name, i + 1));
+                        }
+                    }
+                    else if (dt.Rows.Count == 2)
+                    {
+                        //字段名
+                        //类型
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            var name = dt.Rows[table.nameline][i].ToString();
+                            if (string.IsNullOrEmpty(name))
+                                throw new Exception("字段名称未设置！");
+                            if (name.StartsWith("#")) continue;
 
-                        names.Add(name);
-                        types.Add(type);
+                            var type = dt.Rows[table.typeline][i].ToString();
+                            if (string.IsNullOrEmpty(type))
+                                throw new Exception("字段类型未设置！");
+                            if (type.StartsWith("#")) continue;
+
+                            if (cacheProto.ContainsKey(type))
+                                list.Add(string.Format("{0} {1} = {2};", cacheProto[type], name, i + 1));
+                            else
+                                list.Add(string.Format("{0} {1} = {2};", "	optional string", name, i + 1));
+                        }
+                    }
+                    else if (dt.Rows.Count == 3)
+                    {
+                        //描述
+                        //字段名
+                        //类型
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            var remark = dt.Rows[table.descline][i].ToString().Replace("\r", ";").Replace("\n", ";");
+                            if (remark.StartsWith("#")) continue;
+
+                            var name = dt.Rows[table.nameline][i].ToString();
+                            if (string.IsNullOrEmpty(name))
+                                throw new Exception("字段名称未设置！");
+                            if (name.StartsWith("#")) continue;
+
+                            var type = dt.Rows[table.typeline][i].ToString();
+                            if (string.IsNullOrEmpty(type))
+                                throw new Exception("字段类型未设置！");
+                            if (type.StartsWith("#")) continue;
+
+
+                            if (cacheProto.ContainsKey(type))
+                                list.Add(string.Format("{0} {1} = {2}; // {3}", cacheProto[type], name, i + 1, remark));
+                            else
+                                list.Add(string.Format("{0} {1} = {2}; // {3}", "	optional string", name, i + 1, remark));
+                        }
+                    }
+                    else if (dt.Rows.Count == 4)
+                    {
+                        //键标注
+                        //描述
+                        //字段名
+                        //类型
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            var remark = dt.Rows[table.descline][i].ToString().Replace("\r", ";").Replace("\n", ";");
+                            if (remark.StartsWith("#")) continue;
+                            
+                            var name = dt.Rows[table.nameline][i].ToString();
+                            if (string.IsNullOrEmpty(name))
+                                throw new Exception("字段名称未设置！");
+                            if (name.StartsWith("#")) continue;
+
+                            var type = dt.Rows[table.typeline][i].ToString();
+                            if (string.IsNullOrEmpty(type))
+                                throw new Exception("字段类型未设置！");
+                            if (type.StartsWith("#")) continue;
+
+                            if (cacheProto.ContainsKey(type))
+                                list.Add(string.Format("{0} {1} = {2}; // {3}", cacheProto[type], name, i + 1, remark));
+                            else
+                                list.Add(string.Format("{0} {1} = {2}; // {3}", "	optional string", name, i + 1, remark));
+
+                            var key = dt.Rows[table.keysline][i].ToString();
+                            if (string.IsNullOrEmpty(key)) continue;
+                            if (key.StartsWith("#")) continue;
+
+                            names.Add(name);
+                            types.Add(type);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("没有的配置类型！");
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    throw new Exception("没有的配置类型！");
+                    Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        Console.WriteLine(string.Join("\t|", dt.Rows[i].ItemArray.Select(q => q.ToString()).ToArray()));
+                    }
+                    Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+
+                    throw;
                 }
+
                 list.Add("}");
 
                 //WriteAllText(string.Format("tables/Info/{0}.cs", fileInfo),

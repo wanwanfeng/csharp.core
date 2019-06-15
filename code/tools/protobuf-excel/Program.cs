@@ -65,9 +65,47 @@ namespace protobuf_excel
         /// Excel导入成Datable
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
-        /// <param name="lineCount">只去取前三行</param>
+        /// <param name="lineCount">取得行数</param>
         /// <returns></returns>
         public static List<DataTable> ImportExcelToDataTable(string file, int lineCount = Int32.MaxValue)
+        {
+            var list = new List<DataTable>();
+            ImportExcel(file, (fileName, sheet) =>
+            {
+                DataTable dt = new DataTable();
+
+                //表名
+                dt.TableName = sheet.SheetName;
+
+                //表头  
+                IRow header = sheet.GetRow(sheet.FirstRowNum);
+                for (int i = 0; i < header.LastCellNum; i++)
+                    dt.Columns.Add(new DataColumn("Columns" + i));
+
+                //数据  
+                int readCount = Math.Max(0, Math.Min(lineCount, sheet.LastRowNum - sheet.FirstRowNum));
+                for (int i = sheet.FirstRowNum; i < sheet.FirstRowNum + readCount; i++)
+                {
+                    IRow row = sheet.GetRow(i);
+                    if (row == null) continue;
+                    if (row.Cells.Count == 0) continue;
+                    DataRow dr = dt.NewRow();
+                    for (int j = 0; j < dt.Columns.Count; j++)
+                        dr[j] = GetValueType(row.GetCell(j));
+                    dt.Rows.Add(dr);
+                }
+                list.Add(dt);
+            });
+            return list;
+        }
+
+        /// <summary>
+        /// Excel导入成Datable
+        /// </summary>
+        /// <param name="file">导入路径(包含文件名与扩展名)</param>
+        /// <param name="runAction"></param>
+        /// <returns></returns>
+        public static void ImportExcel(string file, Action<string, ISheet> runAction)
         {
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -88,60 +126,16 @@ namespace protobuf_excel
                 }
                 if (workbook == null)
                 {
-                    return null;
+                    return;
                 }
 
-                var list = new List<DataTable>();
                 for (int index = 0; index < workbook.NumberOfSheets; index++)
                 {
                     ISheet sheet = workbook.GetSheetAt(index);
                     if (sheet.LastRowNum == 0) continue;
 
-                    DataTable dt = new DataTable
-                    {
-                        TableName = sheet.SheetName,
-                    };
-
-                    //表头  
-                    IRow header = sheet.GetRow(sheet.FirstRowNum);
-                    List<int> columns = new List<int>();
-                    for (int i = 0; i < header.LastCellNum; i++)
-                    {
-                        //object obj = GetValueType(header.GetCell(i));
-                        //if (obj == null || obj.ToString() == string.Empty)
-                        //{
-                        //    dt.Columns.Add(new DataColumn("Columns" + i));
-                        //}
-                        //else
-                        //    dt.Columns.Add(new DataColumn(obj.ToString()));
-                        //columns.Add(i);
-
-                        dt.Columns.Add(new DataColumn("Columns" + i));
-                        columns.Add(i);
-                    }
-
-                    //数据  
-                    int max = Math.Max(0, Math.Min(lineCount, sheet.LastRowNum));
-                    for (int i = sheet.FirstRowNum; i < max; i++)
-                    {
-                        DataRow dr = dt.NewRow();
-                        bool hasValue = false;
-                        foreach (int j in columns)
-                        {
-                            dr[j] = GetValueType(sheet.GetRow(i).GetCell(j));
-                            if (dr[j] != null && dr[j].ToString() != string.Empty)
-                            {
-                                hasValue = true;
-                            }
-                        }
-                        if (hasValue)
-                        {
-                            dt.Rows.Add(dr);
-                        }
-                    }
-                    list.Add(dt);
+                    runAction.Invoke(file, sheet);
                 }
-                return list;
             }
         }
     }

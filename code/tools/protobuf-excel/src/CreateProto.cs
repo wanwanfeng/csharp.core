@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Library;
+using Library.Excel;
 using Library.Extensions;
 
 public class CreateProto : BaseSystemConsole
@@ -114,4 +117,17 @@ namespace $namespace$ {
 		public override string Name { get { return $FileName$; } }
 	}";
 
+
+
+    protected void ErrorOut(Exception e, DataTable dt)
+    {
+        Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+        Console.WriteLine(e.Message);
+        Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+        for (int i = 0; i < dt.Rows.Count; i++)
+        {
+            Console.WriteLine(string.Join("\t|", dt.Rows[i].ItemArray.Select(q => q.ToString()).ToArray()));
+        }
+        Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+    }
 }

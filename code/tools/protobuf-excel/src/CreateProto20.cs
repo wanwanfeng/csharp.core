@@ -185,15 +185,7 @@ public class CreateProto20 : CreateProto
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
-                    for (int i = 0; i < dt.Columns.Count; i++)
-                    {
-                        Console.WriteLine(string.Join("\t|", dt.Rows[i].ItemArray.Select(q => q.ToString()).ToArray()));
-                    }
-                    Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
-
+                    ErrorOut(e, dt);
                     throw;
                 }
 

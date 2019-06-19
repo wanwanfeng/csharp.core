@@ -62,6 +62,7 @@ namespace $namespace$ {
 	}
 
 	public partial class Data$Master$Base<T, TK> : IData$Master$Base<T, TK> where T : IData$Entity$Base<TK> {
+		public static tables tables { get; set; }
 		public virtual string Name { get; }
 		public List<T> List { get; set; }
 		public Dictionary<TK, T> Cache { get; set; }
@@ -70,10 +71,13 @@ namespace $namespace$ {
 			Cache = new Dictionary<TK, T> ();
 		}
 
-		public void Init (List<T> list) {
-			List = list;
-			Cache = list.ToDictionary (p => p.getKey ());
+		public virtual void Init () {
+			List.TrimExcess();
+			Cache = List.ToDictionary (p => p.getKey ());
+			OnInitEnd ();
 		}
+
+		partial void OnInitEnd ();
 
 		public virtual T Get$Entity$ (TK key) {
 			T t = default (T);
@@ -115,6 +119,10 @@ namespace $namespace$ {
     public string str_master = @"
 	public partial class $MasterName$ : $Partent$ {
 		public override string Name { get { return $FileName$; } }
+		public override void Init () {
+			List.AddRange (tables.$MasterName$);
+			base.Init ();
+		}
 	}";
 
 

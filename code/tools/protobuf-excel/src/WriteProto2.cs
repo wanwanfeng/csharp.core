@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Table;
 
 namespace protobuf_excel
 {
@@ -11,7 +10,7 @@ namespace protobuf_excel
     {
         public WriteProto2()
         {
-            AudioInfo audio = new AudioInfo();
+           
         }
     }
 }

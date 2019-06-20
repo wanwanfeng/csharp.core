@@ -128,35 +128,7 @@ namespace $namespace$ {
 
     public virtual string str_data_master
     {
-        get
-        {
-            return @"using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using UnityEngine;
-
-namespace $namespace$ {
-    public partial class Data$Master$Manager {
-
-        public static tables tables { get; set; }
-
-        public List<IData$Master$Base> dataObjects { get; private set; }
-
-$ListField$
-
-        public Data$Master$Manager () {
-            dataObjects = new List<IData$Master$Base> ();
-$List$
-        }
-
-        public void Init () {
-            var stream = new MemoryStream (UnityEngine.Resources.Load<TextAsset> (""masters"").bytes);
-            ProtoBuf.Serializer.Serialize<tables> (stream, tables);
-            dataObjects.ForEach (p => p.Init ());
-        }
-    }
-}";
-        }
+        get { return @""; }
     }
 
     protected void ErrorOut(Exception e, DataTable dt)
@@ -169,5 +141,31 @@ $List$
             Console.WriteLine(string.Join("\t|", dt.Rows[i].ItemArray.Select(q => q.ToString()).ToArray()));
         }
         Console.WriteLine("-".PadLeft(Console.WindowWidth - 1, '-'));
+    }
+
+    public string _Entity = "Info";
+    public string _Master = "Table";
+    public string _NameSpace = "Table";
+
+    public string Replace(string str)
+    {
+        return str.Replace("$namespace$", _NameSpace).Replace("$Entity$", _Entity).Replace("$Master$", _Master);
+    }
+
+    protected void CreateCS(List<string> relultTableList, List<string> relultInfosList, List<string> fileList)
+    {
+        relultTableList.Add("}");
+        WriteAllLines("tables/Base/DataTableBase.cs", relultTableList.ToArray());
+        relultInfosList.Add("}");
+        WriteAllLines("tables/Base/DataInfoBase.cs", relultInfosList.ToArray());
+
+        WriteAllText("tables/Base/IDataInfoBase.cs", Replace(str_IDataEntityBase));
+        WriteAllText("tables/Base/IDataTableBase.cs", Replace(str_IDataMasterBase));
+
+        string temp = 
+            Replace(str_data_master)
+            .Replace("$List$",string.Join("\n",fileList.Select(p => string.Format("\t\t\tdataObjects.Add ({0} = new {0}());", p)).ToArray()))
+            .Replace("$ListField$",string.Join("\n", fileList.Select(p => string.Format("\t\tpublic {0} {0} {{ get; set; }}", p)).ToArray()));
+        WriteAllText("tables/DataTableManager.cs", temp);
     }
 }

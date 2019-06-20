@@ -27,11 +27,6 @@ public class CreateProto3 : CreateProto
     public string _Master = "Table";
     public string _NameSpace = "Table";
 
-    public string Replace(string str)
-    {
-        return str.Replace("$namespace$", _NameSpace).Replace("$Entity$", _Entity).Replace("$Master$", _Master);
-    }
-
     public CreateProto3()
     {
         var relultTableList = new List<string>()
@@ -248,19 +243,7 @@ public class CreateProto3 : CreateProto
         string cmd = "protoc.exe --proto_path=./ --csharp_out=./{0} tables.proto";
         CmdReadAll(string.Format(cmd, GetType().Name)).ForEach(p => Console.WriteLine(p));
 
-        relultTableList.Add("}");
-        WriteAllLines("tables/Base/DataTableBase.cs", relultTableList.ToArray());
-        relultInfosList.Add("}");
-        WriteAllLines("tables/Base/DataInfoBase.cs", relultInfosList.ToArray());
-
-        WriteAllText("tables/Base/IDataInfoBase.cs", Replace(str_IDataEntityBase));
-        WriteAllText("tables/Base/IDataTableBase.cs", Replace(str_IDataMasterBase));
-
-        string temp = Replace(str_data_master)
-            .Replace("$List$", string.Join("\n", fileList.Select(p => string.Format("\t\t\tdataObjects.Add ({0} = new {0}());", p)).ToArray()))
-            .Replace("$ListField$", string.Join("\n", fileList.Select(p => string.Format("\t\tpublic {0} {0} {{ get; set; }}", p)).ToArray()));
-        WriteAllText("tables/DataTableManager.cs", temp);
-
+        CreateCS(relultTableList, relultInfosList, fileList);
     }
 
     public override string str_data_master

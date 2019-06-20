@@ -34,9 +34,6 @@ public class CreateProto3 : CreateProto
 
     public CreateProto3()
     {
-        WriteAllText("tables/Base/IDataInfoBase.cs", Replace(str_IDataEntityBase));
-        WriteAllText("tables/Base/IDataTableBase.cs", Replace(str_IDataMasterBase));
-
         var relultTableList = new List<string>()
         {
             "namespace " + _NameSpace,
@@ -59,7 +56,7 @@ public class CreateProto3 : CreateProto
             "package " + _NameSpace + ";",
         };
 
-        CheckPath(".xls|.xlsx")
+        var fileList =  CheckPath(".xls|.xlsx")
             .Select((p, index) =>
             {
                 return new
@@ -75,8 +72,9 @@ public class CreateProto3 : CreateProto
                 Console.WriteLine(p.file);
                 var list = new List<string> {string.Format("\nmessage {0}", fileInfo), "{"};
 
-                var names = new List<string>();
-                var types = new List<string>();
+                var keyNames = new List<string>();
+                var keyTypes = new List<string>();
+                var Names = new List<string>();
 
                 var dt = p.dts.First();
 
@@ -150,6 +148,7 @@ public class CreateProto3 : CreateProto
                         //描述
                         //字段名
                         //类型
+                        int line = 1;
                         for (int i = 0; i < dt.Columns.Count; i++)
                         {
                             var remark = dt.Rows[table.descline][i].ToString().Replace("\r", ";").Replace("\n", ";");
@@ -166,16 +165,17 @@ public class CreateProto3 : CreateProto
                             if (type.StartsWith("#")) continue;
 
                             if (cacheProto.ContainsKey(type))
-                                list.Add(string.Format("{0} {1} = {2}; // {3}", cacheProto[type], name, i + 1, remark));
+                                list.Add(string.Format("{0} {1} = {2}; // {3}", cacheProto[type], name, line++,
+                                    remark));
                             else
-                                list.Add(string.Format("{0} {1} = {2}; // {3}", "	string", name, i + 1, remark));
+                                list.Add(string.Format("{0} {1} = {2}; // {3}", "	string", name, line++, remark));
 
                             var key = dt.Rows[table.keysline][i].ToString();
                             if (string.IsNullOrEmpty(key)) continue;
                             if (key.StartsWith("#")) continue;
 
-                            names.Add(name);
-                            types.Add(type);
+                            keyNames.Add(name);
+                            keyTypes.Add(type);
                         }
                     }
                     else
@@ -198,20 +198,21 @@ public class CreateProto3 : CreateProto
                 //        .Replace("$IdType$", types[0])
                 //);
 
-                string keyString = types.Count == 0
+                string keyString = keyTypes.Count == 0
                     ? ""
-                    : string.Format(" DataInfoBase<{0}>", string.Join(",", types.ToArray()));
+                    : string.Format(" DataInfoBase<{0}>", string.Join(",", keyTypes.ToArray()));
+
                 relultInfosList.Add(
                     Replace(str_entity)
                         .Replace("$EntityName$", fileInfo)
                         .Replace("$Partent$", keyString)
-                        .Replace("$Id$", names[0])
-                        .Replace("$IdType$", types[0]));
+                        .Replace("$Id$", keyNames[0]+"_")
+                        .Replace("$IdType$", keyTypes[0])
+                        );
 
-                return new {list = list, fileInfo = fileInfo, table = fileTable, index = index, types = types};
+                return new { list = list, fileInfo = fileInfo, table = fileTable, index = index, keyTypes = keyTypes };
             })
-            .ToList()
-            .ForEach(p =>
+            .Select(p =>
             {
                 infos.AddRange(p.list);
                 tables.Add(string.Format("   repeated  {0} {1} = {2};", p.fileInfo, p.table, p.index + 1));
@@ -224,9 +225,10 @@ public class CreateProto3 : CreateProto
                 //    "}"
                 //});
 
-                string keys = p.types.Count == 0
+                string keys = p.keyTypes.Count == 0
                     ? ""
-                    : string.Format(", {0}", string.Join(",", p.types.ToArray()));
+                    : string.Format(", {0}", string.Join(",", p.keyTypes.ToArray()));
+
                 keys = string.Format(" DataTableBase<{0}{1}>", p.fileInfo, keys);
                 relultTableList.Add(
                     Replace(str_master)
@@ -234,23 +236,62 @@ public class CreateProto3 : CreateProto
                         .Replace("$MasterName$", p.table)
                         .Replace(" $FileName$", "\"" + p.table + "\"")
 
-                    );
-            }
-            );
+                );
+                return p.table;
+            }).ToList();
+
         tables.Add("}");
         infos.AddRange(tables);
         string tables_path = WriteAllLines("tables.proto", infos.ToArray());
-
-        string cmd = "protoc.exe --proto_path=./{0} tables.proto --csharp_out=./{0} --print_free_field_numbers";
+		
+        File.Copy(tables_path, "tables.proto");
+        string cmd = "protoc.exe --proto_path=./ --csharp_out=./{0} tables.proto";
         CmdReadAll(string.Format(cmd, GetType().Name)).ForEach(p => Console.WriteLine(p));
-
-        //string cmd = "protogen.exe -i:{0} -o:{1} -p:partialMethods";
-        //CmdReadAll(string.Format(cmd, tables_path, Path.ChangeExtension(tables_path, ".cs")))
-        //    .ForEach(p => Console.WriteLine(p));
 
         relultTableList.Add("}");
         WriteAllLines("tables/Base/DataTableBase.cs", relultTableList.ToArray());
         relultInfosList.Add("}");
         WriteAllLines("tables/Base/DataInfoBase.cs", relultInfosList.ToArray());
+
+        WriteAllText("tables/Base/IDataInfoBase.cs", Replace(str_IDataEntityBase));
+        WriteAllText("tables/Base/IDataTableBase.cs", Replace(str_IDataMasterBase));
+
+        string temp = Replace(str_data_master)
+            .Replace("$List$", string.Join("\n", fileList.Select(p => string.Format("\t\t\tdataObjects.Add ({0} = new {0}());", p)).ToArray()))
+            .Replace("$ListField$", string.Join("\n", fileList.Select(p => string.Format("\t\tpublic {0} {0} {{ get; set; }}", p)).ToArray()));
+        WriteAllText("tables/DataTableManager.cs", temp);
+
+    }
+
+    public override string str_data_master
+    {
+        get
+        {
+            return @"using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+
+namespace $namespace$ {
+    public partial class Data$Master$Manager {
+
+        public static tables tables { get; set; }
+
+        public List<IData$Master$Base> dataObjects { get; private set; }
+
+$ListField$
+
+        public Data$Master$Manager () {
+            dataObjects = new List<IData$Master$Base> ();
+$List$
+        }
+
+        public void Init () {
+            tables = Table.tables.Parser.ParseFrom (System.Convert.FromBase64String (System.IO.File.ReadAllText (""masters.data"")));
+            dataObjects.ForEach (p => p.Init ());
+        }
+    }
+}";
+        }
     }
 }

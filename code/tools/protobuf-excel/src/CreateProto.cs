@@ -53,6 +53,7 @@ using System.Linq;
 
 namespace $namespace$ {
 	public partial interface IData$Master$Base {
+		void Init();
 		string Name { get; }
 	}
 	public partial interface IData$Master$Base<T, TK> : IData$Master$Base where T : IData$Entity$Base<TK> {
@@ -62,10 +63,10 @@ namespace $namespace$ {
 	}
 
 	public partial class Data$Master$Base<T, TK> : IData$Master$Base<T, TK> where T : IData$Entity$Base<TK> {
-		public static tables tables { get; set; }
 		public virtual string Name { get; }
 		public List<T> List { get; set; }
 		public Dictionary<TK, T> Cache { get; set; }
+
 		protected Data$Master$Base () {
 			List = new List<T> ();
 			Cache = new Dictionary<TK, T> ();
@@ -120,12 +121,43 @@ namespace $namespace$ {
 	public partial class $MasterName$ : $Partent$ {
 		public override string Name { get { return $FileName$; } }
 		public override void Init () {
-			List.AddRange (tables.$MasterName$);
+			List.AddRange (Data$Master$Manager.tables.$MasterName$);
 			base.Init ();
 		}
 	}";
 
+    public virtual string str_data_master
+    {
+        get
+        {
+            return @"using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
 
+namespace $namespace$ {
+    public partial class Data$Master$Manager {
+
+        public static tables tables { get; set; }
+
+        public List<IData$Master$Base> dataObjects { get; private set; }
+
+$ListField$
+
+        public Data$Master$Manager () {
+            dataObjects = new List<IData$Master$Base> ();
+$List$
+        }
+
+        public void Init () {
+            var stream = new MemoryStream (UnityEngine.Resources.Load<TextAsset> (""masters"").bytes);
+            ProtoBuf.Serializer.Serialize<tables> (stream, tables);
+            dataObjects.ForEach (p => p.Init ());
+        }
+    }
+}";
+        }
+    }
 
     protected void ErrorOut(Exception e, DataTable dt)
     {

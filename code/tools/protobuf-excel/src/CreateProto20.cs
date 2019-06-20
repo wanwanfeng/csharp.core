@@ -27,11 +27,6 @@ public class CreateProto20 : CreateProto
     public string _Master = "Table";
     public string _NameSpace = "Table";
 
-    public string Replace(string str)
-    {
-        return str.Replace("$namespace$", _NameSpace).Replace("$Entity$", _Entity).Replace("$Master$", _Master);
-    }
-
     public CreateProto20()
     {
         var relultTableList = new List<string>()
@@ -248,18 +243,39 @@ public class CreateProto20 : CreateProto
         string cmd = "protogen.exe -i:{0} -o:{1} -p:partialMethods";
         CmdReadAll(string.Format(cmd, tables_path, Path.ChangeExtension(tables_path, ".cs"))).ForEach(p => Console.WriteLine(p));
 
-        relultTableList.Add("}");
-        WriteAllLines("tables/Base/DataTableBase.cs", relultTableList.ToArray());
-        relultInfosList.Add("}");
-        WriteAllLines("tables/Base/DataInfoBase.cs", relultInfosList.ToArray());
+        CreateCS(relultTableList, relultInfosList, fileList);
+    }
 
-        WriteAllText("tables/Base/IDataInfoBase.cs", Replace(str_IDataEntityBase));
-        WriteAllText("tables/Base/IDataTableBase.cs", Replace(str_IDataMasterBase));
+    public override string str_data_master
+    {
+        get
+        {
+            return @"using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
 
-        string temp = Replace(str_data_master)
-            .Replace("$List$", string.Join("\n", fileList.Select(p => string.Format("\t\t\tdataObjects.Add ({0} = new {0}());", p)).ToArray()))
-            .Replace("$ListField$", string.Join("\n", fileList.Select(p => string.Format("\t\tpublic {0} {0} {{ get; set; }}", p)).ToArray()));
-        WriteAllText("tables/DataTableManager.cs", temp);
+namespace $namespace$ {
+    public partial class Data$Master$Manager {
 
+        public static tables tables { get; set; }
+
+        public List<IData$Master$Base> dataObjects { get; private set; }
+
+$ListField$
+
+        public Data$Master$Manager () {
+            dataObjects = new List<IData$Master$Base> ();
+$List$
+        }
+
+        public void Init () {
+            var stream = new MemoryStream (UnityEngine.Resources.Load<TextAsset> (""masters"").bytes);
+            ProtoBuf.Serializer.Serialize<tables> (stream, tables);
+            dataObjects.ForEach (p => p.Init ());
+        }
+    }
+}";
+        }
     }
 }

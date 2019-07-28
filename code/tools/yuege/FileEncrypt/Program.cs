@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Library.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Library.Extensions;
 
 namespace encrypt
 {
@@ -10,12 +9,6 @@ namespace encrypt
     {
         static void Main(string[] args)
         {
-            if (args.Length != 0)
-            {
-                test.GetValue(args);
-                return;
-            }
-
             do
             {
                 SystemConsole.Run(config: new Dictionary<string, Action>()
@@ -25,11 +18,14 @@ namespace encrypt
                     {"解密2", () => { new YueGeDencrypt2(); }}
                 });
             } while (SystemConsole.ContinueY());
+        }
+    }
 
-            return;
-
-            var list = new[,]
-            {
+    public class test
+    {
+        static void Main(string[] args)
+        {
+            var list = new[,] {
                 {"md5,image"},
                 {"md5,ff277dcb965c4e0b1bc16d38999e417a.jpg"}
             };
@@ -37,8 +33,47 @@ namespace encrypt
             {
                 test.GetValue(s.Split(','));
             }
+        }
 
-            Console.ReadKey();
+        static void GetValue(string[] args)
+        {
+            Queue<string> queue = new Queue<string>(args);
+            string type = queue.Count == 0 ? "" : queue.Dequeue();
+            if (string.IsNullOrEmpty(type))
+                return;
+
+            string res = "";
+            switch (type)
+            {
+                case "md5":
+                    {
+                        string input = queue.Count == 0 ? "" : queue.Dequeue();
+                        res = input.MD5();
+                    }
+                    break;
+                case "aes":
+                    {
+                        string input = queue.Count == 0 ? "" : queue.Dequeue();
+                        string key = queue.Count == 0 ? "" : queue.Dequeue();
+                        string third = queue.Count == 0 ? "-e" : queue.Dequeue();
+                        var resBytes = third == "-d"
+                            ? File.ReadAllText(input).AES_Dencrypt(key)
+                            : File.ReadAllText(input).AES_Encrypt(key);
+                        File.WriteAllText(input, resBytes);
+                    }
+                    break;
+                case "help":
+                    {
+                        res = @"
+输入格式（类型，源串，密钥，其他）
+MD5加密（string:md5,string:input,string:[key],string[-h|-e]）
+AES加密（string:aes,string:input,string:[key],string[-e]）
+AES解密（string:aes,string:input,string:[key],string[-d]）
+";
+                    }
+                    break;
+            }
+            Console.WriteLine(res);
         }
     }
 }

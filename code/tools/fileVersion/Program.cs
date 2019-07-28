@@ -12,7 +12,7 @@ namespace FileVersion
     {
         public enum MyEnum
         {
-            [Category("Svn命令")] [TypeValue(typeof(SvnList))] SvnList,
+            [Category("Svn命令")] [TypeValue(typeof(FileVersion.SvnList))] SvnList = 1,
             [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnMaster))] SvnMaster,
             [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnPatch))] SvnPatch,
             [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnUpdate))] SvnUpdate,
@@ -21,13 +21,6 @@ namespace FileVersion
             [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitUpdate))] GitUpdate,
         }
 
-
-        private static void Main(string[] args)
-        {
-            SystemConsole.Run<MyEnum>(columnsCount: 4, callAction: Run);
-        }
-
-        private static bool isRuning = true;
         public static void Run(object o)
         {
             var commonBase = (CommonBase)o;
@@ -35,32 +28,36 @@ namespace FileVersion
             if (commonBase.isInstall)
                 commonBase.Run();
         }
-    }
 
-    internal class SvnListProgram : Program
-    {
         private static void Main(string[] args)
         {
-            SystemConsole.Run<MyEnum>(columnsCount: 4, group: "Svn命令", callAction: Run);
+            SystemConsole.Run<MyEnum>(columnsCount: 4, callAction: Run);
         }
-    }
 
-    internal class SvnProgram : Program
-    {
-        private static void Main(string[] args)
+        internal class SvnList
         {
-            SystemConsole.Run<MyEnum>(columnsCount: 4, group: "\nSvn【命令2->3->4】", callAction: Run);
+            private static void Main(string[] args)
+            {
+                SystemConsole.Run<MyEnum>(group: "Svn命令", callAction: Run);
+            }
         }
-    }
 
-    internal class GitProgram : Program
-    {
-        private static void Main(string[] args)
+        internal class Svn
         {
-            SystemConsole.Run<MyEnum>(columnsCount: 4, group: "\nGit【命令5->6->7】", callAction: Run);
+            private static void Main(string[] args)
+            {
+                SystemConsole.Run<MyEnum>(group: "\nSvn【命令2->3->4】", callAction: Run);
+            }
+        }
+
+        internal class Git
+        {
+            private static void Main(string[] args)
+            {
+                SystemConsole.Run<MyEnum>(group: "\nGit【命令5->6->7】", callAction: Run);
+            }
         }
     }
-
     internal class Test
     {
         private static void Main(string[] args)

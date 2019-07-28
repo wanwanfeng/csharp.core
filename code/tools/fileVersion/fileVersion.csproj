@@ -55,7 +55,7 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>FileVersion.SvnListProgram</StartupObject>
+    <StartupObject>FileVersion.Program.SvnList</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

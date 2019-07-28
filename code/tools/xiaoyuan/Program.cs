@@ -1,6 +1,4 @@
-﻿using checkcard;
-using checkJson;
-using Library;
+﻿using Library;
 using Library.Extensions;
 using System;
 using System.ComponentModel;
@@ -11,13 +9,13 @@ namespace xiaoyuan
     {
         private enum MyEnum
         {
-            [Category("Json")] [Description("有效性检测"), TypeValue(typeof(CheckJson))] CheckJson,
-            [Category("Json")] [Description("格式缩进"), TypeValue(typeof(IndentJson))] IndentJson,
-            [Category("Json")] [Description("格式取消缩进"), TypeValue(typeof(CancelIndentJson))] CancelIndentJson,
+            [Category("Json")] [Description("有效性检测"), TypeValue(typeof(checkJson.CheckJson))] CheckJson,
+            [Category("Json")] [Description("格式缩进"), TypeValue(typeof(checkJson.IndentJson))] IndentJson,
+            [Category("Json")] [Description("格式取消缩进"), TypeValue(typeof(checkJson.CancelIndentJson))] CancelIndentJson,
 
-            [Category("Check")] [Description("卡片检测"), TypeValue(typeof(CheckCard))] CheckCard,
-            [Category("Check")] [Description("剧情符号检测"), TypeValue(typeof(CheckScenario))] CheckScenario,
-            [Category("Check")] [Description("剧情导出"), TypeValue(typeof(ExportScenario))] ExportScenario,
+            [Category("Check")] [Description("卡片检测"), TypeValue(typeof(checkcard.CheckCard))] CheckCard,
+            [Category("Check")] [Description("剧情符号检测"), TypeValue(typeof(checkcard.CheckScenario))] CheckScenario,
+            [Category("Check")] [Description("剧情导出"), TypeValue(typeof(checkcard.ExportScenario))] ExportScenario,
         }
 
         private static void Main(string[] args)
@@ -25,7 +23,7 @@ namespace xiaoyuan
             SystemConsole.Run<MyEnum>();
         }
 
-        internal class CheckJsonProgram
+        internal class Json
         {
             private static void Main(string[] args)
             {
@@ -33,7 +31,7 @@ namespace xiaoyuan
             }
         }
 
-        internal class CheckProgram
+        internal class Check
         {
             private static void Main(string[] args)
             {

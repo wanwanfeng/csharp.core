@@ -10,8 +10,8 @@ namespace fileUtils
     {
         internal enum MyEnum
         {
-            [Category("FileMerge"), Description("ByName"), TypeValue(typeof(FileMerge.ByName))] FileMergeByName,
-            [Category("FileMerge"), Description("ByNumber"), TypeValue(typeof(FileMerge.ByNumber))] FileMergeByNumber,
+            [Category("FileMerge"), Description("ByName"), TypeValue(typeof(fileUtils.FileMerge.ByName))] FileMergeByName,
+            [Category("FileMerge"), Description("ByNumber"), TypeValue(typeof(fileUtils.FileMerge.ByNumber))] FileMergeByNumber,
 
             [Category("FileDown"), Description("DownFile"), TypeValue(typeof(FileDown.DownFile))] FileDown,
             [Category("FileDown"), Description("DownM3U8"), TypeValue(typeof(FileDown.DownM3U8))] DownM3U8,
@@ -21,6 +21,13 @@ namespace fileUtils
         private static void Main(string[] args)
         {
             SystemConsole.Run<MyEnum>();
+        }
+        internal class FileMerge
+        {
+            private static void Main(string[] args)
+            {
+                SystemConsole.Run<MyEnum>(group: "FileMerge");
+            }
         }
     }
 

@@ -46,7 +46,6 @@ namespace Library.Excel
             [Category("文件内容提取与替换"), Description("CSV->KvExcel"), TypeValue(typeof (ActionCSV.ToKvExcel))] CsvToKvExcel,
             [Category("文件内容提取与替换"), Description("CSV->FromKvExcel"), TypeValue(typeof (ActionCSV.KvExcelTo))] CsvFromKvExcel,
 
-
             [Category("Json"), Description("有效性检测"), TypeValue(typeof (CheckJson))] CheckJson,
             [Category("Json"), Description("格式缩进"), TypeValue(typeof (IndentJson))] IndentJson,
             [Category("Json"), Description("格式取消缩进"), TypeValue(typeof (CancelIndentJson))] CancelIndentJson,
@@ -61,11 +60,15 @@ namespace Library.Excel
 
         private static void Main(string[] args)
         {
-            //Console.WriteLine(DateTime.Now.Format("yy/M/D"));
-            //Console.WriteLine(new TimeSpan(5000, 5, 15).Format("d天h时m分s秒"));
-            //Console.ReadKey();
-
             SystemConsole.Run<CaoType>(columnsCount: 4);
+        }
+
+        internal class Json
+        {
+            private static void Main(string[] args)
+            {
+                SystemConsole.Run<CaoType>(group: "Json");
+            }
         }
     }
 
@@ -73,8 +76,8 @@ namespace Library.Excel
     {
         public enum CaoType
         {
-            [Category("文件转换")] [Description("Excel->Json")] [TypeValue(typeof(ActionExcel.ToJson))] ExcelToJson,
-            [Category("文件转换")] [Description("Json->Excel")] [TypeValue(typeof(ActionJson.ToExcel))] JsonToExcel
+            [Category("文件转换")][TypeValue(typeof(ActionExcel.ToJson))] Excel2Json,
+            [Category("文件转换")][TypeValue(typeof(ActionJson.ToExcel))] Json2Excel
         }
 
         private static void Main(string[] args)
@@ -83,11 +86,31 @@ namespace Library.Excel
         }
     }
 
-    internal class JsonTools: Program
+    internal class Csv2Excel
     {
+        public enum CaoType
+        {
+            [Category("文件转换")][TypeValue(typeof(ActionExcel.ToCsv))] Excel2CSV,
+            [Category("文件转换")][TypeValue(typeof(ActionCSV.ToExcel))] CSV2Excel
+        }
+
         private static void Main(string[] args)
         {
-            SystemConsole.Run<CaoType>(group: "Json");
+            SystemConsole.Run<CaoType>();
+        }
+    }
+
+    internal class Xml2Excel
+    {
+        public enum CaoType
+        {
+            [Category("文件转换")] [TypeValue(typeof(ActionExcel.ToXml))] Excel2Xml,
+            [Category("文件转换")] [TypeValue(typeof(ActionXml.ToExcel))] Xml2Excel
+        }
+
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<CaoType>();
         }
     }
 }

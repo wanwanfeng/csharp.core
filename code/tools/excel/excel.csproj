@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Library.Excel.JsonTools</StartupObject>
+    <StartupObject>Library.Excel.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Excel, Version=2.1.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">

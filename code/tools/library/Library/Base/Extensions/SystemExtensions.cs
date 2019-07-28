@@ -140,7 +140,7 @@ namespace Library.Extensions
 
     public static class SystemConsole
     {
-        public static void Run<T>(Action<object> callAction = null, int columnsCount = 1) where T : struct
+        public static void Run<T>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct
         {
             Console.Title = typeof (T).Namespace ?? Console.Title;
             //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
@@ -148,6 +148,13 @@ namespace Library.Extensions
             var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
                 .GroupBy(p => p.Value == null ? "" : p.Value.Category)
                 .ToDictionary(p => p.Key, p => p.ToDictionary(q => (int) q.Key, q => (T) q.Key));
+
+            if (!string.IsNullOrEmpty(group) && cacheCategory.ContainsKey(group))
+                cacheCategory = new Dictionary<string, Dictionary<int, T>>()
+                    {
+                        { group, cacheCategory[group]}
+                    };
+
             var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>()
                 .ToDictionary(p => (int) p.Key);
             var cacheDesc = AttributeHelper.GetCacheDescription<T>()

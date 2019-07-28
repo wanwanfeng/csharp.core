@@ -8,9 +8,9 @@ using Library.Extensions;
 
 namespace Script
 {
-    internal static class Program
+    internal class Program
     {
-        private enum MyEnum
+        internal enum MyEnum
         {
             //[Description("CompareFolder"), TypeValue(typeof (CompareFolder))] CompareFolder = 1,
             [Description("CopyToOneFolder"), TypeValue(typeof (CopyToOneFolder))] CopyToOneFolder,
@@ -38,26 +38,47 @@ namespace Script
         private static void Main(string[] args)
         {
             SystemConsole.Run<MyEnum>(columnsCount:3);
+        }
+    }
 
-            //FileInfo fileInfo = new FileInfo("TextFile");
-            //Console.WriteLine("ex:{0}", fileInfo.Extension);
-            //Console.WriteLine("ex:{0}", fileInfo.Length);
-            //fileInfo = new FileInfo("hh");
-            //Console.WriteLine("ex:{0}", fileInfo.Extension);
-            //Console.WriteLine("ex:{0}", fileInfo.);
+    internal class FileTools : Program
+    {
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<MyEnum>(group: "dos2");
+        }
+    }
 
-            //Console.ReadKey();
+    internal class ImageTools : Program
+    {
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<MyEnum>(group: "Image");
+        }
+    }
 
-            //Branch myEnum;
+    internal static class Test
+    {
+        private static void Main(string[] args)
+        {
+            FileInfo fileInfo = new FileInfo("TextFile");
+            Console.WriteLine("ex:{0}", fileInfo.Extension);
+            Console.WriteLine("ex:{0}", fileInfo.Length);
+            fileInfo = new FileInfo("hh");
+            Console.WriteLine("ex:{0}", fileInfo.Extension);
 
-            //myEnum = (Branch) (~(0 << -1));
+            Console.ReadKey();
 
-            //Console.WriteLine(myEnum);
-            //Console.WriteLine(!IsClose(Branch.None, Branch.None));
+            Branch myEnum;
+
+            myEnum = (Branch)(~(0 << -1));
+
+            Console.WriteLine(myEnum);
+            Console.WriteLine(!IsClose(Branch.None, Branch.None));
 
 
-            //new hahab();
-            //Console.ReadKey();
+            new hahab();
+            Console.ReadKey();
         }
 
         [Flags]
@@ -90,8 +111,6 @@ namespace Script
         }
 
     }
-
-
     public class hahaa
     {
         static hahaa()

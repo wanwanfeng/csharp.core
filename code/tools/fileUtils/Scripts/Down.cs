@@ -11,12 +11,7 @@ namespace fileUtils
 {
     public abstract class Down : BaseSystemConsole
     {
-         protected string RegexUrl = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
-
-        public virtual void Run()
-        {
-
-        }
+        protected string RegexUrl = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
 
         public string[] GetM3U8(string url)
         {

@@ -12,29 +12,61 @@ namespace FileVersion
     {
         public enum MyEnum
         {
-            [Category("Svn命令")] [TypeValue(typeof (SvnList))] SvnList,
-            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof (SvnMaster))] SvnMaster,
-            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof (SvnPatch))] SvnPatch,
-            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof (SvnUpdate))] SvnUpdate,
-            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof (GitMaster))] GitMaster,
-            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof (GitPatch))] GitPatch,
-            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof (GitUpdate))] GitUpdate,
+            [Category("Svn命令")] [TypeValue(typeof(SvnList))] SvnList,
+            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnMaster))] SvnMaster,
+            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnPatch))] SvnPatch,
+            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnUpdate))] SvnUpdate,
+            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitMaster))] GitMaster,
+            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitPatch))] GitPatch,
+            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitUpdate))] GitUpdate,
+        }
+
+
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<MyEnum>(columnsCount: 4, callAction: Run);
         }
 
         private static bool isRuning = true;
+        public static void Run(object o)
+        {
+            var commonBase = (CommonBase)o;
+            if (commonBase == null) return;
+            if (commonBase.isInstall)
+                commonBase.Run();
+        }
+    }
 
+    internal class SvnListProgram : Program
+    {
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<MyEnum>(columnsCount: 4, group: "Svn命令", callAction: Run);
+        }
+    }
+
+    internal class SvnProgram : Program
+    {
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<MyEnum>(columnsCount: 4, group: "\nSvn【命令2->3->4】", callAction: Run);
+        }
+    }
+
+    internal class GitProgram : Program
+    {
+        private static void Main(string[] args)
+        {
+            SystemConsole.Run<MyEnum>(columnsCount: 4, group: "\nGit【命令5->6->7】", callAction: Run);
+        }
+    }
+
+    internal class Test
+    {
         private static void Main(string[] args)
         {
             // 添加程序集解析事件
             AppDomain.CurrentDomain.AssemblyResolve += (sender, assembly) => LoadFromResource(assembly.Name);
-
-            SystemConsole.Run<MyEnum>(columnsCount: 4, callAction: delegate(object o)
-            {
-                var commonBase = (CommonBase) o;
-                if (commonBase == null) return;
-                if (commonBase.isInstall)
-                    commonBase.Run();
-            });
         }
 
 

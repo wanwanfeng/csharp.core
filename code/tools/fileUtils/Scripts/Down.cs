@@ -13,11 +13,6 @@ namespace fileUtils
     {
         protected string RegexUrl = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
 
-        public string[] GetM3U8(string url)
-        {
-            return GetWebFileContent(url).Where(p => !p.StartsWith("#")).ToArray();
-        }
-
         /// <summary>
         /// 暂放在临时文件夹
         /// </summary>
@@ -69,39 +64,39 @@ namespace fileUtils
                 switch (uri.Scheme)
                 {
                     case "https":
-                    {
-                        ServicePointManager.ServerCertificateValidationCallback =
-                            new RemoteCertificateValidationCallback(CheckValidationResult);
-                        //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
-                        request = WebRequest.CreateHttp(url);
-                        request.ProtocolVersion = HttpVersion.Version10;
-                        //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
-                        //request.Method = "GET";
-                        //发送请求并获取相应回应数据
-                        response = request.GetResponse() as HttpWebResponse;
-                        //string cookieString = response.Headers["Set-Cookie"];
-                        //CookieCollection cookies = new CookieCollection();
-                        //Regex re = new Regex("([^;,]+)=([^;,]+); path=([^;,]+); expires=([^;,]+)",RegexOptions.IgnoreCase);
-                        ////视具体内容进行调整
-                        //foreach (Match m in re.Matches(cookieString))
-                        //{
-                        //    Cookie c = new Cookie(m.Groups[1].Value, m.Groups[2].Value);
-                        //    c.Domain = uri.Authority; //放你要访问网站的域名
-                        //    cookies.Add(c);
-                        //}
-                    }
+                        {
+                            ServicePointManager.ServerCertificateValidationCallback =
+                                new RemoteCertificateValidationCallback(CheckValidationResult);
+                            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+                            request = WebRequest.CreateHttp(url);
+                            request.ProtocolVersion = HttpVersion.Version10;
+                            //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
+                            //request.Method = "GET";
+                            //发送请求并获取相应回应数据
+                            response = request.GetResponse() as HttpWebResponse;
+                            //string cookieString = response.Headers["Set-Cookie"];
+                            //CookieCollection cookies = new CookieCollection();
+                            //Regex re = new Regex("([^;,]+)=([^;,]+); path=([^;,]+); expires=([^;,]+)",RegexOptions.IgnoreCase);
+                            ////视具体内容进行调整
+                            //foreach (Match m in re.Matches(cookieString))
+                            //{
+                            //    Cookie c = new Cookie(m.Groups[1].Value, m.Groups[2].Value);
+                            //    c.Domain = uri.Authority; //放你要访问网站的域名
+                            //    cookies.Add(c);
+                            //}
+                        }
                         break;
                     case "http":
                     default:
-                    {
-                        request = WebRequest.CreateHttp(url);
-                        ;
-                        //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
-                        //request.Method = "GET";
+                        {
+                            request = WebRequest.CreateHttp(url);
+                            ;
+                            //request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; QQWubi 133; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; CIBA; InfoPath.2)";
+                            //request.Method = "GET";
 
-                        //发送请求并获取相应回应数据
-                        response = request.GetResponse() as HttpWebResponse;
-                    }
+                            //发送请求并获取相应回应数据
+                            response = request.GetResponse() as HttpWebResponse;
+                        }
                         break;
                 }
 

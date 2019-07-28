@@ -1,6 +1,7 @@
 ﻿using Library.Extensions;
 using Library.Helper;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -46,12 +47,13 @@ namespace fileUtils
             }
         }
 
-        public class DownM3U8 : Down
+        public abstract class DownM3U8Base : Down
         {
-            public DownM3U8()
+            new protected string RegexUrl = @"^http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$";
+
+            public IEnumerable<string> GetM3U8(string url)
             {
-                var url = SystemConsole.GetInputStr("请输入m3u8文件url:", regex: RegexUrl /*".m3u8"*/);
-                GetValue(url);
+                return GetWebFileContent(url).Where(p => !p.StartsWith("#"));
             }
 
             protected void GetValue(string url, string mergePath = null)
@@ -66,8 +68,8 @@ namespace fileUtils
                 //fileList.AsParallel().ForAll(p =>
                 fileList.ForEach((p, i, count) =>
                 {
-                //http://v1.benbi123.com/20190409/yzqObCmT/index.m3u8
-                var temp = p.StartsWith("http") ? p : uri.AbsoluteUri.Replace(uri.AbsolutePath, p);
+                    //http://v1.benbi123.com/20190409/yzqObCmT/index.m3u8
+                    var temp = p.StartsWith("http") ? p : uri.AbsoluteUri.Replace(uri.AbsolutePath, p);
                     SystemConsole.SetProgress(temp, ((float)i / count));
                     GetWebFile(temp);
                 });
@@ -86,7 +88,16 @@ namespace fileUtils
             }
         }
 
-        public class DownIndexM3U8 : DownM3U8
+        public class DownM3U8 : DownM3U8Base
+        {
+            public DownM3U8()
+            {
+                var url = SystemConsole.GetInputStr("请输入m3u8文件url:", regex: RegexUrl /*".m3u8"*/);
+                GetValue(url);
+            }
+        }
+
+        public class DownIndexM3U8 : DownM3U8Base
         {
             public DownIndexM3U8()
             {

@@ -47,7 +47,6 @@
     <Compile Include="FileDownload\Program.cs" />
     <Compile Include="FileDownload\UtilSecurity.cs" />
     <Compile Include="FileEncrypt\Program.cs" />
-    <Compile Include="FileEncrypt\test.cs" />
     <Compile Include="FileEncrypt\YueGeDencrypt.cs" />
     <Compile Include="FileEncrypt\YueGeEncrypt.cs" />
     <Compile Include="Program.cs" />

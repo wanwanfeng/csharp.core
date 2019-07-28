@@ -69,7 +69,7 @@ namespace Library.Excel
         }
     }
 
-    public class Json2Excel
+    internal class Json2Excel
     {
         public enum CaoType
         {
@@ -83,11 +83,11 @@ namespace Library.Excel
         }
     }
 
-    public class JsonTools
+    internal class JsonTools: Program
     {
         private static void Main(string[] args)
         {
-            SystemConsole.Run<Program.CaoType>(group: "Json");
+            SystemConsole.Run<CaoType>(group: "Json");
         }
     }
 }

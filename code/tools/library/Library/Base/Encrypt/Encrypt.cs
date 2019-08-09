@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System;
 using Library.Extensions;
+using System.Linq;
 
 namespace Library.Extensions
 {
@@ -104,8 +105,24 @@ namespace Library.Extensions
         }
 
         #endregion
+
+        #region XOR
+
+        /// <summary>
+        /// 异或加密与解密
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static byte[] XOR(byte[] byteArray, string key = "")
+        {
+            byte[] keyArray = Encoding.UTF8.GetBytes(key);
+            return byteArray.Select((p, i) => (byte)(p ^ keyArray[i % keyArray.Length])).ToArray();
+        }
+
+
+        #endregion
     }
-    
 }
 
 namespace Library

@@ -150,9 +150,6 @@ namespace Library.Helper
         {
             byte[] keyArray = Encoding.UTF8.GetBytes("fdhgfhyut6yik768iujhf523w5656786olkou8i9089");
 
-            public FileStream(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize, bool useAsync) : base(path, mode, access, share, bufferSize, useAsync)
-            {
-            }
             public FileStream(string path, FileMode mode) : base(path, mode)
             {
             }
@@ -185,16 +182,13 @@ namespace Library.Helper
 
             using (var sr = new FileStream(sourceFileName, FileMode.Open))
             {
-                using (var sw = new MemoryStream())
+                byte[] array = new byte[sr.Length];
+                int len = 0, index = 0;
+                while ((len = sr.Read(array, index * 4096, 4096)) > 0)
                 {
-                    byte[] bytes = new byte[4096];
-                    int len;
-                    while ((len = sr.Read(bytes, 0, bytes.Length)) > 0)
-                    {
-                        sw.Write(bytes, 0, len);
-                    }
-                    return sw.ToArray();
+                    index++;
                 }
+                return array;
             }
         }
 

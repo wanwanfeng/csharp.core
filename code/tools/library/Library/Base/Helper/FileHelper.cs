@@ -7,7 +7,7 @@ using Library.Extensions;
 
 namespace Library.Helper
 {
-    public class FileHelper : DirectoryHelper
+    public partial class FileHelper : DirectoryHelper
     {
         /// <summary>
         /// 路径为key获取dic嵌套值
@@ -141,6 +141,112 @@ namespace Library.Helper
                     }
                 }
             }
+        }
+    }
+
+    public partial class FileHelper
+    {
+        private class FileStream : System.IO.FileStream
+        {
+            byte[] keyArray = Encoding.UTF8.GetBytes("fdhgfhyut6yik768iujhf523w5656786olkou8i9089");
+
+            public FileStream(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize, bool useAsync) : base(path, mode, access, share, bufferSize, useAsync)
+            {
+            }
+            public FileStream(string path, FileMode mode) : base(path, mode)
+            {
+            }
+            public override int Read(byte[] array, int offset, int count)
+            {
+                var index = base.Read(array, offset, count);
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] ^= keyArray[i % keyArray.Length];
+                }
+                return index;
+            }
+            public override void Write(byte[] array, int offset, int count)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] ^= keyArray[i % keyArray.Length];
+                }
+                base.Write(array, offset, count);
+            }
+        }
+
+        /// <summary>
+        /// 文件读取异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static byte[] ReadAllBytes(string sourceFileName)
+        {
+            if (!File.Exists(sourceFileName)) return null;
+
+            using (var sr = new FileStream(sourceFileName, FileMode.Open))
+            {
+                using (var sw = new MemoryStream())
+                {
+                    byte[] bytes = new byte[4096];
+                    int len;
+                    while ((len = sr.Read(bytes, 0, bytes.Length)) > 0)
+                    {
+                        sw.Write(bytes, 0, len);
+                    }
+                    return sw.ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 文件读取异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static string ReadAllText(string sourceFileName)
+        {
+            if (!File.Exists(sourceFileName)) return "";
+            byte[] content = ReadAllBytes(sourceFileName);
+            return content == null ? "" : Encoding.UTF8.GetString(content, 0, content.Length);
+        }
+
+        /// <summary>
+        /// 文件读取异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static string[] ReadAllLines(string sourceFileName)
+        {
+            if (!File.Exists(sourceFileName)) return null;
+            return ReadAllText(sourceFileName).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        /// <summary>
+        /// 文件写入异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static void WriteAllBytes(string destFileName, byte[] bytes)
+        {
+            using (var sw = new FileStream(destFileName, FileMode.OpenOrCreate))
+            {
+                sw.Write(bytes, 0, bytes.Length);
+            }
+        }
+
+        /// <summary>
+        /// 文件写入异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static void WriteAllText(string destFileName, string content)
+        {
+            WriteAllBytes(destFileName, Encoding.UTF8.GetBytes(content));
+        }
+
+        /// <summary>
+        /// 文件写入异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static void WriteAllLines(string destFileName, string[] contents)
+        {
+            WriteAllText(destFileName, string.Join("\n", contents));
         }
     }
 }

@@ -117,7 +117,11 @@ namespace Library.Extensions
         public static byte[] XOR(byte[] byteArray, string key = "")
         {
             byte[] keyArray = Encoding.UTF8.GetBytes(key);
-            return byteArray.Select((p, i) => (byte)(p ^ keyArray[i % keyArray.Length])).ToArray();
+            for (int i = 0; i < byteArray.Length; i++)
+            {
+                byteArray[i] ^= keyArray[i % keyArray.Length];
+            }
+            return byteArray;
         }
 
 

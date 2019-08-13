@@ -72,13 +72,18 @@ namespace findText
             }
         }
 
+        protected virtual string ToJson(object json)
+        {
+            return JsonHelper.ToJson(json);
+        }
+
         private void GetValue()
         {
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
-            CheckPath(exName, SelectType.Folder).ForEach(OpenRun, "搜索中...请稍后");
+            CheckPath(exName, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
 
-            var vals = GetJsonDataArray(JsonHelper.ToJson(resJsonData));
+            var vals = GetJsonDataArray(ToJson(resJsonData));
             if (vals.Rows.Count == 0)
             {
                 Console.WriteLine("未搜索到结果！");

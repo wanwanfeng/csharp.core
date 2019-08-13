@@ -35,6 +35,7 @@ namespace Library.Excel
                     .GroupBy(p => p.First())
                     .ToDictionary(p => p.Key.ToString(), q => q.ToList());
                 cache.Remove(table.Columns.First());
+                cache.Remove("");
                 return cache;
             }).ToList();
         }

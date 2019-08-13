@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using findText.Script;
+﻿using findText.Script;
 using Library;
 using Library.Extensions;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace findText
 {
@@ -13,6 +11,7 @@ namespace findText
     {
         public enum ConvertType
         {
+            [TypeValue(typeof(ActionForUnity0))] unity,
             [TypeValue(typeof(ActionForCss))] css,
             [TypeValue(typeof(ActionForCpp))] cpp,
             [TypeValue(typeof(ActionForCSharp))] csharp,
@@ -23,7 +22,8 @@ namespace findText
             javascript,
             [TypeValue(typeof(ActionForHtml))] html,
 
-            [TypeValue(typeof(ActionForHtml2))] [Description("html 插件")]
+            [TypeValue(typeof(ActionForHtml2))]
+            [Description("html 插件")]
             html2
         }
 
@@ -31,7 +31,7 @@ namespace findText
         {
             Action<object> callFunc = obj =>
             {
-                BaseActionFor baseActionFor = (BaseActionFor) obj;
+                BaseActionFor baseActionFor = (BaseActionFor)obj;
                 SystemConsole.Run(config: new Dictionary<string, Action>()
                 {
                     {"搜索", () => { baseActionFor.Open(); }},

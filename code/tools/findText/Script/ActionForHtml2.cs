@@ -101,31 +101,36 @@ namespace findText.Script
                     Console.WriteLine("还原中...请稍后" + ((float)(++i) / dic.Count).ToString("p1") + "\t" + temp);
 
                     string path = (Path.GetDirectoryName(InputPath) + temp).Replace("\\", "/");
-                    string content = File.ReadAllText(path);
-
-                    HtmlDocument doc = new HtmlDocument();
-                    doc.LoadHtml(content);
-                    var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).ToDictionary(p => p.XPath);
-
-                    bool isSave = false;
-
-                    foreach (List<object> data in valuePair.Value)
-                    {
-                        string xPath = data[Convert["行号"]].ToString();
-                        string oldStr = data[Convert["原文"]].ToString();
-                        string newStr = data[Convert["译文"]].ToString();
-                        HtmlNode oldNode = null;
-                        childs.TryGetValue(xPath, out oldNode);
-                        if (oldNode == null) continue;
-                        HtmlNode newNode = HtmlNode.CreateNode(newStr);
-                        if (oldNode.InnerText == oldStr)
-                            continue;
-                        oldNode.ParentNode.ReplaceChild(newNode, oldNode);
-                        isSave = true;
-                    }
-                    if (isSave)
-                        doc.Save(path, new UTF8Encoding(false));
+                    NewMethod(valuePair, path);
                 }
+            }
+
+            void NewMethod(KeyValuePair<string, List<List<object>>> valuePair, string path)
+            {
+                string content = File.ReadAllText(path);
+
+                HtmlDocument doc = new HtmlDocument();
+                doc.LoadHtml(content);
+                var childs = doc.DocumentNode.Descendants().Where(p => !p.HasChildNodes).ToDictionary(p => p.XPath);
+
+                bool isSave = false;
+
+                foreach (List<object> data in valuePair.Value)
+                {
+                    string xPath = data[Convert["行号"]].ToString();
+                    string oldStr = data[Convert["原文"]].ToString();
+                    string newStr = data[Convert["译文"]].ToString();
+                    HtmlNode oldNode = null;
+                    childs.TryGetValue(xPath, out oldNode);
+                    if (oldNode == null) continue;
+                    HtmlNode newNode = HtmlNode.CreateNode(newStr);
+                    if (oldNode.InnerText == oldStr)
+                        continue;
+                    oldNode.ParentNode.ReplaceChild(newNode, oldNode);
+                    isSave = true;
+                }
+                if (isSave)
+                    doc.Save(path, new UTF8Encoding(false));
             }
         }
     }

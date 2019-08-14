@@ -47,8 +47,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlDotNet", "YamlDotNet\Ya
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "core", "core\core.shproj", "{C18E12C1-7251-4F80-9B2D-45992F45CCBC}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HtmlAgilityPack.Shared", "HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.shproj", "{5BA9A0D7-173F-4C4F-AFFA-3DD6DC2F9A79}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{32127943-c42d-4bd5-b9d3-989b9a16851a}*SharedItemsImports = 4
+		HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{5ba9a0d7-173f-4c4f-affa-3dd6dc2f9a79}*SharedItemsImports = 13
+		HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{5cdb9969-16af-4fa4-bf72-5ab1a5ad041f}*SharedItemsImports = 4
 		core\core.projitems*{6c94196a-13a2-4016-9f59-9e426353e92f}*SharedItemsImports = 4
 		core\core.projitems*{7e85e039-6585-44c6-a410-e1a4406a753b}*SharedItemsImports = 4
 		core\core.projitems*{c18e12c1-7251-4f80-9b2d-45992f45ccbc}*SharedItemsImports = 13
@@ -246,6 +251,7 @@ Global
 		{D7E7F7A5-5ED3-4784-897E-B7CAC79787A4} = {B65FA407-7588-42D8-8282-FA2D2AB3076D}
 		{D99CE66F-2A6B-488E-BEC4-431897221419} = {B65FA407-7588-42D8-8282-FA2D2AB3076D}
 		{C18E12C1-7251-4F80-9B2D-45992F45CCBC} = {A62857D2-8324-436D-A52A-E231080FBDA7}
+		{5BA9A0D7-173F-4C4F-AFFA-3DD6DC2F9A79} = {B65FA407-7588-42D8-8282-FA2D2AB3076D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE149189-FAEA-4629-8C50-C17EE7103F6E}

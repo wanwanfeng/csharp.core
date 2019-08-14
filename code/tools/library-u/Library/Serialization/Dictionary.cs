@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace UnityEngine.Library.Serialization
+namespace Library.Serialization
 {
     public class Dictionary<TKey, TValue> : ISerializationCallbackReceiver
     {

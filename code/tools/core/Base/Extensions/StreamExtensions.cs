@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 
 namespace Library.Extensions
 {
-    public static class StreamExtensions
+    public static partial class StreamExtensions
     {
         public static void CopyTo(this Stream stream, Stream destination, int bufferSize = 4096)
         {

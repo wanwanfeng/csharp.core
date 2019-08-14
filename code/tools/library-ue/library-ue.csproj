@@ -69,7 +69,7 @@
     <Compile Include="Library\Editor\Window\BaseEditorWindow.cs" />
     <Compile Include="Library\Editor\Window\BaseToolBarWindow.cs" />
     <Compile Include="Library\Editor\Window\BaseWindow.cs" />
-    <Compile Include="Library\Editor\Window\ExtensionsForUnityEditor.cs" />
+    <Compile Include="Library\Editor\Window\UnityEditorExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

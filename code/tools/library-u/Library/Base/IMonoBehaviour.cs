@@ -1,4 +1,6 @@
-﻿namespace UnityEngine.Library
+﻿using UnityEngine;
+
+namespace Library
 {
     public interface IMonoBehaviour
     {

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Library
+﻿namespace Library
 {
-
     #region 单例
 
     /// <summary>

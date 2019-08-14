@@ -7,7 +7,7 @@ namespace Library.Extensions
     /// <summary>
     /// 值类型扩展
     /// </summary>
-    public static class ValueExtensions
+    public static partial class ValueExtensions
     {
         #region string
 

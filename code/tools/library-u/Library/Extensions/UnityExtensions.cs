@@ -1,7 +1,8 @@
 ﻿using System;
 using Library.Extensions;
+using UnityEngine;
 
-namespace UnityEngine.Library
+namespace Library
 {
     /// <summary>
     /// Unity扩展

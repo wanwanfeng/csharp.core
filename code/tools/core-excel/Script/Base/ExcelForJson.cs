@@ -20,7 +20,7 @@ namespace Library.Excel
         public static void ExportToJson(DataTable dt, string file, bool isIndent = true)
         {
             string newPath = CheckExport(dt, file, ".json");
-            JsonData resJsonDatas = (JsonData)dt;
+            JsonData resJsonDatas = (JsonData)(ListTable)dt;
             File.WriteAllText(newPath,
                 isIndent ? JsonHelper.ToJson(resJsonDatas, indentLevel: 2) : JsonHelper.ToJson(resJsonDatas),
                 new UTF8Encoding(false));

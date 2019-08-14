@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
-namespace UnityEngine.Library
+namespace Library
 {
-
     #region 加载接口
 
     public interface ILoad

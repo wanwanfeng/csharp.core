@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-namespace UnityEngine.Library
+namespace Library
 {
     /// <summary>
-    /// Random扩展
+    ///  Linq扩展
     /// </summary>
-    public static class LinqExtensions
+    public static partial class LinqExtensions
     {
         //public static Vector2 Sum(this Vector2[] target)
         //{

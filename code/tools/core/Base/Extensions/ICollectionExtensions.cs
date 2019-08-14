@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Library.Extensions
 {
-    public static class ICollectionExtensions
+    public static partial class ICollectionExtensions
     {
         public static Dictionary<TKey, TValue> Merge<TKey, TValue>(this Dictionary<TKey, TValue> source,
             params IDictionary<TKey, TValue>[] other)

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-namespace UnityEngine.Library.Serialization
+namespace Library.Serialization
 {
     public class HashTable : ISerializationCallbackReceiver
     {

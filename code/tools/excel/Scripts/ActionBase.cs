@@ -92,7 +92,7 @@ namespace Script
 
             if (dts.Count == 0)
                 return;
-            ExcelUtils.ExportToOneExcel(dts, InputPath);
+            ExcelUtils.ExportToOneExcel(InputPath, dts);
         }
 
         #region 键值对

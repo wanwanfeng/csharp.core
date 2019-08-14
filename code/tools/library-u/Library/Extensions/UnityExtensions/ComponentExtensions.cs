@@ -1,6 +1,7 @@
 ﻿using System;
+using UnityEngine;
 
-namespace UnityEngine.Library
+namespace Library
 {
     /// <summary>
     /// Component扩展

@@ -65,20 +65,5 @@ namespace Library.Excel
         }
 
         #endregion
-
-        #region JsonData DataTable 显示转换（需强制）
-
-
-        public static explicit operator JsonData(DataTable dt)
-        {
-            return (JsonData)(ListTable)dt;
-        }
-
-        public static explicit operator DataTable(JsonData jsonData)
-        {
-            return (DataTable)(ListTable)jsonData;
-        }
-
-        #endregion
     }
 }

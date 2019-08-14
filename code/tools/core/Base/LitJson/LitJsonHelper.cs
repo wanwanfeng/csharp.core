@@ -37,21 +37,19 @@ namespace LitJson
 
 namespace Library.LitJson
 {
-    public class LitJsonHelper : IJsonHelper
+    public partial class LitJsonHelper : IJsonHelper
     {
         static LitJsonHelper()
         {
             JsonMapper.RegisterImporter<double, float>(input => (float) input);
-            //JsonMapper.RegisterImporter<int, long>(input => (long)input);
             JsonMapper.RegisterExporter<float>((v, w) =>
             {
                 w.Write(v);
             });
-            //JsonMapper.RegisterExporter<long>((v, w) =>
-            //{
-            //    w.Write(v);
-            //});
+            StaticConstructor();
         }
+
+        static partial void StaticConstructor();
 
         public T ToObject<T>(string res)
         {

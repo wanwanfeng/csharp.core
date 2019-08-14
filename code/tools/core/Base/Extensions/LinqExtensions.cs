@@ -7,7 +7,7 @@ namespace Library.Extensions
     /// <summary>
     /// Linq扩展
     /// </summary>
-    public static class LinqExtensions
+    public static partial class LinqExtensions
     {
         public static Action<string> LogAction = p => { Console.WriteLine(p); };
 

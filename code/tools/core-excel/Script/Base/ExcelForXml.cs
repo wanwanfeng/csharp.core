@@ -72,7 +72,7 @@ namespace Library.Excel
                         }
                         if (jsonData.Count == 0)
                             return null;
-                        return (DataTable)jsonData;
+                        return (DataTable)(ListTable)jsonData;
                     }
                 default:
                     throw new ArgumentOutOfRangeException();

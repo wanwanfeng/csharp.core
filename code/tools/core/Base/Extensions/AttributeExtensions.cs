@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Library.Extensions
 {
-    public static class AttributeExtensions
+    public static partial class AttributeExtensions
     {
         /// <summary>
         /// 获取第一个自定义的Attribute

@@ -2,7 +2,7 @@
 
 namespace Library.Extensions
 {
-    public static class ExceptionExtensions
+    public static partial class ExceptionExtensions
     {
         /// <summary>
         /// 查找最终异常

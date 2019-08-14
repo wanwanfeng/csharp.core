@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnityEditor
 {
-    public static class ExtensionsForUnityEditor
+    public static class UnityEditorExtensions
     {
         public static bool DisplayDialog(this ScriptableObject target, string msg = "是否要执行选择？", bool ignoreDialog = false)
         {

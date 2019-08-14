@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Library.Extensions
 {
-    public static class PathExtensions
+    public static partial class PathExtensions
     {
         public static string GetFilePathWithoutExtension(this FileInfo fileInfo)
         {

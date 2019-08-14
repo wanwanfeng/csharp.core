@@ -124,7 +124,7 @@ namespace UnityEditor.Library
             string savePath = "./";
             if (!string.IsNullOrEmpty(path))
                 savePath = savePath + path + "/";
-            FileHelper.CreateDirectory(savePath);
+            DirectoryHelper.CreateDirectory(savePath);
             return savePath;
         }
     }

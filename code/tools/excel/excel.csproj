@@ -40,9 +40,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\bin\Excel.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\bin\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -116,10 +113,6 @@
     <ProjectReference Include="..\library-excel\library-excel.csproj">
       <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
       <Name>library-excel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\library\library.csproj">
-      <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
-      <Name>library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,13 +11,14 @@
     <AssemblyName>Library-E</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\unity-bin\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -57,10 +58,6 @@
     <ProjectReference Include="..\library-u\library-u.csproj">
       <Project>{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}</Project>
       <Name>library-u</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\library\library.csproj">
-      <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
-      <Name>library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

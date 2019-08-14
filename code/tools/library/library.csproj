@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -49,61 +49,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Library\Base\Attribute\NameAttribute.cs" />
-    <Compile Include="Library\Base\Attribute\Value\StringValueAttribute.cs" />
-    <Compile Include="Library\Base\Attribute\HookValueAttribute.cs" />
-    <Compile Include="Library\Base\Attribute\Value\IntValueAttribute.cs" />
-    <Compile Include="Library\Base\Attribute\Value\BoolValueAttribute.cs" />
-    <Compile Include="Library\Base\Attribute\Value\TypeValueAttribute.cs" />
-    <Compile Include="Library\Base\Compress\DecompressUtils.cs" />
-    <Compile Include="Library\Base\Config.cs" />
-    <Compile Include="Library\Base\Encrypt\Encrypt.cs" />
-    <Compile Include="Library\Base\Extensions\DateExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\EventsExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\ExceptionExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\EnumExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\DataTableExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\StreamExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\RandomExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\LinqExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\PathExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\StringExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\AttributeExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\SystemExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\ObjectExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\ValueExtensions.cs" />
-    <Compile Include="Library\Base\Extensions\ICollectionExtensions.cs" />
-    <Compile Include="Library\Base\Helper\CmdHelper.cs" />
-    <Compile Include="Library\Base\Helper\CsvHelper.cs" />
-    <Compile Include="Library\Base\Helper\DirectoryHelper.cs" />
-    <Compile Include="Library\Base\Helper\FileHelper.cs" />
-    <Compile Include="Library\Base\Helper\JsonHelper.cs" />
-    <Compile Include="Library\Base\Helper\StringHelper.cs" />
-    <Compile Include="Library\Base\Helper\TypeHelper.cs" />
-    <Compile Include="Library\Base\Helper\WebHelper.cs" />
-    <Compile Include="Library\Base\LitJson\LitJsonHelper.cs" />
-    <Compile Include="Library\Base\Helper\XmlHelper.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\IJsonWrapper.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\JsonData.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\JsonException.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\JsonMapper.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\JsonMockWrapper.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\JsonReader.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\JsonWriter.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\Lexer.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\Netstandard15Polyfill.cs" />
-    <Compile Include="Library\Base\LitJson\LitJson\ParserToken.cs" />
-    <Compile Include="Library\Base\Helper\EnumHelper.cs" />
-    <Compile Include="Library\Base\Promise.cs" />
-    <Compile Include="Library\Base\SimpleLogger.cs" />
-    <Compile Include="Library\Base\Singleton\Singleton.cs" />
-    <Compile Include="Library\Base\VersionInfo\VersionInfo.cs" />
-    <Compile Include="Library\Base\Thread\ThreadAction.cs" />
-    <Compile Include="Library\Ldebug.cs" />
-    <Compile Include="Library\Base\Helper\AttributeHelper.cs" />
-    <Compile Include="Library\LocalEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\litjson\src\LitJson\LitJSON.csproj">
+      <Project>{d7e7f7a5-5ed3-4784-897e-b7cac79787a4}</Project>
+      <Name>LitJSON</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\core\core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using Library;
+using Library.Extensions;
+using Library.Helper;
+using LitJson;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HtmlAgilityPack;
-using Library;
-using Library.Helper;
-using LitJson;
 
 namespace search.Script
 {
@@ -28,7 +29,7 @@ namespace search.Script
         {
             var res = new ListTable();
 
-            urls.ForEachPaths(url =>
+            urls.ForEachPathsAndSleep(url =>
             {
                 HtmlWeb webClient = new HtmlWeb();
                 HtmlDocument doc = webClient.Load(url);
@@ -66,7 +67,7 @@ namespace search.Script
         {
             var res = new ListTable();
 
-            urls.ForEachPaths(url =>
+            urls.ForEachPathsAndSleep(url =>
             {
                 HtmlWeb webClient = new HtmlWeb();
                 HtmlDocument doc = webClient.Load(url);

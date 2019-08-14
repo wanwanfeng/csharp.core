@@ -18,12 +18,12 @@ namespace Script
 
         public override Func<string, IEnumerable<DataTable>> import
         {
-            get { return file => new[] {ExcelByBase.Json.ImportToDataTable(file)}; }
+            get { return file => new[] { ExcelUtils.ImportFromJson(file)}; }
         }
 
         public override Action<DataTable, string> export
         {
-            get { return (table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); }; }
+            get { return (table, s) => { ExcelUtils.ExportToJson(table, s, isIndent); }; }
         }
 
         public ActionJson()

@@ -13,12 +13,12 @@ namespace Script
 
         public override Func<string, IEnumerable<DataTable>> import
         {
-            get { return file => new[] {ExcelByBase.Xml.ImportToDataTable(file)}; }
+            get { return file => new[] { ExcelUtils.ImportFromXml(file)}; }
         }
 
         public override Action<DataTable, string> export
         {
-            get { return ExcelByBase.Data.ExportToXml; }
+            get { return ExcelUtils.ExportToXml; }
         }
 
         public class ToCsv : ActionXml

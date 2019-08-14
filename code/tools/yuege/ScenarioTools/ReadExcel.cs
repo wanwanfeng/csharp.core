@@ -16,7 +16,7 @@ namespace scenario_tools
             var filePath = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：",
                 def: @"D:\Work\yuege\www\assets\res\scenario.xls");
 
-            var cache = ExcelByBase.Data.ImportToDataTable(filePath, false).Select(p => (JsonData) p).Select(
+            var cache = ExcelUtils.ImportFromPath(filePath, false).Select(p => (JsonData) p).Select(
                 data =>
                 {
                     var dic = data.Cast<JsonData>()
@@ -49,7 +49,7 @@ namespace scenario_tools
                     }
 
                     var fileName = Path.ChangeExtension(filePath, "").Trim('.') + "/" + pair.Key + ".json";
-                    FileHelper.CreateDirectory(fileName);
+                    DirectoryHelper.CreateDirectory(fileName);
                     File.WriteAllText(fileName, JsonHelper.ToJson(res));
                 }
             }

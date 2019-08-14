@@ -63,7 +63,7 @@ namespace checkcard
                 row[4] = list[4];
             }
 
-            ExcelByBase.Data.ExportToExcel(dts[0], InputPath + ".xlsx");
+            ExcelUtils.ExportToExcel(dts[0], InputPath + ".xlsx");
         }
     }
 }

@@ -23,16 +23,16 @@ namespace Script
                 if (firstIsKey)
                 {
                     //自定义的输出（首行为key）
-                    return (file) => ExcelByBase.Data.ImportToDataTable(file, false);
+                    return (file) => ExcelUtils.ImportFromPath(file, false);
                 }
                 //未经过滤原样输出
-                return (file) => ExcelByBase.Data.ImportToDataTable(file);
+                return (file) => ExcelUtils.ImportFromPath(file);
             }
         }
 
         public override Action<DataTable, string> export
         {
-            get { return ExcelByBase.Data.ExportToExcel; }
+            get { return ExcelUtils.ExportToExcel; }
         }
 
         public ActionExcel()
@@ -77,7 +77,7 @@ namespace Script
         {
             public FixExcel()
             {
-                ToCommon(ExcelByBase.Data.ExportToExcel, data =>
+                ToCommon(ExcelUtils.ExportToExcel, data =>
                 {
                     if (data == null) return null;
                     var path = Path.ChangeExtension(InputPath, "").TrimEnd('.');

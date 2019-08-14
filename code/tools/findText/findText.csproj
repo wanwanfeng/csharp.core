@@ -92,9 +92,9 @@
       <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
       <Name>library</Name>
     </ProjectReference>
-    <ProjectReference Include="..\yaml\yaml.csproj">
-      <Project>{354feb34-30a2-463a-9dc4-9ab303943cce}</Project>
-      <Name>yaml</Name>
+    <ProjectReference Include="..\YamlDotNet\YamlDotNet\YamlDotNet.csproj">
+      <Project>{d99ce66f-2a6b-488e-bec4-431897221419}</Project>
+      <Name>YamlDotNet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

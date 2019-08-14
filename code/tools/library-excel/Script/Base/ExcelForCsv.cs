@@ -10,7 +10,7 @@ namespace Library.Excel
     /// <summary>
     /// DataTable与CSV
     /// </summary>
-    public abstract partial class ExcelByBase
+    public abstract partial class ExcelUtils
     {
         #region  Convert Csv and DataTable
 
@@ -22,25 +22,23 @@ namespace Library.Excel
 
         public static CsvMode CurCsvMode = CsvMode.CsvHelp;
 
-        public class Csv
+        public static DataTable ImportFromCsv(string path)
         {
-            public static DataTable ImportToDataTable(string path)
+            path = Path.ChangeExtension(path, ".csv");
+            if (!File.Exists(path))
+                Ldebug.Log("文件不存在!");
+            if (path == null) return null;
+
+            List<List<object>> list;
+
+            switch (CurCsvMode)
             {
-                path = Path.ChangeExtension(path, ".csv");
-                if (!File.Exists(path))
-                    Ldebug.Log("文件不存在!");
-                if (path == null) return null;
-
-                List<List<object>> list;
-
-                switch (CurCsvMode)
-                {
-                    case CsvMode.CsvHelp:
+                case CsvMode.CsvHelp:
                     {
                         list = CsvHelper.ReadCSV(path);
                     }
-                        break;
-                    case CsvMode.Normal:
+                    break;
+                case CsvMode.Normal:
                     {
                         string[] content = File.ReadAllLines(path);
                         list = content.Select(
@@ -53,39 +51,36 @@ namespace Library.Excel
                             })
                             .ToList();
                     }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                if (list.Count == 0) return null;
-                return (DataTable) new ListTable()
-                {
-                    TableName = Path.GetFileNameWithoutExtension(path),
-                    FullName = path,
-                    IsArray = true,
-                    Columns = list.First().Cast<string>().ToList(),
-                    Rows = list.Skip(1).ToList()
-                };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+            if (list.Count == 0) return null;
+            return (DataTable)new ListTable()
+            {
+                TableName = Path.GetFileNameWithoutExtension(path),
+                FullName = path,
+                IsArray = true,
+                Columns = list.First().Cast<string>().ToList(),
+                Rows = list.Skip(1).ToList()
+            };
         }
 
-        public partial class Data
+        public static void ExportToCsv(DataTable dt, string file)
         {
-            public static void ExportToCsv(DataTable dt, string file)
-            {
-                string newPath = CheckExport(dt, file, ".csv");
+            string newPath = CheckExport(dt, file, ".csv");
 
-                var list = (ListTable) dt;
-                switch (CurCsvMode)
-                {
-                    case CsvMode.CsvHelp:
+            var list = (ListTable)dt;
+            switch (CurCsvMode)
+            {
+                case CsvMode.CsvHelp:
                     {
                         var res = new List<List<object>>(list.Rows);
                         res.Insert(0, list.Columns.Cast<object>().ToList());
                         CsvHelper.SaveCSV(res, newPath);
                     }
-                        break;
-                    case CsvMode.Normal:
+                    break;
+                case CsvMode.Normal:
                     {
 
                         var contents = list.Rows.Select(p => string.Join(",", p.Select(q =>
@@ -105,13 +100,11 @@ namespace Library.Excel
                         FileHelper.CreateDirectory(newPath);
                         File.WriteAllLines(newPath, contents, new UTF8Encoding(false));
                     }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+            #endregion
         }
-
-        #endregion
     }
 }

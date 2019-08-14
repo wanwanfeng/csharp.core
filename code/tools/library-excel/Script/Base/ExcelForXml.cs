@@ -12,7 +12,7 @@ namespace Library.Excel
     /// <summary>
     /// DataTable与Xml
     /// </summary>
-    public abstract partial class ExcelByBase
+    public abstract partial class ExcelUtils
     {
         #region  Convert Xml and DataTable
 
@@ -24,19 +24,17 @@ namespace Library.Excel
 
         public static XmlMode CurXmlMode = XmlMode.Navicat;
 
-        public class Xml
+        public static DataTable ImportFromXml(string path)
         {
-            public static DataTable ImportToDataTable(string path)
-            {
-                path = Path.ChangeExtension(path, ".xml");
-                if (!File.Exists(path))
-                    Ldebug.Log("文件不存在!");
-                if (path == null) return null;
-                string content = File.ReadAllText(path);
+            path = Path.ChangeExtension(path, ".xml");
+            if (!File.Exists(path))
+                Ldebug.Log("文件不存在!");
+            if (path == null) return null;
+            string content = File.ReadAllText(path);
 
-                switch (CurXmlMode)
-                {
-                    case XmlMode.Excel:
+            switch (CurXmlMode)
+            {
+                case XmlMode.Excel:
                     {
                         StringReader dsr = new StringReader(content);
                         XmlTextReader xr = new XmlTextReader(dsr);
@@ -52,7 +50,7 @@ namespace Library.Excel
                         xr.Close();
                         return dt;
                     }
-                    case XmlMode.Navicat:
+                case XmlMode.Navicat:
                     {
                         XmlDocument doc = new XmlDocument();
                         doc.LoadXml(content);
@@ -74,23 +72,20 @@ namespace Library.Excel
                         }
                         if (jsonData.Count == 0)
                             return null;
-                        return (DataTable) jsonData;
+                        return (DataTable)jsonData;
                     }
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        public partial class Data
+        public static void ExportToXml(DataTable dt, string file)
         {
-            public static void ExportToXml(DataTable dt, string file)
-            {
-                string newPath = CheckExport(dt, file, ".xml");
+            string newPath = CheckExport(dt, file, ".xml");
 
-                switch (CurXmlMode)
-                {
-                    case XmlMode.Excel:
+            switch (CurXmlMode)
+            {
+                case XmlMode.Excel:
                     {
                         StringWriter dsw = new StringWriter();
                         XmlTextWriter xw = new XmlTextWriter(dsw);
@@ -99,8 +94,8 @@ namespace Library.Excel
                         xw.Close();
                         dsw.Close();
                     }
-                        break;
-                    case XmlMode.Navicat:
+                    break;
+                case XmlMode.Navicat:
                     {
                         XmlDocument doc = new XmlDocument();
                         XmlDeclaration xmldecl = doc.CreateXmlDeclaration("1.0", "UTF-8", "yes");
@@ -136,15 +131,12 @@ namespace Library.Excel
                         //    doc.Save(xtw);
                         //}
                     }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-              
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-        }
 
-        #endregion
+            #endregion
+        }
     }
 }

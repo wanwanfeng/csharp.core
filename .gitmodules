@@ -1,0 +1,6 @@
+[submodule "code/tools/litjson"]
+	path = code/tools/litjson
+	url = https://github.com/LitJSON/litjson.git
+[submodule "code/tools/YamlDotNet"]
+	path = code/tools/YamlDotNet
+	url = git@gitee.com:longdaddy/YamlDotNet.git

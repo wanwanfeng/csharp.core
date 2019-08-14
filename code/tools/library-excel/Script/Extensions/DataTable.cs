@@ -76,7 +76,7 @@ namespace Library.Excel
 
         public static explicit operator DataTable(JsonData jsonData)
         {
-            return (DataTable) (ListTable) jsonData;
+            return (DataTable)(ListTable)jsonData;
         }
 
         #endregion

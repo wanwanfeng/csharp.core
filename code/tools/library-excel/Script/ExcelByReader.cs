@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using Excel;
 
-#if true
+#if ExcelByReader
+using Excel;
 
 namespace Library.Excel
 {

@@ -46,7 +46,7 @@ namespace Script
                         return;
                     }
 
-                    if (result["words_result_num"].ToInt() <= 0)
+                    if (result["words_result_num"].ToString().AsInt() <= 0)
                         return;
 #endif
 

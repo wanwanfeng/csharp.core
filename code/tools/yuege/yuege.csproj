@@ -63,9 +63,9 @@
       <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
       <Name>library-excel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\library\library.csproj">
-      <Project>{7e85e039-6585-44c6-a410-e1a4406a753b}</Project>
-      <Name>library</Name>
+    <ProjectReference Include="..\litjson\src\LitJson\LitJSON.csproj">
+      <Project>{d7e7f7a5-5ed3-4784-897e-b7cac79787a4}</Project>
+      <Name>LitJSON</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

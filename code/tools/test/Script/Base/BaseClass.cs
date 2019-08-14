@@ -19,7 +19,7 @@ namespace Script
                 Rows = dic.Select(p => new List<object>() {p.Key, p.Value}).ToList(),
                 Columns = new List<string>() {"key", "value"}
             };
-            ExcelByBase.Data.ExportToExcel(listTable, Path.ChangeExtension(path, ".xlsx"));
+            ExcelUtils.ExportToExcel(listTable, Path.ChangeExtension(path, ".xlsx"));
         }
 
         public void CreateDirectory(string name)

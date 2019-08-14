@@ -57,22 +57,22 @@ namespace Script
 
         protected void ToCsv()
         {
-            ToCommon(ExcelByBase.Data.ExportToCsv);
+            ToCommon(ExcelUtils.ExportToCsv);
         }
 
         protected void ToJson()
         {
-            ToCommon((table, s) => { ExcelByBase.Data.ExportToJson(table, s, isIndent); });
+            ToCommon((table, s) => { ExcelUtils.ExportToJson(table, s, isIndent); });
         }
 
         protected void ToXml()
         {
-            ToCommon(ExcelByBase.Data.ExportToXml);
+            ToCommon(ExcelUtils.ExportToXml);
         }
 
         protected void ToExcel()
         {
-            ToCommon(ExcelByBase.Data.ExportToExcel);
+            ToCommon(ExcelUtils.ExportToExcel);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Script
 
             if (dts.Count == 0)
                 return;
-            ExcelByBase.Data.ExportToOneExcel(dts, InputPath);
+            ExcelUtils.ExportToOneExcel(dts, InputPath);
         }
 
         #region 键值对
@@ -177,7 +177,7 @@ namespace Script
                     dt.TableName = file.Replace(InputPath, "");
                     if (dt.IsArray)
                     {
-                        var list = ExcelByBase.Data.ConvertToRowsList(dt)
+                        var list = ExcelUtils.ConvertToRowsList(dt)
                             .Select(p => string.Join("|", p.Select(q => q.ToString()).ToArray()))
                             .Select(p => predicate.Length == 0 || predicate.First()(p))
                             .ToList();
@@ -245,7 +245,7 @@ namespace Script
                 }
             }
 
-            ExcelByBase.Data.ExportToExcel(dd, InputPath);
+            ExcelUtils.ExportToExcel(dd, InputPath);
         }
 
         /// <summary>

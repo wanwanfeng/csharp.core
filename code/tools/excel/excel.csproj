@@ -114,6 +114,10 @@
       <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
       <Name>library-excel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\litjson\src\LitJson\LitJSON.csproj">
+      <Project>{d7e7f7a5-5ed3-4784-897e-b7cac79787a4}</Project>
+      <Name>LitJSON</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

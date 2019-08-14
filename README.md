@@ -1,4 +1,4 @@
-C#基本库(扩展，excel操作，litjson继承)以及Unity基本库
+C#基本库(扩展，excel操作，litjson集成)以及Unity基本库
 
 C#基本库
 

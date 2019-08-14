@@ -18,7 +18,7 @@ namespace checkcard
             CheckPath(".xlsx").AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return ExcelUtils.ImportFromPath(file);
+                return ExcelUtils.ImportFromExcel(file);
             }).ForAll(dt =>
             {
                 Console.WriteLine(" is now : " + dt.FullName);

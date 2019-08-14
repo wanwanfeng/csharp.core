@@ -21,7 +21,7 @@ namespace Library.Excel
         /// <param name="file"></param>
         /// <param name="containsFirstLine"></param>
         /// <returns></returns>
-        public static IEnumerable<DataTable> ImportFromPath(string file, bool containsFirstLine)
+        public static IEnumerable<DataTable> ImportFromExcel(string file, bool containsFirstLine)
         {
             return ExcelByNpoi.ImportExcelToDataTable(file, containsFirstLine);
         }
@@ -32,7 +32,7 @@ namespace Library.Excel
         /// <param name="file"></param>
         /// <param name="lineCount"></param>
         /// <returns></returns>
-        public static IEnumerable<DataTable> ImportFromPath(string file, int lineCount = int.MaxValue)
+        public static IEnumerable<DataTable> ImportFromExcel(string file, int lineCount = int.MaxValue)
         {
             return ExcelByNpoi.ImportExcelToDataTable(file, lineCount);
         }

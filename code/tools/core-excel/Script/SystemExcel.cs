@@ -49,7 +49,7 @@ namespace Library.Excel
             return CheckPath(".xlsx|.xls", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return ExcelUtils.ImportFromPath(file, false).Select(p => (ListTable)p);
+                return ExcelUtils.ImportFromExcel(file, false).Select(p => (ListTable)p);
             });
         }
     }

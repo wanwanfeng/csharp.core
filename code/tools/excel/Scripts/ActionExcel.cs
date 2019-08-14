@@ -23,10 +23,10 @@ namespace Script
                 if (firstIsKey)
                 {
                     //自定义的输出（首行为key）
-                    return (file) => ExcelUtils.ImportFromPath(file, false);
+                    return (file) => ExcelUtils.ImportFromExcel(file, false);
                 }
                 //未经过滤原样输出
-                return (file) => ExcelUtils.ImportFromPath(file);
+                return (file) => ExcelUtils.ImportFromExcel(file);
             }
         }
 

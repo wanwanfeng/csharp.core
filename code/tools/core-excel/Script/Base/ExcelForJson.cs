@@ -17,10 +17,10 @@ namespace Library.Excel
             return (DataTable)JsonHelper.ImportJsonToListTable(path);
         }
 
-        public static void ExportToJson(DataTable list, string file, bool isIndent = true)
+        public static void ExportToJson(DataTable dt, string file, bool isIndent = true)
         {
-            string newPath = CheckExport(list, file, ".json");
-            JsonData resJsonDatas = (JsonData)list;
+            string newPath = CheckExport(dt, file, ".json");
+            JsonData resJsonDatas = (JsonData)dt;
             File.WriteAllText(newPath,
                 isIndent ? JsonHelper.ToJson(resJsonDatas, indentLevel: 2) : JsonHelper.ToJson(resJsonDatas),
                 new UTF8Encoding(false));

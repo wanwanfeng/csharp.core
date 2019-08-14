@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using Library;
 using Library.Excel;
+using Library.Extensions;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace search.Script
 {
     public class SearchIP : BaseSearch
@@ -21,7 +21,7 @@ namespace search.Script
         {
             var res = new ListTable();
 
-            urls.ForEachPaths(url =>
+            urls.ForEachPathsAndSleep(url =>
             {
                 HtmlWeb webClient = new HtmlWeb();
                 HtmlDocument doc = webClient.Load(url);

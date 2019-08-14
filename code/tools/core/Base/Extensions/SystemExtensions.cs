@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Library.Helper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Library.Helper;
 
 namespace Library.Extensions
 {
@@ -135,6 +135,23 @@ namespace Library.Extensions
                 //Console.WriteLine("is now : " + (((float) i)/target.Count).ToString("p") + "\t" + p);
                 if (File.Exists(p)) callAction(p);
             });
+        }
+
+        /// <summary>
+        /// 默认1000毫秒循环一次
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <param name="callAction"></param>
+        /// <param name="millisecondsTimeout"></param>
+        public static void ForEachPathsAndSleep(this IEnumerable<string> paths, Action<string> callAction, int millisecondsTimeout = 1000)
+        {
+            paths.Select(p => p.Replace("\\", "/")).ToList().ForEach((p, i, target) =>
+            {
+                System.Threading.Thread.Sleep(millisecondsTimeout);
+                SystemConsole.SetProgress(p, ((float)i) / target.Count);
+                callAction(p);
+            });
+            SystemConsole.ClearProgress();
         }
     }
 

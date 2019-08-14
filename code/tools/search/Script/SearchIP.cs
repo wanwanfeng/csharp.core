@@ -45,9 +45,7 @@ namespace search.Script
                     res.Rows.Add(temp);
                 }
             });
-
-            ExcelByBase.Data.ExportToExcel(res, "temp.xlsx");
-
+            ExcelUtils.ExportToExcel(res, "temp.xlsx");
             //File.WriteAllText("temp.txt", JsonHelper.ToJson((JsonData) res, indentLevel: 2));
         }
     }

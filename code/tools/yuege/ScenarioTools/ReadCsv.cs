@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -40,7 +41,7 @@ namespace scenario_tools
             File.WriteAllText("scenario.txt", JsonHelper.ToJson(res));
 
             string outpath = Environment.CurrentDirectory + "/scenario.xlsx";
-            ExcelUtils.ExportToExcel((DataTable) res, outpath);
+            ExcelUtils.ExportToExcel((DataTable)(ListTable)res, outpath);
         }
 
         /// <summary>

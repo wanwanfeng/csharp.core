@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -119,7 +120,7 @@ namespace fileDownload
                 case "1":
                 {
                     var path = string.Format("{0}/{1}.xlsx", root, jsonName);
-                    var tables = ExcelUtils.ImportFromExcel(path, false).Select(p => (JsonData) p).ToList();
+                    var tables = ExcelUtils.ImportFromExcel(path, false).Select(p => (JsonData)(ListTable)p).ToList();
                     dic = tables.First().Cast<JsonData>().ToDictionary(p => p["file_name"].ToString(), q => q);
                     var newPath = root + "res/master/" + jsonName + ".json";
                     File.WriteAllText(newPath, JsonHelper.ToJson(dic));

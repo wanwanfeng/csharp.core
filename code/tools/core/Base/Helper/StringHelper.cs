@@ -31,5 +31,50 @@ namespace Library.Helper
             var regex = new Regex(@"\\u([0-9A-F]{4})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
             return regex.Replace(source, x => Convert.ToChar(Convert.ToUInt16(x.Result("$1"), 16)).ToString());
         }
+        /// <summary>
+        /// 使用litjson的方法进行uncode进行转换
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static string StringToUnicode(string source)
+        {
+            StringBuilder sb = new StringBuilder(1024);
+            foreach (var _char in source.ToCharArray())
+            {
+                if ((int)_char >= 32 && (int)_char <= 126)
+                {
+                    sb.Append(_char);
+                    continue;
+                }
+                sb.Append("\\u");
+                sb.Append(IntToHex(_char));
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 来自于litjson
+        /// </summary>
+        /// <param name="_char"></param>
+        /// <returns></returns>
+        private static char[] IntToHex(int _char)
+        {
+            int n = _char;
+
+            int num;
+            char[] hex = new char[4];
+            for (int i = 0; i < 4; i++)
+            {
+                num = n % 16;
+
+                if (num < 10)
+                    hex[3 - i] = (char)('0' + num);
+                else
+                    hex[3 - i] = (char)('A' + (num - 10));
+
+                n >>= 4;
+            }
+            return hex;
+        }
     }
 }

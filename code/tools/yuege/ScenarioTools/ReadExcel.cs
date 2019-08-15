@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Library;
 using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
@@ -16,7 +17,7 @@ namespace scenario_tools
             var filePath = SystemConsole.GetInputStr("请输入剧情文件（.xls|.xlsx）：",
                 def: @"D:\Work\yuege\www\assets\res\scenario.xls");
 
-            var cache = ExcelUtils.ImportFromExcel(filePath, false).Select(p => (JsonData) p).Select(
+            var cache = ExcelUtils.ImportFromExcel(filePath, false).Select(p => (JsonData)(ListTable)p).Select(
                 data =>
                 {
                     var dic = data.Cast<JsonData>()

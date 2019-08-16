@@ -55,17 +55,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{0106F8B5-5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fgo", "fgo\fgo.csproj", "{68F56591-E79D-4A64-AFDF-046BBF05B744}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "core-version", "core-version\core-version.shproj", "{666BF49F-317B-414E-8B1D-F9B6E530BCF0}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		core-excel\core-excel.projitems*{03e61b0c-84a1-44ba-ade5-55d8804012d1}*SharedItemsImports = 4
+		core-version\core-version.projitems*{03e61b0c-84a1-44ba-ade5-55d8804012d1}*SharedItemsImports = 4
 		core-excel\core-excel.projitems*{1962049b-a853-4b8c-8230-3ab672039553}*SharedItemsImports = 13
 		HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{32127943-c42d-4bd5-b9d3-989b9a16851a}*SharedItemsImports = 4
 		HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{5ba9a0d7-173f-4c4f-affa-3dd6dc2f9a79}*SharedItemsImports = 13
 		HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{5cdb9969-16af-4fa4-bf72-5ab1a5ad041f}*SharedItemsImports = 4
+		core-version\core-version.projitems*{666bf49f-317b-414e-8b1d-f9b6e530bcf0}*SharedItemsImports = 13
 		core-excel\core-excel.projitems*{6c94196a-13a2-4016-9f59-9e426353e92f}*SharedItemsImports = 4
+		core-version\core-version.projitems*{6c94196a-13a2-4016-9f59-9e426353e92f}*SharedItemsImports = 4
 		core\core.projitems*{6c94196a-13a2-4016-9f59-9e426353e92f}*SharedItemsImports = 4
+		core-version\core-version.projitems*{7e85e039-6585-44c6-a410-e1a4406a753b}*SharedItemsImports = 4
 		core\core.projitems*{7e85e039-6585-44c6-a410-e1a4406a753b}*SharedItemsImports = 4
 		core\core.projitems*{c18e12c1-7251-4f80-9b2d-45992f45ccbc}*SharedItemsImports = 13
+		core-version\core-version.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
 		core\core.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -274,6 +281,7 @@ Global
 		{1962049B-A853-4B8C-8230-3AB672039553} = {0106F8B5-5AD9-4442-BE18-7170909D1F27}
 		{0106F8B5-5AD9-4442-BE18-7170909D1F27} = {A62857D2-8324-436D-A52A-E231080FBDA7}
 		{68F56591-E79D-4A64-AFDF-046BBF05B744} = {0C278015-4345-4711-A29C-F5F0AFC725DD}
+		{666BF49F-317B-414E-8B1D-F9B6E530BCF0} = {0106F8B5-5AD9-4442-BE18-7170909D1F27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE149189-FAEA-4629-8C50-C17EE7103F6E}

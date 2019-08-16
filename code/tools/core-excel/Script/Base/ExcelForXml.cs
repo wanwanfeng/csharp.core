@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Library.Extensions;
 using Library.Helper;
 using LitJson;
 
@@ -41,7 +42,6 @@ namespace Library.Excel
 
                         var dt = new DataTable
                         {
-                            FullName = path,
                             TableName = Path.GetFileNameWithoutExtension(path)
                         };
 
@@ -72,7 +72,7 @@ namespace Library.Excel
                         }
                         if (jsonData.Count == 0)
                             return null;
-                        return (DataTable)(ListTable)jsonData;
+                        return ((ListTable)jsonData).ToDataTable();
                     }
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -103,7 +103,7 @@ namespace Library.Excel
                         XmlNode docNode = doc.CreateElement("RECORDS");
                         doc.AppendChild(docNode);
 
-                        ListTable list = (ListTable)dt;
+                        ListTable list = dt.ToListTable();
                         foreach (List<object> objects in list.Rows)
                         {
                             var node = doc.CreateElement("RECORD");

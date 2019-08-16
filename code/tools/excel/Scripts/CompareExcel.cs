@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Data;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,8 +21,8 @@ namespace Script
             var dir1 = SystemConsole.GetInputStr("请拖入目标文件(.xls|xlsx):", "您选择的文件：");
             var dir2 = SystemConsole.GetInputStr("请拖入比较文件(.xls|xlsx):", "您选择的文件：");
 
-            var listTables = ExcelUtils.ImportFromExcel(dir1).Select(p => (ListTable) p).ToDictionary(p => p.TableName);
-            var listTables2 = ExcelUtils.ImportFromExcel(dir2).Select(p => (ListTable) p).ToDictionary(p => p.TableName);
+            var listTables = ExcelUtils.ImportFromExcel(dir1).Select(p =>  p.ToListTable()).ToDictionary(p => p.TableName);
+            var listTables2 = ExcelUtils.ImportFromExcel(dir2).Select(p =>  p.ToListTable()).ToDictionary(p => p.TableName);
 
             foreach (var keyValuePair in listTables)
             {
@@ -42,9 +42,9 @@ namespace Script
                     // ReSharper disable once PossibleNullReferenceException
                     var newName = Path.ChangeExtension(dir1, "").Trim('.') + "-" + Path.GetFileNameWithoutExtension(dir2);
                     keyValuePair.Value.Rows = exceptList.ToList();
-                    ExcelUtils.ExportToExcel(keyValuePair.Value, string.Format("{0}-except.xlsx", newName));
+                    ExcelUtils.ExportToExcel(keyValuePair.Value.ToDataTable(), string.Format("{0}-except.xlsx", newName));
                     keyValuePair.Value.Rows = intersectList.ToList();
-                    ExcelUtils.ExportToExcel(keyValuePair.Value, string.Format("{0}-intersect.xlsx", newName));
+                    ExcelUtils.ExportToExcel(keyValuePair.Value.ToDataTable(), string.Format("{0}-intersect.xlsx", newName));
                 }
                 else
                 {
@@ -90,11 +90,7 @@ namespace Script
             }
 
 
-            var res = listTables.Select(p =>
-            {
-                p.Value.Remove("key");
-                return p.Value;
-            }).ToArray();
+            var res = listTables.Select(p => { return p.Value.Remove("key"); }).ToArray();
             File.WriteAllText("intersectList.json", JsonHelper.ToJson(res, indentLevel: 2));
         }
     }

@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Library.Excel;
+using Library.Extensions;
+using Library.Helper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Library;
-using Library.Excel;
-using Library.Extensions;
-using Library.Helper;
-using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {
@@ -62,7 +60,7 @@ namespace Script
 
         protected void ToJson()
         {
-            ToCommon((table, s) => { ExcelUtils.ExportToJson(table, s, isIndent); });
+            ToCommon((dt, file) => { ExcelUtils.ExportToJson(dt, file, isIndent); });
         }
 
         protected void ToXml()
@@ -72,7 +70,7 @@ namespace Script
 
         protected void ToExcel()
         {
-            ToCommon(ExcelUtils.ExportToExcel);
+            ToCommon((dt, file) => { ExcelUtils.ExportToExcel(dt, file); });
         }
 
         /// <summary>
@@ -92,7 +90,7 @@ namespace Script
 
             if (dts.Count == 0)
                 return;
-            ExcelUtils.ExportToOneExcel(InputPath, dts);
+            ExcelUtils.ExportToExcel(dts, InputPath);
         }
 
         #region 键值对
@@ -175,7 +173,8 @@ namespace Script
                 dts.ForEach(dt =>
                 {
                     dt.TableName = file.Replace(InputPath, "");
-                    if (dt.IsArray)
+                    //if (dt.IsArray)
+                    if (true)
                     {
                         var list = ExcelUtils.ConvertToRowsList(dt)
                             .Select(p => string.Join("|", p.Select(q => q.ToString()).ToArray()))
@@ -194,7 +193,7 @@ namespace Script
                     }
                     else
                     {
-                        var lt = (ListTable) dt;
+                        var lt = dt.ToListTable();
                         lt.Rows = lt.Rows
                             .ToDictionary(p => p, p => string.Join("", p.Select(q => q.ToString()).ToArray()))
                             .Where(p => predicate.Length == 0 || predicate.First()(p.Value))
@@ -203,7 +202,7 @@ namespace Script
                             .Select(p => p.Key)
                             .ToList();
                         //返回符合正则表达式的行
-                        dtObject.Add(lt);
+                        dtObject.Add(lt.ToDataTable());
                     }
                 });
             });
@@ -273,7 +272,8 @@ namespace Script
                         var data = import(fullpath).FirstOrDefault();
                         var columns = data.Columns;
 
-                        if (data.IsArray)
+                        //if (data.IsArray)
+                        if (true)
                         {
                             foreach (List<object> objects in pair.Value)
                             {

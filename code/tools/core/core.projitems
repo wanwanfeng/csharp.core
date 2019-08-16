@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\ICollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\LinqExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\ObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\JsonDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\PathExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\RandomExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\StreamExtensions.cs" />

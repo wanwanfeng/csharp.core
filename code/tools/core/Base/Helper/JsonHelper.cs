@@ -90,7 +90,6 @@ namespace Library.Helper
             string content = File.ReadAllText(file);
             ListTable listTable = ConvertJsonToListTable(content, func);
             listTable.TableName = Path.GetFileName(file);
-            listTable.FullName = file;
             return listTable;
         }
 
@@ -107,11 +106,9 @@ namespace Library.Helper
 namespace Library
 {
     [Serializable]
-    public class ListTable
+    public partial class ListTable
     {
         public string TableName = "";
-        public string FullName = "";
-        public bool IsArray = true;
         /// <summary>
         /// key列表
         /// </summary>

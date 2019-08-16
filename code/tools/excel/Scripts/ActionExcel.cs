@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using Library;
-using Library.Excel;
+﻿using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.IO;
 
 namespace Script
 {
@@ -32,7 +32,7 @@ namespace Script
 
         public override Action<DataTable, string> export
         {
-            get { return ExcelUtils.ExportToExcel; }
+            get { return (dt, file) => { ExcelUtils.ExportToExcel(dt, file); }; }
         }
 
         public ActionExcel()
@@ -77,11 +77,11 @@ namespace Script
         {
             public FixExcel()
             {
-                ToCommon(ExcelUtils.ExportToExcel, data =>
+                ToCommon((dt, file) => { ExcelUtils.ExportToExcel(dt, file); }, data =>
                 {
                     if (data == null) return null;
                     var path = Path.ChangeExtension(InputPath, "").TrimEnd('.');
-                    var list = (ListTable) data;
+                    var list = data.ToListTable();
                     foreach (List<object> objects in list.Rows)
                     {
                         var temp = path + objects[0].ToString();
@@ -93,7 +93,7 @@ namespace Script
                         string value_zh_cn = objects[4].ToString();
                         objects[3] = JsonHelper.ReadValueByKeyPath(json, id.ToString());
                     }
-                    return (DataTable) list;
+                    return list.ToDataTable();
                 });
             }
         }

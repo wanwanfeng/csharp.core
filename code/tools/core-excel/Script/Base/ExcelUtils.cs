@@ -1,5 +1,6 @@
 ﻿using Library.Helper;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 
@@ -9,7 +10,6 @@ namespace Library.Excel
     {
         private static string CheckExport(DataTable dt, string file, string extension)
         {
-            file = string.IsNullOrEmpty(file) ? dt.FullName : file;
             string newPath = Path.ChangeExtension(file, extension);
             DirectoryHelper.CreateDirectory(newPath);
             return newPath;
@@ -37,15 +37,15 @@ namespace Library.Excel
             return ExcelByNpoi.ImportExcelToDataTable(file, lineCount);
         }
 
-        public static void ExportToExcel(DataTable dt, string file)
+        public static void ExportToExcel(DataTable dt, string file, string extension = ".xlsx")
         {
-            string newPath = CheckExport(dt, file, ".xlsx");
+            string newPath = CheckExport(dt, file, extension);
             ExcelByNpoi.ExportDataTableToExcel(newPath, dt);
         }
 
-        public static void ExportToOneExcel(string file, IEnumerable<DataTable> dts)
+        public static void ExportToExcel(IEnumerable<DataTable> dts, string file, string extension = ".xlsx")
         {
-            string newPath = Path.ChangeExtension(file, "xlsx");
+            string newPath = Path.ChangeExtension(file, extension);
             DirectoryHelper.CreateDirectory(newPath);
             ExcelByNpoi.ExportDataTableToExcel(newPath, dts.ToArray());
         }

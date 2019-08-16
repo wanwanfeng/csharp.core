@@ -6,35 +6,6 @@ using Library.Extensions;
 using Library.Helper;
 using LitJson;
 
-namespace LitJson
-{
-    public static class JsonDataExtensions
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="jsonData"></param>
-        /// <param name="indentLevel">缩进级别</param>
-        /// <param name="validate">错误校验输出</param>
-        /// <returns></returns>
-        public static string ToJson(this JsonData jsonData, int indentLevel = 0, bool validate = true)
-        {
-            if (indentLevel == 0 && validate)
-                return jsonData.ToJson();
-
-            StringWriter sw = new StringWriter();
-            JsonWriter jsonWriter = new JsonWriter(sw)
-            {
-                PrettyPrint = true,
-                IndentValue = indentLevel,
-                Validate = validate,
-            };
-            jsonData.ToJson(jsonWriter);
-            return sw.ToString().Trim('\r', '\n');
-        }
-    }
-}
-
 namespace Library.LitJson
 {
     public partial class LitJsonHelper : IJsonHelper
@@ -117,7 +88,7 @@ namespace Library.LitJson
                     }
                     list.Add(val);
                 }
-                return new ListTable {IsArray = true, Columns = keys, Rows = list};
+                return new ListTable {Columns = keys, Rows = list};
             }
             if (data.IsObject)
             {
@@ -127,7 +98,7 @@ namespace Library.LitJson
                     p.Key,
                     func == null ? p.Value : func(p.Value)
                 }).ToList();
-                return new ListTable {IsArray = false, Columns = new List<string> {"key", "value"}, Rows = list};
+                return new ListTable {Columns = new List<string> {"key", "value"}, Rows = list};
             }
             return new ListTable();
         }

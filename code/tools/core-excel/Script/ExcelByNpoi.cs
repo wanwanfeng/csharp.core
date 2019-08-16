@@ -108,7 +108,6 @@ namespace Library.Excel
             {
                 DataTable dt = new DataTable
                 {
-                    FullName = file,
                     TableName = sheet.SheetName,
                 };
 
@@ -247,7 +246,6 @@ namespace Library.Excel
                 //表名
                 DataTable dt = new DataTable
                 {
-                    FullName = file,
                     TableName = sheet.SheetName,
                 };
 

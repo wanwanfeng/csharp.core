@@ -23,8 +23,7 @@ namespace checkcard
         {
             GetListTables().AsParallel().ForAll(lt =>
             {
-                Console.WriteLine(" is now : " + lt.FullName);
-                if (!lt.IsArray) return;
+                Console.WriteLine(" is now : " + lt.TableName);
                 List<string> res = new List<string>();
 
                 foreach (List<object> list in lt.Rows)
@@ -63,7 +62,7 @@ namespace checkcard
                 row[4] = list[4];
             }
 
-            ExcelUtils.ExportToExcel(dts[0], InputPath + ".xlsx");
+            ExcelUtils.ExportToExcel(dts.First().ToDataTable(), InputPath, ".xlsx");
         }
     }
 }

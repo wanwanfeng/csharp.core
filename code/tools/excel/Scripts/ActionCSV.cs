@@ -5,7 +5,6 @@ using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using Library.Excel;
-using DataTable = Library.Excel.DataTable;
 
 namespace Script
 {

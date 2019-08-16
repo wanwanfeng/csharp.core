@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Library.Excel;
+﻿using Library.Excel;
 using Library.Extensions;
 using Library.Helper;
 using LitJson;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
 
 namespace checkcard
 {
@@ -15,28 +16,27 @@ namespace checkcard
         public ExportScenario()
         {
             var faied = new ConcurrentBag<string> {DateTime.Now.ToString("yy-MM-dd hh:mm:ss")};
-            CheckPath(".xlsx").AsParallel().SelectMany(file =>
+            CheckPath(".xlsx").AsParallel().Select(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return ExcelUtils.ImportFromExcel(file);
-            }).ForAll(dt =>
+                return new { dt = ExcelUtils.ImportFromExcel(file).First(), FullName = file };
+            }).ForAll((ins) =>
             {
-                Console.WriteLine(" is now : " + dt.FullName);
-                if (!dt.IsArray) return;
+                Console.WriteLine(" is now : " + ins.FullName);
 
                 try
                 {
-                    var result = GetJsonValue(dt);
+                    var result = GetJsonValue(ins.dt);
                     if (result == null)
                     {
-                        faied.Add(dt.FullName);
+                        faied.Add(ins.FullName);
                         return;
                     }
-                    File.WriteAllText(Path.ChangeExtension(dt.FullName, "json"), JsonHelper.ToJson(result));
+                    File.WriteAllText(Path.ChangeExtension(ins.FullName, "json"), JsonHelper.ToJson(result));
                 }
                 catch (Exception e)
                 {
-                    faied.Add(dt.FullName);
+                    faied.Add(ins.FullName);
                     faied.Add("#" + e.StackTrace);
                 }
             });

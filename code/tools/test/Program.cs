@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Library;
 using Library.Extensions;
 
@@ -57,10 +58,80 @@ namespace Script
         }
     }
 
+    internal static class TestYIHUO
+    {
+        private static void Main(string[] args)
+        {
+            string key = "fdgjdjgdgkjdhfjdyhjkfghk";
+
+            string str = @"Python 是一个高层次的结合了解释性、编译性、互动性和面向对象的脚本语言。
+            Python 的设计具有很强的可读性，相比其他语言经常使用英文关键字，其他语言的一些标点符号，它具有比其他语言更有特色语法结构。";
+            //            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(str);
+            //            Console.WriteLine(string.Join(",", byteArray.Select(p => p.ToString())));
+            //            Console.WriteLine(str);
+            //            Console.WriteLine(str.Length);
+            //            Console.WriteLine(byteArray.Length);
+
+            //            byte[] byteArray2 = byteArray.Select((p, i) => (byte)(p ^ keyArray[i % keyArray.Length])).ToArray();
+            //            File.WriteAllText("sssssss.txt", str);
+            //            File.WriteAllBytes("sssssss.bytes", byteArray2);
+            //            Console.WriteLine(string.Join(",", byteArray2.Select(p => p.ToString())));
+            //            Console.WriteLine(byteArray2.Length);
+
+            //            byte[] byteArray3 = byteArray2.Select((p, i) => (byte)(p ^ keyArray[i % keyArray.Length])).ToArray();
+            //            Console.WriteLine(string.Join(",", byteArray3.Select(p => p.ToString())));
+            //            {
+            //                string reault = System.Text.Encoding.UTF8.GetString(byteArray3);
+            //                Console.WriteLine(reault);
+            //                Console.WriteLine(reault.Length);
+            //                Console.WriteLine(byteArray3.Length);
+            //            }
+
+            int length = 1000000;
+            Console.WriteLine(str);
+            {
+                long time = DateTime.UtcNow.Ticks;
+                for (int i = 0; i < length; i++)
+                {
+                    var xxx = EncryptExtensions.XOR(Encoding.UTF8.GetBytes(str), key);
+                    var yyy = EncryptExtensions.XOR(xxx, key);
+                    //Console.WriteLine(Encoding.UTF8.GetString(yyy));
+                }
+
+                Console.WriteLine("上面这段程序运行了{0}秒",(DateTime.UtcNow.Ticks - time) / 10000000.0);
+            }
+
+            Console.WriteLine(str);
+            {
+                long time = DateTime.UtcNow.Ticks;
+                for (int i = 0; i < length; i++)
+                {
+                    var xxx = Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+                    var yyy = Convert.FromBase64String(xxx);
+                    //Console.WriteLine(Encoding.UTF8.GetString(yyy));
+                }
+
+                Console.WriteLine("上面这段程序运行了{0}秒", (DateTime.UtcNow.Ticks - time) / 10000000.0);
+            }
+            Console.ReadKey();
+        }
+    }
+
     internal static class Test
     {
         private static void Main(string[] args)
         {
+
+            LitJson.JsonData json = new LitJson.JsonData();
+            json["dddd"] = "ghdfgh";
+            json["8987"] = "fghf";
+            json["kjljk"] = "kkkk";
+            json["7777"] = 90909;
+
+            json = json.Remove("kjljk");
+
+            Console.WriteLine(json);
+
             FileInfo fileInfo = new FileInfo("TextFile");
             Console.WriteLine("ex:{0}", fileInfo.Extension);
             Console.WriteLine("ex:{0}", fileInfo.Length);

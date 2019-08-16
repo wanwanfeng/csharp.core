@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Library.Helper;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,13 @@ namespace findText.Script
         }
 
 
-        protected Dictionary<string, object> CacheYamlObject(string[] inputs)
+        public class StructInfo
+        {
+            public List<string> lines;
+            public object yamlObject;
+        }
+
+        protected Dictionary<string, StructInfo> CacheYamlObject(string[] inputs)
         {
             Dictionary<string, List<string>> contents = new Dictionary<string, List<string>>();
             var curKey = "";
@@ -38,7 +45,7 @@ namespace findText.Script
                 contents[curKey].Add(line);
             }
 
-            Dictionary<string, object> cache = new Dictionary<string, object>();
+            Dictionary<string, StructInfo> cache = new Dictionary<string, StructInfo>();
 
             foreach (var item in contents)
             {
@@ -49,7 +56,11 @@ namespace findText.Script
                 var deserializer = new DeserializerBuilder().WithNamingConvention(new CamelCaseNamingConvention()).Build();
 
                 var yamlObject = (Dictionary<object, object>)deserializer.Deserialize(r);
-                cache[item.Key] = yamlObject;
+                cache[item.Key] = new StructInfo()
+                {
+                    lines = item.Value,
+                    yamlObject = yamlObject
+                };
             }
 
             return cache;
@@ -63,7 +74,7 @@ namespace findText.Script
             var cache = CacheYamlObject(inputs.Skip(2).ToArray());
             foreach (var pair in cache)
             {
-                var yamlObject = (Dictionary<object, object>)pair.Value;
+                var yamlObject = (Dictionary<object, object>)pair.Value.yamlObject;
                 foreach (var item in yamlObject)
                 {
                     if (item.Key.ToString() == "MonoBehaviour")
@@ -103,9 +114,10 @@ namespace findText.Script
 
             void ReadAllLines(KeyValuePair<string, List<List<object>>> valuePair, string file)
             {
-                bool isSave = false;
                 string[] inputs = File.ReadAllLines(file);
                 var cache = CacheYamlObject(inputs.Skip(2).ToArray());
+
+                Dictionary<string, bool> cacheSave = new Dictionary<string, bool>();
 
                 foreach (List<object> data in valuePair.Value)
                 {
@@ -114,24 +126,26 @@ namespace findText.Script
                     string newStr = data[Convert["译文"]].ToString();
 
                     Queue<string> queues = new Queue<string>(xPath.Split('/'));
-                    if (cache.ContainsKey(queues.Peek()))
+
+                    var key = queues.Peek();
+                    cacheSave[key] = false; 
+                    if (cache.ContainsKey(key))
                     {
-                        var yamlObject = (Dictionary<object, object>)cache[queues.Dequeue()];
+                        var yamlObject = (Dictionary<object, object>)cache[queues.Dequeue()].yamlObject;
                         if (yamlObject.ContainsKey(queues.Peek()))
                         {
                             var dic = (Dictionary<object, object>)yamlObject[queues.Dequeue()];
                             if (dic.ContainsKey(queues.Peek()))
                             {
-                                dic[queues.Dequeue()] = newStr;
-                                isSave = true;
+                                dic[queues.Dequeue()] = string.Format("\"{0}\"", StringHelper.StringToUnicode(newStr));
+                                cacheSave[key] = true;
                             }
                         }
                     }
                 }
-                if (isSave)
+                if (cacheSave.Values.Contains(true))
                 {
                     List<string> results = inputs.Take(2).ToList();
-
 
                     //var serializer = new Serializer();
                     //var serializer = new SerializerBuilder().Build();
@@ -140,8 +154,15 @@ namespace findText.Script
                     foreach (var pair in cache)
                     {
                         results.Add(pair.Key);
-                        var str = serializer.Serialize(pair.Value);
-                        results.AddRange(str.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+                        if (cacheSave.ContainsKey(pair.Key) && cacheSave[pair.Key])
+                        {
+                            var str = serializer.Serialize(pair.Value.yamlObject);
+                            results.AddRange(str.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+                        }
+                        else
+                        {
+                            results.AddRange(pair.Value.lines);
+                        }
                     }
 
                     File.WriteAllLines(file, results.ToArray());

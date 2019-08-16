@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ExcelByNpoi</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ExcelByNpoi;net35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

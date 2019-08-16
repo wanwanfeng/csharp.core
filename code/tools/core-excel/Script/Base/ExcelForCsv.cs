@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Library.Extensions;
 using Library.Helper;
 
 namespace Library.Excel
@@ -56,21 +58,19 @@ namespace Library.Excel
                     throw new ArgumentOutOfRangeException();
             }
             if (list.Count == 0) return null;
-            return (DataTable)new ListTable()
+            return new ListTable()
             {
                 TableName = Path.GetFileNameWithoutExtension(path),
-                FullName = path,
-                IsArray = true,
                 Columns = list.First().Cast<string>().ToList(),
                 Rows = list.Skip(1).ToList()
-            };
+            }.ToDataTable();
         }
 
         public static void ExportToCsv(DataTable dt, string file)
         {
             string newPath = CheckExport(dt, file, ".csv");
 
-            var list = (ListTable)dt;
+            var list = dt.ToListTable();
             switch (CurCsvMode)
             {
                 case CsvMode.CsvHelp:

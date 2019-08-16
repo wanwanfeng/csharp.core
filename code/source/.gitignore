@@ -1,0 +1,13 @@
+/.vs
+/Assets
+/ProjectSettings
+/Temp
+/Assembly-CSharp.csproj
+/Assembly-CSharp-Editor.csproj
+/source.CSharp.csproj
+/source.CSharp.Editor.csproj
+/source.sln
+/source.sln.DotSettings.user
+/source.v12.suo
+/Library
+/obj

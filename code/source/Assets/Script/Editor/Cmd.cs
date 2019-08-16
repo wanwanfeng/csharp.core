@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Library.Compress;
+using Library.Extensions;
 using Library.Helper;
 using UnityEngine;
 using UnityEditor;
 
+[InitializeOnLoad]
 public class Cmd : Editor
 {
     [MenuItem("Tools/GetFileData")]
@@ -30,7 +32,7 @@ public class Cmd : Editor
                     var index = p.LastIndexOf(flag, StringComparison.Ordinal);
                     return p.Substring(index + flag.Length);
                 });
-        FileHelper.CreateDirectory(path);
+        DirectoryHelper.CreateDirectory(path);
         File.WriteAllLines(path,
             cache.Select(
                 p =>
@@ -39,8 +41,7 @@ public class Cmd : Editor
                     string group = "";
                     if (index != -1)
                         group = p.Value.Substring(0, index);
-                    return Library.Encrypt.MD5("潘之琳") + "," + p.Value + "," +
-                           Library.Encrypt.MD5(p.Value);
+                    return "潘之琳".MD5() + "," + p.Value + "," + p.Value.MD5();
                 })
                 .ToArray());
         AssetDatabase.Refresh();

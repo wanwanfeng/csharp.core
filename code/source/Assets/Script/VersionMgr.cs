@@ -1,15 +1,16 @@
 ﻿#define MD5
 
+using Library;
+using Library.Extensions;
+using Library.Helper;
 using System;
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Library.Helper;
-using UnityEngine.Library;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 //增量更新
@@ -36,17 +37,18 @@ using Debug = UnityEngine.Debug;
 //├─patch-23-33.txt
 //│      
 
-
 public class VersionMgr : SingletonBehaviour<VersionMgr>
 {
     public static string SoftwareVersion { get; set; }
     protected static string KeyMd5 { get; private set; }
+    protected static string KeyAes { get; private set; }
+    protected static string HeadAes { get; private set; }
 
     static VersionMgr()
     {
         KeyMd5 = "";
-        Library.AES.Key = Library.Encrypt.MD5("YmbEV0FVzZN/SvKCCoJje/jSpM");
-        Library.AES.Head = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl";
+        KeyAes = "YmbEV0FVzZN/SvKCCoJje/jSpM".MD5();
+        HeadAes = "JKRihFwgicIzkBPEyyEn9pnpoANbyFuplHl".MD5();
     }
 
     public class FilePatchInfo : FileVersion.FilePatchInfo
@@ -64,7 +66,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             get
             {
                 if (File.Exists(fileLocal))
-                    return !Library.Encrypt.ComparerMD5(content_hash, File.ReadAllText(fileLocal));
+                    return !content_hash.ComparerMD5(File.ReadAllText(fileLocal), KeyMd5);
                 return true;
             }
         }
@@ -113,7 +115,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             {
                 if (!File.Exists(Access.PersistentDataTempPath + path))
                     return "";
-                var temp = Library.Encrypt.MD5(File.ReadAllBytes(Access.PersistentDataTempPath + path));
+                var temp = File.ReadAllBytes(Access.PersistentDataTempPath + path).MD5();
                 return temp;
             }
         }
@@ -141,7 +143,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             this.dataType = DataType.PersistentDataPath;
             patchInfo = info;
 
-            path = fileInfo.path_hash;
+            path = fileInfo.path;
             version = fileInfo.version;
             is_delete = fileInfo.is_delete;
             content_size = fileInfo.content_size;
@@ -237,7 +239,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                 {
                     if (res == null)
                         return;
-                    var hash = Library.Encrypt.MD5(res);
+                    var hash = res.MD5();
                     if (info.IsEncrypt())
                     {
                         if (hash != info.encrypt_hash) return;
@@ -260,11 +262,11 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                 if (bytes.Length == 0) yield break;
 
                 ActionState(State.ApplyPatchList);
-                string content = info.IsEncrypt() ? Library.Dencrypt.AES(bytes) : Encoding.UTF8.GetString(bytes);
-                patchCache[info.fileUrl] =
-                    LitJsonHelper.ToObject<FileVersion.FileDetailInfo[]>(content.Trim())
-                        .Select(p => new FileDetailInfo(info, p))
-                        .ToDictionary(p => p.path);
+                string content = info.IsEncrypt() ? bytes.AES_Dencrypt() : Encoding.UTF8.GetString(bytes);
+                patchCache[info.fileUrl] = Library.Helper.JsonHelper.ToObject<FileVersion.FileDetailInfo[]>(
+                    content.Trim())
+                    .Select(p => new FileDetailInfo(info, p))
+                    .ToDictionary(p => p.path);
             }
             else
             {
@@ -335,7 +337,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                                 if (res == null)
                                     return;
 
-                                var hash = Library.Encrypt.MD5(res);
+                                var hash = res.MD5();
 
                                 if (resInfo.IsEncrypt())
                                 {
@@ -347,7 +349,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                                 }
 
                                 ActionState(State.ApplyResource);
-                                FileHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
+                                DirectoryHelper.CreateDirectory(Access.PersistentDataTempPath + resInfo.path);
                                 File.WriteAllBytes(Access.PersistentDataTempPath + resInfo.path, res);
                                 resInfo.is_ready = true;
                             });
@@ -366,7 +368,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             ActionState(State.DownPatchZip);
             yield return Access.FromRemote(info.path + ".zip", res =>
             {
-                if (res == null || Library.Encrypt.MD5(res) != info.zip_hash) return;
+                if (res == null || res.MD5() != info.zip_hash) return;
                 var zipName = Access.PersistentDataPatchPath + info.path + ".zip";
                 File.WriteAllBytes(zipName, res);
                 ActionState(State.UnMakePatchZip);
@@ -437,19 +439,6 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
     private Dictionary<string, List<string>> streamingAssetsCache { get; set; }
     private Dictionary<string, VersionInfo> patchListCache { get; set; }
 
-    /// <summary>
-    ///  下载记录补丁的文本获取补丁列表
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator GetResourcesAndStreamingAssetsData()
-    {
-        resourcesCache = GetCache(Resources.Load<TextAsset>("resources").bytes);
-        yield return Access.FromStreamingAssetsPath("streamingAssets.txt", res =>
-        {
-            streamingAssetsCache = GetCache(res);
-        });
-    }
-
     private Dictionary<string, List<string>> GetCache(byte[] bytes)
     {
         return Encoding.UTF8.GetString(bytes).Split('\r', '\n')
@@ -459,20 +448,45 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
             .ToDictionary(p => p.Key, q => new List<string>(q));
     }
 
-    /// <summary>
-    ///  下载记录补丁的文本获取补丁列表
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator GetPatchList()
+    public override void Awake()
     {
+        base.Awake();
+        patchListCache = new Dictionary<string, VersionInfo>();
+        DirectoryHelper.CreateDirectory(Access.PersistentDataTempPath);
+    }
+
+    private IEnumerator Start()
+    {
+        //  下载记录补丁的文本获取补丁列表
+
+        var request = Resources.LoadAsync<TextAsset>("resources");
+        yield return request;
+
+        var swww = new WWW(Application.streamingAssetsPath + "streamingAssets.txt");
+        yield return swww;
+
+        var pwww = new WWW(Application.persistentDataPath + "persistentAssets.txt");
+        yield return pwww;
+
+        var rwww = new WWW("" + "fileAssets.txt");
+        yield return rwww;
+
+        var cache = new Dictionary<string, List<string>>().Merge(
+            GetCache(((TextAsset) request.asset).bytes),
+            GetCache(swww.bytes),
+            GetCache(pwww.bytes),
+            GetCache(rwww.bytes)
+            );
+
+        //  下载记录补丁的文本获取补丁列表
         yield return Access.FromRemote(FilePatchInfo.PatchListName, res =>
         {
             if (res == null) return;
-            FileHelper.CreateDirectory(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName);
+            DirectoryHelper.CreateDirectory(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName);
             File.WriteAllBytes(Access.PersistentDataPatchPath + FilePatchInfo.PatchListName, res);
 
-            var content = Library.Dencrypt.AES(res);
-            var versionInfo = LitJsonHelper.ToObject<FileVersion.VersionInfo>(content);
+            var content = res.AES_Dencrypt();
+            var versionInfo = Library.Helper.JsonHelper.ToObject<FileVersion.VersionInfo>(content);
             SoftwareVersion = versionInfo.softwareVersion;
             patchListCache = versionInfo.pathInfos.Select(p => new FilePatchInfo(p)).ToLookup(p => p.group)
                 .ToDictionary(p => p.Key, q =>
@@ -482,19 +496,7 @@ public class VersionMgr : SingletonBehaviour<VersionMgr>
                     return go;
                 });
         });
-    }
 
-    public override void Awake()
-    {
-        base.Awake();
-        patchListCache = new Dictionary<string, VersionInfo>();
-        FileHelper.CreateDirectory(Access.PersistentDataTempPath);
-    }
-
-    private IEnumerator Start()
-    {
-        yield return GetResourcesAndStreamingAssetsData();
-        yield return GetPatchList();
         foreach (var info in patchListCache.Values)
         {
             var resourcesCacheList = resourcesCache.ContainsKey(info.GroupName)

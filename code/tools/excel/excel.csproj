@@ -46,6 +46,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="LitJSON, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\litjson\src\LitJson\bin\Debug\net35\LitJSON.dll</HintPath>
+    </Reference>
     <Reference Include="NPOI, Version=2.3.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
       <HintPath>..\packages\NPOI.2.3.0\lib\net20\NPOI.dll</HintPath>
       <Private>True</Private>
@@ -115,10 +119,6 @@
     <ProjectReference Include="..\library-excel\library-excel.csproj">
       <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
       <Name>library-excel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\litjson\src\LitJson\LitJSON.csproj">
-      <Project>{d7e7f7a5-5ed3-4784-897e-b7cac79787a4}</Project>
-      <Name>LitJSON</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

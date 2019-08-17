@@ -41,6 +41,10 @@
     <Reference Include="AipSdk">
       <HintPath>net35\AipSdk.dll</HintPath>
     </Reference>
+    <Reference Include="LitJSON, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\litjson\src\LitJson\bin\Debug\net35\LitJSON.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>net35\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -73,10 +77,6 @@
     <ProjectReference Include="..\library-excel\library-excel.csproj">
       <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
       <Name>library-excel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\litjson\src\LitJson\LitJSON.csproj">
-      <Project>{d7e7f7a5-5ed3-4784-897e-b7cac79787a4}</Project>
-      <Name>LitJSON</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

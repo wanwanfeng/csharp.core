@@ -42,6 +42,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="LitJSON, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\litjson\src\LitJson\bin\Debug\net35\LitJSON.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
@@ -73,12 +77,6 @@
     <Compile Include="Library\Serialization\Dictionary.cs" />
     <Compile Include="Library\Singleton\Singleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\litjson\src\LitJson\LitJSON.csproj">
-      <Project>{d7e7f7a5-5ed3-4784-897e-b7cac79787a4}</Project>
-      <Name>LitJSON</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="..\core\core.projitems" Label="Shared" />
   <Import Project="..\core-version\core-version.projitems" Label="Shared" />

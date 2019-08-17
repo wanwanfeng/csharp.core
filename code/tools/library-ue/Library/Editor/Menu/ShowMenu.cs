@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using System.Linq;
+﻿using Library;
 using Library.Extensions;
+using System.Linq;
 using UnityEditor.Library;
+using UnityEngine;
 using Object = UnityEngine.Object;
-using Library;
 
 namespace UnityEditor
 {
@@ -83,6 +83,5 @@ namespace UnityEditor
             Vector3 angle = Selection.activeTransform.localEulerAngles;
             EditorUtils.CopyToClipboard(string.Format("{0},{1},{2};{3},{4},{5}", pos.x, pos.y, pos.z, angle.x, angle.y, angle.z));
         }
-
     }
 }

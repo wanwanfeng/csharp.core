@@ -9,7 +9,7 @@ namespace UnityEditor.Library
 {
     class GuidMenu: BaseMenu
     {
-        [MenuItem("Tools/Guid/ReplaceGuid")]
+        [MenuItem("Window/Tools/Guid/ReplaceGuid")]
         private static void ReplaceGuid()
         {
             if (!EditorUtility.DisplayDialog("提示", "是否进行GUID替换?", "确定", "取消")) return;

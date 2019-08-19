@@ -66,6 +66,7 @@
     <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />
     <Compile Include="Library\Extensions\MathfExtensions.cs" />
     <Compile Include="Library\Extensions\LinqExtensions.cs" />
+    <Compile Include="Library\Extensions\TextureExtensions.cs" />
     <Compile Include="Library\Extensions\RandomExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\MonoBehaviourExtensions.cs" />

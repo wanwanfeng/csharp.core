@@ -9,19 +9,25 @@ namespace UnityEditor
 {
     public class ShowMenu : Editor
     {
-        [MenuItem("OpenScene/First")]
+        [MenuItem("Window/Clear/ClearProgressBar")]
+        public static void ClearProgressBar()
+        {
+            EditorUtility.ClearProgressBar();
+        }
+
+        [MenuItem("Window/OpenScene/First")]
         public static void OpenFirstScene()
         {
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.First(p => p.enabled).path);
         }
 
-        [MenuItem("OpenScene/Second")]
+        [MenuItem("Window/OpenScene/Second")]
         public static void OpenSecondScene()
         {
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.Where(p => p.enabled).Skip(1).First().path);
         }
 
-        [MenuItem("OpenScene/Third")]
+        [MenuItem("Window/OpenScene/Third")]
         public static void OpenThirdScene()
         {
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.Where(p => p.enabled).Skip(2).First().path);

@@ -10,20 +10,23 @@ namespace Library.Extensions
     {
         public static void CopyTo(this Stream stream, Stream destination, int bufferSize = 4096)
         {
+#if net20 || net35
             byte[] bytes = new byte[bufferSize];
             var length = 0;
             while ((length = stream.Read(bytes, 0, bytes.Length)) > 0)
             {
                 destination.Write(bytes, 0, length);
             }
-
-            //.net 4.0
-            //stream.CopyTo(destination);
+#else
+            .net 4.0
+            stream.CopyTo(destination);
+#endif
         }
 
         public static void CopyTo(this Stream stream, Stream destination, Action<float> progressAction,
             int bufferSize = 4096)
         {
+#if net20 || net35
             byte[] bytes = new byte[bufferSize];
             var length = 0;
             while ((length = stream.Read(bytes, 0, bytes.Length)) > 0)
@@ -32,9 +35,10 @@ namespace Library.Extensions
                 if (stream.Position % bytes.Length == 5)
                     progressAction((float) stream.Position / stream.Length);
             }
-
-            //.net 4.0
-            //stream.CopyTo(destination);
+#else
+            .net 4.0
+            stream.CopyTo(destination);
+#endif
         }
 
         public static void Write(this Stream stream, byte[] buffer, int bufferSize = 4096)
@@ -50,7 +54,7 @@ namespace Library.Extensions
 
     public static class ArrayExtensions
     {
-        #region byte
+#region byte
 
         public static IEnumerable<byte[]> GroupBuffer(this byte[] source, int bufferSize = 4096)
         {
@@ -73,9 +77,9 @@ namespace Library.Extensions
             return length;
         }
 
-        #endregion
+#endregion
 
-        #region byte
+#region byte
 
         public static IEnumerable<T[]> Group<T>(this T[] source, int bufferSize = 4096)
         {
@@ -99,6 +103,6 @@ namespace Library.Extensions
             return length;
         }
 
-        #endregion
+#endregion
     }
 }

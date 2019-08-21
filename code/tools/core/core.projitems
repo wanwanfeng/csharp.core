@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\CsvHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\DirectoryHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\EnumHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\PathHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\FileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\JsonHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\StringHelper.cs" />

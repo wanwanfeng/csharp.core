@@ -237,34 +237,34 @@ namespace Library.Extensions
 
         #endregion
 
-        /// <summary>
-        /// 转为string[]型
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static string[] ToStringArray(this string value, params char[] separator)
-        {
-            try
-            {
-                return value.Split(separator.Length == 0 ? new[] { ',' } : separator);
-            }
-            catch (Exception)
-            {
-                return new string[0];
-            }
-        }
+        ///// <summary>
+        ///// 转为string[]型
+        ///// </summary>
+        ///// <param name="value"></param>
+        ///// <param name="separator"></param>
+        ///// <returns></returns>
+        //public static string[] ToStringArray(this string value, params char[] separator)
+        //{
+        //    try
+        //    {
+        //        return value.Split(separator.Length == 0 ? new[] { ',' } : separator);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return new string[0];
+        //    }
+        //}
 
-        /// <summary>
-        /// 转为List<string/>型
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="separator"></param>
-        /// <returns></returns>
-        public static List<string> ToStringList(this string value, params char[] separator)
-        {
-            return value.ToStringArray(separator).ToList();
-        }
+        ///// <summary>
+        ///// 转为List<string/>型
+        ///// </summary>
+        ///// <param name="value"></param>
+        ///// <param name="separator"></param>
+        ///// <returns></returns>
+        //public static List<string> ToStringList(this string value, params char[] separator)
+        //{
+        //    return value.ToStringArray(separator).ToList();
+        //}
 
         //#region  split string
 

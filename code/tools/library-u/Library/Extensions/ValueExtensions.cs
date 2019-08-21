@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Library
+namespace Library.Extensions
 {
     /// <summary>
-    ///  Linq扩展
+    /// 值类型扩展
     /// </summary>
-    public static partial class LinqExtensions
+    public static partial class ValueExtensions
     {
         public static Vector2 Sum(this Vector2[] target)
         {

@@ -73,6 +73,8 @@
     <Compile Include="Library\Extensions\UnityExtensions\GameObjectExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\TransformExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\ComponentExtensions.cs" />
+    <Compile Include="Library\Extensions\ValueExtensions.cs" />
+    <Compile Include="Library\Helper\PathHelper.cs" />
     <Compile Include="Library\LitJson\LitJsonHelper.cs" />
     <Compile Include="Library\Serialization\HashTable.cs" />
     <Compile Include="Library\Serialization\Dictionary.cs" />

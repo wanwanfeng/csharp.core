@@ -18,7 +18,7 @@ namespace Library.Extensions
                 destination.Write(bytes, 0, length);
             }
 #else
-            .net 4.0
+            //.net 4.0
             stream.CopyTo(destination);
 #endif
         }
@@ -36,7 +36,7 @@ namespace Library.Extensions
                     progressAction((float) stream.Position / stream.Length);
             }
 #else
-            .net 4.0
+            //.net 4.0
             stream.CopyTo(destination);
 #endif
         }

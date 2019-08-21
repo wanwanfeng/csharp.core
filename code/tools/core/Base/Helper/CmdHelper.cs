@@ -9,9 +9,11 @@ namespace Library.Helper
 {
     public abstract class CmdHelper
     {
+        public Action<string> LogAction = msg => { Console.WriteLine(msg); };
+
         private static Process GetProcess(string input)
         {
-            var process = new System.Diagnostics.Process();
+            var process = new Process();
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.FileName = "cmd.exe";
             process.StartInfo.UseShellExecute = false; //是否使用操作系统shell启动
@@ -33,11 +35,10 @@ namespace Library.Helper
             try
             {
                 string output = process.StandardOutput.ReadToEnd();
-                var res = output.ToStringArray('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).ToList();
-
                 process.WaitForExit();
 
-                Console.WriteLine(res[2].Replace("&exit", ""));
+                var res = output.Split('\r', '\n').Where(p => !string.IsNullOrEmpty(p)).ToList();
+                LogAction(res[2].Replace("&exit", ""));
                 return res.Skip(3).ToArray();
             }
             finally
@@ -57,11 +58,10 @@ namespace Library.Helper
                 {
                     res.Add(reader.ReadLine());
                 }
-
                 process.WaitForExit();
 
                 res = res.Where(p => !string.IsNullOrEmpty(p)).ToList();
-                Console.WriteLine(res[2].Replace("&exit", ""));
+                LogAction(res[2].Replace("&exit", ""));
                 return res.Skip(3).ToArray();
             }
             finally

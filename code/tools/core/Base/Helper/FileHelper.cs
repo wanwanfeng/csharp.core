@@ -146,7 +146,7 @@ namespace Library.Helper
 
     public partial class FileHelper
     {
-        private class FileStream : System.IO.FileStream
+        public class FileStream : System.IO.FileStream
         {
             byte[] keyArray = Encoding.UTF8.GetBytes("fdhgfhyut6yik768iujhf523w5656786olkou8i9089");
 
@@ -158,7 +158,8 @@ namespace Library.Helper
                 var index = base.Read(array, offset, count);
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] ^= keyArray[i % keyArray.Length];
+                    if (i % 2 == 0)
+                        array[i] ^= keyArray[i % keyArray.Length];
                 }
                 return index;
             }
@@ -166,7 +167,8 @@ namespace Library.Helper
             {
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] ^= keyArray[i % keyArray.Length];
+                    if (i % 2 == 0)
+                        array[i] ^= keyArray[i % keyArray.Length];
                 }
                 base.Write(array, offset, count);
             }
@@ -241,6 +243,32 @@ namespace Library.Helper
         public static void WriteAllLines(string destFileName, string[] contents)
         {
             WriteAllText(destFileName, string.Join("\n", contents));
+        }
+
+        /// <summary>
+        /// 对象序列化写入异或加密文件
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static void Serialize(string destFileName, object obj)
+        {
+            using (var fs = new FileStream(destFileName, FileMode.OpenOrCreate))
+            {
+                var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                bf.Serialize(fs, obj);
+            }
+        }
+
+        /// <summary>
+        /// 从异或加密文件中反序列化
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        private object Deserialize(string destFileName)
+        {
+            using (var fs = new FileStream(destFileName, FileMode.Open))
+            {
+                var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return bf.Deserialize(fs);
+            }
         }
     }
 }

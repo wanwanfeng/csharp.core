@@ -145,219 +145,6 @@ namespace Library.Extensions
 
         #endregion
 
-        #region IEnumerable<string>
-
-        /// <summary>
-        /// 转为int[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<int> AsInt(this IEnumerable<string> value, int def = 0)
-        {
-            return value.Select(p => p.AsInt(def));
-        }
-
-        /// <summary>
-        /// 转为float[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<float> AsFloat(this IEnumerable<string> value, float def = 0)
-        {
-            return value.Select(p => p.AsFloat(def));
-        }
-
-        /// <summary>
-        /// 转为double[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<double> AsDouble(this IEnumerable<string> value, double def = 0)
-        {
-            return value.Select(p => p.AsDouble(def));
-        }
-
-        /// <summary>
-        /// 转为long[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<long> AsLong(this IEnumerable<string> value, long def = 0)
-        {
-            return value.Select(p => p.AsLong(def));
-        }
-
-        /// <summary>
-        /// 转为decimal[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<decimal>AsDecimal(this IEnumerable<string> value, decimal def = 0)
-        {
-            return value.Select(p => p.AsDecimal(def));
-        }
-
-        /// <summary>
-        /// 转为decimal[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<byte> AsByte(this IEnumerable<string> value, byte def = 0)
-        {
-            return value.Select(p => p.AsByte(def));
-        }
-
-        /// <summary>
-        /// 转为decimal[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<short> AsShort(this IEnumerable<string> value, short def = 0)
-        {
-            return value.Select(p => p.AsShort(def));
-        }
-
-        /// <summary>
-        /// 转为bool[]型数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="def">默认值</param>
-        /// <returns></returns>
-        public static IEnumerable<bool> AsBool(this IEnumerable<string> value, bool def = false)
-        {
-            return value.Select(p => p.AsBool(def));
-        }
-
-        #endregion
-
-        ///// <summary>
-        ///// 转为string[]型
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static string[] ToStringArray(this string value, params char[] separator)
-        //{
-        //    try
-        //    {
-        //        return value.Split(separator.Length == 0 ? new[] { ',' } : separator);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return new string[0];
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 转为List<string/>型
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static List<string> ToStringList(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).ToList();
-        //}
-
-        //#region  split string
-
-        ///// <summary>
-        ///// 转为IEnumerable<int/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<int> SplitInt(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsInt();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<float/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<float> SplitFloat(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsFloat();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<double/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<double> SplitDouble(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsDouble();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<long/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<long> SplitLong(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsLong();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<decimal/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<decimal> SplitDecimal(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsDecimal();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<decimal/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<byte> SplitByte(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsByte();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<decimal/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<short> SplitShort(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsShort();
-        //}
-
-        ///// <summary>
-        ///// 转为IEnumerable<bool/>
-        ///// </summary>
-        ///// <param name="value"></param>
-        ///// <param name="separator"></param>
-        ///// <returns></returns>
-        //public static IEnumerable<bool> SplitBool(this string value, params char[] separator)
-        //{
-        //    return value.ToStringArray(separator).AsBool();
-        //}
-
-        //#endregion
-
         #region  string toArray
 
         /// <summary>
@@ -368,7 +155,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static int[] ToIntArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsInt().ToArray();
+            return value.Split(separator).Select(p => p.AsInt()).ToArray();
         }
 
         /// <summary>
@@ -379,7 +166,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static float[] ToFloatArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsFloat().ToArray();
+            return value.Split(separator).Select(p => p.AsFloat()).ToArray();
         }
 
         /// <summary>
@@ -390,7 +177,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static double[] ToDoubleArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsDouble().ToArray();
+            return value.Split(separator).Select(p => p.AsDouble()).ToArray();
         }
 
         /// <summary>
@@ -401,7 +188,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static long[] ToLongArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsLong().ToArray();
+            return value.Split(separator).Select(p => p.AsLong()).ToArray();
         }
 
         /// <summary>
@@ -412,7 +199,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static decimal[] ToDecimalArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsDecimal().ToArray();
+            return value.Split(separator).Select(p => p.AsDecimal()).ToArray();
         }
 
         /// <summary>
@@ -423,7 +210,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static byte[] ToByteArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsByte().ToArray();
+            return value.Split(separator).Select(p => p.AsByte()).ToArray();
         }
 
         /// <summary>
@@ -434,7 +221,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static short[] ToShortArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsShort().ToArray();
+            return value.Split(separator).Select(p => p.AsShort()).ToArray();
         }
 
         /// <summary>
@@ -445,7 +232,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static bool[] ToBoolArray(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsBool().ToArray();
+            return value.Split(separator).Select(p => p.AsBool()).ToArray();
         }
 
         #endregion
@@ -460,7 +247,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<int> ToIntList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsInt().ToList();
+            return value.Split(separator).Select(p => p.AsInt()).ToList();
         }
 
         /// <summary>
@@ -471,7 +258,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<float> ToFloatList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsFloat().ToList();
+            return value.Split(separator).Select(p => p.AsFloat()).ToList();
         }
 
         /// <summary>
@@ -482,7 +269,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<double> ToDoubleList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsDouble().ToList();
+            return value.Split(separator).Select(p => p.AsDouble()).ToList();
         }
 
         /// <summary>
@@ -493,7 +280,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<long> ToLongList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsLong().ToList();
+            return value.Split(separator).Select(p => p.AsLong()).ToList();
         }
 
         /// <summary>
@@ -504,7 +291,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<decimal> ToDecimalList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsDecimal().ToList();
+            return value.Split(separator).Select(p => p.AsDecimal()).ToList();
         }
 
         /// <summary>
@@ -515,7 +302,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<byte> ToByteList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsByte().ToList();
+            return value.Split(separator).Select(p => p.AsByte()).ToList();
         }
 
         /// <summary>
@@ -526,7 +313,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<short> ToShortList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsShort().ToList();
+            return value.Split(separator).Select(p => p.AsShort()).ToList();
         }
 
         /// <summary>
@@ -537,7 +324,7 @@ namespace Library.Extensions
         /// <returns></returns>
         public static  List<bool> ToBoolList(this string value, params char[] separator)
         {
-            return value.ToStringArray(separator).AsBool().ToList();
+            return value.Split(separator).Select(p => p.AsBool()).ToList();
         }
 
         #endregion

@@ -1,38 +1,22 @@
-# pytools 
-##   _for ptotobuf & flatbuf_ 
+# tools 
 
 ####  介绍
-###### 功能1：利用Python读取Excel并生成.proto文件，之后生成对应的C#以及Python代码。
-###### 功能2：利用生成的Python代码读取Excel内数据并生成为一个被压缩的?.bin.bz2文件，供其余的C#工程使用（配合生成的C#代码）
+ C# dll库，方便自己用于C#工程或unity工程
 
 #### 使用说明
- 1. 请按模板*.xlsx文件进行设置。
- 2. 目前支持数据类型仅为基本数据类型，复杂数据类型谨慎使用（代码熟悉后也是可以的 :smile: ）。
-
-----
-# 支持的数据类型对照表
-数据类型|proto2对应类型|proto3对应类型
---|--|--
-bool|optional bool|bool
-bool[]|repeated bool|repeated bool
-int|optional int32|int32
-int[]|repeated int32|repeated int32
-long|optional int64|int64
-long[]|repeated int64|repeated int64
-float|optional float|float
-float[]|repeated float|repeated float
-double|optional double|double
-double[]|repeated double|repeated double
-string|optional string|string
-string[]|repeated string|repeated string
+ 1. 请用vs2017版本打开并编译
 
 ----
 # 工具描述
-性质|状态|语法|数据结构|描述|适用范围|生成代码|生成数据文件|引用文件
---|--|--|--|--|--|--|--|--
-genJson.py|已完成|json|单表单结构，不统一|生成json|*.xlsx *.xls|*.cs|*.json|commonutils.py
-genpb2.py|已完成|proto2|单表单结构，不统一|生成proto2的数据文件|*.xlsx *.xls|*.cs|*.bin *.bin.bz2|commonutils.py
-genpb3.py|已完成|proto3|单表单结构，不统一|生成proto3的数据文件|*.xlsx *.xls|*.cs|*.bin *.bin.bz2|commonutils.py
-genpb3_combine.py|已完成|proto3|多表单结构，统一|生成proto3的数据文件|*.xlsx *.xls|*.cs|*.bin *.bin.bz2|commonutils.py
-genpb3_textlist.py|已完成|proto3|多表单结构，统一|生成proto3的数据文件|*.txt|*.cs|*.bin *.bin.bz2|commonutils.py
-genfb.py|待完成|flat|单表单结构，不统一|通过生成json后转换到falt|*.xlsx *.xls|*.cs|*.bin|commonutils.py genJson.py
+工程名称|性质|目的|描述|包含工程
+--|--|--|--|--
+core|共享代码|被库工程使用|/|/
+core-excel|共享代码|被库工程使用|/|/
+core-version|共享代码|被库工程使用|用于控制并统一库工程版本号|/
+library|库工程|被其余工程使用|基本常用代码集|core-version core
+library-excel|库工程|被其余工程使用|基本常用代码集（包含Excel文件处理）|core-version core  core-excel
+library-u|库工程|被其余工程使用|unity运行时基本常用代码集|core-version core
+library-ue|库工程|被其余工程使用|unity编辑器基本常用代码集（包含Excel文件处理）|core-version core-excel
+excel|控制台工程|工具|Excel文件的各种处理|library-excel
+test|控制台工程|工具||library-excel
+search|控制台工程|工具||library-excel

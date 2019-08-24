@@ -60,8 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Attribute\Attribute.cs" />
-    <Compile Include="Library\Base\ILoad.cs" />
-    <Compile Include="Library\Base\BaseLoad.cs" />
+    <Compile Include="Library\Base\CacheMonoBehaviour.cs" />
+    <Compile Include="Library\Base\ILoadExtensions.cs" />
     <Compile Include="Library\Base\IMonoBehaviour.cs" />
     <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />
     <Compile Include="Library\Extensions\MathfExtensions.cs" />
@@ -80,6 +80,7 @@
     <Compile Include="Library\Serialization\HashTable.cs" />
     <Compile Include="Library\Serialization\Dictionary.cs" />
     <Compile Include="Library\Singleton\Singleton.cs" />
+    <Compile Include="Library\StateMachine\BaseState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\core\core.projitems" Label="Shared" />

@@ -8,7 +8,7 @@ namespace Library
     /// 场景单例(自动生成物体并挂载)
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour
+    public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour, ILoad
     {
         private static T _instance;
 
@@ -37,14 +37,22 @@ namespace Library
     /// base.Awake();
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
+    public abstract partial class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour, ILoad
     {
-        public static T Instance { get; private set; }
-        public virtual void Awake()
+        private static T _instance;
+
+        public static T Instance
         {
-            if (Instance != null) return;
-            Instance = this as T;
+            get { return _instance ?? (_instance = FindObjectOfType<T>()); }
+            set { _instance = value; }
         }
+
+        //public static T Instance { get; private set; }
+        //public virtual void Awake()
+        //{
+        //    if (Instance != null) return;
+        //    Instance = this as T;
+        //}
 
 
         public virtual void OnDestroy()

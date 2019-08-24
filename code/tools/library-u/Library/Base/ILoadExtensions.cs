@@ -5,10 +5,11 @@ using Object = UnityEngine.Object;
 
 namespace Library
 {
+    public interface ILoad
+    {
+    }
 
-    #region 非MonoBehaviour基类
-
-    public class BaseLoad : ILoad
+    public static class ILoadExtensions
     {
         #region prefab克隆
 
@@ -27,7 +28,7 @@ namespace Library
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public bool HasPath(string path)
+        public static bool HasPath(this ILoad load, string path)
         {
             return OnFuncHasPath != null && OnFuncHasPath.Invoke(path);
         }
@@ -39,7 +40,7 @@ namespace Library
         /// <param name="filePath"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
-        public T Load<T>(string filePath, Action<T> callAction = null) where T : Object
+        public static T Load<T>(this ILoad load, string filePath, Action<T> callAction = null) where T : Object
         {
             if (OnFuncLoad != null)
             {
@@ -62,28 +63,18 @@ namespace Library
         /// </summary>
         public static string PrefabRoot = "";
 
-        public GameObject CreateObject(string path, Transform parent = null)
+        public static GameObject CreateObject(this ILoad load, string path, Transform parent = null)
         {
-            var obj = Load<GameObject>(PrefabRoot + path);
-            return CreateObject(obj, parent);
+            var obj = load.Load<GameObject>(PrefabRoot + path);
+            return load.CreateObject(obj, parent);
         }
 
-        public GameObject CreateObject(GameObject obj, Transform parent = null)
+        public static GameObject CreateObject(this ILoad load, GameObject obj, Transform parent = null)
         {
             var go = Object.Instantiate(obj) as GameObject;
             if (parent != null)
                 parent.AddChild(go.transform);
             return go;
-        }
-
-        public void Destroy(Object obj)
-        {
-            Object.Destroy(obj);
-        }
-
-        public void DestroyImmediate(Object obj)
-        {
-            Object.DestroyImmediate(obj);
         }
 
         /// <summary>
@@ -96,16 +87,13 @@ namespace Library
         /// </summary>
         public static string SpriteRoot = "";
 
-        public Sprite LoadSprite(string path)
+        public static Sprite LoadSprite(this ILoad load, string path)
         {
             path = SpriteRoot + path;
-            return OnLoadSprite != null ? OnLoadSprite.Invoke(path) : Load<Sprite>(path);
+            return OnLoadSprite != null ? OnLoadSprite.Invoke(path) : load.Load<Sprite>(path);
         }
 
         #endregion
     }
-
-    #endregion
-
 }
 

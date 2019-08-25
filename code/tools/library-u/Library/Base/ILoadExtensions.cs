@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Library.Extensions;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -30,7 +31,7 @@ namespace Library
         /// <returns></returns>
         public static bool HasPath(this ILoad load, string path)
         {
-            return OnFuncHasPath != null && OnFuncHasPath.Invoke(path);
+            return OnFuncHasPath.Call(path);
         }
 
         /// <summary>
@@ -46,11 +47,11 @@ namespace Library
             {
                 return OnFuncLoad(filePath, obj =>
                 {
-                    if (callAction != null) callAction(obj as T);
+                   callAction.Call(obj as T);
                 }) as T;
             }
             var t = Resources.Load<T>(filePath) as T;
-            if (callAction != null) callAction(t as T);
+            callAction.Call(t as T);
             return t;
         }
 

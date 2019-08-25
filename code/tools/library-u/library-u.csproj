@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Attribute\Attribute.cs" />
-    <Compile Include="Library\Base\CacheMonoBehaviour.cs" />
+    <Compile Include="Library\MonoBehaviour\CacheMonoBehaviour.cs" />
     <Compile Include="Library\Base\ILoadExtensions.cs" />
     <Compile Include="Library\Base\IMonoBehaviour.cs" />
     <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />
@@ -76,11 +76,12 @@
     <Compile Include="Library\Extensions\ValueExtensions.cs" />
     <Compile Include="Library\Helper\PathHelper.cs" />
     <Compile Include="Library\Helper\UnityHelper\TextureHelper.cs" />
-    <Compile Include="Library\LitJson\LitJsonHelper.cs" />
+    <Compile Include="Library\Helper\LitJsonHelper.cs" />
     <Compile Include="Library\Serialization\HashTable.cs" />
     <Compile Include="Library\Serialization\Dictionary.cs" />
     <Compile Include="Library\Singleton\Singleton.cs" />
     <Compile Include="Library\StateMachine\BaseState.cs" />
+    <Compile Include="Library\MonoBehaviour\TriggerMonoBehaviour.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\core\core.projitems" Label="Shared" />

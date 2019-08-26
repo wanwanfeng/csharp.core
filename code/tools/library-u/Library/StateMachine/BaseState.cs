@@ -16,7 +16,7 @@ namespace Library
         Action<T> OnExitAction { get; set; }
     }
 
-    public class StateMachine<T> : ISimpleState<T>, ILoad
+    public class StateMachine<T> : ISimpleState<T>
     {
 
         private float startTime;

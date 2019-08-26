@@ -2,7 +2,7 @@
 
 namespace Library
 {
-    public partial class CacheMonoBehaviour : MonoBehaviour, ILoad
+    public partial class CacheMonoBehaviour : MonoBehaviour
     {
         private GameObject _gameObject;
         private Rigidbody _rigidbody;

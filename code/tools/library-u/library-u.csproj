@@ -60,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Attribute\Attribute.cs" />
+    <Compile Include="Library\MonoBehaviour\CacheUIMonoBehaviour.cs" />
+    <Compile Include="Library\MonoBehaviour\CacheWWW.cs" />
     <Compile Include="Library\MonoBehaviour\CacheMonoBehaviour.cs" />
     <Compile Include="Library\Base\ILoadExtensions.cs" />
     <Compile Include="Library\Base\IMonoBehaviour.cs" />

@@ -148,29 +148,49 @@ namespace Library.Helper
     {
         public class FileStream : System.IO.FileStream
         {
-            byte[] keyArray = Encoding.UTF8.GetBytes("fdhgfhyut6yik768iujhf523w5656786olkou8i9089");
+            Func<byte[], int, int, int> ReadFunc;
+            Action<byte[], int, int> WriteFunc;
 
-            public FileStream(string path, FileMode mode) : base(path, mode)
+            public FileStream(string path, FileMode mode, string key = "fdhgfhyut6yik768iujhf523w5656786olkou8i9089") : base(path, mode)
             {
+                if (string.IsNullOrEmpty(key))
+                {
+                    ReadFunc = base.Read;
+                    WriteFunc = base.Write;
+                }
+                else
+                {
+                    var keyArray = Encoding.UTF8.GetBytes(key);
+                    ReadFunc = (byte[] array, int offset, int count) =>
+                    {
+                        var index = base.Read(array, offset, count);
+                        for (int i = 0; i < array.Length; i++)
+                        {
+                            if (i % 2 == 0)
+                                array[i] ^= keyArray[i % keyArray.Length];
+                        }
+                        return index;
+                    };
+                    WriteFunc = (byte[] array, int offset, int count) =>
+                    {
+                        for (int i = 0; i < array.Length; i++)
+                        {
+                            if (i % 2 == 0)
+                                array[i] ^= keyArray[i % keyArray.Length];
+                        }
+                        base.Write(array, offset, count);
+                    };
+                }
             }
+
             public override int Read(byte[] array, int offset, int count)
             {
-                var index = base.Read(array, offset, count);
-                for (int i = 0; i < array.Length; i++)
-                {
-                    if (i % 2 == 0)
-                        array[i] ^= keyArray[i % keyArray.Length];
-                }
-                return index;
+                return ReadFunc.Call(array, offset, count);
             }
+
             public override void Write(byte[] array, int offset, int count)
             {
-                for (int i = 0; i < array.Length; i++)
-                {
-                    if (i % 2 == 0)
-                        array[i] ^= keyArray[i % keyArray.Length];
-                }
-                base.Write(array, offset, count);
+                WriteFunc.Call(array, offset, count);
             }
         }
 
@@ -178,19 +198,17 @@ namespace Library.Helper
         /// 文件读取异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static byte[] ReadAllBytes(string sourceFileName)
+        public static byte[] ReadAllBytes(string sourceFileName, string key = "")
         {
             if (!File.Exists(sourceFileName)) return null;
 
-            using (var sr = new FileStream(sourceFileName, FileMode.Open))
+            using (var sr = new FileStream(sourceFileName, FileMode.Open, key))
             {
                 byte[] array = new byte[sr.Length];
-                int len = 0, index = 0;
-                while ((len = sr.Read(array, index * 4096, 4096)) > 0)
-                {
-                    index++;
-                }
-                return array;
+                if (sr.Read(array, 0, array.Length) == array.Length)
+                    return array;
+                else
+                    return null;
             }
         }
 
@@ -198,10 +216,10 @@ namespace Library.Helper
         /// 文件读取异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static string ReadAllText(string sourceFileName)
+        public static string ReadAllText(string sourceFileName, string key = "")
         {
             if (!File.Exists(sourceFileName)) return "";
-            byte[] content = ReadAllBytes(sourceFileName);
+            byte[] content = ReadAllBytes(sourceFileName, key);
             return content == null ? "" : Encoding.UTF8.GetString(content, 0, content.Length);
         }
 
@@ -209,19 +227,19 @@ namespace Library.Helper
         /// 文件读取异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static string[] ReadAllLines(string sourceFileName)
+        public static string[] ReadAllLines(string sourceFileName, string key = "")
         {
             if (!File.Exists(sourceFileName)) return null;
-            return ReadAllText(sourceFileName).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            return ReadAllText(sourceFileName, key).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
         /// 文件写入异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static void WriteAllBytes(string destFileName, byte[] bytes)
+        public static void WriteAllBytes(string destFileName, byte[] bytes, string key = "")
         {
-            using (var sw = new FileStream(destFileName, FileMode.OpenOrCreate))
+            using (var sw = new FileStream(destFileName, FileMode.OpenOrCreate, key))
             {
                 sw.Write(bytes, 0, bytes.Length);
             }
@@ -231,27 +249,27 @@ namespace Library.Helper
         /// 文件写入异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static void WriteAllText(string destFileName, string content)
+        public static void WriteAllText(string destFileName, string content, string key = "")
         {
-            WriteAllBytes(destFileName, Encoding.UTF8.GetBytes(content));
+            WriteAllBytes(destFileName, Encoding.UTF8.GetBytes(content), key);
         }
 
         /// <summary>
         /// 文件写入异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static void WriteAllLines(string destFileName, string[] contents)
+        public static void WriteAllLines(string destFileName, string[] contents, string key = "")
         {
-            WriteAllText(destFileName, string.Join("\n", contents));
+            WriteAllText(destFileName, string.Join("\n", contents), key);
         }
 
         /// <summary>
         /// 对象序列化写入异或加密文件
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        public static void Serialize(string destFileName, object obj)
+        public static void Serialize(string destFileName, object obj, string key = "")
         {
-            using (var fs = new FileStream(destFileName, FileMode.OpenOrCreate))
+            using (var fs = new FileStream(destFileName, FileMode.OpenOrCreate, key))
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 bf.Serialize(fs, obj);
@@ -262,9 +280,9 @@ namespace Library.Helper
         /// 从异或加密文件中反序列化
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        private object Deserialize(string destFileName)
+        private object Deserialize(string destFileName, string key = "")
         {
-            using (var fs = new FileStream(destFileName, FileMode.Open))
+            using (var fs = new FileStream(destFileName, FileMode.Open, key))
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 return bf.Deserialize(fs);

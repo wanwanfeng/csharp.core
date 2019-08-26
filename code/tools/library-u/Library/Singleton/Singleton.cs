@@ -2,13 +2,13 @@
 
 namespace Library
 {
-    #region 单例
+        #region 单例
 
-    /// <summary>
-    /// 场景单例(自动生成物体并挂载)
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour, ILoad
+        /// <summary>
+        /// 场景单例(自动生成物体并挂载)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 
@@ -37,7 +37,7 @@ namespace Library
     /// base.Awake();
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour, ILoad
+    public abstract partial class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 

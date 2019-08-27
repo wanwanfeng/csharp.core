@@ -11,4 +11,7 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Plugins\Editor\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\DebugUILine.cs" />
+  </ItemGroup>
 </Project>

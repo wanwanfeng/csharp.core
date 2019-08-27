@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Editor\Attribute\AttributeDrawer.cs" />
+    <Compile Include="Library\Editor\Menu\TextureMenu.cs" />
     <Compile Include="Library\Editor\Menu\BaseMenu.cs" />
     <Compile Include="Library\Editor\Menu\GuidMenu.cs" />
     <Compile Include="Library\Editor\Menu\MiscMenu.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Library\Editor\Utils\EditorUtils.cs" />
     <Compile Include="Library\Editor\Menu\ShowMenu.cs" />
     <Compile Include="Library\Editor\Utils\ScriptableObjectUtils.cs" />
+    <Compile Include="Library\Editor\Viewer\EditorStyleViewer.cs" />
     <Compile Include="Library\Editor\Window\BaseDoubleWindow.cs" />
     <Compile Include="Library\Editor\Window\BaseEditorWindow.cs" />
     <Compile Include="Library\Editor\Window\BaseToolBarWindow.cs" />

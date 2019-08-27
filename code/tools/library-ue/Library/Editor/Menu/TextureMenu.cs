@@ -9,10 +9,19 @@ namespace UnityEditor.Library
 {
     class TextureMenu : BaseMenu
     {
-        [MenuItem("Assets/Texture/SpliteSprite")]
+        [MenuItem("Assets/Texture/SpliteSprite", true)]
+        [MenuItem("Assets/Texture/SplitAlpha", true)]
+        [MenuItem("Assets/Texture/SaveAlpha", true)]
+        [MenuItem("Assets/Texture/ForceSquared", true)]
+        private static bool VTexture2D()
+        {
+            return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length != 0;
+        }
+
+        [MenuItem("Assets/Texture/SpliteSprite", false)]
         private static void SpliteSprite()
         {
-            Object[] go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            Texture2D[] go = Selection.GetFiltered<Texture2D>(SelectionMode.Assets);
             foreach (var o in go)
             {
                 string selectionPath = AssetDatabase.GetAssetPath(o);
@@ -37,7 +46,7 @@ namespace UnityEditor.Library
             AssetDatabase.Refresh();
         }
 
-        //[MenuItem("Assets/Texture/SpriteJoin")]
+        //[MenuItem("Assets/Texture/SpriteJoin", false)]
         //private static void TextureJoin()
         //{
         //    var go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets).Cast<Texture2D>().OrderBy(p => p.name).ToList();
@@ -57,10 +66,10 @@ namespace UnityEditor.Library
         //}
 
 
-        [MenuItem("Assets/Texture/SplitAlpha")]
+        [MenuItem("Assets/Texture/SplitAlpha", false)]
         private static void SplitAlpha()
         {
-            Object[] go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            Texture2D[] go = Selection.GetFiltered<Texture2D>(SelectionMode.Assets);
             foreach (var o in go)
             {
                 string selectionPath = AssetDatabase.GetAssetPath(o);
@@ -72,10 +81,10 @@ namespace UnityEditor.Library
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Assets/Texture/SaveAlpha")]
+        [MenuItem("Assets/Texture/SaveAlpha", false)]
         private static void SaveAlpha()
         {
-            Object[] go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            Texture2D[] go = Selection.GetFiltered<Texture2D>(SelectionMode.Assets);
             foreach (var o in go)
             {
                 string selectionPath = AssetDatabase.GetAssetPath(o);
@@ -88,7 +97,7 @@ namespace UnityEditor.Library
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Assets/Texture/ForceSquared")]
+        [MenuItem("Assets/Texture/ForceSquared", false)]
         //[MenuItem("Assets/Texture/ForceSquared/UpperLeft %UpperLeft")]
         //[MenuItem("Assets/Texture/ForceSquared/UpperCenter")]
         //[MenuItem("Assets/Texture/ForceSquared/UpperRight")]
@@ -100,7 +109,7 @@ namespace UnityEditor.Library
         //[MenuItem("Assets/Texture/ForceSquared/LowerRight")]
         private static void ForceSquared()
         {
-            Object[] go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            Texture2D[] go = Selection.GetFiltered<Texture2D>(SelectionMode.Assets);
             foreach (var o in go)
             {
                 string selectionPath = AssetDatabase.GetAssetPath(o);

@@ -60,6 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Attribute\Attribute.cs" />
+    <Compile Include="Library\MonoBehaviour\CacheAsset.cs" />
+    <Compile Include="Library\Extensions\UnityExtensions\AudioClipExtensions.cs" />
+    <Compile Include="Library\Helper\UnityHelper\AudioClipHelper.cs" />
     <Compile Include="Library\MonoBehaviour\CacheUIMonoBehaviour.cs" />
     <Compile Include="Library\MonoBehaviour\CacheWWW.cs" />
     <Compile Include="Library\MonoBehaviour\CacheMonoBehaviour.cs" />
@@ -68,7 +71,7 @@
     <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />
     <Compile Include="Library\Extensions\MathfExtensions.cs" />
     <Compile Include="Library\Extensions\LinqExtensions.cs" />
-    <Compile Include="Library\Extensions\TextureExtensions.cs" />
+    <Compile Include="Library\Extensions\UnityExtensions\TextureExtensions.cs" />
     <Compile Include="Library\Extensions\RandomExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\MonoBehaviourExtensions.cs" />

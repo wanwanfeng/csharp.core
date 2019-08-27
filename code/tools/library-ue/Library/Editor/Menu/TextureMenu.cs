@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Library;
 using Library.Extensions;
+using Library.Helper;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -36,6 +37,26 @@ namespace UnityEditor.Library
             AssetDatabase.Refresh();
         }
 
+        //[MenuItem("Assets/Texture/SpriteJoin")]
+        //private static void TextureJoin()
+        //{
+        //    var go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets).Cast<Texture2D>().OrderBy(p => p.name).ToList();
+        //    var tex = new Texture2D(go.Sum(p => p.width), go.Max(p => p.height), go.First().format, false);
+        //    var cursum = 0;
+        //    var maxHeight = go.Max(p => p.height);
+        //    foreach (var texture in go)
+        //    {
+        //        tex.SetPixels(cursum, maxHeight - texture.height, texture.width, texture.height,
+        //            texture.GetPixels(0, 0, texture.width, texture.height));
+        //        cursum += texture.width;
+        //        tex.Apply();
+        //    }
+        //    string path = EditorUtility.SaveFilePanel("", "", "texture", "png");
+        //    File.WriteAllBytes(path, tex.EncodeToPNG());
+        //    AssetDatabase.Refresh();
+        //}
+
+
         [MenuItem("Assets/Texture/SplitAlpha")]
         private static void SplitAlpha()
         {
@@ -67,5 +88,29 @@ namespace UnityEditor.Library
             AssetDatabase.Refresh();
         }
 
+        [MenuItem("Assets/Texture/ForceSquared")]
+        //[MenuItem("Assets/Texture/ForceSquared/UpperLeft %UpperLeft")]
+        //[MenuItem("Assets/Texture/ForceSquared/UpperCenter")]
+        //[MenuItem("Assets/Texture/ForceSquared/UpperRight")]
+        //[MenuItem("Assets/Texture/ForceSquared/MiddleLeft")]
+        //[MenuItem("Assets/Texture/ForceSquared/MiddleCenter")]
+        //[MenuItem("Assets/Texture/ForceSquared/MiddleRight")]
+        //[MenuItem("Assets/Texture/ForceSquared/LowerLeft")]
+        //[MenuItem("Assets/Texture/ForceSquared/LowerCenter")]
+        //[MenuItem("Assets/Texture/ForceSquared/LowerRight")]
+        private static void ForceSquared()
+        {
+            Object[] go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            foreach (var o in go)
+            {
+                string selectionPath = AssetDatabase.GetAssetPath(o);
+                string outPath = Path.ChangeExtension(selectionPath, ".fs.png");
+
+                Texture2D tx = TextureHelper.GetRawTexture(selectionPath);
+                if (tx != null)
+                    tx.ForceSquared(outPath, TextAnchor.UpperLeft);
+            }
+            AssetDatabase.Refresh();
+        }
     }
 }

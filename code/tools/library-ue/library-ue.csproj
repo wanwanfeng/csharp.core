@@ -78,6 +78,7 @@
     <Compile Include="Library\Editor\Menu\GuidMenu.cs" />
     <Compile Include="Library\Editor\Menu\MiscMenu.cs" />
     <Compile Include="Library\Editor\Menu\UGUIMenu.cs" />
+    <Compile Include="Library\Editor\UnityEngine\Sprite\UIAtlasEditor.cs" />
     <Compile Include="Library\Editor\Utils\BaseEditorUtils.cs" />
     <Compile Include="Library\Editor\Utils\EditorUtils.cs" />
     <Compile Include="Library\Editor\Menu\ShowMenu.cs" />

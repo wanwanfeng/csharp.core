@@ -31,10 +31,13 @@ namespace UnityEditor
         public int tempHeight = 100;
         public void OnGUI()
         {
-            if (singleWindow)
+            if (EditorApplication.isCompiling)
             {
-                DrawGUI();
+                Close();
+                return;
             }
+            if (singleWindow)
+                DrawGUI();
         }
 
         public virtual void DrawGUI()

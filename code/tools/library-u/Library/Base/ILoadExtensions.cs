@@ -15,27 +15,19 @@ namespace Library
         #region prefab克隆
 
         /// <summary>
-        /// 判断资源委托注入
-        /// </summary>
-        public static Func<string, bool> OnFuncHasPath { private get; set; }
-
-        /// <summary>
-        /// 加载资源委托注入
-        /// </summary>
-        public static Func<string, Action<Object>, Object> OnFuncLoad { private get; set; }
-
-        /// <summary>
         /// 资源存在与否接口
+        /// ---------需要在项目内重载---------------
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static bool HasPath(this ILoad load, string path)
         {
-            return OnFuncHasPath.Call(path);
+            return true;
         }
 
         /// <summary>
         /// 资源加载接口
+        /// ---------需要在项目内重载---------------
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath"></param>
@@ -43,13 +35,6 @@ namespace Library
         /// <returns></returns>
         public static T Load<T>(this ILoad load, string filePath, Action<T> callAction = null) where T : Object
         {
-            if (OnFuncLoad != null)
-            {
-                return OnFuncLoad(filePath, obj =>
-                {
-                   callAction.Call(obj as T);
-                }) as T;
-            }
             var t = Resources.Load<T>(filePath) as T;
             callAction.Call(t as T);
             return t;
@@ -61,12 +46,11 @@ namespace Library
 
         /// <summary>
         /// 预制体资源根目录
+        /// ---------需要在项目内重载---------------
         /// </summary>
-        public static string PrefabRoot = "";
-
         public static GameObject CreateObject(this ILoad load, string path, Transform parent = null)
         {
-            var obj = load.Load<GameObject>(PrefabRoot + path);
+            var obj = load.Load<GameObject>(path);
             return load.CreateObject(obj, parent);
         }
 
@@ -76,22 +60,6 @@ namespace Library
             if (parent != null)
                 parent.AddChild(go.transform);
             return go;
-        }
-
-        /// <summary>
-        /// 加载UGUI Sprite图集注入
-        /// </summary>
-        public static Func<string, Sprite> OnLoadSprite { private get; set; }
-
-        /// <summary>
-        /// Sprite资源根目录
-        /// </summary>
-        public static string SpriteRoot = "";
-
-        public static Sprite LoadSprite(this ILoad load, string path)
-        {
-            path = SpriteRoot + path;
-            return OnLoadSprite != null ? OnLoadSprite.Invoke(path) : load.Load<Sprite>(path);
         }
 
         #endregion

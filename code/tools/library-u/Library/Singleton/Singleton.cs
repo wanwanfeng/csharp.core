@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Library
 {
@@ -29,6 +30,11 @@ namespace Library
         {
 
         }
+
+        public virtual IEnumerator Initialization()
+        {
+            yield break;
+        }
     }
 
     /// <summary>
@@ -54,6 +60,10 @@ namespace Library
         //    Instance = this as T;
         //}
 
+        public virtual IEnumerator Initialization()
+        {
+            yield break;
+        }
 
         public virtual void OnDestroy()
         {

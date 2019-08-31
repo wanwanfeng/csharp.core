@@ -1,4 +1,6 @@
-﻿namespace Library
+﻿using System.Collections;
+
+namespace Library
 {
     #region 单例
 
@@ -36,6 +38,11 @@
         public virtual void Init()
         {
 
+        }
+
+        public virtual IEnumerator Initialization()
+        {
+            yield break;
         }
     }
 

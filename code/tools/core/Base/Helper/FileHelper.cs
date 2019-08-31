@@ -151,7 +151,7 @@ namespace Library.Helper
             Func<byte[], int, int, int> ReadFunc;
             Action<byte[], int, int> WriteFunc;
 
-            public FileStream(string path, FileMode mode, string key = "fdhgfhyut6yik768iujhf523w5656786olkou8i9089") : base(path, mode)
+            public FileStream(string path, FileMode mode, string key = "fdhgfhyut6yik768iujhf523w5656786olkou8i9089") : base(path, mode, FileAccess.ReadWrite)
             {
                 if (string.IsNullOrEmpty(key))
                 {
@@ -269,7 +269,7 @@ namespace Library.Helper
         /// <param name="sourceFileName">源路径</param>
         public static void Serialize(string destFileName, object obj, string key = "")
         {
-            using (var fs = new FileStream(destFileName, FileMode.OpenOrCreate, key))
+            using (var fs = new System.IO.FileStream(destFileName, FileMode.OpenOrCreate))
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 bf.Serialize(fs, obj);
@@ -280,13 +280,22 @@ namespace Library.Helper
         /// 从异或加密文件中反序列化
         /// </summary>
         /// <param name="sourceFileName">源路径</param>
-        private object Deserialize(string destFileName, string key = "")
+        public static object Deserialize(string destFileName, string key = "")
         {
-            using (var fs = new FileStream(destFileName, FileMode.Open, key))
+            using (var fs = new System.IO.FileStream(destFileName, FileMode.Open))
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 return bf.Deserialize(fs);
             }
+        }
+
+        /// <summary>
+        /// 从异或加密文件中反序列化
+        /// </summary>
+        /// <param name="sourceFileName">源路径</param>
+        public static T Deserialize<T>(string destFileName, string key = "") where T : class
+        {
+            return Deserialize(destFileName, key) as T;
         }
     }
 }

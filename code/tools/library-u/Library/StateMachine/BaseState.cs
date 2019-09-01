@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Library.Helper;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Library
@@ -68,6 +70,39 @@ namespace Library
         public Func<T, bool> IsCanEnter { get; set; }
     }
 
+    public class StateMachineCache<T> : StateMachine<T>
+    {
+        protected static Action<T> StateAction = (state) => { };
+        protected Dictionary<T, Action<T>> CacneEnter;
+        protected Dictionary<T, Action<T>> CacneUpdate;
+        protected Dictionary<T, Action<T>> CacneExit;
+
+        public virtual void Initialization(object args)
+        {
+            CacneEnter = EnumHelper.ToIntDic<T>().ToDictionary(p => p.Key, p => StateAction);
+            CacneUpdate = EnumHelper.ToIntDic<T>().ToDictionary(p => p.Key, p => StateAction);
+            CacneExit = EnumHelper.ToIntDic<T>().ToDictionary(p => p.Key, p => StateAction);
+        }
+
+        public sealed override void OnEnter(T state)
+        {
+            base.OnEnter(state);
+            CacneEnter[state].Invoke(state);
+        }
+
+        public sealed override void OnUpdate()
+        {
+            base.OnUpdate();
+            CacneUpdate[CurState].Invoke(CurState);
+        }
+
+        public sealed override void OnExit()
+        {
+            base.OnExit();
+            CacneExit[CurState].Invoke(CurState);
+        }
+    }
+
     #region StateMachineInstanceBase
 
     /// <summary>
@@ -80,7 +115,7 @@ namespace Library
         public Dictionary<T, TInstance> CacheInstances;
         public TInstance CurInstance { get; set; }
 
-        public virtual void Init()
+        public virtual void Initialization()
         {
             CacheInstances = new Dictionary<T, TInstance>();
         }

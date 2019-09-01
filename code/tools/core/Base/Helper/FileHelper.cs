@@ -148,8 +148,8 @@ namespace Library.Helper
     {
         public class FileStream : System.IO.FileStream
         {
-            Func<byte[], int, int, int> ReadFunc;
-            Action<byte[], int, int> WriteFunc;
+            Func<byte[], int, int, int> ReadFunc { get; set; }
+            Action<byte[], int, int> WriteFunc { get; set; }
 
             public FileStream(string path, FileMode mode, string key = "fdhgfhyut6yik768iujhf523w5656786olkou8i9089") : base(path, mode, FileAccess.ReadWrite)
             {
@@ -183,12 +183,12 @@ namespace Library.Helper
                 }
             }
 
-            public override int Read(byte[] array, int offset, int count)
+            public sealed override int Read(byte[] array, int offset, int count)
             {
                 return ReadFunc.Call(array, offset, count);
             }
 
-            public override void Write(byte[] array, int offset, int count)
+            public sealed override void Write(byte[] array, int offset, int count)
             {
                 WriteFunc.Call(array, offset, count);
             }

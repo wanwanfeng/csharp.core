@@ -37,17 +37,19 @@ namespace Library.Excel
             return ExcelByNpoi.ImportExcelToDataTable(file, lineCount);
         }
 
-        public static void ExportToExcel(DataTable dt, string file, string extension = ".xlsx")
+        public static string ExportToExcel(DataTable dt, string file, string extension = ".xlsx")
         {
             string newPath = CheckExport(dt, file, extension);
             ExcelByNpoi.ExportDataTableToExcel(newPath, dt);
+            return newPath;
         }
 
-        public static void ExportToExcel(IEnumerable<DataTable> dts, string file, string extension = ".xlsx")
+        public static string ExportToExcel(IEnumerable<DataTable> dts, string file, string extension = ".xlsx")
         {
             string newPath = Path.ChangeExtension(file, extension);
             DirectoryHelper.CreateDirectory(newPath);
             ExcelByNpoi.ExportDataTableToExcel(newPath, dts.ToArray());
+            return newPath;
         }
     }
 }

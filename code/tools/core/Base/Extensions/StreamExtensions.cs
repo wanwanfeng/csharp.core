@@ -10,7 +10,7 @@ namespace Library.Extensions
     {
         public static void CopyTo(this Stream stream, Stream destination, int bufferSize = 4096)
         {
-#if net20 || net35
+#if false || net20 || net35
             byte[] bytes = new byte[bufferSize];
             var length = 0;
             while ((length = stream.Read(bytes, 0, bytes.Length)) > 0)

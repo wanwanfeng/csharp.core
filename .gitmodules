@@ -7,3 +7,6 @@
 [submodule "code/tools/HtmlAgilityPack"]
 	path = code/tools/HtmlAgilityPack
 	url = https://github.com/zzzprojects/html-agility-pack.git
+[submodule "code/tools/SimpleJSON"]
+	path = code/tools/SimpleJSON
+	url = https://github.com/Bunny83/SimpleJSON.git

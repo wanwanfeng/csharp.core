@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 //[assembly: AssemblyVersion("2.0.*")]
 //[assembly: AssemblyFileVersion("2.0.*")]
-[assembly: AssemblyVersion("2.0.0.7")]
-[assembly: AssemblyFileVersion("2.0.0.7")]
+[assembly: AssemblyVersion("2.0.0.8")]
+[assembly: AssemblyFileVersion("2.0.0.8")]
 
 [assembly: AssemblyCopyright("See https://gitee.com/wanwanfeng/csharp_library")]

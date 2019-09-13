@@ -1,15 +1,15 @@
-[submodule "code/tools/litjson"]
-	path = code/tools/litjson
-	url = https://github.com/LitJSON/litjson.git
-[submodule "code/tools/YamlDotNet"]
-	path = code/tools/YamlDotNet
+[submodule "code/tools/plugins/YamlDotNet"]
+	path = code/tools/plugins/YamlDotNet
 	url = git@gitee.com:longdaddy/YamlDotNet.git
-[submodule "code/tools/HtmlAgilityPack"]
-	path = code/tools/HtmlAgilityPack
+[submodule "code/tools/plugins/HtmlAgilityPack"]
+	path = code/tools/plugins/HtmlAgilityPack
 	url = https://github.com/zzzprojects/html-agility-pack.git
-[submodule "code/tools/SimpleJSON"]
-	path = code/tools/SimpleJSON
+[submodule "code/tools/plugins/SimpleJSON"]
+	path = code/tools/plugins/SimpleJSON
 	url = https://github.com/Bunny83/SimpleJSON.git
 [submodule "code/tools/plugins/ceil"]
 	path = code/tools/plugins/ceil
 	url = https://github.com/jbevain/cecil.git
+[submodule "code/tools/plugins/litjson"]
+	path = code/tools/plugins/litjson
+	url = https://github.com/LitJSON/litjson.git

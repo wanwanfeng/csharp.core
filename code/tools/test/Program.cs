@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Library;
 using Library.Extensions;
+using Library.Helper;
 
 namespace Script
 {
@@ -119,8 +120,164 @@ namespace Script
 
     internal static class Test
     {
+
+        public static void JsonDataToDict(LitJson.JsonData jsonData, Dictionary<string, object> cache, string keyName = "")
+        {
+            if (jsonData.IsObject)
+            {
+                if (jsonData.Keys.Count == 0)
+                {
+                    cache[keyName] = new Dictionary<string, object>();
+                }
+                else
+                {
+                    foreach (var key in jsonData.Keys)
+                    {
+                        LitJson.JsonData value = jsonData[key];
+                        Console.WriteLine(key + ":" + value.GetJsonType());
+                        if (value.IsObject)
+                        {
+                            cache[key] = new Dictionary<string, object>();
+                            JsonDataToDict(value, cache[key] as Dictionary<string, object>, key);
+                        }
+                        else
+                        {
+                            JsonDataToDict(value, cache, key);
+                        }
+                    }
+                }
+            }
+            else if (jsonData.IsArray)
+            {
+                object[]  array = new object[jsonData.Count];
+                cache[keyName] = array;
+                int index = 0;
+                foreach (LitJson.JsonData value in jsonData)
+                {
+                    if (value.IsObject || value.IsArray)
+                    {
+                        array[index] = new Dictionary<string, object>();
+                        JsonDataToDict(value, array[index] as Dictionary<string, object>, "");
+                    }
+                    else
+                    {
+                        if (value.IsString)
+                        {
+                            array[index] = (string)value;
+                        }
+                        else if (value.IsLong)
+                        {
+                            array[index] = (long)value;
+                        }
+                        else if (value.IsInt)
+                        {
+                            array[index] = (int)value;
+                        }
+                        else if (value.IsDouble)
+                        {
+                            array[index] = (double)value;
+                        }
+                        else if (value.IsBoolean)
+                        {
+                            array[index] = (bool)value;
+                        }
+                    }
+                    index++;
+                }
+            }
+            else
+            {
+                if (jsonData.IsString)
+                {
+                    cache[keyName] = (string)jsonData;
+                }
+                else if (jsonData.IsLong)
+                {
+                    cache[keyName] = (long)jsonData;
+                }
+                else if (jsonData.IsInt)
+                {
+                    cache[keyName] = (int)jsonData;
+                }
+                else if (jsonData.IsDouble)
+                {
+                    cache[keyName] = (double)jsonData;
+                }
+                else if (jsonData.IsBoolean)
+                {
+                    cache[keyName] = (bool)jsonData;
+                }
+            }
+        }
+
         private static void Main(string[] args)
         {
+
+            string content = File.ReadAllText("test.txt");
+            var xx = JsonHelper.ToObject<LitJson.JsonData>(content);
+
+            Dictionary<string, object> cache = new Dictionary<string, object>();
+
+            JsonDataToDict(xx, cache);
+
+            Console.WriteLine(xx);
+
+            File.WriteAllText("text.txt",JsonHelper.ToJson(xx));
+            File.WriteAllText("text2.txt",JsonHelper.ToJson(cache));
+
+            Console.WriteLine(cache);
+
+
+
+
+
+
+
+
+
+            FileHelper.Serialize("xxx.txt", "dddddddddddddd","dssttttttttttttttttttttttttty5675756");
+            string value = FileHelper.Deserialize<string>("xxx.txt", "dssttttttttttttttttttttttttty5675756");
+
+            Console.WriteLine(value);
+
+
+
+
+
+
+
+
+
+
+            WebHelper.Post("http://wanwanfeng.gitee.io/demo.assets/version.txt", callAction: (state, result) =>
+            {
+                Console.WriteLine(result);
+                if (state)
+                {
+                }
+                else
+                {
+
+                }
+            });
+
+
+            FileHelper.WriteAllText("test.txt", "上面这段程序运行了{0}秒", "ffffff");
+            var  xxx = FileHelper.ReadAllText("test.txt", "ffffff");
+
+            Console.WriteLine(xxx);
+
+
+            int bossColor;
+
+            //十六进制
+            bossColor = 0xBBFF11;
+            int r = (bossColor & 0xFF0000) >> 16;
+            //十进制
+            bossColor = 12320529;
+            int g = (bossColor & 0xFF0000) >> 16;
+
+            Console.WriteLine(r==g);
 
             LitJson.JsonData json = new LitJson.JsonData();
             json["dddd"] = "ghdfgh";

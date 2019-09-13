@@ -48,7 +48,7 @@
     </Reference>
     <Reference Include="LitJSON, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\litjson\src\LitJson\bin\Debug\net35\LitJSON.dll</HintPath>
+      <HintPath>..\plugins\litjson\src\LitJson\bin\Release\net35\LitJSON.dll</HintPath>
     </Reference>
     <Reference Include="NPOI, Version=2.3.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
       <HintPath>..\packages\NPOI.2.3.0\lib\net20\NPOI.dll</HintPath>

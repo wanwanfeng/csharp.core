@@ -1,6 +1,6 @@
 [submodule "code/tools/plugins/YamlDotNet"]
 	path = code/tools/plugins/YamlDotNet
-	url = git@gitee.com:longdaddy/YamlDotNet.git
+	url = https://gitee.com/longdaddy/YamlDotNet.git
 [submodule "code/tools/plugins/HtmlAgilityPack"]
 	path = code/tools/plugins/HtmlAgilityPack
 	url = https://github.com/zzzprojects/html-agility-pack.git

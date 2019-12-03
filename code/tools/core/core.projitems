@@ -9,12 +9,8 @@
     <Import_RootNamespace>core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\HookValueAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\Attribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\NameAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\Value\BoolValueAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\Value\IntValueAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\Value\StringValueAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\Value\TypeValueAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Compress\DecompressUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Config.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Encrypt\Encrypt.cs" />

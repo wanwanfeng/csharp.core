@@ -73,6 +73,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library\Editor\Attribute\AttributeDrawer.cs" />
+    <Compile Include="Library\Editor\Common\CommandLine.cs" />
+    <Compile Include="Library\Editor\Common\ShowDisplay.cs" />
     <Compile Include="Library\Editor\Menu\TextureMenu.cs" />
     <Compile Include="Library\Editor\Menu\BaseMenu.cs" />
     <Compile Include="Library\Editor\Menu\GuidMenu.cs" />

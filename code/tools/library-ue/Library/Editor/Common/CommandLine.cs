@@ -40,6 +40,39 @@ namespace UnityEditor.Library
                 return defaultValue;
             }
         }
+
+        public int this[string key, int defaultValue = 0]
+        {
+            get
+            {
+                if (ContainsKey(key))
+                {
+                    var val = 0;
+                    if (int.TryParse(dict[key], out val))
+                    {
+                        defaultValue = val;
+                    }
+                }
+                return defaultValue;
+            }
+        }
+
+        public bool this[string key, bool defaultValue = false]
+        {
+            get
+            {
+                if (ContainsKey(key))
+                {
+                    var val = false;
+                    if (bool.TryParse(dict[key], out val))
+                    {
+                        defaultValue = val;
+                    }
+                }
+                return defaultValue;
+            }
+        }
+
         public string Check(string key)
         {
             if (ContainsKey(key))

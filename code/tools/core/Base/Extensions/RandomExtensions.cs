@@ -14,7 +14,7 @@ namespace Library.Extensions
             return target[new System.Random().Next(0, target.Length)];
         }
 
-        public static T RandomValue<T>(this List<T> target)
+        public static T RandomValue<T>(this IList<T> target)
         {
             if (target.Count == 0) return default(T);
             return target[new System.Random().Next(0, target.Count)];

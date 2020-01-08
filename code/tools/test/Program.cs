@@ -24,7 +24,8 @@ namespace Script
             [Category("Image"), Description("ImageConvertToBase64"), TypeValue(typeof(ImageConvertToBase64))] ImageConvertToBase64,
             [Category("Image"), Description("Base64ConvertToImage"), TypeValue(typeof(Base64ConvertToImage))] Base64ConvertToImage,
 
-            [Category("Image"), Description("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))] SpliteAtlas,
+            [Category("Image"), Description("SpliteAdobeAnimateAtlas"), TypeValue(typeof(SpliteAdobeAnimateAtlas))] SpliteAdobeAnimateAtlas,
+            [Category("Image"), Description("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))] SpliteAtlas, 
             //[Category("Image"), Description("CheckImage"), TypeValue(typeof (CheckImage))] CheckImage,
             [Category("Image"), Description("ImageProgressiveJpeg"), TypeValue(typeof(ImageProgressiveJpeg))] ImageProgressiveJpeg,
             [Category("Image"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof(ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,

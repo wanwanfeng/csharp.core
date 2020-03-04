@@ -57,8 +57,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fgo", "fgo\fgo.csproj", "{6
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "core-version", "core-version\core-version.shproj", "{666BF49F-317B-414E-8B1D-F9B6E530BCF0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mono.Cecil", "plugins\ceil\Mono.Cecil.csproj", "{6A9721F5-5035-410D-A3CB-0E62C8823720}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		core-excel\core-excel.projitems*{03e61b0c-84a1-44ba-ade5-55d8804012d1}*SharedItemsImports = 4
@@ -255,16 +253,6 @@ Global
 		{68F56591-E79D-4A64-AFDF-046BBF05B744}.Release-Signed|Any CPU.Build.0 = Release|Any CPU
 		{68F56591-E79D-4A64-AFDF-046BBF05B744}.Release-Unsigned|Any CPU.ActiveCfg = Release|Any CPU
 		{68F56591-E79D-4A64-AFDF-046BBF05B744}.Release-Unsigned|Any CPU.Build.0 = Release|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Debug-AOT|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Debug-AOT|Any CPU.Build.0 = Debug|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Release-Signed|Any CPU.ActiveCfg = Release|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Release-Signed|Any CPU.Build.0 = Release|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Release-Unsigned|Any CPU.ActiveCfg = Release|Any CPU
-		{6A9721F5-5035-410D-A3CB-0E62C8823720}.Release-Unsigned|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -294,7 +282,6 @@ Global
 		{0106F8B5-5AD9-4442-BE18-7170909D1F27} = {A62857D2-8324-436D-A52A-E231080FBDA7}
 		{68F56591-E79D-4A64-AFDF-046BBF05B744} = {0C278015-4345-4711-A29C-F5F0AFC725DD}
 		{666BF49F-317B-414E-8B1D-F9B6E530BCF0} = {0106F8B5-5AD9-4442-BE18-7170909D1F27}
-		{6A9721F5-5035-410D-A3CB-0E62C8823720} = {B65FA407-7588-42D8-8282-FA2D2AB3076D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FE149189-FAEA-4629-8C50-C17EE7103F6E}

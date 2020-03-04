@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Library
 {
-    public class TriggerMonoBehaviour : CacheMonoBehaviour
+    public class TriggerMonoBehaviour : MonoBehaviour
     {
         public Action<GameObject, Collision> OnCollisionEnterAction;
         public Action<GameObject, Collision> OnCollisionStayAction;

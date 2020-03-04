@@ -63,9 +63,9 @@
     <Compile Include="Library\MonoBehaviour\CacheAsset.cs" />
     <Compile Include="Library\Extensions\UnityExtensions\AudioClipExtensions.cs" />
     <Compile Include="Library\Helper\UnityHelper\AudioClipHelper.cs" />
-    <Compile Include="Library\MonoBehaviour\CacheUIMonoBehaviour.cs" />
-    <Compile Include="Library\MonoBehaviour\CacheWWW.cs" />
-    <Compile Include="Library\MonoBehaviour\CacheMonoBehaviour.cs" />
+    <Compile Include="Library\MonoBehaviour\UIMonoBehaviour.cs" />
+    <Compile Include="Library\MonoBehaviour\WWW.cs" />
+    <Compile Include="Library\MonoBehaviour\MonoBehaviour.cs" />
     <Compile Include="Library\Base\ILoadExtensions.cs" />
     <Compile Include="Library\Base\IMonoBehaviour.cs" />
     <Compile Include="Library\Base\MonoBehaviourExtensions.cs" />

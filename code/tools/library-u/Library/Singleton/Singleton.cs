@@ -9,7 +9,7 @@ namespace Library
         /// 场景单例(自动生成物体并挂载)
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour
+    public abstract partial class SingletonBehaviourAuto<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
 

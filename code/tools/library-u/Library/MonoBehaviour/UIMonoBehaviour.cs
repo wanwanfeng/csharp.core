@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Library
 {
-    public partial class CacheUIMonoBehaviour : CacheMonoBehaviour
+    public partial class UIMonoBehaviour : MonoBehaviour
     {
         private Canvas _canvas;
         public Canvas canvas

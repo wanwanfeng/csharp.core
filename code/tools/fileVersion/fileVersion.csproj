@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\CommonBase.cs" />
+    <Compile Include="Common\VersionInfo.cs" />
     <Compile Include="Git\GitCommon.cs" />
     <Compile Include="Git\Git\GitMaster.cs" />
     <Compile Include="Git\Git\GitPatch.cs" />

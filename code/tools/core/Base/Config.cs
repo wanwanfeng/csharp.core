@@ -12,32 +12,20 @@ namespace Library
         [DllImport("kernel32")]
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
 
-        private static string Inipath { get; set; }
+        public static string Inipath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
 
-        static Config()
+        private static bool CheckIniPath(string path)
         {
-            Init(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
-        }
-
-        /// <summary>
-        /// 初始化文件信息
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="defaultName"></param>
-        public static void Init(string path, string defaultName = "config.ini")
-        {
-            if (Path.HasExtension(path))
+            if (File.Exists(path))
             {
-                Inipath = path;
+                return true;
             }
             else
             {
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-                Inipath = Path.Combine(path, defaultName);
+                var dir = Path.GetDirectoryName(path);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                return false;
             }
-            if (!File.Exists(Inipath))
-                File.WriteAllText(Inipath, "");
         }
 
         /// <summary>
@@ -48,11 +36,14 @@ namespace Library
         /// <param name="defaultValue">值</param>
         /// <param name="buffSize">缓冲区大小</param>
         /// <returns></returns>
-        public static string IniReadValue(string section, string key, string defaultValue = "",int buffSize = 500)
+        public static string IniReadValue(string section, string key, string defaultValue = "", int buffSize = 500)
         {
-            StringBuilder temp = new StringBuilder(buffSize);
-            var value = GetPrivateProfileString(section, key, "", temp, buffSize, Inipath);
-            if (value != 0) return temp.ToString();
+            if (CheckIniPath(Inipath))
+            {
+                StringBuilder temp = new StringBuilder(buffSize);
+                var value = GetPrivateProfileString(section, key, "", temp, buffSize, Inipath);
+                if (value != 0) return temp.ToString();
+            }
             IniWriteValue(section, key, defaultValue);
             return defaultValue;
         }

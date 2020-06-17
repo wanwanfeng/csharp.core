@@ -65,15 +65,8 @@ namespace UnityEditor
         private static string GetFileName(string fileName)
         {
             var traceName = Path.GetFileNameWithoutExtension(new StackTrace(true).GetFrame(2).GetFileName());
-            if (!string.IsNullOrEmpty(traceName))
-                fileName = traceName + "/" + fileName;
-            return fileName;
+            return Path.Combine("log", Path.Combine(traceName, fileName));
         }
-
-        /// <summary>
-        /// FileRoot
-        /// </summary>
-        private static string FileRoot = "/../log/";
 
         /// <summary>
         /// 
@@ -82,8 +75,7 @@ namespace UnityEditor
         /// <returns></returns>
         public static List<string> FileRead(string fileName)
         {
-            fileName = GetFileName(fileName);
-            return EditorUtils.FileRead(FileRoot + fileName);
+            return EditorUtils.FileRead(GetFileName(fileName));
         }
 
         /// <summary>
@@ -94,8 +86,7 @@ namespace UnityEditor
         /// <param name="isPopup"></param>
         public static void FileWrite(string fileName, string[] res, bool isPopup = true)
         {
-            fileName = GetFileName(fileName);
-            EditorUtils.FileWrite(FileRoot + fileName, res, isPopup);
+            EditorUtils.FileWrite(GetFileName(fileName), res, isPopup);
         }
 
         /// <summary>
@@ -106,8 +97,7 @@ namespace UnityEditor
         /// <param name="isPopup"></param>
         public static void FileWrite(string fileName, string res, bool isPopup = true)
         {
-            fileName = GetFileName(fileName);
-            EditorUtils.FileWrite(FileRoot + fileName, res, isPopup);
+            EditorUtils.FileWrite(GetFileName(fileName), res, isPopup);
         }
 
         #endregion

@@ -46,16 +46,9 @@ namespace UnityEditor.Library
         /// <returns></returns>
         public static List<string> FileRead(string fileName)
         {
-            string outpath = Application.dataPath + fileName;
-            if (!Path.HasExtension(fileName))
-                outpath += ".txt";
-            outpath = outpath.Replace("\\", "/");
-            List<string> res = new List<string>();
-            if (File.Exists(outpath))
-                return File.ReadAllLines(outpath).ToList();
-
-            Debug.LogError("文件不存在！" + outpath);
-            return new List<string>();
+            string outpath = new Uri(Path.ChangeExtension(fileName, ".txt")).LocalPath;
+            if (File.Exists(outpath)) return File.ReadAllLines(outpath).ToList();
+            throw new Exception("文件不存在！" + outpath);
         }
 
         /// <summary>
@@ -66,10 +59,7 @@ namespace UnityEditor.Library
         /// <param name="isPopup"></param>
         public static void FileWrite(string fileName, string[] res, bool isPopup = true)
         {
-            string outpath = Application.dataPath + fileName;
-            if (!Path.HasExtension(fileName))
-                outpath += ".txt";
-            outpath = outpath.Replace("\\", "/");
+            string outpath = new Uri(Path.ChangeExtension(fileName, ".txt")).LocalPath;
             FileHelper.CreateDirectory(outpath);
             File.WriteAllLines(outpath, res);
             if (isPopup && EditorUtility.DisplayDialog(outpath, "是否打开文件查看信息？", "确定", "取消"))
@@ -84,10 +74,7 @@ namespace UnityEditor.Library
         /// <param name="isPopup"></param>
         public static void FileWrite(string fileName, string res, bool isPopup = true)
         {
-            string outpath = Application.dataPath + fileName;
-            if (!Path.HasExtension(fileName))
-                outpath += ".txt";
-            outpath = outpath.Replace("\\", "/");
+            string outpath = new Uri(Path.ChangeExtension(fileName, ".txt")).LocalPath;
             FileHelper.CreateDirectory(outpath);
             File.WriteAllText(outpath, res);
             if (isPopup && EditorUtility.DisplayDialog(outpath, "是否打开文件查看信息？", "确定", "取消"))
@@ -108,24 +95,5 @@ namespace UnityEditor.Library
         }
 
         #endregion
-
-        public static string DataPath
-        {
-            get { return Application.dataPath.Replace("Assets", ""); }
-        }
-
-        public static string ProjectSettingsPath
-        {
-            get { return GetProjectPath("ProjectSettings"); }
-        }
-
-        public static string GetProjectPath(string path = null)
-        {
-            string savePath = "./";
-            if (!string.IsNullOrEmpty(path))
-                savePath = savePath + path + "/";
-            DirectoryHelper.CreateDirectory(savePath);
-            return savePath;
-        }
     }
 }

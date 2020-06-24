@@ -29,7 +29,7 @@ namespace Library.Excel
         {
             path = Path.ChangeExtension(path, ".xml");
             if (!File.Exists(path))
-                Ldebug.Log("文件不存在!");
+                throw new Exception("文件不存在!");
             if (path == null) return null;
             string content = File.ReadAllText(path);
 

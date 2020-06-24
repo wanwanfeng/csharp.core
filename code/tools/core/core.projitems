@@ -47,7 +47,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\SimpleLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Singleton\Singleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Thread\ThreadAction.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Ldebug.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LocalEvent.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Plugins\" />
   </ItemGroup>
 </Project>

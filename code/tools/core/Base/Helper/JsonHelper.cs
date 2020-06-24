@@ -86,7 +86,7 @@ namespace Library.Helper
         public static ListTable ImportJsonToListTable(string file, Func<object, object> func = null)
         {
             if (!File.Exists(file))
-                Ldebug.Log("文件不存在!");
+                throw new Exception("文件不存在!");
             string content = File.ReadAllText(file);
             ListTable listTable = ConvertJsonToListTable(content, func);
             listTable.TableName = Path.GetFileName(file);
@@ -96,7 +96,7 @@ namespace Library.Helper
         public static T ImportJson<T>(string file)
         {
             if (!File.Exists(file))
-                Ldebug.Log("文件不存在!");
+                throw new Exception("文件不存在!");
             string content = File.ReadAllText(file);
             return ToObject<T>(content.Trim('\0'));
         }

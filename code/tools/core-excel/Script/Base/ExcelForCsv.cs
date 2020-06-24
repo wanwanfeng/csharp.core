@@ -28,7 +28,7 @@ namespace Library.Excel
         {
             path = Path.ChangeExtension(path, ".csv");
             if (!File.Exists(path))
-                Ldebug.Log("文件不存在!");
+                throw new Exception("文件不存在!");
             if (path == null) return null;
 
             List<List<object>> list;

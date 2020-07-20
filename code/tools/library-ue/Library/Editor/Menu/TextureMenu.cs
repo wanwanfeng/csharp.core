@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using Library;
 using Library.Extensions;
 using Library.Helper;
@@ -13,6 +14,8 @@ namespace UnityEditor.Library
         [MenuItem("Assets/Texture/SplitAlpha", true)]
         [MenuItem("Assets/Texture/SaveAlpha", true)]
         [MenuItem("Assets/Texture/ForceSquared", true)]
+        [MenuItem("Assets/Texture/SpriteJoin(Max1024)", true)]
+        [MenuItem("Assets/Texture/SpriteJoin(Max2048)", true)]
         private static bool VTexture2D()
         {
             return Selection.GetFiltered<Texture2D>(SelectionMode.Assets).Length != 0;
@@ -46,24 +49,58 @@ namespace UnityEditor.Library
             AssetDatabase.Refresh();
         }
 
-        //[MenuItem("Assets/Texture/SpriteJoin", false)]
-        //private static void TextureJoin()
-        //{
-        //    var go = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets).Cast<Texture2D>().OrderBy(p => p.name).ToList();
-        //    var tex = new Texture2D(go.Sum(p => p.width), go.Max(p => p.height), go.First().format, false);
-        //    var cursum = 0;
-        //    var maxHeight = go.Max(p => p.height);
-        //    foreach (var texture in go)
-        //    {
-        //        tex.SetPixels(cursum, maxHeight - texture.height, texture.width, texture.height,
-        //            texture.GetPixels(0, 0, texture.width, texture.height));
-        //        cursum += texture.width;
-        //        tex.Apply();
-        //    }
-        //    string path = EditorUtility.SaveFilePanel("", "", "texture", "png");
-        //    File.WriteAllBytes(path, tex.EncodeToPNG());
-        //    AssetDatabase.Refresh();
-        //}
+        [MenuItem("Assets/Texture/SpriteJoin(Max1024)", false)]
+        static void CerateGrid1024()
+        {
+            CerateGrid(1024);
+        }
+
+        [MenuItem("Assets/Texture/SpriteJoin(Max2048)", false)]
+        static void CerateGrid2048()
+        {
+            CerateGrid(2048);
+        }
+
+        static void CerateGrid(int max = 1024)
+        {
+            var paths = Selection.GetFiltered<Texture2D>(SelectionMode.TopLevel).Select(AssetDatabase.GetAssetPath).OrderBy(p => p).ToArray();
+            if (paths.Length == 0) return;
+
+            string[] outPath = null;
+
+            Texture2D target = new Texture2D(max, max, TextureFormat.RGBA32, false);
+            int x = 0, y = 0;
+            for (int i = 0; i < paths.Length; i++)
+            {
+                var path = paths[i];
+               
+                outPath = outPath == null ? path.Split('/') : path.Split('/').Intersect(outPath).ToArray();
+                Texture2D texture = TextureHelper.GetRawTexture(path);
+                if (x > target.width - texture.width)
+                {
+                    x = 0;
+                    y += texture.height;
+                }
+
+                try
+                {
+                    Debug.LogFormat("{0},{1},{2},{3},{4}", path, x, y, texture.width, texture.height);
+                    target.SetPixels(x, y, texture.width, texture.height, texture.GetPixels());
+                    x += texture.width;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogFormat("{0},{1},{2},{3},{4}", path, x, y, texture.width, texture.height);
+                    Debug.LogError(e.Message);
+                    continue;
+                }
+            }
+
+            target.Apply();
+            File.WriteAllBytes(string.Join("/", outPath) + ".png", target.EncodeToPNG());
+
+            AssetDatabase.Refresh();
+        }
 
 
         [MenuItem("Assets/Texture/SplitAlpha", false)]

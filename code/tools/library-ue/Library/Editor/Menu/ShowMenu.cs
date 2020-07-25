@@ -15,19 +15,19 @@ namespace UnityEditor
             EditorUtility.ClearProgressBar();
         }
 
-        [MenuItem("Window/OpenScene/First")]
+        [MenuItem("File/OpenScene/SceneAt(0)")]
         public static void OpenFirstScene()
         {
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.First(p => p.enabled).path);
         }
 
-        [MenuItem("Window/OpenScene/Second")]
+        [MenuItem("File/OpenScene/SceneAt(1)")]
         public static void OpenSecondScene()
         {
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.Where(p => p.enabled).Skip(1).First().path);
         }
 
-        [MenuItem("Window/OpenScene/Third")]
+        [MenuItem("File/OpenScene/SceneAt(2)")]
         public static void OpenThirdScene()
         {
             SceneManagement.EditorSceneManager.OpenScene(EditorBuildSettings.scenes.Where(p => p.enabled).Skip(2).First().path);

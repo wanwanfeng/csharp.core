@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using Library.Helper;
 
 #if ExcelByNpoi
@@ -99,9 +100,10 @@ namespace Library.Excel
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <param name="containsFirstLine">是否包含起始行（排除跳过行）</param>
-        /// <param name="skip">是否跳过一些有效行</param>
+        /// <param name="skip1">是否跳过一些有效行</param>
+        /// <param name="skip2">是否跳过一些有效列</param>
         /// <returns></returns>
-        public static List<DataTable> ImportExcelToDataTable(string file, bool containsFirstLine, int skip = 0)
+        public static List<DataTable> ImportExcelToDataTable(string file, bool containsFirstLine, int skip1 = 0, int skip2 = 0)
         {
             var list = new List<DataTable>();
 
@@ -113,13 +115,14 @@ namespace Library.Excel
                 };
 
                 //表头  
-                var srartLine = sheet.FirstRowNum + skip;
-                IRow header = sheet.GetRow(srartLine);
+                var srartLine = Math.Min(sheet.FirstRowNum + skip1, sheet.LastRowNum);
 
-                if (srartLine >= sheet.LastRowNum)
-                    throw new Exception(string.Format("开始读取行超过了结束行！！！！\n " +
+                if (sheet.FirstRowNum + skip1 >= sheet.LastRowNum)
+                    Console.WriteLine(string.Format("开始读取行超过了结束行！！！！\n " +
                         "sheet.FirstRowNum:{0}\nsheet.LastRowNum:{1}\nsrartLine:{2}",
                         sheet.FirstRowNum, sheet.LastRowNum, srartLine));
+
+                IRow header = sheet.GetRow(srartLine);
 
                 //数据
                 for (int i = srartLine + (containsFirstLine ? 0 : 1); i <= sheet.LastRowNum; i++)
@@ -145,6 +148,11 @@ namespace Library.Excel
                         dr[j] = GetValueType(row.GetCell(j));
                     dt.Rows.Add(dr);
                 }
+
+                //处理跳过列
+                for (int i = 0, max = Math.Max(0, skip2); i < max; i++)
+                    dt.Columns.RemoveAt(0);
+
                 list.Add(dt);
             });
             return list;

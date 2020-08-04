@@ -19,11 +19,12 @@ namespace Library.Excel
         /// 自定义的输出（首行为key）
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <param name="containsFirstLine">是否包含起始行（排除跳过行）</param>
-        /// <param name="skip">是否跳过一些有效行</param>
+        /// <param name="skip1">是否跳过一些有效行</param>
+        /// <param name="skip2">是否跳过一些有效列</param>
         /// <returns></returns>
-        public static IEnumerable<DataTable> ImportFromExcel(string file, bool containsFirstLine, int skip = 0)
+        public static IEnumerable<DataTable> ImportFromExcel(string file, bool containsFirstLine, int skip1 = 0, int skip2 = 0)
         {
-            return ExcelByNpoi.ImportExcelToDataTable(file, containsFirstLine, skip);
+            return ExcelByNpoi.ImportExcelToDataTable(file, containsFirstLine, skip1, skip2);
         }
 
         /// <summary>

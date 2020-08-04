@@ -69,6 +69,7 @@ namespace Library.Excel
                                 path, ext); //xls HDR=NO;不忽略第一行 HDR=YES;忽略第一行
                         break;
                     case ".xlsx":
+                    case ".xlsm":
                         //Excel2007的连接字符串  
                         connectionString =
                             string.Format(

@@ -37,6 +37,7 @@ namespace Library.Excel
                             excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
                             break;
                         case ".xlsx":
+                        case ".xlsm":
                             excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                             break;
                         default:

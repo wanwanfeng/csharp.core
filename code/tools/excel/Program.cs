@@ -52,12 +52,6 @@ namespace Library.Excel
             [Category("Json"), Description("读取值并覆盖Excel中值"), TypeValue(typeof (ActionExcel.FixExcel))] FixExcel,
         }
 
-        static Program()
-        {
-            Ldebug.OnActionLog += Console.WriteLine;
-            Ldebug.OnActionLogError += Console.WriteLine;
-        }
-
         private static void Main(string[] args)
         {
             SystemConsole.Run<CaoType>(columnsCount: 4);

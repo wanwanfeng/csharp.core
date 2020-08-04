@@ -13,7 +13,7 @@ namespace Script
     {
         public override string selectExtension
         {
-            get { return ".xlsx|.xls"; }
+            get { return ".xlsx|.xlsm|.xls"; }
         }
 
         public override Func<string, IEnumerable<DataTable>> import

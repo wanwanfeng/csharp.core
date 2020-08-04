@@ -38,6 +38,7 @@ namespace Library.Excel
                 switch (fileExt)
                 {
                     case ".xlsx":
+                    case ".xlsm":
                         workbook = new XSSFWorkbook(fs);
                         break;
                     case ".xls":
@@ -161,6 +162,7 @@ namespace Library.Excel
             switch (fileExt)
             {
                 case ".xlsx":
+                case ".xlsm":
                     workbook = new XSSFWorkbook();
                     break;
                 case ".xls":

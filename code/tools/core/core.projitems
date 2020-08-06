@@ -43,6 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\WebHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\XmlHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\LitJsonHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\MiniJSON.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Promise.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\SimpleLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Singleton\Singleton.cs" />

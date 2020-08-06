@@ -91,9 +91,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\library-excel\library-excel.csproj">
-      <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
-      <Name>library-excel</Name>
+    <ProjectReference Include="..\excel\excel.csproj">
+      <Project>{576fd8f1-075a-49d0-ac86-47596b1b88b2}</Project>
+      <Name>excel</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\plugins\HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems" Label="Shared" />

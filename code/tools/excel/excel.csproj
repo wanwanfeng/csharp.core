@@ -38,10 +38,6 @@
     <StartupObject>Library.Excel.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Excel, Version=2.1.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\bin\Excel.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -115,12 +111,8 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\library-excel\library-excel.csproj">
-      <Project>{6c94196a-13a2-4016-9f59-9e426353e92f}</Project>
-      <Name>library-excel</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Import Project="..\core\core.projitems" Label="Shared" />
+  <Import Project="..\core-excel\core-excel.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

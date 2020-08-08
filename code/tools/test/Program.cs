@@ -97,7 +97,7 @@ namespace Script
                 {
                     var xxx = EncryptExtensions.XOR(Encoding.UTF8.GetBytes(str), key);
                     var yyy = EncryptExtensions.XOR(xxx, key);
-                    //Console.WriteLine(Encoding.UTF8.GetString(yyy));
+                    Console.WriteLine(Encoding.UTF8.GetString(yyy));
                 }
 
                 Console.WriteLine("上面这段程序运行了{0}秒",(DateTime.UtcNow.Ticks - time) / 10000000.0);

@@ -53,11 +53,7 @@ namespace checkcard
 
             foreach (List<string> list in res)
             {
-                var row = dts[0].Rows.FirstOrDefault(q =>
-                {
-                    string[] p = q.Cast<string>().ToArray();
-                    return p[0] == list[0] && p[1] == list[1] && p[2] == list[2] && p[3] == list[3];
-                });
+                var row = dts[0].Rows.FirstOrDefault(q => { return q.Take(4).Cast<string>().SequenceEqual(list.Take(4)); });
                 Console.WriteLine(" is now : " + row[0]);
                 row[4] = list[4];
             }

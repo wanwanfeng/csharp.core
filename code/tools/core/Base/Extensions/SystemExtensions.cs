@@ -131,7 +131,7 @@ namespace Library.Extensions
         {
             paths.Select(p => p.Replace("\\", "/").TrimStart('/')).ToList().ForEach((p, i, target) =>
             {
-                SystemConsole.SetProgress(string.Format("is now : {0} {1}", (((float) i)/target.Count).ToString("p"), p));
+                SystemConsole.SetProgress(string.Format("is now : {0} {1}", (((float)i) / target.Count).ToString("p"), p));
                 //Console.WriteLine("is now : " + (((float) i)/target.Count).ToString("p") + "\t" + p);
                 if (File.Exists(p)) callAction(p);
             });
@@ -193,7 +193,7 @@ namespace Library.Extensions
             }
         }
 
-        public static void Run(Action<object> callAction = null, int columnsCount = 1, string group = "", params Type[] types) 
+        public static void Run(Action<object> callAction = null, int columnsCount = 4, string group = "", params Type[] types)
         {
             //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
 
@@ -252,9 +252,7 @@ namespace Library.Extensions
                         color = ConsoleColor.Red,
                     });
 
-                    var lineNum = (int)Math.Ceiling((float)pair.Value.Count() / columnsCount);
-
-                    for (int i = 0, max = pair.Value.Count(); i <= max; i += columnsCount)
+                    for (int i = 0, max = pair.Value.Count(); i < max; i += columnsCount)
                     {
                         var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChLength(), '.')).ToArray();
                         showList.Add(new datastr()
@@ -262,6 +260,11 @@ namespace Library.Extensions
                             content = string.Format("\t{0}", string.Join("\t", strs))
                         });
                     }
+
+                    showList.Add(new datastr()
+                    {
+                        content = "",
+                    });
                 }
 
                 int maxLine = showList.Max(p => p.Length() + columnsCount * 4 + 8);
@@ -279,8 +282,8 @@ namespace Library.Extensions
                 {
                     content = "命令索引".Pad(maxLine - 4, '-') + "\n"
                 });
+                Console.WindowHeight = Math.Max(showList.Count, 30) + 10;
                 showList.ForEach(p => p.WriteLine());
-                Console.WindowHeight = Math.Max(showList.Count, 25) + 10;
 
                 try
                 {
@@ -308,19 +311,62 @@ namespace Library.Extensions
             } while (ContinueY());
         }
 
-        public static void Run<T>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct
+        public static void Run<T, T1, T2, T3, T4, T5, T6>(Action<object> callAction = null, int columnsCount = 4, string group = "")
+            where T : struct
+            where T1 : struct
+            where T2 : struct
+            where T3 : struct
+            where T4 : struct
+            where T5 : struct
+            where T6 : struct
         {
-            Console.Title = typeof(T).Namespace ?? Console.Title;
-            SystemConsole.Run(callAction, columnsCount, group, typeof(T));
+            Run(callAction, columnsCount, group, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
         }
-        public static void Run<T, T2>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct where T2 : struct
+        public static void Run<T, T1, T2, T3, T4, T5>(Action<object> callAction = null, int columnsCount = 4, string group = "")
+           where T : struct
+           where T1 : struct
+           where T2 : struct
+           where T3 : struct
+           where T4 : struct
+           where T5 : struct
         {
-            SystemConsole.Run(callAction, columnsCount, group, typeof(T), typeof(T2));
+            Run(callAction, columnsCount, group, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
         }
-        public static void Run<T,T2,T3>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct where T2: struct where T3 : struct 
+        public static void Run<T, T1, T2, T3, T4>(Action<object> callAction = null, int columnsCount = 4, string group = "")
+          where T : struct
+          where T1 : struct
+          where T2 : struct
+          where T3 : struct
+          where T4 : struct
         {
-            SystemConsole.Run(callAction, columnsCount, group, typeof(T), typeof(T2), typeof(T3));
+            Run(callAction, columnsCount, group, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
+        public static void Run<T, T1, T2, T3>(Action<object> callAction = null, int columnsCount = 4, string group = "")
+         where T : struct
+         where T1 : struct
+         where T2 : struct
+         where T3 : struct
+        {
+            Run(callAction, columnsCount, group, typeof(T), typeof(T1), typeof(T2), typeof(T3));
+        }
+        public static void Run<T, T1, T2>(Action<object> callAction = null, int columnsCount = 4, string group = "")
+         where T : struct
+         where T1 : struct
+         where T2 : struct
+        {
+            Run(callAction, columnsCount, group, typeof(T), typeof(T1), typeof(T2));
+        }
+        public static void Run<T, T1>(Action<object> callAction = null, int columnsCount = 4, string group = "")
+         where T : struct
+         where T1 : struct
+        {
+            Run(callAction, columnsCount, group, typeof(T), typeof(T1));
+        }
+        public static void Run<T>(Action<object> callAction = null, int columnsCount = 4, string group = "") where T : struct
+        {
+            Run(callAction, columnsCount, group, typeof(T));
+        }
+
         public static void Run(Dictionary<string, Action> config)
         {
             Console.WriteLine("-------操作列表-------");
@@ -416,7 +462,7 @@ namespace Library.Extensions
         private static int _lastOffset = 0;
         public static void SetProgress(string info = "", float progress = 0.0f)
         {
-            var msg = string.Format("[{0}] {1} {2}", "*".PadRight((int) Math.Floor(15*progress), '*').PadRight(15, '-'), progress.ToString("p2"), info);
+            var msg = string.Format("[{0}] {1} {2}", "*".PadRight((int)Math.Floor(15 * progress), '*').PadRight(15, '-'), progress.ToString("p2"), info);
             Console.WriteLine(msg);
             _lastOffset = msg.Length / Console.WindowWidth + 1;
             Console.SetCursorPosition(0, Math.Max(0, Console.CursorTop - _lastOffset));

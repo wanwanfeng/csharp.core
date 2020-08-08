@@ -10,17 +10,6 @@ namespace FileVersion
 {
     internal class Program
     {
-        public enum MyEnum
-        {
-            [Category("Svn命令")] [TypeValue(typeof(FileVersion.SvnList))] SvnList = 1,
-            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnMaster))] SvnMaster,
-            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnPatch))] SvnPatch,
-            [Category("\nSvn【命令2->3->4】")] [TypeValue(typeof(SvnUpdate))] SvnUpdate,
-            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitMaster))] GitMaster,
-            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitPatch))] GitPatch,
-            [Category("\nGit【命令5->6->7】")] [TypeValue(typeof(GitUpdate))] GitUpdate,
-        }
-
         public static void Run(object o)
         {
             var commonBase = (CommonBase)o;
@@ -31,30 +20,49 @@ namespace FileVersion
 
         private static void Main(string[] args)
         {
-            SystemConsole.Run<MyEnum>(columnsCount: 4, callAction: Run);
+            SystemConsole.Run<SvnList.MyEnum, Svn.MyEnum, Git.MyEnum>(columnsCount: 4, callAction: Run);
         }
 
         internal class SvnList
         {
+            public enum MyEnum
+            {
+                [TypeValue(typeof(FileVersion.SvnList))] SvnList,
+            }
+
             private static void Main(string[] args)
             {
-                SystemConsole.Run<MyEnum>(group: "Svn命令", callAction: Run);
+                SystemConsole.Run<MyEnum>(callAction: Run);
             }
         }
 
         internal class Svn
         {
+            public enum MyEnum
+            {
+                [TypeValue(typeof(SvnMaster))] SvnMaster,
+                [TypeValue(typeof(SvnPatch))] SvnPatch,
+                [TypeValue(typeof(SvnUpdate))] SvnUpdate,
+            }
+
             private static void Main(string[] args)
             {
-                SystemConsole.Run<MyEnum>(group: "\nSvn【命令2->3->4】", callAction: Run);
+                SystemConsole.Run<MyEnum>(callAction: Run);
             }
         }
 
         internal class Git
         {
+            public enum MyEnum
+            {
+                [TypeValue(typeof(GitMaster))] GitMaster,
+                [TypeValue(typeof(GitPatch))] GitPatch,
+                [TypeValue(typeof(GitUpdate))] GitUpdate,
+            }
+
             private static void Main(string[] args)
             {
-                SystemConsole.Run<MyEnum>(group: "\nGit【命令5->6->7】", callAction: Run);
+                SystemConsole.Run<MyEnum>(callAction: Run);
             }
         }
     }

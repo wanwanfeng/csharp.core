@@ -174,9 +174,30 @@ namespace Library.Extensions
                 return xx;
             }
         }
+
+        class datastr
+        {
+            public string content = "";
+            public ConsoleColor color = ConsoleColor.White;
+
+            public int Length()
+            {
+                return System.Text.Encoding.Default.GetBytes(content).Length;
+            }
+
+            public void WriteLine()
+            {
+                Console.ForegroundColor = color;
+                Console.WriteLine(content);
+                Console.ResetColor();
+            }
+        }
+
         public static void Run(Action<object> callAction = null, int columnsCount = 1, string group = "", params Type[] types) 
         {
             //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
+
+            Console.ResetColor();
 
             var datas = new List<data>();
 
@@ -221,28 +242,44 @@ namespace Library.Extensions
             {
                 Console.Clear();
 
-                List<string> showList = new List<string>();
+                List<datastr> showList = new List<datastr>();
 
                 foreach (var pair in datas.GroupBy(p => p.group).ToDictionary(p => p.Key))
                 {
-                    showList.Add(pair.Key);
+                    showList.Add(new datastr()
+                    {
+                        content = pair.Key,
+                        color = ConsoleColor.Red,
+                    });
 
                     var lineNum = (int)Math.Ceiling((float)pair.Value.Count() / columnsCount);
 
                     for (int i = 0, max = pair.Value.Count(); i <= max; i += columnsCount)
                     {
                         var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChLength(), '.')).ToArray();
-                        showList.Add(string.Format("\t{0}", string.Join("\t", strs)));
+                        showList.Add(new datastr()
+                        {
+                            content = string.Format("\t{0}", string.Join("\t", strs))
+                        });
                     }
                 }
 
-                int maxLine = showList.Max(p => System.Text.Encoding.Default.GetBytes(p).Length + columnsCount * 4 + 8);
+                int maxLine = showList.Max(p => p.Length() + columnsCount * 4 + 8);
                 maxLine += (maxLine % 2 == 0 ? 0 : 1);
                 Console.WindowWidth = maxLine;
-                showList.Add("\n\t" + "e：exit\n");
-                showList.Add("-".PadRight(maxLine, '-'));
-                showList.Insert(0, "命令索引".Pad(maxLine - 4, '-') + "\n");
-                showList.ForEach(Console.WriteLine);
+                showList.Add(new datastr()
+                {
+                    content = "\n\t" + "e：exit\n"
+                });
+                showList.Add(new datastr()
+                {
+                    content = "-".PadRight(maxLine, '-')
+                });
+                showList.Insert(0, new datastr()
+                {
+                    content = "命令索引".Pad(maxLine - 4, '-') + "\n"
+                });
+                showList.ForEach(p => p.WriteLine());
                 Console.WindowHeight = Math.Max(showList.Count, 25) + 10;
 
                 try

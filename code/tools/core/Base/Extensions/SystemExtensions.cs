@@ -157,27 +157,64 @@ namespace Library.Extensions
 
     public static class SystemConsole
     {
-        public static void Run<T>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct
+        class data
         {
-            Console.Title = typeof (T).Namespace ?? Console.Title;
+            public string group = "";
+            public string description = "";
+            public Type type = null;
+
+            public int Length()
+            {
+                return System.Text.Encoding.Default.GetBytes(description).Length;
+            }
+
+            public int ZhChLength()
+            {
+                var xx = description.ToCharArray().Where(p => 2 == System.Text.Encoding.Default.GetByteCount(p.ToString())).Count();
+                return xx;
+            }
+        }
+        public static void Run(Action<object> callAction = null, int columnsCount = 1, string group = "", params Type[] types) 
+        {
             //Console.OutputEncoding = Console.InputEncoding = System.Text.Encoding.UTF8;
 
-            var cacheCategory = AttributeHelper.GetCache<T, CategoryAttribute>()
-                .GroupBy(p => p.Value == null ? "" : p.Value.Category)
-                .ToDictionary(p => p.Key, p => p.ToDictionary(q => (int) q.Key, q => (T) q.Key));
+            var datas = new List<data>();
 
-            if (!string.IsNullOrEmpty(group) && cacheCategory.ContainsKey(group))
-                cacheCategory = new Dictionary<string, Dictionary<int, T>>()
+            foreach (var type in types)
+            {
+                if (type.IsEnum)
+                {
+                    foreach (var it in Enum.GetValues(type))
                     {
-                        { group, cacheCategory[group]}
-                    };
+                        var field = type.GetField(it.ToString());
+                        if (field == null) continue;
+                        var typeValueAttribute = field.GetCustomAttributes(false).OfType<TypeValueAttribute>().FirstOrDefault();
+                        if (typeValueAttribute == null) continue;
 
-            var cacheType = AttributeHelper.GetCache<T, TypeValueAttribute>()
-                .ToDictionary(p => (int) p.Key);
-            var cacheDesc = AttributeHelper.GetCacheDescription<T>()
-                .ToDictionary(p => p.Key, q => string.IsNullOrEmpty(q.Value) ? q.Key.ToString() : q.Value);
+                        var categoryAttribute = field.GetCustomAttributes(false).OfType<CategoryAttribute>().FirstOrDefault();
 
-            int maxLength = cacheDesc.Values.Max(p => p.Length);
+                        var data = new data();
+
+                        data.group = categoryAttribute == null ? "" : categoryAttribute.Category;
+                        if (!string.IsNullOrEmpty(group) && group != data.group)
+                            continue;
+
+                        data.group = type.FullName + "/" + data.group;
+
+                        var descriptionAttribute = field.GetCustomAttributes(false).OfType<DescriptionAttribute>().FirstOrDefault();
+                        data.description = descriptionAttribute == null ? field.Name : descriptionAttribute.Description;
+                        data.description = string.Format("{0:d2}：{1}", datas.Count, data.description);
+
+                        data.type = typeValueAttribute.value;
+
+                        datas.Add(data);
+                    }
+                }
+            }
+
+
+
+            int maxLength = datas.Max(p => p.Length() + 2);
 
             bool y = false;
             do
@@ -186,47 +223,39 @@ namespace Library.Extensions
 
                 List<string> showList = new List<string>();
 
-                foreach (KeyValuePair<string, Dictionary<int, T>> pair in cacheCategory)
+                foreach (var pair in datas.GroupBy(p => p.group).ToDictionary(p => p.Key))
                 {
                     showList.Add(pair.Key);
 
-                    var lineNum = (int) Math.Ceiling((float) pair.Value.Count/columnsCount);
-                    var cache = pair.Value
-                        .GroupBy(p => p.Key%lineNum, q => q)
-                        .ToDictionary(p => p.Key, q => q.ToList());
+                    var lineNum = (int)Math.Ceiling((float)pair.Value.Count() / columnsCount);
 
-                    foreach (var value in cache.Values)
+                    for (int i = 0, max = pair.Value.Count(); i <= max; i += columnsCount)
                     {
-                        var res =
-                            value.Select(
-                                p => string.Format("{0:d2}：{1}", p.Key, cacheDesc[p.Value].PadRight(maxLength, '.')));
-                        showList.Add(string.Format("\t{0}\t", string.Join("\t", res.ToArray())));
+                        var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChLength(), '.')).ToArray();
+                        showList.Add(string.Format("\t{0}", string.Join("\t", strs)));
                     }
                 }
 
-                int maxLine = showList.Max(p => p.Length + columnsCount*4 + 8);
-                maxLine += (maxLine%2 == 0 ? 0 : 1);
-                Console.WindowWidth = maxLine < Console.WindowWidth ? Console.WindowWidth : maxLine;
+                int maxLine = showList.Max(p => System.Text.Encoding.Default.GetBytes(p).Length + columnsCount * 4 + 8);
+                maxLine += (maxLine % 2 == 0 ? 0 : 1);
+                Console.WindowWidth = maxLine;
                 showList.Add("\n\t" + "e：exit\n");
                 showList.Add("-".PadRight(maxLine, '-'));
                 showList.Insert(0, "命令索引".Pad(maxLine - 4, '-') + "\n");
                 showList.ForEach(Console.WriteLine);
-                Console.WindowHeight = showList.Count < 25 ? 25 : showList.Count + 5;
+                Console.WindowHeight = Math.Max(showList.Count, 25) + 10;
 
                 try
                 {
                     //resetInput:
                     var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
-                    if (cacheType.ContainsKey(index))
-                    {
-                        Console.WriteLine("当前的选择：" + index);
-                        //do
-                        //{
-                        var obj = Activator.CreateInstance(cacheType[index].Value.value);
-                        if (callAction != null)
-                            callAction.Invoke(obj);
-                        //} while (ContinueY());
-                    }
+                    Console.WriteLine("当前的选择：" + index);
+                    //do
+                    //{
+                    var obj = Activator.CreateInstance(datas[index].type);
+                    if (callAction != null)
+                        callAction.Invoke(obj);
+                    //} while (ContinueY());
                     //goto resetInput;
                 }
                 catch (Exception e)
@@ -242,6 +271,19 @@ namespace Library.Extensions
             } while (ContinueY());
         }
 
+        public static void Run<T>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct
+        {
+            Console.Title = typeof(T).Namespace ?? Console.Title;
+            SystemConsole.Run(callAction, columnsCount, group, typeof(T));
+        }
+        public static void Run<T, T2>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct where T2 : struct
+        {
+            SystemConsole.Run(callAction, columnsCount, group, typeof(T), typeof(T2));
+        }
+        public static void Run<T,T2,T3>(Action<object> callAction = null, int columnsCount = 1, string group = "") where T : struct where T2: struct where T3 : struct 
+        {
+            SystemConsole.Run(callAction, columnsCount, group, typeof(T), typeof(T2), typeof(T3));
+        }
         public static void Run(Dictionary<string, Action> config)
         {
             Console.WriteLine("-------操作列表-------");

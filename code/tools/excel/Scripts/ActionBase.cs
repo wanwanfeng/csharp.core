@@ -26,16 +26,24 @@ namespace Script
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
 
-        protected void ToCommon(Action<DataTable, string> expAction, Func<DataTable, DataTable> runAction = null)
+        protected void ToCommon(Action<DataTable, string> expAction)
         {
             Action<string> action = file =>
             {
                 Console.WriteLine(" is now : " + file);
-                var dts =
-                    import.Invoke(file)
-                        .Where(p => p != null)
-                        .Select(p => runAction == null ? p : runAction.Invoke(p))
-                        .ToList();
+                var dts = import.Invoke(file).Where(p => p != null).ToList();
+
+                foreach (var dt in dts)
+                {
+                    //例:删除第一列 
+                    //dt.Columns.RemoveAt(0);
+
+                    //例:根据过滤条件删除行
+                    //DataRow[] select = dt.Select("sex = '男' and age >= 18");
+                    //dt.Rows.Clear();
+                    //select.ForEach(dt.Rows.Add);
+                }
+
                 if (dts.Count == 1)
                 {
                     expAction.Invoke(dts.First(), file);

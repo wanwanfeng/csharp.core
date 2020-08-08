@@ -77,11 +77,10 @@ namespace Script
         {
             public FixExcel()
             {
-                ToCommon((dt, file) => { ExcelUtils.ExportToExcel(dt, file); }, data =>
-                {
-                    if (data == null) return null;
+                ToCommon((dt, file) => {
                     var path = Path.ChangeExtension(InputPath, "").TrimEnd('.');
-                    var list = data.ToListTable();
+
+                    var list = dt.ToListTable();
                     foreach (List<object> objects in list.Rows)
                     {
                         var temp = path + objects[0].ToString();
@@ -93,7 +92,9 @@ namespace Script
                         string value_zh_cn = objects[4].ToString();
                         objects[3] = JsonHelper.ReadValueByKeyPath(json, id.ToString());
                     }
-                    return list.ToDataTable();
+                    var newdt =  list.ToDataTable();
+
+                    ExcelUtils.ExportToExcel(newdt, file);
                 });
             }
         }

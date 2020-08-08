@@ -57,7 +57,7 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>FileVersion.Program.Git</StartupObject>
+    <StartupObject>FileVersion.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
@@ -111,7 +111,7 @@
   <ItemGroup>
     <Folder Include="Git\GitList\" />
   </ItemGroup>
-  <Import Project="..\core\core.projitems" Label="Shared" />
+  <Import Project="..\core\core\core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

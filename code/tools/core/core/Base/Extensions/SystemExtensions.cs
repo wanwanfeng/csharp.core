@@ -377,7 +377,7 @@ namespace Library.Extensions
             config = new Dictionary<string, Action>
             {
                 {"e", () => { QuitReadKey(); }}
-            }.Merge(config);
+            }.Union(config).ToDictionary(p => p.Key, p => p.Value);
 
             string cmd = "e";
             do
@@ -410,7 +410,7 @@ namespace Library.Extensions
                 var config = new Dictionary<string, Action>
                 {
                     {"e", () => { QuitReadKey(); }}
-                }.Merge(null);
+                };
                 if (config.ContainsKey(str))
                     config[str].Invoke();
                 return str;

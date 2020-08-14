@@ -162,6 +162,7 @@ namespace Library.Extensions
             public string group = "";
             public string description = "";
             public Type type = null;
+            public Action action = null;
 
             public int Length()
             {
@@ -191,6 +192,60 @@ namespace Library.Extensions
                 Console.WriteLine(content);
                 Console.ResetColor();
             }
+        }
+
+        static Stack<object> stack = new Stack<object>();
+
+        private static void ShowCmd(List<data> datas, int columnsCount)
+        {
+            stack.Push(new object[] { datas, columnsCount });
+
+            Console.Clear();
+
+            int maxLength = datas.Max(p => p.Length() + 2);
+
+            List<datastr> showList = new List<datastr>();
+
+            foreach (var pair in datas.GroupBy(p => p.group).ToDictionary(p => p.Key))
+            {
+                showList.Add(new datastr()
+                {
+                    content = pair.Key,
+                    color = ConsoleColor.Red,
+                });
+
+                for (int i = 0, max = pair.Value.Count(); i < max; i += columnsCount)
+                {
+                    var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChLength(), '.')).ToArray();
+                    showList.Add(new datastr()
+                    {
+                        content = string.Format("\t{0}", string.Join("\t", strs))
+                    });
+                }
+
+                showList.Add(new datastr()
+                {
+                    content = "",
+                });
+            }
+
+            int maxLine = showList.Max(p => p.Length() + columnsCount * 4 + 8);
+            maxLine += (maxLine % 2 == 0 ? 0 : 1);
+            Console.WindowWidth = maxLine;
+            showList.Add(new datastr()
+            {
+                content = "\n\t" + "e：exit\n"
+            });
+            showList.Add(new datastr()
+            {
+                content = "-".PadRight(maxLine, '-')
+            });
+            showList.Insert(0, new datastr()
+            {
+                content = "命令索引".Pad(maxLine - 4, '-') + "\n"
+            });
+            Console.WindowHeight = Math.Max(showList.Count, 30) + 10;
+            showList.ForEach(p => p.WriteLine());
         }
 
         public static void Run(Action<object> callAction = null, int columnsCount = 4, string group = "", params Type[] types)
@@ -233,70 +288,16 @@ namespace Library.Extensions
                 }
             }
 
-
-
-            int maxLength = datas.Max(p => p.Length() + 2);
-
-            bool y = false;
             do
             {
-                Console.Clear();
-
-                List<datastr> showList = new List<datastr>();
-
-                foreach (var pair in datas.GroupBy(p => p.group).ToDictionary(p => p.Key))
-                {
-                    showList.Add(new datastr()
-                    {
-                        content = pair.Key,
-                        color = ConsoleColor.Red,
-                    });
-
-                    for (int i = 0, max = pair.Value.Count(); i < max; i += columnsCount)
-                    {
-                        var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChLength(), '.')).ToArray();
-                        showList.Add(new datastr()
-                        {
-                            content = string.Format("\t{0}", string.Join("\t", strs))
-                        });
-                    }
-
-                    showList.Add(new datastr()
-                    {
-                        content = "",
-                    });
-                }
-
-                int maxLine = showList.Max(p => p.Length() + columnsCount * 4 + 8);
-                maxLine += (maxLine % 2 == 0 ? 0 : 1);
-                Console.WindowWidth = maxLine;
-                showList.Add(new datastr()
-                {
-                    content = "\n\t" + "e：exit\n"
-                });
-                showList.Add(new datastr()
-                {
-                    content = "-".PadRight(maxLine, '-')
-                });
-                showList.Insert(0, new datastr()
-                {
-                    content = "命令索引".Pad(maxLine - 4, '-') + "\n"
-                });
-                Console.WindowHeight = Math.Max(showList.Count, 30) + 10;
-                showList.ForEach(p => p.WriteLine());
-
+                ShowCmd(datas, columnsCount);
                 try
                 {
-                    //resetInput:
                     var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
                     Console.WriteLine("当前的选择：" + index);
-                    //do
-                    //{
                     var obj = Activator.CreateInstance(datas[index].type);
                     if (callAction != null)
                         callAction.Invoke(obj);
-                    //} while (ContinueY());
-                    //goto resetInput;
                 }
                 catch (Exception e)
                 {
@@ -306,7 +307,6 @@ namespace Library.Extensions
                         Console.WriteLine(p.StackTrace);
                     });
                 }
-
                 GC.Collect();
             } while (ContinueY());
         }
@@ -367,25 +367,37 @@ namespace Library.Extensions
             Run(callAction, columnsCount, group, typeof(T));
         }
 
-        public static void Run(Dictionary<string, Action> config)
+        public static void Run(Dictionary<string, Action> config, int columnsCount = 1, string group = "")
         {
-            Console.WriteLine("-------操作列表-------");
-            config.Keys.ToList().ForEach((p, i) => Console.WriteLine((i + 1) + "：" + p));
-            Console.WriteLine("----------------------");
-            List<Action> result = config.Values.ToList();
-            config = result.ToDictionary(p => (result.IndexOf(p) + 1).ToString());
-            config = new Dictionary<string, Action>
-            {
-                {"e", () => { QuitReadKey(); }}
-            }.Union(config).ToDictionary(p => p.Key, p => p.Value);
-
-            string cmd = "e";
+            var datas = config.Keys.ToList().Select((p, i) =>
+           {
+               return new data()
+               {
+                   action = config[p],
+                   description = string.Format("{0:d2}：{1}", i, p),
+                   group = group
+               };
+           }).ToList();
             do
             {
-                cmd = GetInputStr("输入指令：");
-                if (config.ContainsKey(cmd))
-                    config[cmd].Invoke();
-            } while (!config.ContainsKey(cmd));
+                ShowCmd(datas, columnsCount);
+                try
+                {
+                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
+                    Console.WriteLine("当前的选择：" + index);
+                    if (datas[index].action != null)
+                        datas[index].action.Invoke();
+                }
+                catch (Exception e)
+                {
+                    e.FinalException().ForEach(p =>
+                    {
+                        Console.WriteLine(p.Message);
+                        Console.WriteLine(p.StackTrace);
+                    });
+                }
+                GC.Collect();
+            } while (ContinueY());
         }
 
         /// <summary>

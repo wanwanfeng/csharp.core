@@ -196,7 +196,7 @@ namespace Library.Extensions
 
         static Stack<object> stack = new Stack<object>();
 
-        private static void ShowCmd(List<data> datas, int columnsCount)
+        private static void ShowCmd(List<data> datas, int columnsCount, Action<data> action)
         {
             stack.Push(new object[] { datas, columnsCount });
 
@@ -246,6 +246,25 @@ namespace Library.Extensions
             });
             Console.WindowHeight = Math.Max(showList.Count, 30) + 10;
             showList.ForEach(p => p.WriteLine());
+
+            do
+            {
+                try
+                {
+                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
+                    Console.WriteLine("当前的选择：" + index);
+                    action.Invoke(datas[index]);
+                }
+                catch (Exception e)
+                {
+                    e.FinalException().ForEach(p =>
+                    {
+                        Console.WriteLine(p.Message);
+                        Console.WriteLine(p.StackTrace);
+                    });
+                }
+                GC.Collect();
+            } while (ContinueY());
         }
 
         public static void Run(Action<object> callAction = null, int columnsCount = 4, string group = "", params Type[] types)
@@ -288,27 +307,12 @@ namespace Library.Extensions
                 }
             }
 
-            do
+            ShowCmd(datas, columnsCount, data =>
             {
-                ShowCmd(datas, columnsCount);
-                try
-                {
-                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
-                    Console.WriteLine("当前的选择：" + index);
-                    var obj = Activator.CreateInstance(datas[index].type);
-                    if (callAction != null)
-                        callAction.Invoke(obj);
-                }
-                catch (Exception e)
-                {
-                    e.FinalException().ForEach(p =>
-                    {
-                        Console.WriteLine(p.Message);
-                        Console.WriteLine(p.StackTrace);
-                    });
-                }
-                GC.Collect();
-            } while (ContinueY());
+                var obj = Activator.CreateInstance(data.type);
+                if (callAction != null)
+                    callAction.Invoke(obj);
+            });
         }
 
         public static void Run<T, T1, T2, T3, T4, T5, T6>(Action<object> callAction = null, int columnsCount = 4, string group = "")
@@ -378,26 +382,12 @@ namespace Library.Extensions
                    group = group
                };
            }).ToList();
-            do
+
+            ShowCmd(datas, columnsCount, data =>
             {
-                ShowCmd(datas, columnsCount);
-                try
-                {
-                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
-                    Console.WriteLine("当前的选择：" + index);
-                    if (datas[index].action != null)
-                        datas[index].action.Invoke();
-                }
-                catch (Exception e)
-                {
-                    e.FinalException().ForEach(p =>
-                    {
-                        Console.WriteLine(p.Message);
-                        Console.WriteLine(p.StackTrace);
-                    });
-                }
-                GC.Collect();
-            } while (ContinueY());
+                if (data.action != null)
+                    data.action.Invoke();
+            });
         }
 
         /// <summary>

@@ -21,41 +21,36 @@ namespace Script
             [Description("GetLineCount"), TypeValue(typeof(GetLineCount))] GetLineCount,
             //[Description("DeleteFiles"), TypeValue(typeof (DeleteFiles))] DeleteFiles,
 
-            [Category("Image"), Description("ImageConvertToBase64"), TypeValue(typeof(ImageConvertToBase64))] ImageConvertToBase64,
-            [Category("Image"), Description("Base64ConvertToImage"), TypeValue(typeof(Base64ConvertToImage))] Base64ConvertToImage,
+            [Category("Image/Base64"), Description("ImageConvertToBase64"), TypeValue(typeof(ImageConvertToBase64))] ImageConvertToBase64,
+            [Category("Image/Base64"), Description("Base64ConvertToImage"), TypeValue(typeof(Base64ConvertToImage))] Base64ConvertToImage,
 
-            [Category("Image"), Description("SpliteAdobeAnimateAtlas"), TypeValue(typeof(SpliteAdobeAnimateAtlas))] SpliteAdobeAnimateAtlas,
-            [Category("Image"), Description("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))] SpliteAtlas, 
+            [Category("Image/Splite"), Description("SpliteAdobeAnimateAtlas"), TypeValue(typeof(SpliteAdobeAnimateAtlas))] SpliteAdobeAnimateAtlas,
+            [Category("Image/Splite"), Description("SpliteAtlas"), TypeValue(typeof(SpliteAtlas))] SpliteAtlas, 
             //[Category("Image"), Description("CheckImage"), TypeValue(typeof (CheckImage))] CheckImage,
-            [Category("Image"), Description("ImageProgressiveJpeg"), TypeValue(typeof(ImageProgressiveJpeg))] ImageProgressiveJpeg,
-            [Category("Image"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof(ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,
-            [Category("Image"), Description("ImageFind"), TypeValue(typeof(ImageFind))] ImageFind,
-            [Category("Image"), Description("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))] ImageFindOrc,
-
-            [Category("dos2"), Description("dos2unix"), TypeValue(typeof(dos2unix))] dos2unix,
-            [Category("dos2"), Description("unix2dos"), TypeValue(typeof(unix2dos))] unix2dos,
-            [Category("dos2"), Description("mac2unix"), TypeValue(typeof(mac2unix))] mac2unix,
-            [Category("dos2"), Description("unix2mac"), TypeValue(typeof(unix2mac))] unix2mac,
+            [Category("Image/ProgressiveJpeg"), Description("ImageProgressiveJpeg"), TypeValue(typeof(ImageProgressiveJpeg))] ImageProgressiveJpeg,
+            [Category("Image/ProgressiveJpeg"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof(ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,
+            [Category("Image/Find"), Description("ImageFind"), TypeValue(typeof(ImageFind))] ImageFind,
+            [Category("Image/Find"), Description("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))] ImageFindOrc,
         }
 
         private static void Main(string[] args)
         {
-            SystemConsole.Run<MyEnum>(columnsCount: 3);
+            SystemConsole.Run<MyEnum, Dos2.MyEnum>(columnsCount: 4);
         }
 
         internal class Dos2
         {
+            internal enum MyEnum
+            {
+                [Description("dos2unix"), TypeValue(typeof(dos2unix))] dos2unix,
+                [Description("unix2dos"), TypeValue(typeof(unix2dos))] unix2dos,
+                [Description("mac2unix"), TypeValue(typeof(mac2unix))] mac2unix,
+                [Description("unix2mac"), TypeValue(typeof(unix2mac))] unix2mac,
+            }
+
             private static void Main(string[] args)
             {
                 SystemConsole.Run<MyEnum>(group: "dos2");
-            }
-        }
-
-        internal class Image
-        {
-            private static void Main(string[] args)
-            {
-                SystemConsole.Run<MyEnum>(group: "Image");
             }
         }
     }

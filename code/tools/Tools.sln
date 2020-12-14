@@ -62,6 +62,7 @@ Global
 		core\core-excel\core-excel.projitems*{1962049b-a853-4b8c-8230-3ab672039553}*SharedItemsImports = 13
 		plugins\HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{32127943-c42d-4bd5-b9d3-989b9a16851a}*SharedItemsImports = 4
 		core\core\core.projitems*{32c3f2cd-87bc-4bc4-8c44-cbae98315bfb}*SharedItemsImports = 4
+		plugins\litjson.projitems*{32c3f2cd-87bc-4bc4-8c44-cbae98315bfb}*SharedItemsImports = 4
 		core\core\core.projitems*{339466c1-2c12-4a64-8f75-2e12fcaeccfe}*SharedItemsImports = 4
 		plugins\litjson.projitems*{339466c1-2c12-4a64-8f75-2e12fcaeccfe}*SharedItemsImports = 4
 		core\core-excel\core-excel.projitems*{576fd8f1-075a-49d0-ac86-47596b1b88b2}*SharedItemsImports = 4

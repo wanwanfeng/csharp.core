@@ -193,12 +193,19 @@ namespace Library.Extensions
                 Console.ResetColor();
             }
         }
+		class dataArgas
+		{
+			public List<data> datas ;
+            public int columnsCount;
+		}
 
-        static Stack<object> stack = new Stack<object>();
+		static Stack<dataArgas> stack = new Stack<dataArgas>();
 
         private static void ShowCmd(List<data> datas, int columnsCount, Action<data> action)
         {
-            stack.Push(new object[] { datas, columnsCount });
+			columnsCount = stack.Count == 0 ? columnsCount : Math.Max(columnsCount, stack.Pop().columnsCount);
+
+			stack.Push(new dataArgas() { datas = datas, columnsCount = columnsCount });
 
             Console.Clear();
 
@@ -231,8 +238,10 @@ namespace Library.Extensions
 
             int maxLine = showList.Max(p => p.Length() + columnsCount * 4 + 8);
             maxLine += (maxLine % 2 == 0 ? 0 : 1);
-            Console.WindowWidth = maxLine;
-            showList.Add(new datastr()
+
+			Console.WindowWidth = maxLine = Math.Max(maxLine, Console.WindowWidth);
+
+			showList.Add(new datastr()
             {
                 content = "\n\t" + "e：exit\n"
             });
@@ -244,7 +253,9 @@ namespace Library.Extensions
             {
                 content = "命令索引".Pad(maxLine - 4, '-') + "\n"
             });
-            Console.WindowHeight = Math.Max(showList.Count, 30) + 10;
+
+			Console.WindowHeight = Math.Max(Console.WindowHeight, Math.Max(showList.Count, 30) + 10);
+
             showList.ForEach(p => p.WriteLine());
 
             do

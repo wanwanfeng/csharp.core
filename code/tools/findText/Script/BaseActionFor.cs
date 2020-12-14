@@ -14,7 +14,7 @@ namespace findText
 {
     public abstract class BaseActionFor : BaseSystemExcel
     {
-        protected Regex regex { get; set; }
+        protected Regex regex { get; private set; }
 
         public virtual string regexStr { get; set; }
 
@@ -39,38 +39,37 @@ namespace findText
             get { return "*.*"; }
         }
 
-        public void Open()
-        {
-            var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
-            var str = string.Join("|", cache.Values);
-            {
-                SystemConsole.Run(config: new Dictionary<string, Action>()
-                {
-                    {
-                        "匹配中文与日文",
-                        () =>
-                        {
-                            regexStr = str;
-                            GetValue();
-                        }
-                    },
-                    {
-                        "只匹配中文", () =>
-                        {
-                            regexStr = cache[RegexLanguaheEnum.中文];
-                            GetValue();
-                        }
-                    },
-                    {
-                        "只匹配日文", () =>
-                        {
-                            regexStr = string.Join("|", cache.Where(p => p.Key < RegexLanguaheEnum.中文).Select(p => p.Value));
-                            GetValue();
-                        }
-                    }
-                });
-            }
-        }
+		public void Open()
+		{
+
+			var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
+			SystemConsole.Run(config: new Dictionary<string, Action>()
+			{
+				["匹配中文与日文"] = () =>
+				{
+					regexStr = string.Join("|", cache.Where(p => p.Key >= RegexLanguaheEnum.日文 && p.Key <= RegexLanguaheEnum.中文).Select(p => p.Value));
+					GetValue();
+				},
+
+				//["只匹配中文"] = () =>
+				//{
+				//	regexStr = cache[RegexLanguaheEnum.中文];
+				//	GetValue();
+				//},
+
+				["只匹配日文"] = () =>
+				{
+					regexStr = string.Join("|", cache.Where(p => p.Key < RegexLanguaheEnum.中文).Select(p => p.Value));
+					GetValue();
+				},
+
+				["只匹配韩文"] = () =>
+				{
+					regexStr = cache[RegexLanguaheEnum.韩文];
+					GetValue();
+				}
+			});
+		}
 
         protected virtual string ToJson(object json)
         {
@@ -81,7 +80,7 @@ namespace findText
         {
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
-            CheckPath(exName, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
+			CheckPath(exName, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
 
             var vals = GetJsonDataArray(ToJson(resJsonData));
             if (vals.Rows.Count == 0)

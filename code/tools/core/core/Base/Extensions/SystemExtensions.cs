@@ -384,12 +384,12 @@ namespace Library.Extensions
 
         public static void Run(Dictionary<string, Action> config, int columnsCount = 1, string group = "")
         {
-            var datas = config.Keys.ToList().Select((p, i) =>
+            var datas = config.Select((p, i) =>
            {
                return new data()
                {
-                   action = config[p],
-                   description = string.Format("{0:d2}：{1}", i, p),
+                   action = p.Value,
+                   description = string.Format("{0:d2}：{1}", i, p.Key),
                    group = group
                };
            }).ToList();

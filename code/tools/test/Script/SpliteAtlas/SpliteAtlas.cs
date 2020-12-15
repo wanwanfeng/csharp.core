@@ -17,79 +17,53 @@ namespace Script
         /// </summary>
         public SpliteAtlas()
         {
-            SystemConsole.Run(config: new Dictionary<string, Action>()
-            {
-                {
-                    "图集拆解", () =>
-                    {
-                        GetPaths().ForEachPaths(re =>
-                        {
-                            PList plist = new PList();
-                            plist.Load(re);
-                            TextureInfo textureInfo = new TextureInfo(plist, re);
-                            if (!textureInfo.voild) return;
-                            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+			SystemConsole.Run(config: new Dictionary<string, Action>()
+			{
+				["图集拆解"] = () =>
+				 {
+					 GetPaths("*.plist").ForEachPaths(re =>
+					 {
+						 PList plist = new PList();
+						 plist.Load(re);
+						 TextureInfo textureInfo = new TextureInfo(plist, re);
+						 if (!textureInfo.voild) return;
+						 var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
 
-                            if (File.Exists(imagePath))
-                                HaveImageAndRead(imagePath, textureInfo);
-                        });
-                    }
-                },
-                {
-                    "图集合并", () =>
-                    {
-                        GetPaths().ForEachPaths(re =>
-                        {
-                            PList plist = new PList();
-                            plist.Load(re);
-                            TextureInfo textureInfo = new TextureInfo(plist, re);
-                            if (!textureInfo.voild) return;
-                            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+						 if (File.Exists(imagePath))
+							 HaveImageAndRead(imagePath, textureInfo);
+					 });
+				 },
+				["图集合并"] = () =>
+				 {
+					 GetPaths("*.plist").ForEachPaths(re =>
+					 {
+						 PList plist = new PList();
+						 plist.Load(re);
+						 TextureInfo textureInfo = new TextureInfo(plist, re);
+						 if (!textureInfo.voild) return;
+						 var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
 
-                            if (File.Exists(imagePath))
-                                HaveImageAndWrite(imagePath, textureInfo);
-                        });
-                    }
-                },
-                {
-                    "文件夹删除", () =>
-                    {
-                        GetPaths().ForEachPaths(re =>
-                        {
-                            PList plist = new PList();
-                            plist.Load(re);
-                            TextureInfo textureInfo = new TextureInfo(plist, re);
-                            if (!textureInfo.voild) return;
-                            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+						 if (File.Exists(imagePath))
+							 HaveImageAndWrite(imagePath, textureInfo);
+					 });
+				 },
+				["文件夹删除"] = () =>
+				 {
+					 GetPaths("*.plist").ForEachPaths(re =>
+					 {
+						 PList plist = new PList();
+						 plist.Load(re);
+						 TextureInfo textureInfo = new TextureInfo(plist, re);
+						 if (!textureInfo.voild) return;
+						 var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
 
-                            string dir = Path.GetDirectoryName(imagePath) + "/" +
-                                         Path.GetFileNameWithoutExtension(imagePath);
-                            if (Directory.Exists(dir))
-                                Directory.Delete(dir, true);
-                        });
-                    }
-                },
-            });
-        }
-
-        private List<string> GetPaths()
-        {
-            var path = SystemConsole.GetInputStr("请拖入选定（文件夹或文件）:");
-
-            List<string> res = new List<string>();
-            if (Directory.Exists(path))
-            {
-                if (File.Exists(path + ".plist"))
-                    res.Add(path + ".plist");
-                else
-                    res.AddRange(Directory.GetFiles(path, "*.plist", SearchOption.AllDirectories));
-            }
-            else
-            {
-                if (File.Exists(path) && Path.GetExtension(path) == ".plist")
-                    res.Add(path);
-            }
-            return res;
+						 string dir = Path.GetDirectoryName(imagePath) + "/" +
+									  Path.GetFileNameWithoutExtension(imagePath);
+						 if (Directory.Exists(dir))
+							 Directory.Delete(dir, true);
+					 });
+				 },
+			});
         }
 
         private static void HaveImageAndRead(string re, TextureInfo textureInfo)
@@ -169,91 +143,66 @@ namespace Script
             public float pivotX, pivotY;
         }
 
-        public SpliteAdobeAnimateAtlas()
-        {
-            SystemConsole.Run(config: new Dictionary<string, Action>()
-            {
-                {
-                    "图集拆解", () =>
-                    {
-                        GetPaths().ForEachPaths(re =>
-                        {
-                            XDocument xDoc = XDocument.Load(re);
-                            var list = xDoc.Element("TextureAtlas").Elements("SubTexture").Select(p=>{
-                                return new Sprite{
-                                    name=(string)p.Attribute("name")+".png",
-                                    x=(int)p.Attribute("x"),
-                                    y=(int)p.Attribute("y"),
-                                    width=(int)p.Attribute("width"),
-                                    height=(int)p.Attribute("height"),
-                                    pivotX=p.Attribute("pivotX")!=null?(float)p.Attribute("pivotX"):0,
-                                    pivotY=p.Attribute("pivotY")!=null?(float)p.Attribute("pivotY"):0,
-                                };
-                            }).OrderBy(p=>p.name).ToList();
+		public SpliteAdobeAnimateAtlas()
+		{
+			SystemConsole.Run(config: new Dictionary<string, Action>()
+			{
+				["图集拆解"] = () =>
+				 {
+					 GetPaths(".bin").ForEachPaths(re =>
+					 {
+						 XDocument xDoc = XDocument.Load(re);
+						 var list = xDoc.Element("TextureAtlas").Elements("SubTexture").Select(p =>
+						 {
+							 return new Sprite
+							 {
+								 name = (string)p.Attribute("name") + ".png",
+								 x = (int)p.Attribute("x"),
+								 y = (int)p.Attribute("y"),
+								 width = (int)p.Attribute("width"),
+								 height = (int)p.Attribute("height"),
+								 pivotX = p.Attribute("pivotX") != null ? (float)p.Attribute("pivotX") : 0,
+								 pivotY = p.Attribute("pivotY") != null ? (float)p.Attribute("pivotY") : 0,
+							 };
+						 }).OrderBy(p => p.name).ToList();
 
-                            var imagePath = re.Replace("Xml.bin",".png");
-                            if (File.Exists(imagePath))
-                                HaveImageAndRead(imagePath, imagePath,list);
-                        });
-                    }
-                },
-                //{
-                //    "图集合并", () =>
-                //    {
-                //        GetPaths().ForEachPaths(re =>
-                //        {
-                //            //PList plist = new PList();
-                //            //plist.Load(re);
-                //            //TextureInfo textureInfo = new TextureInfo(plist, re);
-                //            //if (!textureInfo.voild) return;
-                //            //var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+						 var imagePath = re.Replace("Xml.bin", ".png");
+						 if (File.Exists(imagePath))
+							 HaveImageAndRead(imagePath, imagePath, list);
+					 });
+				 },
+				//["图集合并"] = () =>
+				//{
+				//	GetPaths("*.plist").ForEachPaths(re =>
+				//	{
+				//		PList plist = new PList();
+				//		plist.Load(re);
+				//		TextureInfo textureInfo = new TextureInfo(plist, re);
+				//		if (!textureInfo.voild) return;
+				//		var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
 
-                //            //if (File.Exists(imagePath))
-                //            //    HaveImageAndWrite(imagePath, textureInfo);
-                //        });
-                //    }
-                //},
-                //{
-                //    "文件夹删除", () =>
-                //    {
-                //        GetPaths().ForEachPaths(re =>
-                //        {
-                //            PList plist = new PList();
-                //            plist.Load(re);
-                //            TextureInfo textureInfo = new TextureInfo(plist, re);
-                //            if (!textureInfo.voild) return;
-                //            var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
+				//		if (File.Exists(imagePath))
+				//			HaveImageAndWrite(imagePath, textureInfo);
+				//	});
+				//},
+				//["文件夹删除"] = () =>
+				//{
+				//	GetPaths("*.plist").ForEachPaths(re =>
+				//	{
+				//		PList plist = new PList();
+				//		plist.Load(re);
+				//		TextureInfo textureInfo = new TextureInfo(plist, re);
+				//		if (!textureInfo.voild) return;
+				//		var imagePath = Path.GetDirectoryName(re) + "/" + textureInfo.name;
 
-                //            string dir = Path.GetDirectoryName(imagePath) + "/" +
-                //                         Path.GetFileNameWithoutExtension(imagePath);
-                //            if (Directory.Exists(dir))
-                //                Directory.Delete(dir, true);
-                //        });
-                //    }
-                //},
-            });
-        }
-
-
-        private List<string> GetPaths()
-        {
-            var path = SystemConsole.GetInputStr("请拖入选定（文件夹或文件）:");
-
-            List<string> res = new List<string>();
-            if (Directory.Exists(path))
-            {
-                if (File.Exists(path + ".bin"))
-                    res.Add(path + ".bin");
-                else
-                    res.AddRange(Directory.GetFiles(path, "*.bin", SearchOption.AllDirectories));
-            }
-            else
-            {
-                if (File.Exists(path) && Path.GetExtension(path) == ".bin")
-                    res.Add(path);
-            }
-            return res;
-        }
+				//		string dir = Path.GetDirectoryName(imagePath) + "/" +
+				//					 Path.GetFileNameWithoutExtension(imagePath);
+				//		if (Directory.Exists(dir))
+				//			Directory.Delete(dir, true);
+				//	});
+				//},
+			});
+		}
 
         private static void HaveImageAndRead(string re, string imagePath, List<Sprite> list)
         {

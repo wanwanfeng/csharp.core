@@ -101,69 +101,57 @@ namespace Script
             ExcelUtils.ExportToExcel(dts, InputPath);
         }
 
-        #region 键值对
+		#region 键值对
 
-        public void ToKvExcelAll()
-        {
-            var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
-            var str = string.Join("|", cache.Values);
-            {
-                SystemConsole.Run(config: new Dictionary<string, Action>()
-                {
-                    {
-                        "不筛选", () =>
-                        {
-                            ToKvExcel();
-                        }
-                    },
-                    {
-                        "筛选声音路径", () =>
-                        {
-                            ToKvExcel(
-                                p =>
-                                    p.Contains("bgm/") || p.Contains("fullvoice/") || p.Contains("jingle/") ||
-                                    p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/") ||
-                                    p.Contains("vo_kyube_") || p.Contains("vo_char_") || p.Contains("vo_game_"));
-                        }
-                    },
-                    {
-                        "匹配中文与日文",
-                        () =>
-                        {
-                            ToKvExcel(p => Regex.IsMatch(p, str));
-                        }
-                    },
-                    {
-                        "只匹配中文", () =>
-                        {
-                            ToKvExcel(
-                                p => Regex.IsMatch(p, str)
-                                , s => Regex.IsMatch(s, cache[RegexLanguaheEnum.中文])
-                                //,s => !Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
-                                );
-                        }
-                    },
-                    {
-                        "只匹配日文", () =>
-                        {
-                            ToKvExcel(
-                                p => Regex.IsMatch(p, str),
-                                p =>
-                                {
-                                    var val = Regex.Replace(p, "[a-z]", "", RegexOptions.IgnoreCase);
-                                    val = Regex.Replace(val, "[0-9]", "", RegexOptions.IgnoreCase);
-                                    val = Regex.Replace(val,
-                                        "[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”-]", "");
-                                    return Regex.IsMatch(val, str);
-                                }
-                                //,s => Regex.IsMatch(s,string.Join("|", cache.Where(p => p.Key < MyEnum.中文).Select(p => p.Value)))
-                                //, s => !Regex.IsMatch(s, cache[MyEnum.中文])
-                                );
-                        }
-                    }
-                });
-            }
-        }
+		public void ToKvExcelAll()
+		{
+			var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
+			var str = string.Join("|", cache.Values);
+
+			SystemConsole.Run(config: new Dictionary<string, Action>()
+			{
+				["不筛选"] = () =>
+				{
+					ToKvExcel();
+				},
+				["筛选声音路径"] = () =>
+				 {
+					 ToKvExcel(
+						 p =>
+							 p.Contains("bgm/") || p.Contains("fullvoice/") || p.Contains("jingle/") ||
+							 p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/") ||
+							 p.Contains("vo_kyube_") || p.Contains("vo_char_") || p.Contains("vo_game_"));
+				 },
+				["匹配中文与日文"] = () =>
+				{
+					ToKvExcel(p => Regex.IsMatch(p, str));
+				},
+				["只匹配中文"] = () =>
+				 {
+					 ToKvExcel(
+						 p => Regex.IsMatch(p, cache[RegexLanguaheEnum.中文]),
+						 p => Regex.IsMatch(p, str)
+						 );
+
+				 },
+				["只匹配日文"] = () =>
+				{
+					ToKvExcel(
+						s => Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key > RegexLanguaheEnum.日文 && p.Key < RegexLanguaheEnum.中文).Select(p => p.Value))),
+						p => Regex.IsMatch(p, str),
+						p =>
+						{
+							var val = Regex.Replace(p, "[a-z]", "", RegexOptions.IgnoreCase);
+							val = Regex.Replace(val, "[0-9]", "", RegexOptions.IgnoreCase);
+							val = Regex.Replace(val,
+								"[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”-]", "");
+							return Regex.IsMatch(val, str);
+						}
+						);
+					;
+				}
+			});
+		}
 
         /// <summary>
         /// 导出为键值对

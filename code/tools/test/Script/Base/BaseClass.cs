@@ -57,5 +57,28 @@ namespace Script
                 return string.Format("<table><img src='{0}' width='{1}' height='{2}'>", path, width, height);
             }
         }
-    }
+
+		protected List<string> GetPaths(string extension = ".txt")
+		{
+			extension = Path.GetExtension(extension);
+
+			var path = SystemConsole.GetInputStr("请拖入选定（文件夹或文件）:");
+
+			List<string> res = new List<string>();
+			if (Directory.Exists(path))
+			{
+				var newPath = Path.ChangeExtension(path, extension);
+				if (File.Exists(newPath))
+					res.Add(newPath);
+				else
+					res.AddRange(Directory.GetFiles(path, "*" + extension, SearchOption.AllDirectories));
+			}
+			else
+			{
+				if (File.Exists(path) && Path.GetExtension(path) == Path.GetExtension(extension))
+					res.Add(path);
+			}
+			return res;
+		}
+	}
 }

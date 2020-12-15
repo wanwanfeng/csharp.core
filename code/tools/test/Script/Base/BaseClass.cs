@@ -75,7 +75,7 @@ namespace Script
 			}
 			else
 			{
-				if (File.Exists(path) && Path.GetExtension(path) == Path.GetExtension(extension))
+				if (File.Exists(path) && Path.GetExtension(path) == extension)
 					res.Add(path);
 			}
 			return res;

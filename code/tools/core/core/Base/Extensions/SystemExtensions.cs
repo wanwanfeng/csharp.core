@@ -193,19 +193,19 @@ namespace Library.Extensions
                 Console.ResetColor();
             }
         }
-		class dataArgas
+		class dataParams
 		{
-			public List<data> datas ;
-            public int columnsCount;
+			public List<data> datas;
+			public int columnsCount;
 		}
 
-		static Stack<dataArgas> stack = new Stack<dataArgas>();
+		static Stack<dataParams> stack = new Stack<dataParams>();
 
         private static void ShowCmd(List<data> datas, int columnsCount, Action<data> action)
         {
 			columnsCount = stack.Count == 0 ? columnsCount : Math.Max(columnsCount, stack.Pop().columnsCount);
 
-			stack.Push(new dataArgas() { datas = datas, columnsCount = columnsCount });
+			stack.Push(new dataParams() { datas = datas, columnsCount = columnsCount });
 
             Console.Clear();
 
@@ -262,7 +262,7 @@ namespace Library.Extensions
             {
                 try
                 {
-                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: "^[0-9]*$").AsInt();
+                    var index = GetInputStr("请选择，然后回车：", def: "e", regex: @"^[0-9]*$").AsInt();
                     Console.WriteLine("当前的选择：" + index);
                     action.Invoke(datas[index]);
                 }

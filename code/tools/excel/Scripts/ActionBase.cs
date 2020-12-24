@@ -211,7 +211,7 @@ namespace Script
                         {
                             if (string.IsNullOrEmpty(dr[s].ToString())) continue;
 							if (CheckMatches(regex, dr[s].ToString())) continue;
-                            dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], dr[s]);
+                            dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], "");
                         }
                     }
                 }
@@ -225,7 +225,7 @@ namespace Script
 					{
 						if (string.IsNullOrEmpty(dr[1].ToString())) continue;
 						if (CheckMatches(regex, dr[1].ToString())) continue;
-						dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], dr[1]);
+						dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], "");
 					}
 				}
 			}

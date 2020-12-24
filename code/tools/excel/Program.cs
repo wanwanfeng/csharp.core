@@ -39,12 +39,12 @@ namespace Library.Excel
 
             [Category("文件内容提取与替换"), Description("Excel->KvExcel"), TypeValue(typeof(ActionExcel.ToKvExcel))] ExcelToKvExcel,
             [Category("文件内容提取与替换"), Description("Excel->FromKvExcel"), TypeValue(typeof(ActionExcel.KvExcelTo))] ExcelFromKvExcel,
-            [Category("文件内容提取与替换"), Description("Json->KvExcel"), TypeValue(typeof(ActionJson.ToKvExcel))] JsonToKvExcel,
-            [Category("文件内容提取与替换"), Description("Json->FromKvExcel"), TypeValue(typeof(ActionJson.KvExcelTo))] JsonFromKvExcel,
-            [Category("文件内容提取与替换"), Description("Xml->KvExcel"), TypeValue(typeof(ActionXml.ToKvExcel))] XmlToKvExcel,
-            [Category("文件内容提取与替换"), Description("Xml->FromKvExcel"), TypeValue(typeof(ActionXml.KvExcelTo))] XmlFromKvExcel,
-            [Category("文件内容提取与替换"), Description("CSV->KvExcel"), TypeValue(typeof(ActionCSV.ToKvExcel))] CsvToKvExcel,
-            [Category("文件内容提取与替换"), Description("CSV->FromKvExcel"), TypeValue(typeof(ActionCSV.KvExcelTo))] CsvFromKvExcel,
+            [Category("文件内容提取与替换"), Description("Json ->KvExcel"), TypeValue(typeof(ActionJson.ToKvExcel))] JsonToKvExcel,
+            [Category("文件内容提取与替换"), Description("Json ->FromKvExcel"), TypeValue(typeof(ActionJson.KvExcelTo))] JsonFromKvExcel,
+            [Category("文件内容提取与替换"), Description("Xml  ->KvExcel"), TypeValue(typeof(ActionXml.ToKvExcel))] XmlToKvExcel,
+            [Category("文件内容提取与替换"), Description("Xml  ->FromKvExcel"), TypeValue(typeof(ActionXml.KvExcelTo))] XmlFromKvExcel,
+            [Category("文件内容提取与替换"), Description("CSV  ->KvExcel"), TypeValue(typeof(ActionCSV.ToKvExcel))] CsvToKvExcel,
+            [Category("文件内容提取与替换"), Description("CSV  ->FromKvExcel"), TypeValue(typeof(ActionCSV.KvExcelTo))] CsvFromKvExcel,
         }
 
         private static void Main(string[] args)

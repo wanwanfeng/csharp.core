@@ -46,8 +46,10 @@ namespace findText.Script
                 }
                 if (val.TrimStart().StartsWith("*")) continue;
 
-                MatchCollection mc = regex.Matches(val);
-                if (mc.Count == 0) continue;
+				if (CheckMatches(val)) continue;
+
+				MatchCollection mc = null;
+
                 //去除中间有//
                 var index = val.IndexOf("//", StringComparison.Ordinal);
                 if (index >= 0)

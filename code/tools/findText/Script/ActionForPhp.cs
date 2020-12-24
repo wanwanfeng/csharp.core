@@ -61,12 +61,14 @@ namespace findText.Script
                 if (val.TrimStart().StartsWith("//")) continue;
                 if (val.TrimStart().StartsWith("*")) continue;
 
-                //if(!Regex.IsMatch(val,regexStr)) continue;
+				//if(!Regex.IsMatch(val,regexStr)) continue;
 
-                MatchCollection mc = regex.Matches(val);
-                if (mc.Count == 0) continue;
-                //去除中间有//
-                var index = val.IndexOf("//", StringComparison.Ordinal);
+				if (CheckMatches(val)) continue;
+
+				MatchCollection mc = null;
+
+				//去除中间有//
+				var index = val.IndexOf("//", StringComparison.Ordinal);
                 if (index >= 0)
                 {
                     val = val.Substring(0, index);

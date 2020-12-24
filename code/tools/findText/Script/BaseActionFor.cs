@@ -14,7 +14,19 @@ namespace findText
 {
     public abstract class BaseActionFor : BaseSystemExcel
     {
-        protected Regex regex { get; private set; }
+		protected Regex regex { get; private set; }
+
+		/// <summary>
+		/// https://www.cnblogs.com/icejd/archive/2010/12/22/1913508.html
+		/// </summary>
+		/// <param name="val"></param>
+		/// <returns></returns>
+		protected bool CheckMatches(string val)
+		{
+			var temp = Regex.Replace(val, "[\\s\\p{P}\n\r=<>$>+￥^]", "");
+			MatchCollection mc = regex.Matches(temp);
+			return mc.Count == 0;
+		}
 
         public virtual string regexStr { get; set; }
 
@@ -51,11 +63,11 @@ namespace findText
 					GetValue();
 				},
 
-				//["只匹配中文"] = () =>
-				//{
-				//	regexStr = cache[RegexLanguaheEnum.中文];
-				//	GetValue();
-				//},
+				["只匹配中文"] = () =>
+				{
+					regexStr = cache[RegexLanguaheEnum.中文];
+					GetValue();
+				},
 
 				["只匹配日文"] = () =>
 				{
@@ -81,6 +93,12 @@ namespace findText
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
 			CheckPath(exName, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
+
+			if (resJsonData.IsArray && resJsonData.Count == 0)
+			{
+				Console.WriteLine("未搜索到结果！");
+				return;
+			}
 
             var vals = GetJsonDataArray(ToJson(resJsonData));
             if (vals.Rows.Count == 0)

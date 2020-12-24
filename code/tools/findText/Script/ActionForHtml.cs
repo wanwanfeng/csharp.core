@@ -25,52 +25,53 @@ namespace findText.Script
             {
                 if (isTrue) continue;
                 var val = input[k];
-                //if (val.TrimStart().StartsWith("//")) continue;
-                ////跨行注释
-                //if (val.TrimStart().Contains("<!--"))
-                //{
-                //    if (!val.Contains("-->"))
-                //        isTrue = true;
-                //    continue;
-                //}
-                //if (val.TrimStart().Contains("-->"))
-                //{
-                //    if (!val.Contains("<!--"))
-                //        isTrue = false;
-                //    continue;
-                //}
+				//if (val.TrimStart().StartsWith("//")) continue;
+				////跨行注释
+				//if (val.TrimStart().Contains("<!--"))
+				//{
+				//    if (!val.Contains("-->"))
+				//        isTrue = true;
+				//    continue;
+				//}
+				//if (val.TrimStart().Contains("-->"))
+				//{
+				//    if (!val.Contains("<!--"))
+				//        isTrue = false;
+				//    continue;
+				//}
 
-                MatchCollection mc = regex.Matches(val);
-                if (mc.Count == 0) continue;
-                ////去除中间有//
-                //var index = val.IndexOf("//", StringComparison.Ordinal);
-                //if (index >= 0)
-                //{
-                //    val = val.Substring(0, index);
-                //    mc = regex.Matches(val);
-                //    if (mc.Count == 0) continue;
-                //}
-                ////去除中间有/**
-                //index = val.IndexOf("/**", StringComparison.Ordinal);
-                //if (index >= 0)
-                //{
-                //    val = val.Substring(0, index);
-                //    mc = regex.Matches(val);
-                //    if (mc.Count == 0) continue;
-                //}
-                ////去除最后一个双引号后的
-                //index = val.LastIndexOf("\"", StringComparison.Ordinal);
-                //if (index >= 0)
-                //{
-                //    val = val.Substring(0, index);
-                //}
-                ////去除第一个双引号前的
-                //index = val.IndexOf("\"", StringComparison.Ordinal);
-                //if (index >= 0)
-                //{
-                //    val = val.Substring(index + 1);
-                //}
-                GetJsonValue(val, file, k, input);
+				if (CheckMatches(val)) continue;
+
+				MatchCollection mc = null;
+				////去除中间有//
+				//var index = val.IndexOf("//", StringComparison.Ordinal);
+				//if (index >= 0)
+				//{
+				//    val = val.Substring(0, index);
+				//    mc = regex.Matches(val);
+				//    if (mc.Count == 0) continue;
+				//}
+				////去除中间有/**
+				//index = val.IndexOf("/**", StringComparison.Ordinal);
+				//if (index >= 0)
+				//{
+				//    val = val.Substring(0, index);
+				//    mc = regex.Matches(val);
+				//    if (mc.Count == 0) continue;
+				//}
+				////去除最后一个双引号后的
+				//index = val.LastIndexOf("\"", StringComparison.Ordinal);
+				//if (index >= 0)
+				//{
+				//    val = val.Substring(0, index);
+				//}
+				////去除第一个双引号前的
+				//index = val.IndexOf("\"", StringComparison.Ordinal);
+				//if (index >= 0)
+				//{
+				//    val = val.Substring(index + 1);
+				//}
+				GetJsonValue(val, file, k, input);
             }
         }
     }

@@ -26,24 +26,25 @@ namespace findText.Script
             {
                 //////if (isTrue) continue;
                 var val = input[k];
-                //////////跨行注释
-                ////////if (val.TrimStart().StartsWith("/*"))
-                ////////{
-                ////////    if (!val.Contains("*/"))
-                ////////        isTrue = true;
-                ////////    continue;
-                ////////}
-                ////////if (val.Trim().EndsWith("*/"))
-                ////////{
-                ////////    if (!val.Contains("/*"))
-                ////////        isTrue = false;
-                ////////    continue;
-                ////////}
- 
-                MatchCollection mc = regex.Matches(val);
-                if (mc.Count == 0) continue;
+				//////////跨行注释
+				////////if (val.TrimStart().StartsWith("/*"))
+				////////{
+				////////    if (!val.Contains("*/"))
+				////////        isTrue = true;
+				////////    continue;
+				////////}
+				////////if (val.Trim().EndsWith("*/"))
+				////////{
+				////////    if (!val.Contains("/*"))
+				////////        isTrue = false;
+				////////    continue;
+				////////}
 
-                if (val.TrimStart().StartsWith("//")) continue;
+				if (CheckMatches(val)) continue;
+
+				MatchCollection mc = null;
+
+				if (val.TrimStart().StartsWith("//")) continue;
                 //去除中间有//
                 var index = val.IndexOf("//", StringComparison.Ordinal);
                 if (index >= 0)

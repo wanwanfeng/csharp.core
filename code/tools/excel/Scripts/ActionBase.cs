@@ -106,49 +106,28 @@ namespace Script
 		public void ToKvExcelAll()
 		{
 			var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
-			var str = string.Join("|", cache.Values);
-
+			var regexStr = string.Empty;
 			SystemConsole.Run(config: new Dictionary<string, Action>()
 			{
-				["不筛选"] = () =>
-				{
-					ToKvExcel();
-				},
-				["筛选声音路径"] = () =>
-				 {
-					 ToKvExcel(
-						 p =>
-							 p.Contains("bgm/") || p.Contains("fullvoice/") || p.Contains("jingle/") ||
-							 p.Contains("se/") || p.Contains("surround/") || p.Contains("voice/") ||
-							 p.Contains("vo_kyube_") || p.Contains("vo_char_") || p.Contains("vo_game_"));
-				 },
 				["匹配中文与日文"] = () =>
 				{
-					ToKvExcel(p => Regex.IsMatch(p, str));
+					regexStr = string.Join("|", cache.Where(p => p.Key >= RegexLanguaheEnum.日文 && p.Key <= RegexLanguaheEnum.中文).Select(p => p.Value));
+					ToKvExcel(regexStr);
 				},
 				["只匹配中文"] = () =>
-				 {
-					 ToKvExcel(
-						 p => Regex.IsMatch(p, cache[RegexLanguaheEnum.中文]),
-						 p => Regex.IsMatch(p, str)
-						 );
-
+				{
+					 regexStr = cache[RegexLanguaheEnum.中文];
+					 ToKvExcel(regexStr);
 				 },
 				["只匹配日文"] = () =>
 				{
-					ToKvExcel(
-						s => Regex.IsMatch(s, string.Join("|", cache.Where(p => p.Key > RegexLanguaheEnum.日文 && p.Key < RegexLanguaheEnum.中文).Select(p => p.Value))),
-						p => Regex.IsMatch(p, str),
-						p =>
-						{
-							var val = Regex.Replace(p, "[a-z]", "", RegexOptions.IgnoreCase);
-							val = Regex.Replace(val, "[0-9]", "", RegexOptions.IgnoreCase);
-							val = Regex.Replace(val,
-								"[ \\[ \\] \\^ \\-_*×――(^)（^）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”-]", "");
-							return Regex.IsMatch(val, str);
-						}
-						);
-					;
+					regexStr = string.Join("|", cache.Where(p => p.Key < RegexLanguaheEnum.中文).Select(p => p.Value));
+					ToKvExcel(regexStr);
+				},
+				["只匹配韩文"] = () =>
+				{
+					regexStr = cache[RegexLanguaheEnum.韩文];
+					ToKvExcel(regexStr);
 				}
 			});
 		}
@@ -156,12 +135,25 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        private void ToKvExcel(params Func<string, bool>[] predicate)
+        private void ToKvExcel(string regexStr, params Func<string, bool>[] predicate)
         {
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
-            CheckPath(selectExtension).ForEach((file, index) =>
+			Regex regex = new Regex(regexStr);
+			/// <summary>
+			/// https://www.cnblogs.com/icejd/archive/2010/12/22/1913508.html
+			/// </summary>
+			/// <param name="val"></param>
+			/// <returns></returns>
+			bool CheckMatches(string val)
+			{
+				var temp = Regex.Replace(val, "[\\s\\p{P}\n\r=<>$>+￥^]", "");
+				MatchCollection mc = regex.Matches(temp);
+				return mc.Count == 0;
+			}
+
+			CheckPath(selectExtension).ForEach((file, index) =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import(file).Where(p => p != null).ToList();
@@ -172,17 +164,24 @@ namespace Script
                     //if (dt.IsArray)
                     if (true)
                     {
-                        var list = ExcelUtils.ConvertToRowsList(dt)
-                            .Select(p => string.Join("|", p.Select(q => q.ToString()).ToArray()))
-                            .Select(p => predicate.Length == 0 || predicate.First()(p))
-                            .ToList();
+						var list = ExcelUtils.ConvertToRowsList(dt)
+							.Select( p => {
+								bool result = false;
+								foreach (var item in p)
+								{
+									if (CheckMatches(item.ToString())) continue;
+									result = true;
+									break;
+								}
+								return new { p, result };
+							})
+							.Select(p => p.result)
+							.ToList();
+
                         //返回符合正则表达式的列
                         var header = dt.GetHeaderList().Where((p, i) => (i == 0 || list[i])).ToList();
 
                         var resdt = dt.DefaultView.ToTable(false, header.ToArray());
-
-                        //foreach (object o in header.Skip(1))
-                        //    resdt.Columns.Add(o + "_zh_ch", typeof(string));
 
                         if (header.Count > 1)
                             dtArray.Add(resdt);
@@ -222,23 +221,25 @@ namespace Script
                         foreach (string s in header.Skip(1))
                         {
                             if (string.IsNullOrEmpty(dr[s].ToString())) continue;
+							if (CheckMatches(dr[s].ToString())) continue;
                             dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], dr[s]);
                         }
                     }
                 }
             }
 
-            if (dtObject.Count != 0)
-            {
-                foreach (DataTable dataTable in dtObject)
-                {
-                    foreach (DataRow dr in dataTable.Rows)
-                    {
-                        if (string.IsNullOrEmpty(dr[1].ToString())) continue;
-                        dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], dr[1]);
-                    }
-                }
-            }
+			if (dtObject.Count != 0)
+			{
+				foreach (DataTable dataTable in dtObject)
+				{
+					foreach (DataRow dr in dataTable.Rows)
+					{
+						if (string.IsNullOrEmpty(dr[1].ToString())) continue;
+						if (CheckMatches(dr[1].ToString())) continue;
+						dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], dr[1]);
+					}
+				}
+			}
 
             ExcelUtils.ExportToExcel(dd, InputPath);
         }

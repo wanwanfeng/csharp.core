@@ -180,51 +180,60 @@ namespace Library.Excel
                     throw new Exception("保存的文件格式不符合要求 ！");
             }
 
-            foreach (DataTable dt in dts)
-            {
-                if (fileExt == ".xls" && dt.Rows.Count > 65536)
-                {
-                    throw new Exception("数据量过大，请保存为.xlsx");
-                }
+			foreach (DataTable dt in dts)
+			{
+				if (fileExt == ".xls" && dt.Rows.Count > 65536)
+				{
+					throw new Exception("数据量过大，请保存为.xlsx");
+				}
 
-                ISheet sheet = string.IsNullOrEmpty(dt.TableName)
-                    ? workbook.CreateSheet("Sheet1")
-                    : workbook.CreateSheet(dt.TableName);
+				ISheet sheet = string.IsNullOrEmpty(dt.TableName)
+					? workbook.CreateSheet("Sheet1")
+					: workbook.CreateSheet(dt.TableName);
 
-                //表头  
-                IRow row = sheet.CreateRow(0);
-                for (int i = 0; i < dt.Columns.Count; i++)
-                {
-                    ICell cell = row.CreateCell(i);
-                    var value = dt.Columns[i].ColumnName;
-                    cell.SetCellValue(value);
-                }
+				//表头  
+				Dictionary<string, HashSet<int>> charactersDict = new Dictionary<string, HashSet<int>>();
 
-                //数据  
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    IRow row1 = sheet.CreateRow(i + 1);
-                    for (int j = 0; j < dt.Columns.Count; j++)
-                    {
-                        var value = dt.Rows[i][j];
-                        ICell cell = row1.CreateCell(j);
+				IRow row = sheet.CreateRow(0);
+				for (int i = 0; i < dt.Columns.Count; i++)
+				{
+					ICell cell = row.CreateCell(i);
+					var value = dt.Columns[i].ColumnName;
+					cell.SetCellValue(value);
+					charactersDict[value] = new HashSet<int>() { value.Length };
+				}
 
-                        if (value is int)
-                            cell.SetCellValue((int) value);
-                        if (value is bool)
-                            cell.SetCellValue((bool) value);
-                        cell.SetCellValue(value.ToString());
-                    }
-                }
+				//数据  
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					IRow row1 = sheet.CreateRow(i + 1);
+					for (int j = 0; j < dt.Columns.Count; j++)
+					{
+						var value = dt.Rows[i][j];
+						ICell cell = row1.CreateCell(j);
 
-                //默认一个样式以及自动宽度
-                for (int i = 0; i < dt.Columns.Count; i++)
-                {
-                    var style = workbook.CreateCellStyle();
-                    sheet.SetDefaultColumnStyle(i, style);
-                    sheet.AutoSizeColumn(i);
-                }
-            }
+						if (value is int)
+							cell.SetCellValue((int)value);
+						if (value is bool)
+							cell.SetCellValue((bool)value);
+						cell.SetCellValue(value.ToString());
+
+						charactersDict[dt.Columns[j].ColumnName].Add(value.ToString().Length);
+					}
+				}
+
+				//默认一个样式以及
+				for (int i = 0; i < dt.Columns.Count; i++)
+				{
+					var style = workbook.CreateCellStyle();
+					sheet.SetDefaultColumnStyle(i, style);
+
+					//sheet.AutoSizeColumn(i); //自动宽度
+
+					var columnWidth = charactersDict[dt.Columns[i].ColumnName].OrderBy(p => p).Skip(1).Reverse().Skip(1).FirstOrDefault();
+					sheet.SetColumnWidth(i, Math.Min(columnWidth, 50) * 256);
+				}
+			}
 
 
             //转为字节数组  

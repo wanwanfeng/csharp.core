@@ -116,7 +116,7 @@ namespace findText
             jsonData["文件名"] = file.Replace(dir, "");
             jsonData["行号"] = k;
             jsonData["原文"] = input.Trim();
-            jsonData["译文"] = val.Trim();
+            jsonData["译文"] = "";
             resJsonData.Add(jsonData);
         }
 
@@ -128,7 +128,7 @@ namespace findText
             jsonData["文件名"] = file.Replace(dir, "");
             jsonData["行号"] = k + 1;
             jsonData["原文"] = input[k].Trim();
-            jsonData["译文"] = val.Trim();
+            jsonData["译文"] = "";
             resJsonData.Add(jsonData);
         }
 

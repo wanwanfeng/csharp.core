@@ -16,16 +16,9 @@ namespace findText
     {
 		protected Regex regex { get; private set; }
 
-		/// <summary>
-		/// https://www.cnblogs.com/icejd/archive/2010/12/22/1913508.html
-		/// </summary>
-		/// <param name="val"></param>
-		/// <returns></returns>
 		protected bool CheckMatches(string val)
 		{
-			var temp = Regex.Replace(val, "[\\s\\p{P}\n\r=<>$>+￥^]", "");
-			MatchCollection mc = regex.Matches(temp);
-			return mc.Count == 0;
+			return CheckMatches(regex, val);
 		}
 
         public virtual string regexStr { get; set; }

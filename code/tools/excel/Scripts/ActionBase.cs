@@ -141,17 +141,6 @@ namespace Script
             var dtObject = new List<DataTable>();
 
 			Regex regex = new Regex(regexStr);
-			/// <summary>
-			/// https://www.cnblogs.com/icejd/archive/2010/12/22/1913508.html
-			/// </summary>
-			/// <param name="val"></param>
-			/// <returns></returns>
-			bool CheckMatches(string val)
-			{
-				var temp = Regex.Replace(val, "[\\s\\p{P}\n\r=<>$>+￥^]", "");
-				MatchCollection mc = regex.Matches(temp);
-				return mc.Count == 0;
-			}
 
 			CheckPath(selectExtension).ForEach((file, index) =>
             {
@@ -169,7 +158,7 @@ namespace Script
 								bool result = false;
 								foreach (var item in p)
 								{
-									if (CheckMatches(item.ToString())) continue;
+									if (CheckMatches(regex, item.ToString())) continue;
 									result = true;
 									break;
 								}
@@ -221,7 +210,7 @@ namespace Script
                         foreach (string s in header.Skip(1))
                         {
                             if (string.IsNullOrEmpty(dr[s].ToString())) continue;
-							if (CheckMatches(dr[s].ToString())) continue;
+							if (CheckMatches(regex, dr[s].ToString())) continue;
                             dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], dr[s]);
                         }
                     }
@@ -235,7 +224,7 @@ namespace Script
 					foreach (DataRow dr in dataTable.Rows)
 					{
 						if (string.IsNullOrEmpty(dr[1].ToString())) continue;
-						if (CheckMatches(dr[1].ToString())) continue;
+						if (CheckMatches(regex, dr[1].ToString())) continue;
 						dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], dr[1]);
 					}
 				}

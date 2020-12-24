@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Library.Extensions;
 
 namespace Library.Excel
@@ -25,11 +26,23 @@ namespace Library.Excel
 			韩文 = 20,
 		}
 
-        /// <summary>
-        /// 已首列分组形成字典
-        /// </summary>
-        /// <returns></returns>
-        protected static List<Dictionary<string, List<List<object>>>> GetFileCaches()
+		/// <summary>
+		/// https://www.cnblogs.com/icejd/archive/2010/12/22/1913508.html
+		/// </summary>
+		/// <param name="val"></param>
+		/// <returns></returns>
+		public static bool CheckMatches(Regex regex, string val)
+		{
+			var temp = Regex.Replace(val, "[\\s\\p{P}\n\r=<>$>+￥^]", "");
+			MatchCollection mc = regex.Matches(temp);
+			return mc.Count == 0;
+		}
+
+		/// <summary>
+		/// 已首列分组形成字典
+		/// </summary>
+		/// <returns></returns>
+		protected static List<Dictionary<string, List<List<object>>>> GetFileCaches()
         {
             return GetListTables().Select(table =>
             {

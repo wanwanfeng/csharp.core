@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 
 #if ExcelByReader
-using Excel;
+using ExcelDataReader;
 
 namespace Library.Excel
 {
@@ -41,7 +41,7 @@ namespace Library.Excel
                             excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                             break;
                         default:
-                            Ldebug.LogError("文件类型错误！！！");
+							Console.WriteLine("文件类型错误！！！");
                             break;
                     }
 

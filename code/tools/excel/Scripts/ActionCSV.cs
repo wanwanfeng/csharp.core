@@ -62,19 +62,19 @@ namespace Script
         /// </summary>
         public class ToKvExcel : ActionCSV
         {
-            public ToKvExcel()
-            {
-                ToKvExcelAll();
-            }
-        }
+			public ToKvExcel(object obj) : base()
+			{
+				ToKvExcelAll();
+			}
+		}
 
         /// <summary>
         /// 还原键值对
         /// </summary>
         public class KvExcelTo : ActionCSV
         {
-            public KvExcelTo()
-            {
+			public KvExcelTo(object obj) : base()
+			{
                 KvExcelTo();
             }
         }

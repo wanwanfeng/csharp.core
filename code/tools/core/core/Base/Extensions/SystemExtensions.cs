@@ -161,7 +161,8 @@ namespace Library.Extensions
         {
             public string group = "";
             public string description = "";
-            public Type type = null;
+            public object arges = null;
+			public Type type = null;
             public Action action = null;
 
             public int Length()
@@ -311,20 +312,22 @@ namespace Library.Extensions
                         data.description = descriptionAttribute == null ? field.Name : descriptionAttribute.Description;
                         data.description = string.Format("{0:d2}：{1}", datas.Count, data.description);
 
-                        data.type = typeValueAttribute.value;
+						var defaultValueAttribute = field.GetCustomAttributes(false).OfType<DefaultValueAttribute>().FirstOrDefault();
+						data.arges = defaultValueAttribute?.Value;
+
+						data.type = typeValueAttribute.value;
 
                         datas.Add(data);
                     }
                 }
             }
 
-            ShowCmd(datas, columnsCount, data =>
-            {
-                var obj = Activator.CreateInstance(data.type);
-                if (callAction != null)
-                    callAction.Invoke(obj);
-            });
-        }
+			ShowCmd(datas, columnsCount, data =>
+			{
+				var obj = data.arges == null ? Activator.CreateInstance(data.type) : Activator.CreateInstance(data.type, new object[] { data.arges });
+				callAction?.Invoke(obj);
+			});
+		}
 
         public static void Run<T, T1, T2, T3, T4, T5, T6>(Action<object> callAction = null, int columnsCount = 4, string group = "")
             where T : struct

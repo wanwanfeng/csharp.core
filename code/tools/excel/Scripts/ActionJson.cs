@@ -63,45 +63,43 @@ namespace Script
             }
         }
 
-        /// <summary>
-        /// 导出为键值对
-        /// </summary>
-        public class ToKvExcel : ActionJson
-        {
-            public ToKvExcel()
-            {
-                ToKvExcelAll();
-            }
-        }
+		/// <summary>
+		/// 导出为键值对
+		/// </summary>
+		public class ToKvExcel : ActionJson
+		{
+			public ToKvExcel(object obj) : base()
+			{
+				ToKvExcelAll((bool)obj);
+			}
+		}
 
         /// <summary>
         /// 还原键值对
         /// </summary>
         public sealed class KvExcelTo : ActionJson
         {
-            public KvExcelTo()
-            {
-                KvExcelTo(
-                    isCustomAction: (fullpath, list) =>
-                    {
-                        Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
-                        foreach (List<object> objects in list)
-                        {
-                            object id = objects[1];
-                            string key = objects[2].ToString();
-                            object value = objects[3];
-                            string value_zh_cn = objects[4].ToString();
+			public KvExcelTo(object obj) : base()
+			{
+				KvExcelTo(isCustomAction: (fullpath, list) =>
+				{
+					Dictionary<string, JsonData> dictionary = new Dictionary<string, JsonData>();
+					foreach (List<object> objects in list)
+					{
+						object id = objects[1];
+						string key = objects[2].ToString();
+						object value = objects[3];
+						string value_zh_cn = objects[4].ToString();
 
-                            dictionary[id.ToString()] = value_zh_cn;
-                        }
+						dictionary[id.ToString()] = value_zh_cn;
+					}
 
-                        JsonData jsonData = JsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
-                        JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
-                        return isIndent ? JsonHelper.ToJson(jsonData, indentLevel: 2) : JsonHelper.ToJson(jsonData);
-                    }
-                    );
-            }
-        }
-
+					JsonData jsonData = JsonHelper.ToObject(File.ReadAllText(fullpath).Trim().Trim('\0'));
+					JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
+					return isIndent ? JsonHelper.ToJson(jsonData, indentLevel: 2) : JsonHelper.ToJson(jsonData);
+				}, isArray: (bool)obj
+					);
+			}
+		}
     }
 }

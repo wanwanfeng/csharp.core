@@ -103,7 +103,7 @@ namespace Script
 
 		#region 键值对
 
-		public void ToKvExcelAll()
+		public void ToKvExcelAll(bool isArray = true)
 		{
 			var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
 			var regexStr = string.Empty;
@@ -112,22 +112,22 @@ namespace Script
 				["匹配中文与日文"] = () =>
 				{
 					regexStr = string.Join("|", cache.Where(p => p.Key >= RegexLanguaheEnum.日文 && p.Key <= RegexLanguaheEnum.中文).Select(p => p.Value));
-					ToKvExcel(regexStr);
+					ToKvExcel(isArray, regexStr);
 				},
 				["只匹配中文"] = () =>
 				{
 					 regexStr = cache[RegexLanguaheEnum.中文];
-					 ToKvExcel(regexStr);
-				 },
+					ToKvExcel(isArray, regexStr);
+				},
 				["只匹配日文"] = () =>
 				{
 					regexStr = string.Join("|", cache.Where(p => p.Key < RegexLanguaheEnum.中文).Select(p => p.Value));
-					ToKvExcel(regexStr);
+					ToKvExcel(isArray, regexStr);
 				},
 				["只匹配韩文"] = () =>
 				{
 					regexStr = cache[RegexLanguaheEnum.韩文];
-					ToKvExcel(regexStr);
+					ToKvExcel(isArray, regexStr);
 				}
 			});
 		}
@@ -135,7 +135,7 @@ namespace Script
         /// <summary>
         /// 导出为键值对
         /// </summary>
-        private void ToKvExcel(string regexStr, params Func<string, bool>[] predicate)
+        private void ToKvExcel(bool isArray, string regexStr, params Func<string, bool>[] predicate)
         {
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
@@ -151,7 +151,7 @@ namespace Script
                 {
                     dt.TableName = file.Replace(InputPath, "");
                     //if (dt.IsArray)
-                    if (true)
+                    if (isArray)
                     {
 						var list = ExcelUtils.ConvertToRowsList(dt)
 							.Select( p => {
@@ -236,7 +236,7 @@ namespace Script
         /// <summary>
         /// 还原键值对
         /// </summary>
-        public void KvExcelTo(Func<string, List<List<object>>, string> isCustomAction = null)
+        public void KvExcelTo(bool isArray = true, Func<string, List<List<object>>, string> isCustomAction = null)
         {
             var caches = GetFileCaches();
             if (caches.Count == 0) return;
@@ -259,7 +259,7 @@ namespace Script
                         var columns = data.Columns;
 
                         //if (data.IsArray)
-                        if (true)
+                        if (isArray)
                         {
                             foreach (List<object> objects in pair.Value)
                             {

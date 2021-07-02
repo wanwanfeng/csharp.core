@@ -312,10 +312,8 @@ namespace Library.Extensions
                         data.description = descriptionAttribute == null ? field.Name : descriptionAttribute.Description;
                         data.description = string.Format("{0:d2}：{1}", datas.Count, data.description);
 
-						var defaultValueAttribute = field.GetCustomAttributes(false).OfType<DefaultValueAttribute>().FirstOrDefault();
-						data.arges = defaultValueAttribute?.Value;
-
 						data.type = typeValueAttribute.value;
+                        data.arges = typeValueAttribute.args;
 
                         datas.Add(data);
                     }

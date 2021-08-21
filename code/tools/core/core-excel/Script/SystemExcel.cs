@@ -83,7 +83,7 @@ namespace Library.Excel
             return CheckPath(".xlsx|.xls", SelectType.File).SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
-                return ExcelUtils.ImportFromExcel(file, false).Select(p => p.ToListTable());
+                return ExcelUtils.ImportFromExcel(file).Select(p => p.ToListTable());
             });
         }
     }

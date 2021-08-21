@@ -1,79 +1,42 @@
 ﻿using Library.Excel;
+using Script;
 using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace Script
+namespace ActionXml
 {
     public class ActionXml : ActionBase
     {
-        public override string selectExtension
-        {
-            get { return ".xml"; }
-        }
+        public override string selectExtension => ".xml";
 
-        public override Func<string, IEnumerable<DataTable>> import
-        {
-            get { return file => new[] { ExcelUtils.ImportFromXml(file)}; }
-        }
+        public override Func<string, IEnumerable<DataTable>> import => file => new[] { ExcelUtils.ImportFromXml(file) };
 
-        public override Action<DataTable, string> export
-        {
-            get { return ExcelUtils.ExportToXml; }
-        }
+        public override Action<DataTable, string> export => ExcelUtils.ExportToXml;
+    }
 
-        public class ToCsv : ActionXml
+    public class ToCsv : ActionXml { public ToCsv() => ToCsv(); }
+
+    public class ToJson : ActionXml { public ToJson() => ToJson(); }
+
+    public class ToExcel : ActionXml { public ToExcel() => ToExcel(); }
+
+    public class ToOneExcel : ActionXml { public ToOneExcel() => ToOneExcel(); }
+
+    /// <summary>
+    /// 导出为键值对
+    /// </summary>
+    public class ToKvExcel : ActionXml    {        public ToKvExcel(object obj) : base() => ToKvExcelAll();    }
+
+    /// <summary>
+    /// 还原键值对
+    /// </summary>
+    public class KvExcelTo : ActionXml
+    {
+        public KvExcelTo(object obj) : base()
         {
-            public ToCsv()
+            KvExcelTo(isCustomAction: (fullpath, list) =>
             {
-                ToCsv();
-            }
-        }
-
-        public class ToJson : ActionXml
-        {
-            public ToJson()
-            {
-                ToJson();
-            }
-        }
-
-        public class ToExcel : ActionXml
-        {
-            public ToExcel()
-            {
-                ToExcel();
-            }
-        }
-
-        public class ToOneExcel : ActionXml
-        {
-            public ToOneExcel()
-            {
-                ToOneExcel();
-            }
-        }
-
-        /// <summary>
-        /// 导出为键值对
-        /// </summary>
-        public class ToKvExcel : ActionXml
-        {
-			public ToKvExcel(object obj) : base()
-			{
-				ToKvExcelAll();
-			}
-		}
-
-        /// <summary>
-        /// 还原键值对
-        /// </summary>
-        public class KvExcelTo : ActionXml
-        {
-			public KvExcelTo(object obj) : base()
-			{
-                KvExcelTo(isCustomAction: (fullpath, list) =>
-                {
                     //Dictionary<string, object> dictionary = new Dictionary<string, object>();
                     //foreach (List<object> objects in list)
                     //{
@@ -111,8 +74,7 @@ namespace Script
                     //JsonHelper.RevertDictionaryToJson(jsonData, dictionary);
                     //return isIndent ? JsonHelper.ToJson(jsonData, indentLevel: 2) : JsonHelper.ToJson(jsonData);
                     return "";
-                });
-            }
+            });
         }
     }
 }

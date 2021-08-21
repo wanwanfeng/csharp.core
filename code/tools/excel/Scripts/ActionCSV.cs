@@ -5,80 +5,37 @@ using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using Library.Excel;
+using Script;
 
-namespace Script
+namespace ActionCSV
 {
-    public class ActionCSV : ActionBase
+    public partial class ActionCSV : ActionBase
     {
-        public override string selectExtension
-        {
-            get { return ".csv"; }
-        }
+        public override string selectExtension => ".csv";
+        public override Func<string, IEnumerable<DataTable>> import => file => new[] { ExcelUtils.ImportFromCsv(file) };
+        public override Action<DataTable, string> export => ExcelUtils.ExportToCsv;
+    }
 
-        public override Func<string, IEnumerable<DataTable>> import
-        {
-            get { return file => new[] { ExcelUtils.ImportFromCsv(file) }; }
-        }
+    public class ToXml : ActionCSV { public ToXml() => ToXml(); }
 
-        public override Action<DataTable, string> export
-        {
-            get { return ExcelUtils.ExportToCsv; }
-        }
+    public class ToJson : ActionCSV { public ToJson() => ToJson(); }
 
-        public class ToXml : ActionCSV
-        {
-            public ToXml()
-            {
-                ToXml();
-            }
-        }
+    public class ToExcel : ActionCSV { public ToExcel() => ToExcel(); }
 
-        public class ToJson : ActionCSV
-        {
-            public ToJson()
-            {
-                ToJson();
-            }
-        }
+    public class ToOneExcel : ActionCSV { public ToOneExcel() => ToOneExcel(); }
 
-        public class ToExcel : ActionCSV
-        {
-            public ToExcel()
-            {
-                ToExcel();
-            }
-        }
+    /// <summary>
+    /// 导出为键值对
+    /// </summary>
+    public class ToKvExcel : ActionCSV { public ToKvExcel(object obj) : base() => ToKvExcelAll(); }
 
-        public class ToOneExcel : ActionCSV
-        {
-            public ToOneExcel()
-            {
-                ToOneExcel();
-            }
-        }
+    /// <summary>
+    /// 还原键值对
+    /// </summary>
+    public class KvExcelTo : ActionCSV { public KvExcelTo(object obj) : base() => KvExcelTo(); }
 
-        /// <summary>
-        /// 导出为键值对
-        /// </summary>
-        public class ToKvExcel : ActionCSV
-        {
-			public ToKvExcel(object obj) : base()
-			{
-				ToKvExcelAll();
-			}
-		}
-
-        /// <summary>
-        /// 还原键值对
-        /// </summary>
-        public class KvExcelTo : ActionCSV
-        {
-			public KvExcelTo(object obj) : base()
-			{
-                KvExcelTo();
-            }
-        }
-
+    public partial class ActionCSV
+    {
         public static void SaveCSV(DataTable dt, string fullPath) //table数据写入csv
         {
             FileInfo fi = new FileInfo(fullPath);
@@ -109,7 +66,7 @@ namespace Script
                     str = str.Replace("\"", "\"\""); //替换英文冒号 英文冒号需要换成两个冒号
 
                     if (str.Contains(',') || str.Contains('\"') || str.Contains('\r') || str.Contains('\n'))
-                        //含逗号 冒号 换行符的需要放到引号中
+                    //含逗号 冒号 换行符的需要放到引号中
                     {
                         str = string.Format("\"{0}\"", str);
                     }
@@ -221,9 +178,9 @@ namespace Script
         /// <returns>文件的编码类型</returns>  
         public static System.Text.Encoding GetType(FileStream fs)
         {
-            byte[] Unicode = new byte[] {0xFF, 0xFE, 0x41};
-            byte[] UnicodeBIG = new byte[] {0xFE, 0xFF, 0x00};
-            byte[] UTF8 = new byte[] {0xEF, 0xBB, 0xBF}; //带BOM  
+            byte[] Unicode = new byte[] { 0xFF, 0xFE, 0x41 };
+            byte[] UnicodeBIG = new byte[] { 0xFE, 0xFF, 0x00 };
+            byte[] UTF8 = new byte[] { 0xEF, 0xBB, 0xBF }; //带BOM  
             System.Text.Encoding reVal = System.Text.Encoding.Default;
 
             BinaryReader r = new BinaryReader(fs, System.Text.Encoding.Default);

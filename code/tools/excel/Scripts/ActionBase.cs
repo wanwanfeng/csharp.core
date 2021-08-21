@@ -12,16 +12,6 @@ namespace Script
 {
     public class ActionBase : BaseSystemExcel
     {
-        /// <summary>
-        /// Json是否缩进
-        /// </summary>
-        protected bool isIndent { get; set; }
-
-        /// <summary>
-        /// excel导入时首行是否是Key
-        /// </summary>
-        protected bool firstIsKey { get; set; }
-
         public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
@@ -68,7 +58,7 @@ namespace Script
 
         protected void ToJson()
         {
-            ToCommon((dt, file) => { ExcelUtils.ExportToJson(dt, file, isIndent); });
+            ToCommon((dt, file) => { ExcelUtils.ExportToJson(dt, file); });
         }
 
         protected void ToXml()

@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.IO;
 using System.Text;
 using Library.Extensions;
@@ -19,13 +20,18 @@ namespace Library.Excel
             return JsonHelper.ImportJsonToListTable(path).ToDataTable();
         }
 
-        public static void ExportToJson(DataTable dt, string file, bool isIndent = true)
+        public static void ExportToJson(DataTable dt, string file)
         {
             string newPath = CheckExport(dt, file, ".json");
             JsonData resJsonDatas = (JsonData)dt.ToListTable();
-            File.WriteAllText(newPath,
-                isIndent ? JsonHelper.ToJson(resJsonDatas, indentLevel: 2) : JsonHelper.ToJson(resJsonDatas),
-                new UTF8Encoding(false));
+            File.WriteAllText(newPath, ExportToJson(resJsonDatas), new UTF8Encoding(false));
+        }
+
+        public static string ExportToJson(object obj)
+        {
+            int.TryParse(Environment.GetEnvironmentVariable("JsonIsIndent"), out int JsonIsIndent);
+            var isIndent = JsonIsIndent == 1;
+            return isIndent ? JsonHelper.ToJson(obj, indentLevel: 2) : JsonHelper.ToJson(obj);
         }
 
         #endregion

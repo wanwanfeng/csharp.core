@@ -155,7 +155,7 @@ namespace Library.Extensions
         }
     }
 
-    public static class SystemConsole
+    public static partial class SystemConsole
     {
         class data
         {
@@ -485,6 +485,16 @@ namespace Library.Extensions
         public static void ClearProgress()
         {
             Console.SetCursorPosition(0, Math.Max(0, Console.CursorTop + _lastOffset));
+        }
+    }
+
+    public static partial class SystemConsole
+    {
+        public static string GetommandLineArgs(string key)
+        {
+            var args = Environment.GetCommandLineArgs().ToList();
+            var index = args.IndexOf(key);
+            return index == -1 ? null : args.Skip(index).Take(2).LastOrDefault();
         }
     }
 }

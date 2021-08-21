@@ -189,7 +189,7 @@ namespace Library.Excel
             }
         }
 
-        private static DataTable GetDataTable(int index,IWorkbook workbook)
+        private static DataTable GetDataTable(int index, IWorkbook workbook)
         {
             ISheet sheet = workbook.GetSheetAt(index);
             if (sheet.LastRowNum == 0) return null;
@@ -200,7 +200,7 @@ namespace Library.Excel
             List<int> columns = new List<int>();
             for (int i = 0; i < header.LastCellNum; i++)
             {
-                object obj = GetValueType(header.GetCell(i));
+                object obj = GetValueType(header.GetCell(i), workbook);
                 if (obj == null || obj.ToString() == string.Empty)
                 {
                     dt.Columns.Add(new DataColumn("Columns" + i.ToString()));
@@ -217,7 +217,7 @@ namespace Library.Excel
                 bool hasValue = false;
                 foreach (int j in columns)
                 {
-                    dr[j] = GetValueType(sheet.GetRow(i).GetCell(j));
+                    dr[j] = GetValueType(sheet.GetRow(i).GetCell(j), workbook);
                     if (dr[j] != null && dr[j].ToString() != string.Empty)
                     {
                         hasValue = true;

@@ -29,7 +29,7 @@ namespace Library.Excel
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
         /// <param name="runAction"></param>
         /// <returns></returns>
-        public static void ImportExcel(string file, Action<string, ISheet> runAction)
+        public static void ImportExcel(string file, Action<string, IWorkbook, ISheet> runAction)
         {
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
@@ -54,12 +54,17 @@ namespace Library.Excel
                     return;
                 }
 
-                for (int index = 0; index < workbook.NumberOfSheets; index++)
-                {
+                if (!int.TryParse(Environment.GetEnvironmentVariable("SkipSheet"), out int skipSheetIndex)) skipSheetIndex = 0;
+                if (!int.TryParse(Environment.GetEnvironmentVariable("TakeSheet"), out int takeSheetIndex)) takeSheetIndex = int.MaxValue;
+
+                for (var index = 0; index < workbook.NumberOfSheets; index++)
+				{
+                    if (index < skipSheetIndex) continue;
+                    if (index >= skipSheetIndex + takeSheetIndex) continue;
+
                     ISheet sheet = workbook.GetSheetAt(index);
                     if (sheet.LastRowNum == 0) continue;
-
-                    runAction.Invoke(file, sheet);
+                    runAction.Invoke(file, workbook, sheet);
                 }
             }
         }
@@ -69,7 +74,7 @@ namespace Library.Excel
         /// </summary>
         /// <param name="cell"></param>
         /// <returns></returns>
-        protected static object GetValueType(ICell cell)
+        protected static object GetValueType(ICell cell, IWorkbook workbook)
         {
             if (cell == null)
                 return null;
@@ -90,8 +95,17 @@ namespace Library.Excel
                 case CellType.Error: //ERROR:  
                     return cell.ErrorCellValue;
                 case CellType.Formula: //FORMULA:  
-                default:
-                    return "=" + cell.CellFormula;
+					switch (workbook)
+					{
+						case XSSFWorkbook _:
+							return GetValueType(new XSSFFormulaEvaluator(workbook).EvaluateInCell(cell), workbook);
+						case HSSFWorkbook _:
+							return GetValueType(new HSSFFormulaEvaluator(workbook).EvaluateInCell(cell), workbook);
+						default:
+							return cell.CellFormula;
+					}
+				default:
+                    return "";
             }
         }
 
@@ -99,59 +113,53 @@ namespace Library.Excel
         /// Excel导入成Datable
         /// </summary>
         /// <param name="file">导入路径(包含文件名与扩展名)</param>
-        /// <param name="containsFirstLine">是否包含起始行（排除跳过行）</param>
-        /// <param name="skip1">是否跳过一些有效行</param>
-        /// <param name="skip2">是否跳过一些有效列</param>
         /// <returns></returns>
-        public static List<DataTable> ImportExcelToDataTable(string file, bool containsFirstLine, int skip1 = 0, int skip2 = 0)
+        public static List<DataTable> ImportExcelToDataTable(string file, int keyLine = -1, int SkipRows = 0, int SkipColumns = 0, int TakeColumns = int.MaxValue)
         {
             var list = new List<DataTable>();
 
-            ImportExcel(file, (fileName, sheet) =>
+            ImportExcel(file, (fileName, workbook, sheet) =>
             {
                 DataTable dt = new DataTable
                 {
                     TableName = sheet.SheetName,
                 };
 
-                //表头  
-                var srartLine = Math.Min(sheet.FirstRowNum + skip1, sheet.LastRowNum);
-
-                if (sheet.FirstRowNum + skip1 >= sheet.LastRowNum)
-                    Console.WriteLine(string.Format("开始读取行超过了结束行！！！！\n " +
-                        "sheet.FirstRowNum:{0}\nsheet.LastRowNum:{1}\nsrartLine:{2}",
-                        sheet.FirstRowNum, sheet.LastRowNum, srartLine));
-
-                IRow header = sheet.GetRow(srartLine);
+                IRow header = sheet.GetRow(Math.Max(0, keyLine));
 
                 //数据
-                for (int i = srartLine + (containsFirstLine ? 0 : 1); i <= sheet.LastRowNum; i++)
+                for (int i = 0; i <= sheet.LastRowNum; i++)
                 {
+                    if (i == keyLine) continue;//跳过作为key的行
+                    if (i < SkipRows) continue;//跳过放弃的行
+                    if (i >= SkipColumns + TakeColumns) continue;//跳过放弃的行
+
                     IRow row = sheet.GetRow(i);
                     if (row == null) continue;
                     if (row.Cells.Count == 0) continue;
 
                     //创建列
-                    var cha = row.Cells.Count - dt.Columns.Count;
-                    for (; cha > 0; cha--)
+                    for (var cha = row.Cells.Count - dt.Columns.Count; cha > 0; cha--)
                     {
-                        object obj = GetValueType(header.GetCell(dt.Columns.Count));
-                        if (obj == null || obj.ToString() == string.Empty)
-                            dt.Columns.Add(new DataColumn("Columns" + dt.Columns.Count));
-                        else
-                            dt.Columns.Add(new DataColumn(obj.ToString()));
+                        object obj = GetValueType(header.GetCell(dt.Columns.Count), workbook);
+                        var columnsName = (obj == null || obj.ToString() == string.Empty || keyLine == -1) ? ("Columns" + dt.Columns.Count) : obj.ToString();
+                        dt.Columns.Add(new DataColumn(columnsName));
                     }
 
                     //创建行
                     DataRow dr = dt.NewRow();
                     for (int j = 0; j < dt.Columns.Count; j++)
-                        dr[j] = GetValueType(row.GetCell(j));
+                    {
+                        dr[j] = GetValueType(row.GetCell(j), workbook);
+                    }
                     dt.Rows.Add(dr);
                 }
 
                 //处理跳过列
-                for (int i = 0, max = Math.Max(0, skip2); i < max; i++)
+                for (int i = 0, max = Math.Max(0, SkipColumns); i < max; i++)
+                {
                     dt.Columns.RemoveAt(0);
+                }
 
                 list.Add(dt);
             });
@@ -248,49 +256,6 @@ namespace Library.Excel
                 fs.Write(buf, 0, buf.Length);
                 fs.Flush();
             }
-        }
-
-
-        /// <summary>
-        /// Excel导入成Datable
-        /// </summary>
-        /// <param name="file">导入路径(包含文件名与扩展名)</param>
-        /// <param name="lineCount">读取的行数</param>
-        /// <returns></returns>
-        public static List<DataTable> ImportExcelToDataTable(string file, int lineCount = int.MaxValue)
-        {
-            var list = new List<DataTable>();
-            ImportExcel(file, (fileName, sheet) =>
-            {
-                //表名
-                DataTable dt = new DataTable
-                {
-                    TableName = sheet.SheetName,
-                };
-
-                //数据  
-                int readCount = Math.Max(0, Math.Min(lineCount, sheet.LastRowNum - sheet.FirstRowNum));
-                for (int i = sheet.FirstRowNum; i < sheet.FirstRowNum + readCount; i++)
-                {
-                    IRow row = sheet.GetRow(i);
-                    if (row == null) continue;
-                    if (row.Cells.Count == 0) continue;
-
-                    //创建列
-                    var cha = row.Cells.Count - dt.Columns.Count;
-                    for (; cha > 0; cha--)
-                        dt.Columns.Add(new DataColumn("Columns" + dt.Columns.Count));
-
-                    //创建行
-                    DataRow dr = dt.NewRow();
-                    for (int j = 0; j < dt.Columns.Count; j++)
-                        dr[j] = GetValueType(row.GetCell(j));
-
-                    dt.Rows.Add(dr);
-                }
-                list.Add(dt);
-            });
-            return list;
         }
     }
 }

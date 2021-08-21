@@ -1,14 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using Library.Extensions;
+using Library.Helper;
 using Script;
 
 namespace Library.Excel
 {
-
     public class Program
     {
-		public enum CaoType
+        static Program()
+        {
+            Environment.SetEnvironmentVariable("SkipSheet", SystemConsole.GetommandLineArgs("skipSheet"));
+            Environment.SetEnvironmentVariable("TakeSheet", SystemConsole.GetommandLineArgs("takeSheet"));
+
+            Environment.SetEnvironmentVariable("JsonIsIndent", 1.ToString());
+            Environment.SetEnvironmentVariable("KeyLine", 1.ToString());
+            Environment.SetEnvironmentVariable("SkipRows", 0.ToString());
+            Environment.SetEnvironmentVariable("SkipColumns", 0.ToString());
+            Environment.SetEnvironmentVariable("TakeColumns", int.MaxValue.ToString());
+
+            if (File.Exists("config.ini"))
+            {
+                var json = JsonHelper.ToObject(File.ReadAllText("config.ini"));
+                foreach (var item in json.Keys)
+                {
+                    Environment.SetEnvironmentVariable(item, json[item].ToString());
+                }
+            }
+
+            File.WriteAllText("log.txt", ExcelUtils.ExportToJson(Environment.GetEnvironmentVariables()));
+        }
+
+        public enum CaoType
 		{
 			[Category("两个文件比较"), TypeValue(typeof(CompareExcel))] CompareExcel,
 			[Category("两个文件比较"), TypeValue(typeof(CompareJson))] CompareJson,
@@ -58,10 +83,7 @@ namespace Library.Excel
             [Category("文件内容提取与替换【内容为对象】"), Description("CSV  ->FromKvExcel"), TypeValue(typeof(ActionCSV.KvExcelTo), false)]CsvFromKvExcel,
         }
 
-        private static void Main(string[] args)
-        {
-			SystemConsole.Run<CaoType, CaoType2, Json.CaoType>(columnsCount: 4);
-        }
+        private static void Main(string[] args) => SystemConsole.Run<CaoType, CaoType2, Json.CaoType>(columnsCount: 4);
 
         internal class Json
         {
@@ -73,10 +95,7 @@ namespace Library.Excel
                 [Category("Json"), Description("读取值并覆盖Excel中值"), TypeValue(typeof(ActionExcel.FixExcel))] FixExcel,
             }
 
-            private static void Main(string[] args)
-            {
-                SystemConsole.Run<CaoType>(columnsCount: 4);
-            }
+            private static void Main(string[] args) => SystemConsole.Run<CaoType>(columnsCount: 4);
         }
 
         internal class Json2Excel
@@ -87,10 +106,7 @@ namespace Library.Excel
                 [Category("文件转换")] [TypeValue(typeof(ActionJson.ToExcel))] Json2Excel
             }
 
-            private static void Main(string[] args)
-            {
-                SystemConsole.Run<CaoType>();
-            }
+            private static void Main(string[] args) => SystemConsole.Run<CaoType>();
         }
 
         internal class Csv2Excel
@@ -101,10 +117,7 @@ namespace Library.Excel
                 [Category("文件转换")] [TypeValue(typeof(ActionCSV.ToExcel))] CSV2Excel
             }
 
-            private static void Main(string[] args)
-            {
-                SystemConsole.Run<CaoType>();
-            }
+            private static void Main(string[] args) => SystemConsole.Run<CaoType>();
         }
 
         internal class Xml2Excel
@@ -115,10 +128,7 @@ namespace Library.Excel
                 [Category("文件转换")] [TypeValue(typeof(ActionXml.ToExcel))] Xml2Excel
             }
 
-            private static void Main(string[] args)
-            {
-                SystemConsole.Run<CaoType>();
-            }
+            private static void Main(string[] args) => SystemConsole.Run<CaoType>();
         }
     }
 }

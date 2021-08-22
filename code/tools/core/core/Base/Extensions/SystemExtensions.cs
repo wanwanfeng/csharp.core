@@ -164,13 +164,14 @@ namespace Library.Extensions
             public object arges = null;
 			public Type type = null;
             public Action action = null;
+            public char pad = '.';
 
             public int Length()
             {
                 return System.Text.Encoding.Default.GetBytes(description).Length;
             }
 
-            public int ZhChLength()
+            public int ZhChCount()
             {
                 var xx = description.ToCharArray().Where(p => 2 == System.Text.Encoding.Default.GetByteCount(p.ToString())).Count();
                 return xx;
@@ -206,7 +207,7 @@ namespace Library.Extensions
         {
 			columnsCount = stack.Count == 0 ? columnsCount : Math.Max(columnsCount, stack.Pop().columnsCount);
 
-			stack.Push(new dataParams() { datas = datas, columnsCount = columnsCount });
+            stack.Push(new dataParams() { datas = datas, columnsCount = columnsCount });
 
             Console.Clear();
 
@@ -214,7 +215,9 @@ namespace Library.Extensions
 
             List<datastr> showList = new List<datastr>();
 
-            foreach (var pair in datas.GroupBy(p => p.group).ToDictionary(p => p.Key))
+            var tab = " ".PadRight(8);
+
+            foreach (var pair in datas.GroupBy(p => p.group).ToDictionary(p => p.Key, p => p.ToList()))
             {
                 showList.Add(new datastr()
                 {
@@ -222,40 +225,39 @@ namespace Library.Extensions
                     color = ConsoleColor.Red,
                 });
 
-                for (int i = 0, max = pair.Value.Count(); i < max; i += columnsCount)
-                {
-                    var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChLength(), '.')).ToArray();
-                    showList.Add(new datastr()
-                    {
-                        content = string.Format("\t{0}", string.Join("\t", strs))
-                    });
-                }
+                //var value = pair.Value;
+                //for (int i = 0; i < (value.Count % columnsCount); i++)
+                //{
+                //    value.Add(new data() { pad = ' ' });
+                //}
 
-                showList.Add(new datastr()
+                for (int i = 0, max = pair.Value.Count; i < max; i += columnsCount)
                 {
-                    content = "",
-                });
+                    var strs = pair.Value.Skip(i).Take(columnsCount).Select(p => p.description.PadRight(maxLength - p.ZhChCount(), p.pad)).ToArray();
+                    showList.Add(new datastr() { content = string.Format("{1}{0}{1}", string.Join(tab, strs), tab) });
+                }
+                showList.Add(new datastr());
             }
 
-            int maxLine = showList.Max(p => p.Length() + columnsCount * 4 + 8);
-            maxLine += (maxLine % 2 == 0 ? 0 : 1);
+            int maxLine = showList.Max(p => p.Length());
+            maxLine += (maxLine % 2 == 0 ? 0 : 1) + 2;
+            maxLine = Math.Max(maxLine, Console.WindowWidth);
 
-			Console.WindowWidth = maxLine = Math.Max(maxLine, Console.WindowWidth);
+            if (maxLine == Console.WindowWidth)
+            {
+                //showList.Skip(1).ToList().ForEach(p => p.content = p.content.Pad(maxLine, ' '));
+            }
 
-			showList.Add(new datastr()
-            {
-                content = "\n\t" + "e：exit\n"
-            });
-            showList.Add(new datastr()
-            {
-                content = "-".PadRight(maxLine, '-')
-            });
-            showList.Insert(0, new datastr()
-            {
-                content = "命令索引".Pad(maxLine - 4, '-') + "\n"
-            });
+            Console.WindowWidth = maxLine;
 
-			Console.WindowHeight = Math.Max(Console.WindowHeight, Math.Max(showList.Count, 30) + 10);
+            showList.Add(new datastr());
+            showList.Add(new datastr() { content = tab + "e：exit" });
+            showList.Add(new datastr());
+            showList.Add(new datastr() { content = "-".PadRight(maxLine, '-') });
+            showList.Insert(0, new datastr());
+            showList.Insert(0, new datastr() { content = "命令索引".Pad(maxLine, '-') });
+
+            Console.WindowHeight = Math.Max(Console.WindowHeight, Math.Max(showList.Count, 30) + 10);
 
             showList.ForEach(p => p.WriteLine());
 
@@ -310,7 +312,7 @@ namespace Library.Extensions
 
                         var descriptionAttribute = field.GetCustomAttributes(false).OfType<DescriptionAttribute>().FirstOrDefault();
                         data.description = descriptionAttribute == null ? field.Name : descriptionAttribute.Description;
-                        data.description = string.Format("{0:d2}：{1}", datas.Count, data.description);
+                        data.description = string.Format("【{0:d2}】{1}", datas.Count, data.description);
 
 						data.type = typeValueAttribute.value;
                         data.arges = typeValueAttribute.args;

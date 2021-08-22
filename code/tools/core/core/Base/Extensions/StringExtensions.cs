@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace Library.Extensions
@@ -101,8 +102,10 @@ namespace Library.Extensions
         {
             //lineCount = 9;
 
-            lineCount += lineCount%2 == 0 ? 0 : 1;
-            return value.PadLeft(lineCount/2 + value.Length/2, paddingChar).PadRight(lineCount, paddingChar);
+            lineCount += lineCount % 2 == 0 ? 0 : 1;
+            var count = value.ToCharArray().Where(p => 2 == Encoding.Default.GetByteCount(p.ToString())).Count();
+            var length = value.Length - count;
+            return value.PadLeft(lineCount / 2 + length / 2, paddingChar).PadRight(lineCount - count, paddingChar);
         }
 
         /// <summary>

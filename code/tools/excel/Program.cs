@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using Library.Extensions;
 using Library.Helper;
@@ -10,7 +11,12 @@ namespace Library.Excel
 {
     public class Program
     {
-        static Program()
+		/// <summary>
+		/// https://blog.csdn.net/Q672405097/article/details/86639488
+		/// </summary>
+		private static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+		static Program()
         {
             Environment.SetEnvironmentVariable("SkipSheet", SystemConsole.GetommandLineArgs("skipSheet"));
             Environment.SetEnvironmentVariable("TakeSheet", SystemConsole.GetommandLineArgs("takeSheet"));
@@ -21,14 +27,10 @@ namespace Library.Excel
             Environment.SetEnvironmentVariable("SkipColumns", 0.ToString());
             Environment.SetEnvironmentVariable("TakeColumns", int.MaxValue.ToString());
 
-            if (File.Exists("config.ini"))
-            {
-                var json = JsonHelper.ToObject(File.ReadAllText("config.ini"));
-                foreach (var item in json.Keys)
-                {
-                    Environment.SetEnvironmentVariable(item, json[item].ToString());
-                }
-            }
+			foreach (var item in ConfigurationManager.AppSettings.AllKeys)
+			{
+				Environment.SetEnvironmentVariable(item, config.AppSettings.Settings[item].Value);
+			}
 
             File.WriteAllText("log.txt", ExcelUtils.ExportToJson(Environment.GetEnvironmentVariables()));
         }

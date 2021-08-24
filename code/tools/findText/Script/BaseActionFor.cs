@@ -34,17 +34,13 @@ namespace findText
 
         private JsonData resJsonData = new JsonData();
 
-        protected virtual string textName
-        {
-            get { return "Find_Text"; }
-        }
+        protected virtual string textName => "Find_Text";
 
-        protected virtual string exName
-        {
-            get { return "*.*"; }
-        }
+        protected virtual string exName => "*.*";
 
-		public void Open()
+        public string selectExtension => GetEnvironmentVariable(GetType().Name + ".SelectExtension", exName);
+
+        public void Open()
 		{
 
 			var cache = AttributeHelper.GetCacheStringValue<RegexLanguaheEnum>();
@@ -85,7 +81,7 @@ namespace findText
         {
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
-			CheckPath(exName, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
+			CheckPath(selectExtension, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
 
 			if (resJsonData.IsArray && resJsonData.Count == 0)
 			{
@@ -100,7 +96,7 @@ namespace findText
                 return;
             }
             Console.WriteLine("正在写入Excel...");
-            string outpath = string.Format("{0}({1}).xlsx", InputPath, exName.Replace("*", "").Replace("|", ""));
+            string outpath = string.Format("{0}({1}).xlsx", InputPath, selectExtension.Replace("*", "").Replace("|", ""));
             ExcelUtils.ExportToExcel(vals.ToDataTable(), outpath);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);

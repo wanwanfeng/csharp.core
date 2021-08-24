@@ -15,7 +15,7 @@ namespace Script
         public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
-
+        public string getSelectExtension => GetEnvironmentVariable(GetType().Namespace + ".SelectExtension", selectExtension);
         protected void ToCommon(Action<DataTable, string> expAction)
         {
             Action<string> action = file =>
@@ -46,37 +46,25 @@ namespace Script
                 });
             };
 
-            //Parallel.ForEach(CheckPath(selectExtension), action);//并行操作
-            CheckPath(selectExtension).AsParallel().ForAll(action); //并行操作
-            //CheckPath(selectExtension).ForEach(action); //并行操作
+            //Parallel.ForEach(CheckPath(getSelectExtension), action);//并行操作
+            CheckPath(getSelectExtension).AsParallel().ForAll(action); //并行操作
+            //CheckPath(getSelectExtension).ForEach(action); //并行操作
         }
 
-        protected void ToCsv()
-        {
-            ToCommon(ExcelUtils.ExportToCsv);
-        }
+        protected void ToCsv() => ToCommon(ExcelUtils.ExportToCsv);
 
-        protected void ToJson()
-        {
-            ToCommon((dt, file) => { ExcelUtils.ExportToJson(dt, file); });
-        }
+        protected void ToJson() => ToCommon((dt, file) => { ExcelUtils.ExportToJson(dt, file); });
 
-        protected void ToXml()
-        {
-            ToCommon(ExcelUtils.ExportToXml);
-        }
+        protected void ToXml() => ToCommon(ExcelUtils.ExportToXml);
 
-        protected void ToExcel()
-        {
-            ToCommon((dt, file) => { ExcelUtils.ExportToExcel(dt, file); });
-        }
+        protected void ToExcel() => ToCommon((dt, file) => { ExcelUtils.ExportToExcel(dt, file); });
 
         /// <summary>
         /// 多个DataTable保存在同一文件
         /// </summary>
         public void ToOneExcel()
         {
-            var dts = CheckPath(selectExtension, SelectType.Folder).AsParallel().SelectMany(file =>
+            var dts = CheckPath(getSelectExtension, SelectType.Folder).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 return import(file).Where(p => p != null).Select(p =>
@@ -132,7 +120,7 @@ namespace Script
 
 			Regex regex = new Regex(regexStr);
 
-			CheckPath(selectExtension).ForEach((file, index) =>
+			CheckPath(getSelectExtension).ForEach((file, index) =>
             {
                 Console.WriteLine(" is now : " + file);
                 var dts = import(file).Where(p => p != null).ToList();

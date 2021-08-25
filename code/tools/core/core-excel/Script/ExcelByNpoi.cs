@@ -125,7 +125,14 @@ namespace Library.Excel
                     TableName = sheet.SheetName,
                 };
 
+				//表头
                 IRow header = sheet.GetRow(Math.Max(0, keyLine));
+				foreach (var item in header)
+				{
+					object obj = GetValueType(item, workbook);
+					var columnsName = (obj == null || obj.ToString() == string.Empty || keyLine == -1) ? ("Columns" + dt.Columns.Count) : obj.ToString();
+					dt.Columns.Add(new DataColumn(columnsName));
+				}
 
                 //数据
                 for (int i = 0; i <= sheet.LastRowNum; i++)
@@ -137,14 +144,6 @@ namespace Library.Excel
                     IRow row = sheet.GetRow(i);
                     if (row == null) continue;
                     if (row.Cells.Count == 0) continue;
-
-                    //创建列
-                    for (var cha = row.Cells.Count - dt.Columns.Count; cha > 0; cha--)
-                    {
-                        object obj = GetValueType(header.GetCell(dt.Columns.Count), workbook);
-                        var columnsName = (obj == null || obj.ToString() == string.Empty || keyLine == -1) ? ("Columns" + dt.Columns.Count) : obj.ToString();
-                        dt.Columns.Add(new DataColumn(columnsName));
-                    }
 
                     //创建行
                     DataRow dr = dt.NewRow();

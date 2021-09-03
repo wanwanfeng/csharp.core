@@ -10,12 +10,6 @@ namespace Library.Extensions
 {
     public abstract class BaseSystemConsole : CmdHelper
     {
-        protected string GetEnvironmentVariable(string key, string defaultValue)
-        {
-            var value = Environment.GetEnvironmentVariable(key);
-            return string.IsNullOrEmpty(value) ? defaultValue : value;
-        }
-
         public enum SelectType
         {
             [Description("请拖入文件({0})：")] File,

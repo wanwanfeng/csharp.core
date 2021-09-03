@@ -38,7 +38,7 @@ namespace findText
 
         protected virtual string exName => "*.*";
 
-        public string selectExtension => GetEnvironmentVariable(GetType().Name + ".SelectExtension", exName);
+		public string selectExtension => Environment.GetEnvironmentVariable(GetType().Name + ".SelectExtension") ?? exName;
 
         public void Open()
 		{

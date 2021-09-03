@@ -15,7 +15,7 @@ namespace Script
         public virtual Func<string, IEnumerable<DataTable>> import { get; set; }
         public virtual Action<DataTable, string> export { get; set; }
         public virtual string selectExtension { get; set; }
-        public string getSelectExtension => GetEnvironmentVariable(GetType().Namespace + ".SelectExtension", selectExtension);
+		public string getSelectExtension => Environment.GetEnvironmentVariable(GetType().Namespace + ".SelectExtension") ?? selectExtension;
         protected void ToCommon(Action<DataTable, string> expAction)
         {
             Action<string> action = file =>

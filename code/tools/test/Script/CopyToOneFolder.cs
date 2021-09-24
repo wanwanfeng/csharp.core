@@ -15,8 +15,9 @@ namespace Script
         {
             SystemConsole.Run(config: new Dictionary<string, Action>()
             {
-                {"递归搜索文件重命名并复制到同一文件夹下", CopyToOne},
-                {"还原", RevertCopyToOne},
+                {"递归搜索文件重命名并复制到同一文件夹下：搜索", CopyToOne},
+				{"递归搜索文件重命名并复制到同一文件夹下：还原", RevertCopyToOne},
+                {"原结构复制", CopyTo},
             });
         }
 
@@ -50,5 +51,21 @@ namespace Script
                     File.Copy(re, newPath, true);
                 });
         }
-    }
+
+		private void CopyTo()
+		{
+			CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SelectType.Folder,
+				searchOption: SearchOption.AllDirectories)
+				.ForEachPaths(re =>
+				{
+					var input = InputPath;
+					string newPath = input + "_To/" + re.Replace(input, "").TrimStart('/');
+					DirectoryHelper.CreateDirectory(newPath);
+					File.Copy(re, newPath, true);
+					var xxx = Path.ChangeExtension(re, ".plist");
+					if (File.Exists(xxx))
+						File.Copy(xxx, Path.ChangeExtension(newPath, ".plist"), true);
+				});
+		}
+	}
 }

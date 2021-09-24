@@ -30,32 +30,39 @@ namespace Script
 
         public string GetExcelCell(string path)
         {
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-            {
-                System.Drawing.Image image = System.Drawing.Image.FromStream(fs);
-                int width = image.Width;
-                int height = image.Height;
+			try
+			{
+				using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+				{
+					System.Drawing.Image image = System.Drawing.Image.FromStream(fs);
+					int width = image.Width;
+					int height = image.Height;
 
 
-                int max = Math.Max(width, height);
-                if (max == width)
-                {
-                    if (max > 350)
-                    {
-                        height = 350*height/width;
-                        width = 350;
-                    }
-                }
-                else
-                {
-                    if (max > 350)
-                    {
-                        width = 350*width/height;
-                        height = 350;
-                    }
-                }
-                return string.Format("<table><img src='{0}' width='{1}' height='{2}'>", path, width, height);
-            }
+					int max = Math.Max(width, height);
+					if (max == width)
+					{
+						if (max > 350)
+						{
+							height = 350 * height / width;
+							width = 350;
+						}
+					}
+					else
+					{
+						if (max > 350)
+						{
+							width = 350 * width / height;
+							height = 350;
+						}
+					}
+					return string.Format("<table><img src='{0}' width='{1}' height='{2}'>", path, width, height);
+				}
+			}
+			catch (Exception)
+			{
+				return "";
+			}
         }
 
 		protected List<string> GetPaths(string extension = ".txt")

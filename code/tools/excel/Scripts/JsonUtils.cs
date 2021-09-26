@@ -19,8 +19,8 @@ namespace Script
                 Console.WriteLine(" is now : " + file);
                 try
                 {
-                    if (callAction != null) callAction(file);
-                }
+					callAction?.Invoke(file);
+				}
                 catch (Exception)
                 {
                     res.Add(file);
@@ -39,7 +39,7 @@ namespace Script
     {
         public CheckJson()
         {
-            Check(".json", file =>
+            Check(".json|.txt", file =>
             {
                 JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
                 JsonHelper.ToJson(json, false);
@@ -51,7 +51,7 @@ namespace Script
     {
         public IndentJson()
         {
-            Check(".json", file =>
+            Check(".json|.txt", file =>
             {
                 JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
                 string jsonStr = JsonHelper.ToJson(json, indentLevel: 2);
@@ -64,7 +64,7 @@ namespace Script
     {
         public CancelIndentJson()
         {
-            Check(".json", file =>
+            Check(".json|.txt", file =>
             {
                 JsonData json = JsonHelper.ToObject(File.ReadAllText(file).Trim('\0').Trim());
                 string jsonStr = JsonHelper.ToJson(json, isUnicode: false);

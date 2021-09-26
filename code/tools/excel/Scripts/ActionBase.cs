@@ -87,6 +87,10 @@ namespace Script
 			var regexStr = string.Empty;
 			SystemConsole.Run(config: new Dictionary<string, Action>()
 			{
+				["不过滤"] = () =>
+				{
+					ToKvExcel(isArray, regexStr);
+				},
 				["匹配中文与日文"] = () =>
 				{
 					regexStr = string.Join("|", cache.Where(p => p.Key >= RegexLanguaheEnum.日文 && p.Key <= RegexLanguaheEnum.中文).Select(p => p.Value));
@@ -94,7 +98,7 @@ namespace Script
 				},
 				["只匹配中文"] = () =>
 				{
-					 regexStr = cache[RegexLanguaheEnum.中文];
+					regexStr = cache[RegexLanguaheEnum.中文];
 					ToKvExcel(isArray, regexStr);
 				},
 				["只匹配日文"] = () =>
@@ -107,7 +111,7 @@ namespace Script
 					regexStr = cache[RegexLanguaheEnum.韩文];
 					ToKvExcel(isArray, regexStr);
 				}
-			});
+			}, columnsCount: 3);
 		}
 
         /// <summary>
@@ -118,7 +122,7 @@ namespace Script
             var dtArray = new List<System.Data.DataTable>();
             var dtObject = new List<DataTable>();
 
-			Regex regex = new Regex(regexStr);
+			Regex regex = string.IsNullOrEmpty(regexStr) ? null : new Regex(regexStr);
 
 			CheckPath(getSelectExtension).ForEach((file, index) =>
             {
@@ -136,7 +140,7 @@ namespace Script
 								bool result = false;
 								foreach (var item in p)
 								{
-									if (CheckMatches(regex, item.ToString())) continue;
+									if (regex != null && CheckMatches(regex, item.ToString())) continue;
 									result = true;
 									break;
 								}
@@ -188,7 +192,7 @@ namespace Script
                         foreach (string s in header.Skip(1))
                         {
                             if (string.IsNullOrEmpty(dr[s].ToString())) continue;
-							if (CheckMatches(regex, dr[s].ToString())) continue;
+							if (regex != null && CheckMatches(regex, dr[s].ToString())) continue;
                             dd.Rows.Add(dataTable.TableName, dr[0], s, dr[s], "");
                         }
                     }
@@ -202,7 +206,7 @@ namespace Script
 					foreach (DataRow dr in dataTable.Rows)
 					{
 						if (string.IsNullOrEmpty(dr[1].ToString())) continue;
-						if (CheckMatches(regex, dr[1].ToString())) continue;
+						if (regex != null && CheckMatches(regex, dr[1].ToString())) continue;
 						dd.Rows.Add(dataTable.TableName, dr[0], Path.GetFileName(dr[0].ToString()), dr[1], "");
 					}
 				}

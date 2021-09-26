@@ -1,5 +1,4 @@
-﻿using Library.Extensions;
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace Library
@@ -14,34 +13,16 @@ namespace Library
         public Action<GameObject, Collider> OnTriggerStayAction;
         public Action<GameObject, Collider> OnTriggerExitAction;
 
-        private void OnCollisionEnter(Collision col)
-        {
-            OnCollisionEnterAction.Call(gameObject, col);
-        }
+        private void OnCollisionEnter(Collision col) => OnCollisionEnterAction?.Invoke(gameObject, col);
 
-        private void OnCollisionStay(Collision col)
-        {
-            OnCollisionStayAction.Call(gameObject, col);
-        }
+        private void OnCollisionStay(Collision col) => OnCollisionStayAction?.Invoke(gameObject, col);
 
-        private void OnCollisionExit(Collision col)
-        {
-            OnCollisionExitAction.Call(gameObject, col);
-        }
+        private void OnCollisionExit(Collision col) => OnCollisionExitAction?.Invoke(gameObject, col);
 
-        private void OnTriggerEnter(Collider col)
-        {
-            OnTriggerEnterAction.Call(gameObject, col);
-        }
+        private void OnTriggerEnter(Collider col) => OnTriggerEnterAction?.Invoke(gameObject, col);
 
-        private void OnTriggerStay(Collider col)
-        {
-            OnTriggerStayAction.Call(gameObject, col);
-        }
+        private void OnTriggerStay(Collider col) => OnTriggerStayAction?.Invoke(gameObject, col);
 
-        private void OnTriggerExit(Collider col)
-        {
-            OnTriggerExitAction.Call(gameObject, col);
-        }
+        private void OnTriggerExit(Collider col) => OnTriggerExitAction?.Invoke(gameObject, col);
     }
 }

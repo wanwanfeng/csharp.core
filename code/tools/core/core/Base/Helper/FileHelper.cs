@@ -185,12 +185,13 @@ namespace Library.Helper
 
             public sealed override int Read(byte[] array, int offset, int count)
             {
-                return ReadFunc.Call(array, offset, count);
+                if (ReadFunc == null) return -1;
+                return ReadFunc.Invoke(array, offset, count);
             }
 
             public sealed override void Write(byte[] array, int offset, int count)
             {
-                WriteFunc.Call(array, offset, count);
+                WriteFunc?.Invoke(array, offset, count);
             }
         }
 

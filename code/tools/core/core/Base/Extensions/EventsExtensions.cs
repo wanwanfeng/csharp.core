@@ -29,8 +29,7 @@ namespace Library
             if (target == null) return;
             if (target.CacheEvents != null)
             {
-                Action<object, object> list = null;
-                if (target.CacheEvents.TryGetValue(eventName, out list))
+                if (target.CacheEvents.TryGetValue(eventName, out Action<object, object> list))
                     target.CacheEvents[eventName] += callAction;
                 else
                     target.CacheEvents[eventName] = callAction;
@@ -50,8 +49,7 @@ namespace Library
         public static void RemoveListener(this IEvent target, string eventName, Action<object, object> callAction)
         {
             if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
-            Action<object, object> list = null;
-            if (!target.CacheEvents.TryGetValue(eventName, out list)) return;
+            if (!target.CacheEvents.TryGetValue(eventName, out Action<object, object> list)) return;
             if (list.GetInvocationList().Length == 0) return;
             target.CacheEvents[eventName] -= callAction;
         }
@@ -64,8 +62,7 @@ namespace Library
         public static void RemoveListener(this IEvent target, string eventName)
         {
             if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
-            Action<object, object> list = null;
-            if (!target.CacheEvents.TryGetValue(eventName, out list)) return;
+            if (!target.CacheEvents.TryGetValue(eventName, out Action<object, object> list)) return;
             target.CacheEvents.Remove(eventName);
         }
 
@@ -89,8 +86,7 @@ namespace Library
         public static void TriggerListener(this IEvent target, string eventName, object param = default(object))
         {
             if (target == null || target.CacheEvents == null || target.CacheEvents.Count == 0) return;
-            Action<object, object> list = null;
-            if (!target.CacheEvents.TryGetValue(eventName, out list)) return;
+            if (!target.CacheEvents.TryGetValue(eventName, out Action<object, object> list)) return;
             list.Invoke(list.Target, param);
         }
     }

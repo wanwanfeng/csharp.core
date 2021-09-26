@@ -19,12 +19,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\EnumExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\EventsExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\ExceptionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\ICollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\LinqExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\JsonDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\PathExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\DelegateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\RandomExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\StreamExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\StringExtensions.cs" />
@@ -44,8 +41,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\XmlHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\LitJsonHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\MiniJSON.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Promise.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\SimpleLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Singleton\Singleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Thread\ThreadAction.cs" />
   </ItemGroup>

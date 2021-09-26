@@ -22,7 +22,7 @@ namespace Library
                 path = component.transform.parent.name + "/" + path;
                 component = component.transform.parent;
             }
-            return haveRoot ? path : path.Replace(component.transform.root.name + "/", "");
+            return haveRoot ? path : path.Substring(component.transform.root.name.Length + 1);
         }
 
 
@@ -46,8 +46,7 @@ namespace Library
         /// <returns></returns>
         public static T GetOrAddComponent<T>(this Component component) where T : Component
         {
-            if (component == null)
-                return default(T);
+            if (component == null) return default(T);
             T t = component.GetComponent<T>();
             if (t == null) t = component.gameObject.AddComponent<T>();
             return t;

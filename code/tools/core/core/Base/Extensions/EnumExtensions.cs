@@ -10,8 +10,7 @@ namespace Library.Extensions
     {
         public static IEnumerable<object> GetEnumerator(this Enum type)
         {
-            var list = Enum.GetValues(type.GetType());
-            foreach (var it in list)
+            foreach (var it in Enum.GetValues(type.GetType()))
             {
                 yield return it;
             }
@@ -42,13 +41,13 @@ namespace Library.Extensions
         public static Type GetTypeValue(this Enum type)
         {
             var v = type.Get<TypeValueAttribute>();
-            return v != null ? v.value : null;
+            return v?.value;
         }
 
         public static object GetDefaultValue(this Enum type)
         {
             var v = type.Get<DefaultValueAttribute>();
-            return v != null ? v.Value : null;
+            return v?.Value;
         }
 
         public static string GetDescription(this Enum type)

@@ -30,22 +30,22 @@ namespace Library.Helper
                             using (var sm = new MemoryStream())
                             {
                                 rs.CopyTo(sm);
-                                OnComplete.Call(true, sm.ToArray());
+                                OnComplete?.Invoke(true, sm.ToArray());
                             }
                         }
                         else
                         {
-                            OnComplete.Call(false, Encoding.UTF8.GetBytes(response.StatusDescription));
+                            OnComplete?.Invoke(false, Encoding.UTF8.GetBytes(response.StatusDescription));
                         }
                     }
                 }
                 catch (WebException e)
                 {
-                    OnComplete.Call(false, Encoding.UTF8.GetBytes(e.Message));
+                    OnComplete?.Invoke(false, Encoding.UTF8.GetBytes(e.Message));
                 }
                 catch (Exception e)
                 {
-                    OnComplete.Call(false, Encoding.UTF8.GetBytes(e.Message));
+                    OnComplete?.Invoke(false, Encoding.UTF8.GetBytes(e.Message));
                 }
             }
 
@@ -102,11 +102,11 @@ namespace Library.Helper
                 {
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        OnComplete.Call(true, null);
+                        OnComplete?.Invoke(true, null);
                     }
                     else
                     {
-                        OnComplete.Call(false, Encoding.UTF8.GetBytes(response.StatusDescription));
+                        OnComplete?.Invoke(false, Encoding.UTF8.GetBytes(response.StatusDescription));
                     }
                 }
             }

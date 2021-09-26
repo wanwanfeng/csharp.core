@@ -2,14 +2,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Library
 {
-    public interface ILoad
-    {
-    }
-
+    using Object = UnityEngine.Object;
     public static class ILoadExtensions
     {
         #region prefab克隆
@@ -20,7 +16,7 @@ namespace Library
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static bool HasPath(this ILoad load, string path)
+        public static bool HasPath(this UnityEngine.MonoBehaviour load, string path)
         {
             return true;
         }
@@ -33,11 +29,15 @@ namespace Library
         /// <param name="filePath"></param>
         /// <param name="callAction"></param>
         /// <returns></returns>
-        public static T Load<T>(this ILoad load, string filePath, Action<T> callAction = null) where T : Object
+        public static T Load<T>(this UnityEngine.MonoBehaviour load, string filePath, Action<T> callAction = null) where T : Object
         {
-            var t = Resources.Load<T>(filePath) as T;
-            callAction.Call(t as T);
-            return t;
+            if (Resources.Load<T>(filePath) is T t)
+            {
+                callAction?.Invoke(t);
+                return t;
+            }
+            callAction?.Invoke(null);
+            return null;
         }
 
         #endregion
@@ -48,18 +48,20 @@ namespace Library
         /// 预制体资源根目录
         /// ---------需要在项目内重载---------------
         /// </summary>
-        public static GameObject CreateObject(this ILoad load, string path, Transform parent = null)
+        public static GameObject CreateObject(this UnityEngine.MonoBehaviour load, string path, Transform parent = null)
         {
             var obj = load.Load<GameObject>(path);
             return load.CreateObject(obj, parent);
         }
 
-        public static GameObject CreateObject(this ILoad load, GameObject obj, Transform parent = null)
+        public static GameObject CreateObject(this UnityEngine.MonoBehaviour load, GameObject obj, Transform parent = null)
         {
-            var go = Object.Instantiate(obj) as GameObject;
-            if (parent != null)
-                parent.AddChild(go.transform);
-            return go;
+            if (Object.Instantiate(obj) is GameObject go)
+            {
+                parent?.AddChild(go.transform);
+                return go;
+            }
+            return null;
         }
 
         #endregion

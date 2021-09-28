@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Windows.Media;
 using fontConvert.Script;
 using Library;
 using Library.Extensions;
+using Library.Helper;
+using LitJson;
 
 namespace fontConvert
 {
@@ -28,4 +33,48 @@ namespace fontConvert
             SystemConsole.Run<ConvertType>(callAction);
         }
     }
+
+
+	internal class ProgramTest
+	{
+		private static void Main(string[] args)
+		{
+			List<string> keys = new List<string>();
+			var path = Path.GetFullPath("SEGA_MatisseN v2-B.ttf");
+			foreach (FontFamily fontFamily in Fonts.GetFontFamilies(path))
+			{
+				var typefaces = fontFamily.GetTypefaces();
+				int index = 0;
+				foreach (Typeface typeface in typefaces)
+				{
+					index++;
+					Dictionary<object, object> result = new Dictionary<object, object>();
+					if (typeface.TryGetGlyphTypeface(out GlyphTypeface glyphTypeface))
+					{
+						foreach (var item in glyphTypeface.CharacterToGlyphMap)
+						{
+							var key = item.Key.ToString("x8");
+							byte[] arr = HexStringToByteArray(key);
+							System.Text.UnicodeEncoding converter = new System.Text.UnicodeEncoding();
+							string str = converter.GetString(arr);
+							result[str] = item.Value;
+						}
+					}
+					File.WriteAllText("test" + index + ".json", JsonHelper.ToJson(result, indentLevel: 2, isUnicode: false));
+				}
+			}
+			File.WriteAllLines("test.txt", keys.ToArray());
+		}
+
+		public static byte[] HexStringToByteArray(string s)
+		{
+			s = s.Replace(" ", "");
+			byte[] buffer = new byte[s.Length / 2];
+			for (int i = 0; i < s.Length; i += 2)
+			{
+				buffer[i / 2] = (byte)Convert.ToByte(s.Substring(i, 2), 16);
+			}
+			return buffer;
+		}
+	}
 }

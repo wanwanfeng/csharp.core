@@ -81,7 +81,10 @@ namespace findText
         {
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
-			CheckPath(selectExtension, SelectType.All).ForEach(OpenRun, "搜索中...请稍后");
+			CheckPath(selectExtension, SelectType.All)
+				.Where(p=>!p.Contains("/Assets/WFS/fbschema/MasterTool/MasterTool/MasterTool"))
+				.ToList()
+				.ForEach(OpenRun, "搜索中...请稍后");
 
 			if (resJsonData.IsArray && resJsonData.Count == 0)
 			{
@@ -89,14 +92,17 @@ namespace findText
 				return;
 			}
 
-            var vals = GetJsonDataArray(ToJson(resJsonData));
+			string outpath = string.Format("{0}({1}).json", InputPath, selectExtension.Replace("*", "").Replace("|", ""));
+			File.WriteAllText(outpath, JsonHelper.ToJson(resJsonData, indentLevel: 2));
+
+			var vals = GetJsonDataArray(File.ReadAllText(outpath));
             if (vals.Rows.Count == 0)
             {
                 Console.WriteLine("未搜索到结果！");
                 return;
             }
-            Console.WriteLine("正在写入Excel...");
-            string outpath = string.Format("{0}({1}).xlsx", InputPath, selectExtension.Replace("*", "").Replace("|", ""));
+			outpath = Path.ChangeExtension(outpath, ".xlsx");
+			Console.WriteLine("正在写入Excel...");
             ExcelUtils.ExportToExcel(vals.ToDataTable(), outpath);
             Console.WriteLine("写入完成，正在启动...");
             System.Diagnostics.Process.Start(outpath);

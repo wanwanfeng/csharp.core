@@ -75,7 +75,6 @@ Global
 		plugins\litjson.projitems*{cb75d446-e01b-47af-bd86-ee3779e2fc0f}*SharedItemsImports = 13
 		core\core-version\core-version.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
 		core\core\core.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
-		plugins\litjson.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
 		core\core\core.projitems*{ee8048e9-8118-48d7-88c7-5578dd50a196}*SharedItemsImports = 4
 		plugins\litjson.projitems*{ee8048e9-8118-48d7-88c7-5578dd50a196}*SharedItemsImports = 4
 	EndGlobalSection

@@ -39,7 +39,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\TypeHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\WebHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\XmlHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\IJsonWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\JsonData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\JsonException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\JsonMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\JsonMockWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\JsonReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\JsonWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\Lexer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\LitJsonHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\Netstandard15Polyfill.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\LitJson\ParserToken.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\MiniJSON.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Singleton\Singleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Thread\ThreadAction.cs" />

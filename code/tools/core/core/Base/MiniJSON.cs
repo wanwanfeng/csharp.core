@@ -34,7 +34,7 @@ using System.Text;
 using System.Reflection;
 using System.Threading;
 
-namespace MiniJSON {
+namespace MiniJSON.Core {
     // Example usage:
     //
     //  using UnityEngine;

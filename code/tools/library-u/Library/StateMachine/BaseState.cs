@@ -30,16 +30,13 @@ namespace Library
 
         public void ChangeState(T targetState, object args = null)
         {
-            bool isCanEnter = true;
-            if (IsCanEnter != null)
-                isCanEnter = IsCanEnter.Invoke(targetState);
-            if (!isCanEnter) return;
-            if (OnExitAction != null)
-                OnExitAction.Invoke(CurState);
+            var isCanEnter = IsCanEnter == null ? true : IsCanEnter.Invoke(targetState);
+            if (isCanEnter == false) return;
+
+            OnExitAction?.Invoke(CurState);
             StartTime = Time.time;
             Args = args;
-            if (OnEnterAction != null)
-                OnEnterAction.Invoke(CurState = targetState);
+            OnEnterAction?.Invoke(CurState = targetState);
         }
 
         public Action<T> OnEnterAction { get; set; }

@@ -7,6 +7,7 @@ using System.Text;
 using Library;
 using Library.Extensions;
 using Library.Helper;
+using LitJson.P;
 
 namespace Script
 {
@@ -117,7 +118,7 @@ namespace Script
     internal static class Test
     {
 
-        public static void JsonDataToDict(LitJson.JsonData jsonData, Dictionary<string, object> cache, string keyName = "")
+        public static void JsonDataToDict(JsonData jsonData, Dictionary<string, object> cache, string keyName = "")
         {
             if (jsonData.IsObject)
             {
@@ -129,7 +130,7 @@ namespace Script
                 {
                     foreach (var key in jsonData.Keys)
                     {
-                        LitJson.JsonData value = jsonData[key];
+                        JsonData value = jsonData[key];
                         Console.WriteLine(key + ":" + value.GetJsonType());
                         if (value.IsObject)
                         {
@@ -148,7 +149,7 @@ namespace Script
                 object[]  array = new object[jsonData.Count];
                 cache[keyName] = array;
                 int index = 0;
-                foreach (LitJson.JsonData value in jsonData)
+                foreach (JsonData value in jsonData)
                 {
                     if (value.IsObject || value.IsArray)
                     {
@@ -210,7 +211,7 @@ namespace Script
         {
 
             string content = File.ReadAllText("test.txt");
-            var xx = JsonHelper.ToObject<LitJson.JsonData>(content);
+            var xx = JsonHelper.ToObject<JsonData>(content);
 
             Dictionary<string, object> cache = new Dictionary<string, object>();
 
@@ -275,7 +276,7 @@ namespace Script
 
             Console.WriteLine(r==g);
 
-            LitJson.JsonData json = new LitJson.JsonData();
+            JsonData json = new JsonData();
             json["dddd"] = "ghdfgh";
             json["8987"] = "fghf";
             json["kjljk"] = "kkkk";

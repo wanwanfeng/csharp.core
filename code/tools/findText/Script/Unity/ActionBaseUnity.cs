@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LitJson.P;
+using System;
 
 namespace findText.Script
 {
@@ -11,7 +12,7 @@ namespace findText.Script
 
         protected override string ToJson(object json)
         {
-            return LitJson.JsonMapper.ToJson(json);
+            return JsonMapper.ToJson(json);
         }
 
         internal static class Program2

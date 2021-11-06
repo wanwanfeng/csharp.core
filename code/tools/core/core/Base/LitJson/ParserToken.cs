@@ -9,7 +9,7 @@
 #endregion
 
 
-namespace LitJson.P
+namespace PLitJson
 {
     internal enum ParserToken
     {

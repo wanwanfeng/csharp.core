@@ -16,7 +16,7 @@ using System.IO;
 using System.Text;
 
 
-namespace LitJson.P
+namespace PLitJson
 {
     internal enum Condition
     {

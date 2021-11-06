@@ -15,7 +15,7 @@ using System.IO;
 using System.Text;
 
 
-namespace LitJson.P
+namespace PLitJson
 {
     internal class FsmContext
     {

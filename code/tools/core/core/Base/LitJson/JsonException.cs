@@ -1,7 +1,7 @@
 #region Header
 /**
  * JsonException.cs
- *   Base class throwed by LitJson.P when a parsing error occurs.
+ *   Base class throwed by PLitJson when a parsing error occurs.
  *
  * The authors disclaim copyright to this source code. For more details, see
  * the COPYING file included with this distribution.
@@ -12,7 +12,7 @@
 using System;
 
 
-namespace LitJson.P
+namespace PLitJson
 {
     public class JsonException :
 #if NETSTANDARD1_5

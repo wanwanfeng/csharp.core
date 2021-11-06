@@ -1,10 +1,9 @@
-﻿using LitJson;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace LitJson.P
+namespace PLitJson
 {
     public static partial class JsonDataExtensions
     {

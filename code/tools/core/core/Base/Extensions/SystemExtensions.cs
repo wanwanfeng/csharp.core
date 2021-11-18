@@ -86,7 +86,7 @@ namespace Library.Extensions
             }
 
             files.Sort();
-            return files;
+            return files.Select(p=>p.Replace("\\", "/")).ToList();
         }
 
         protected static void WriteError(string name, IEnumerable<string> resList)

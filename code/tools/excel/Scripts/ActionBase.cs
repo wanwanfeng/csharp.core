@@ -131,7 +131,19 @@ namespace Script
                 if (dts.Count <= 0) return;
                 dts.ForEach(dt =>
                 {
-                    dt.TableName = file.Replace(InputPath, "");
+                    if (File.Exists(InputPath))
+                    {
+                        dt.TableName = Path.GetFileName(file);
+                    }
+                    else if (Directory.Exists(InputPath))
+                    {
+                        dt.TableName = file.Replace(InputPath, "");
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+
                     //if (dt.IsArray)
                     if (isArray)
                     {
@@ -223,7 +235,8 @@ namespace Script
             var caches = GetFileCaches();
             if (caches.Count == 0) return;
 
-            string root = InputPath.Replace(".xlsx", "");
+            string[] root = { "", new FileInfo(InputPath).Directory.FullName, Path.ChangeExtension(InputPath, "").TrimEnd('.') };
+
             var isBak = SystemConsole.GetInputStr("是否每一个备份文件？(true:false)", def: "false").AsBool(false);
             List<List<string>> error = new List<List<string>>();
 
@@ -231,7 +244,7 @@ namespace Script
             {
                 foreach (KeyValuePair<string, List<List<object>>> pair in table)
                 {
-                    string fullpath = root + pair.Key;
+                    var fullpath = root.Select(p => Path.Combine(p, pair.Key)).FirstOrDefault(File.Exists);
 
                     try
                     {

@@ -15,7 +15,7 @@ namespace Library
         private ConstantForce2D _constantForce2D;
         private Renderer _renderer;
         private AudioSource _audio;
-        private GUIElement _guiElement;
+        //private GUIElement _guiElement;
         private Collider _collider;
         private Collider2D _collider2D;
         private HingeJoint _hingeJoint;
@@ -34,7 +34,7 @@ namespace Library
         public new ConstantForce2D constantForce2D { get { return _constantForce2D == null ? (_constantForce2D = gameObject.GetComponent<ConstantForce2D>()) : _constantForce2D; } }
         public new Renderer renderer { get { return _renderer == null ? (_renderer = gameObject.GetComponent<Renderer>()) : _renderer; } }
         public new AudioSource audio { get { return _audio == null ? (_audio = gameObject.GetComponent<AudioSource>()) : _audio; } }
-        public new GUIElement guiElement { get { return _guiElement == null ? (_guiElement = gameObject.GetComponent<GUIElement>()) : _guiElement; } }
+        //public new GUIElement guiElement { get { return _guiElement == null ? (_guiElement = gameObject.GetComponent<GUIElement>()) : _guiElement; } }
         public new Collider collider { get { return _collider == null ? (_collider = gameObject.GetComponent<Collider>()) : _collider; } }
         public new Collider2D collider2D { get { return _collider2D == null ? (_collider2D = gameObject.GetComponent<Collider2D>()) : _collider2D; } }
         public new HingeJoint hingeJoint { get { return _hingeJoint == null ? (_hingeJoint = gameObject.GetComponent<HingeJoint>()) : _hingeJoint; } }

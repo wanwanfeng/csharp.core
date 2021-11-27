@@ -22,15 +22,13 @@ namespace Library.LitJson
 
         static partial void StaticConstructor();
 
-        public T ToObject<T>(string res)
-        {
-            return JsonMapper.ToObject<T>(res);
-        }
+        public T ToObject<T>(string res) => JsonMapper.ToObject<T>(res);
 
-        public JsonData ToObject(string res)
-        {
-            return JsonMapper.ToObject(res);
-        }
+        public T ToObject<T>(TextReader reader) => JsonMapper.ToObject<T>(reader);
+
+        public JsonData ToObject(string res) => JsonMapper.ToObject(res);
+
+        public JsonData ToObject(TextReader reader) => JsonMapper.ToObject(reader);
 
         /// <summary>
         /// 

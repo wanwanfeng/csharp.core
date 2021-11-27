@@ -10,7 +10,9 @@ namespace Library.Helper
     public interface IJsonHelper
     {
         T ToObject<T>(string res);
+        T ToObject<T>(TextReader textReader);
         JsonData ToObject(string res);
+        JsonData ToObject(TextReader textReader);
         string ToJson<T>(T t, int indentLevel = 0, bool validate = true);
         ListTable ConvertJsonToListTable(string content, Func<object, object> func = null);
         JsonData ConvertListTableToJson(ListTable list);
@@ -21,27 +23,13 @@ namespace Library.Helper
 
     public class JsonHelper
     {
-        static JsonHelper()
-        {
-            SetJsonHelper(new LitJsonHelper());
-        }
-
-        private static IJsonHelper Helper { get; set; }
-
-        public static void SetJsonHelper(IJsonHelper jsonHelper)
-        {
-            Helper = jsonHelper;
-        }
-
-        public static T ToObject<T>(string res)
-        {
-            return Helper.ToObject<T>(res);
-        }
-
-        public static JsonData ToObject(string res)
-        {
-            return Helper.ToObject(res);
-        }
+        private static IJsonHelper helper { get; set; }
+        static JsonHelper() => SetJsonHelper(new LitJsonHelper());
+        public static void SetJsonHelper(IJsonHelper jsonHelper) => helper = jsonHelper;
+        public static T ToObject<T>(string res) => helper.ToObject<T>(res);
+        public static T ToObject<T>(TextReader textReader) => helper.ToObject<T>(textReader);
+        public static JsonData ToObject(string res) => helper.ToObject(res);
+        public static JsonData ToObject(TextReader textReader) => helper.ToObject(textReader);
 
         /// <summary>
         /// 
@@ -54,33 +42,33 @@ namespace Library.Helper
         /// <returns></returns>
         public static string ToJson<T>(T t, bool isUnicode = false, int indentLevel = 0, bool validate = true)
         {
-            var value = Helper.ToJson(t, indentLevel, validate);
+            var value = helper.ToJson(t, indentLevel, validate);
             return (isUnicode ? value : StringHelper.Unicode2String(value)).Replace(@"\r\n", @"\n");
         }
 
         public static JsonData ConvertListTableToJson(ListTable list)
         {
-            return Helper.ConvertListTableToJson(list);
+            return helper.ConvertListTableToJson(list);
         }
 
         public static JsonData RevertDictionaryToJson(JsonData data, Dictionary<string, JsonData> vals)
         {
-            return Helper.RevertDictionaryToJson(data, vals);
+            return helper.RevertDictionaryToJson(data, vals);
         }
 
         public static Dictionary<string, object> ReadJsonByPathToDictionary(JsonData data, Dictionary<string, JsonData> vals)
         {
-            return Helper.ReadJsonByPathToDictionary(data, vals);
+            return helper.ReadJsonByPathToDictionary(data, vals);
         }
 
         public static object ReadValueByKeyPath(JsonData data, string keyPath)
         {
-            return Helper.ReadValueByKeyPath(data, keyPath);
+            return helper.ReadValueByKeyPath(data, keyPath);
         }
 
         public static ListTable ConvertJsonToListTable(string content, Func<object, object> func = null)
         {
-            return Helper.ConvertJsonToListTable(content, func);
+            return helper.ConvertJsonToListTable(content, func);
         }
 
         public static ListTable ImportJsonToListTable(string file, Func<object, object> func = null)

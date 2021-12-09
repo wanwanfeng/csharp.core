@@ -10,20 +10,6 @@ namespace Library.Extensions
 {
     public abstract class BaseSystemConsole : CmdHelper
     {
-        public enum SelectType
-        {
-            [Description("请拖入文件({0})：")] File,
-            [Description("请拖入文件夹({0})：")] Folder,
-            [Description("请拖入文件夹或文件({0})：")] All
-        }
-
-        public static IDictionary<SelectType, string> CacheSelect;
-
-        static BaseSystemConsole()
-        {
-            CacheSelect = AttributeHelper.GetCacheDescription<SelectType>();
-        }
-
         public static string InputPath { get; set; }
 
         public static string CheckExtension()
@@ -35,8 +21,7 @@ namespace Library.Extensions
                     selectExtension.Split(',', '|').Select(p => "." + p.TrimStart('*').TrimStart('.')).ToArray());
         }
 
-        public static List<string> CheckPath(string selectExtension = "*.*", SelectType selectType = SelectType.All,
-            SearchOption searchOption = SearchOption.AllDirectories)
+        public static List<string> CheckPath(string selectExtension = "*.*", SearchOption searchOption = SearchOption.AllDirectories)
         {
             if (string.IsNullOrEmpty(selectExtension))
                 selectExtension = SystemConsole.GetInputStr("请输入文件后缀 ('.cs'):");
@@ -45,48 +30,35 @@ namespace Library.Extensions
                 ? new string[0]
                 : selectExtension.Split(',', '|').Select(p => "." + p.TrimStart('*').TrimStart('.')).ToArray();
 
-            List<string> files = new List<string>();
             string path = SystemConsole.GetInputStr(
-                beforeTip: string.Format(CacheSelect[selectType], selectExtension),
+                beforeTip: string.Format("请拖入文件夹或文件({0})：", selectExtension),
                 afterTip: "您选择的文件夹或文件：");
+
+            List<string> files = new List<string>();
+
             if (string.IsNullOrEmpty(path))
                 return files;
 
             InputPath = path.Replace("\\", "/").TrimEnd('/');
 
-            switch (selectType)
+            if (Directory.Exists(path))
             {
-                case SelectType.File:
-                    if (File.Exists(path))
-                    {
-                        if (selectExtensions.Contains(Path.GetExtension(path)))
-                            files.Add(path);
-                        if (selectExtensions.Length == 0)
-                            files.Add(path);
-                    }
-                    break;
-                case SelectType.Folder:
-                    if (Directory.Exists(path))
-                        files.AddRange(DirectoryHelper.GetFiles(path, selectExtensions, searchOption));
-                    break;
-                case SelectType.All:
-                    if (Directory.Exists(path))
-                        files.AddRange(DirectoryHelper.GetFiles(path, selectExtensions, searchOption));
-                    else if (File.Exists(path))
-                    {
-                        if (selectExtensions.Contains(Path.GetExtension(path)))
-                            files.Add(path);
-                        if (selectExtensions.Length == 0)
-                            files.Add(path);
-                    }
-                    break;
-                default:
-                    Console.WriteLine("path is not valid!");
-                    return files;
+                files.AddRange(DirectoryHelper.GetFiles(path, selectExtensions, searchOption));
+            }
+            else if (File.Exists(path))
+            {
+                if (selectExtensions.Contains(Path.GetExtension(path)))
+                    files.Add(path);
+                if (selectExtensions.Length == 0)
+                    files.Add(path);
+            }
+            else
+            {
+                Console.WriteLine("path is not valid!");
             }
 
             files.Sort();
-            return files.Select(p=>p.Replace("\\", "/")).ToList();
+            return files.Select(p => p.Replace("\\", "/")).ToList();
         }
 
         protected static void WriteError(string name, IEnumerable<string> resList)

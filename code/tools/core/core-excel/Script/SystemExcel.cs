@@ -80,7 +80,7 @@ namespace Library.Excel
         /// <returns></returns>
         protected static IEnumerable<ListTable> GetListTables()
         {
-            return CheckPath(".xlsx|.xls", SelectType.File).SelectMany(file =>
+            return CheckPath(".xlsx|.xls").SelectMany(file =>
             {
                 Console.WriteLine(" from : " + file);
                 return ExcelUtils.ImportFromExcel(file).Select(p => p.ToListTable());

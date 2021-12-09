@@ -23,8 +23,7 @@ namespace Script
 
         private void CopyToOne()
         {
-            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SelectType.Folder,
-                searchOption: SearchOption.AllDirectories)
+            CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
                 .ForEachPaths(re =>
                 {
                     var input = InputPath;
@@ -43,7 +42,7 @@ namespace Script
         /// <param name="re"></param>
         private void RevertCopyToOne()
         {
-            CheckPath("*.*", SelectType.Folder, searchOption: SearchOption.TopDirectoryOnly)
+            CheckPath("*.*", searchOption: SearchOption.TopDirectoryOnly)
                 .ForEachPaths(re =>
                 {
                     string newPath = re.Replace("_merge", "_new").Replace("..", "/");
@@ -54,8 +53,7 @@ namespace Script
 
 		private void CopyTo()
 		{
-			CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", SelectType.Folder,
-				searchOption: SearchOption.AllDirectories)
+			CheckPath(".png|.jpg|.bmp|.psd|.tga|.tif|.dds", searchOption: SearchOption.AllDirectories)
 				.ForEachPaths(re =>
 				{
 					var input = InputPath;

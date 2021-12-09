@@ -17,7 +17,7 @@ namespace fileUtils
             public ByName()
             {
                 var ex = SystemConsole.GetInputStr("请输入文件后缀(如\"cs,cpp\"：");
-                var files = CheckPath("*.*", SelectType.Folder).Where(p => p.EndsWith(ex)).ToArray();
+                var files = CheckPath("*.*").Where(p => p.EndsWith(ex)).ToArray();
                 var outFile = Path.ChangeExtension(InputPath.Trim('.'), ex);
                 FileHelper.FileMerge(files.ToArray(), outFile);
             }
@@ -30,7 +30,7 @@ namespace fileUtils
         {
             public ByNumber()
             {
-                var files = CheckPath(".ts", SelectType.Folder);
+                var files = CheckPath(".ts");
                 var outFile = Path.ChangeExtension(InputPath.Trim('.'), ".ts");
                 FileHelper.FileMerge(files.ToArray(), outFile);
             }

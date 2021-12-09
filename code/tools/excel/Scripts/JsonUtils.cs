@@ -27,9 +27,9 @@ namespace Script
                 }
             };
 
-            //Parallel.ForEach(CheckPath(selectExtension, SelectType.Folder), action);//并行操作
-            CheckPath(selectExtension, SelectType.Folder).AsParallel().ForAll(action); //并行操作
-            //CheckPath(".json", SelectType.Folder).ForEach(action);//线性操作
+            //Parallel.ForEach(CheckPath(selectExtension), action);//并行操作
+            CheckPath(selectExtension).AsParallel().ForAll(action); //并行操作
+            //CheckPath(".json").ForEach(action);//线性操作
 
             WriteError(res.Select(p => p.Replace("/", "\\")));
         }

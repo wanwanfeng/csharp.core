@@ -64,7 +64,7 @@ namespace Script
         /// </summary>
         public void ToOneExcel()
         {
-            var dts = CheckPath(getSelectExtension, SelectType.Folder).AsParallel().SelectMany(file =>
+            var dts = CheckPath(getSelectExtension).AsParallel().SelectMany(file =>
             {
                 Console.WriteLine(" is now : " + file);
                 return import(file).Where(p => p != null).Select(p =>

@@ -81,7 +81,7 @@ namespace findText
         {
             resJsonData = new JsonData();
             regex = new Regex(regexStr);
-			CheckPath(selectExtension, SelectType.All)
+			CheckPath(selectExtension)
 				.Where(p=>!p.Contains("/Assets/WFS/fbschema/MasterTool/MasterTool/MasterTool"))
 				.ToList()
 				.ForEach(OpenRun, "搜索中...请稍后");

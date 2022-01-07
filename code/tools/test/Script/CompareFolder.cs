@@ -60,4 +60,13 @@ namespace Script
             //WriteAllLines(dic, InputPath);
         }
     }
+
+    public class FileGzip : BaseClass
+    {
+        public FileGzip()
+        {
+            var list = CheckPath(".txt", searchOption: SearchOption.AllDirectories);
+            FileHelper.GZIP.Serialize(list.ToArray(), InputPath + "/temp.bin");
+        }
+    }
 }

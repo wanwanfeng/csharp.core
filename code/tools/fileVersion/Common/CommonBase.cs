@@ -163,19 +163,19 @@ namespace FileVersion
         {
             var bytes = File.ReadAllBytes(fullPath);
             fileDetailInfo.content_size = bytes.Length;
-            fileDetailInfo.content_hash = bytes.MD5(KeyMd5);
+            fileDetailInfo.content_hash = GetMD5(bytes);
         }
 
         protected static bool TargetMd5Dir(out string targetMd5Dir, string dir, string targetDir)
         {
-            targetMd5Dir = targetDir.Replace(dir, dir.MD5(KeyMd5));
+            targetMd5Dir = targetDir.Replace(dir, GetMD5(dir));
             bool md5 = Directory.Exists(targetMd5Dir);
             return md5;
         }
 
         protected string GetPathHash(string path)
         {
-            return Path.GetDirectoryName(path).MD5(KeyMd5) + "/" + Path.GetFileName(path).MD5(KeyMd5);
+            return GetMD5(Path.GetDirectoryName(path)) + "/" + GetMD5(Path.GetFileName(path));
         }
 
         /// <summary>
@@ -238,10 +238,10 @@ namespace FileVersion
                 array = EncryptRootDir.Split(',').Where(p => !string.IsNullOrEmpty(p)).ToArray();
                 if (array.Any(p => s.Key.StartsWith(p))) continue;
 
-                var content = File.ReadAllText(fullPath).AES_Encrypt(AESKey);
-                s.Value.encrypt_hash = content.MD5(KeyMd5);
+                var content = AES.Encrypt(File.ReadAllBytes(fullPath), AESKey);
+                s.Value.encrypt_hash = GetMD5(content);
                 s.Value.encrypt_size = content.Length;
-                File.WriteAllText(fullPath, content);
+                File.WriteAllBytes(fullPath, content);
             }
         }
 
@@ -287,7 +287,7 @@ namespace FileVersion
         protected void EncryptFile(string fileName)
         {
             fileName += string.IsNullOrEmpty(Path.GetExtension(fileName)) ? Extension : "";
-            File.WriteAllText(fileName, File.ReadAllText(fileName).AES_Encrypt(AESKey), TxTEncoding);
+            File.WriteAllBytes(fileName, AES.Encrypt(File.ReadAllBytes(fileName), AESKey));
         }
 
         protected void DeleteInfo(string dir, bool onlyDir = false)
@@ -345,15 +345,16 @@ namespace FileVersion
 
                 if (txt != null && File.Exists(txt))
                 {
-                    filePatchInfo.content_hash = File.ReadAllBytes(txt).MD5(KeyMd5);
+                    filePatchInfo.content_hash = GetMD5(File.ReadAllBytes(txt));
                     filePatchInfo.content_size = new FileInfo(txt).Length;
                     if (yes) EncryptFile(txt);
-                    filePatchInfo.encrypt_hash = File.ReadAllBytes(txt).MD5(KeyMd5);
+                    filePatchInfo.encrypt_hash = GetMD5(File.ReadAllBytes(txt));
                     filePatchInfo.encrypt_size = new FileInfo(txt).Length;
                 }
+
                 if (zip != null && File.Exists(zip))
                 {
-                    filePatchInfo.zip_hash = File.ReadAllBytes(zip).MD5(KeyMd5);
+                    filePatchInfo.zip_hash = GetMD5(File.ReadAllBytes(zip));
                     filePatchInfo.zip_size = new FileInfo(zip).Length;
                 }
 

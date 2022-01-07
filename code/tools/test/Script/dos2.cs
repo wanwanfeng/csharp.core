@@ -9,13 +9,13 @@ namespace Script
     {
         public dos2()
         {
-            //var files = CheckPath(CheckExtension(), searchOption: SearchOption.AllDirectories).Select(p => "\"" + p + "\"").Join(" ");
+            //var files = CheckPath("*.*", searchOption: SearchOption.AllDirectories).Select(p => "\"" + p + "\"").Join(" ");
             //var cmd = string.Format("{0} -k -s -q -i -o {1}", this.GetType().Name, files);
             //Console.WriteLine(cmd);
             //CmdReadLine(cmd).ForEach(p => Console.WriteLine(p));
 
 
-            var files = CheckPath(CheckExtension(), searchOption: SearchOption.AllDirectories);
+            var files = CheckPath(null, searchOption: SearchOption.AllDirectories);
 
             files.AsParallel().WithDegreeOfParallelism(Environment.ProcessorCount).ForAll(file =>
             {

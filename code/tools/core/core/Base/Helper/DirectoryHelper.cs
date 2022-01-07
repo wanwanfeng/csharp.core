@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Library.Helper
 {
-    public class DirectoryHelper
+    public class DirectoryHelper: GzipHelper
     {
         /// <summary>
         /// 创建父级目录

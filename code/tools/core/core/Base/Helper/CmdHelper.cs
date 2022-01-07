@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Library.Extensions;
 
 namespace Library.Helper
 {
-    public abstract class CmdHelper
+    public abstract class CmdHelper : EncryptHelper
     {
         public Action<string> LogAction = msg => { Console.WriteLine(msg); };
 

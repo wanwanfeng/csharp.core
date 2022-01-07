@@ -13,7 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Attribute\NameAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Compress\DecompressUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Config.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Encrypt\Encrypt.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\EncryptHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\DateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Extensions\EnumExtensions.cs" />
@@ -32,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\CsvHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\DirectoryHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\EnumHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\GzipHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\PathHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\FileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Helper\JsonHelper.cs" />

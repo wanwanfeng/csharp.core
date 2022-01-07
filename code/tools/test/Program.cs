@@ -32,6 +32,7 @@ namespace Script
             [Category("Image/ProgressiveJpeg"), Description("ImageCmdProgressiveJpeg"), TypeValue(typeof(ImageCmdProgressiveJpeg))] ImageCmdProgressiveJpeg,
             [Category("Image/Find"), Description("ImageFind"), TypeValue(typeof(ImageFind))] ImageFind,
             [Category("Image/Find"), Description("ImageFindOrc(图像识别)"), TypeValue(typeof(ImageFindOrc))] ImageFindOrc,
+            [Category("File/GZIP"), Description("GZIP压缩"), TypeValue(typeof(FileGzip))] FileGzip,
         }
 
         private static void Main(string[] args)
@@ -91,8 +92,8 @@ namespace Script
                 long time = DateTime.UtcNow.Ticks;
                 for (int i = 0; i < length; i++)
                 {
-                    var xxx = EncryptExtensions.XOR(Encoding.UTF8.GetBytes(str), key);
-                    var yyy = EncryptExtensions.XOR(xxx, key);
+                    var xxx = EncryptHelper.XOR(Encoding.UTF8.GetBytes(str), key);
+                    var yyy = EncryptHelper.XOR(xxx, key);
                     Console.WriteLine(Encoding.UTF8.GetString(yyy));
                 }
 

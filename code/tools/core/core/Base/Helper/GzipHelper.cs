@@ -29,11 +29,11 @@ namespace Library.Helper
 
 				File.WriteAllBytes(destFileName, AES.Encrypt(File.ReadAllBytes(destFileName), "567jr766kn64o8[/;,dfs"));
 
-				TestDeserialize(destFileName);
+				//TestDeserialize(destFileName);
 			}
 
-			//[System.Diagnostics.Conditional("UNITY_EDITOR")]
-			static void TestDeserialize(string destFileName)
+            [System.Diagnostics.Conditional("UNITY_EDITOR")]
+            static void TestDeserialize(string destFileName)
 			{
 				Dictionary<string, byte[]> result = new Dictionary<string, byte[]>();
 				IEnumerator enumerator = Deserialize(destFileName, result);

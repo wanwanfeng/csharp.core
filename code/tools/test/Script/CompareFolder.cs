@@ -65,8 +65,8 @@ namespace Script
     {
         public FileGzip()
         {
-            var list = CheckPath(".txt", searchOption: SearchOption.AllDirectories);
-            FileHelper.GZIP.Serialize(list.ToArray(), InputPath + "/temp.bin");
+            var config = CheckPath(".txt", searchOption: SearchOption.AllDirectories).ToDictionary(p => p.Replace(InputPath, ""), p => new FileInfo(p));
+            FileHelper.GZIP.Serialize(config, InputPath + ".bin");
         }
     }
 }

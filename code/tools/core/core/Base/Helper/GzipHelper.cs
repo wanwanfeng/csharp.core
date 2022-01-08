@@ -11,17 +11,17 @@ namespace Library.Helper
 	{
 		public class GZIP
 		{
-			public static void Serialize(string[] sourceFileName, string destFileName)
+			public static void Serialize(Dictionary<string, FileInfo> sourceFile, string destFileName)
 			{
 				using (FileStream fileStream = new FileStream(destFileName, FileMode.Create, FileAccess.Write))
 				using (GZipStream compressedzipStream = new GZipStream(fileStream, CompressionMode.Compress, true))
 				using (BinaryWriter bw = new BinaryWriter(compressedzipStream))
 				{
-					bw.Write(sourceFileName.Length);
-					foreach (var item in sourceFileName.Select(p => p.Replace("\\", "/")))
+					bw.Write(sourceFile.Count);
+					foreach (var item in sourceFile)
 					{
-						bw.Write(item);
-						var bytes = File.ReadAllBytes(item);
+						bw.Write(item.Key);
+						var bytes = File.ReadAllBytes(item.Value.FullName);
 						bw.Write(bytes.Length);
 						bw.Write(bytes);
 					}

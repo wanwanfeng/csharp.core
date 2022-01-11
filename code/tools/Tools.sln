@@ -58,13 +58,10 @@ Global
 		core\core-excel\core-excel.projitems*{03e61b0c-84a1-44ba-ade5-55d8804012d1}*SharedItemsImports = 4
 		core\core-version\core-version.projitems*{03e61b0c-84a1-44ba-ade5-55d8804012d1}*SharedItemsImports = 4
 		core\core\core.projitems*{04099ee6-805a-40ac-bfb3-fd633a61eae3}*SharedItemsImports = 4
-		plugins\litjson.projitems*{04099ee6-805a-40ac-bfb3-fd633a61eae3}*SharedItemsImports = 4
 		core\core-excel\core-excel.projitems*{1962049b-a853-4b8c-8230-3ab672039553}*SharedItemsImports = 13
 		plugins\HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{32127943-c42d-4bd5-b9d3-989b9a16851a}*SharedItemsImports = 4
 		core\core\core.projitems*{32c3f2cd-87bc-4bc4-8c44-cbae98315bfb}*SharedItemsImports = 4
-		plugins\litjson.projitems*{32c3f2cd-87bc-4bc4-8c44-cbae98315bfb}*SharedItemsImports = 4
 		core\core\core.projitems*{339466c1-2c12-4a64-8f75-2e12fcaeccfe}*SharedItemsImports = 4
-		plugins\litjson.projitems*{339466c1-2c12-4a64-8f75-2e12fcaeccfe}*SharedItemsImports = 4
 		core\core-excel\core-excel.projitems*{576fd8f1-075a-49d0-ac86-47596b1b88b2}*SharedItemsImports = 4
 		core\core\core.projitems*{576fd8f1-075a-49d0-ac86-47596b1b88b2}*SharedItemsImports = 4
 		plugins\HtmlAgilityPack\src\HtmlAgilityPack.Shared\HtmlAgilityPack.Shared.projitems*{5ba9a0d7-173f-4c4f-affa-3dd6dc2f9a79}*SharedItemsImports = 13
@@ -75,7 +72,6 @@ Global
 		core\core-version\core-version.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
 		core\core\core.projitems*{d13a02ea-ebc9-4f88-8887-a6e006fb0fb0}*SharedItemsImports = 4
 		core\core\core.projitems*{ee8048e9-8118-48d7-88c7-5578dd50a196}*SharedItemsImports = 4
-		plugins\litjson.projitems*{ee8048e9-8118-48d7-88c7-5578dd50a196}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

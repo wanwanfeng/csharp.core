@@ -309,7 +309,7 @@ namespace Library.Helper
             {
                 GzipHelper.GZIP.Serialize(sourceFile, destFileName);
                 File.WriteAllBytes(destFileName, AES.Encrypt(File.ReadAllBytes(destFileName), keyStr));
-                //TestDeserialize(destFileName);
+                TestDeserialize(destFileName);
             }
 
             [System.Diagnostics.Conditional("UNITY_EDITOR")]

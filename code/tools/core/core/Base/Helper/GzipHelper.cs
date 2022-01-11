@@ -26,18 +26,6 @@ namespace Library.Helper
 						}
 					}
 				}
-				TestDeserialize(destFileName);
-			}
-
-			[System.Diagnostics.Conditional("UNITY_EDITOR")]
-			static void TestDeserialize(string destFileName)
-			{
-				Dictionary<string, byte[]> result = Deserialize(destFileName);
-				foreach (var item in result)
-				{
-                    Console.WriteLine(item.Key);
-                    Console.WriteLine(item.Value.Length);
-				}
 			}
 
 			public static Dictionary<string, byte[]> Deserialize(string sourceFileName)
@@ -76,18 +64,6 @@ namespace Library.Helper
 						bw.Write(bytes.Length);
 						bw.Write(bytes);
 					}
-				}
-				//TestDeserialize(destFileName);
-			}
-
-            [System.Diagnostics.Conditional("UNITY_EDITOR")]
-            static void TestDeserialize(string destFileName)
-			{
-				Dictionary<string, byte[]> result = Deserialize(destFileName);
-				foreach (var item in result)
-				{
-					Console.WriteLine(item.Key);
-					Console.WriteLine(item.Value.Length);
 				}
 			}
 

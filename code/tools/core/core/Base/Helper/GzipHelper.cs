@@ -113,6 +113,17 @@ namespace Library.Helper
 				using (StreamReader reader = new StreamReader(decompressedStream))
 					yield return reader.ReadLine();
 			}
+
+			public static byte[] ReadAllBytes(string fileName)
+			{
+				using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+				using (GZipStream decompressedStream = new GZipStream(fileStream, CompressionMode.Decompress))
+				using (MemoryStream ms = new MemoryStream())
+				{
+					decompressedStream.CopyTo(ms);
+					return ms.ToArray();
+				}
+			}
 		}
 	}
 }

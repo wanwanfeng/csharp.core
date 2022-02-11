@@ -10,7 +10,7 @@ namespace Library.Helper
 	public partial class GzipHelper : EncryptHelper
 	{
 		public class ZIP
-		{
+		{/*
 			public static void Serialize(Dictionary<string, FileInfo> sourceFile, string destFileName)
 			{
 				using (FileStream fileStream = new FileStream(destFileName, FileMode.Create, FileAccess.Write))
@@ -45,7 +45,7 @@ namespace Library.Helper
 					}
 				}
 				return result;
-			}
+			}*/
 		}
 
 		public class GZIP

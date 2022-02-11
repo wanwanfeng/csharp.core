@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -297,6 +298,67 @@ namespace Library.Helper
         public static T Deserialize<T>(string destFileName, string key = "") where T : class
         {
             return Deserialize(destFileName, key) as T;
+        }
+    }
+
+    public partial class FileHelper
+    {
+        public class GZIP : GzipHelper.GZIP
+        {
+            public static void Serialize(Dictionary<string, FileInfo> sourceFile, string destFileName, string keyStr = "567jr766kn64o8[/;,dfs")
+            {
+                GzipHelper.GZIP.Serialize(sourceFile, destFileName);
+                File.WriteAllBytes(destFileName, AES.Encrypt(File.ReadAllBytes(destFileName), keyStr));
+                //TestDeserialize(destFileName);
+            }
+
+            [System.Diagnostics.Conditional("UNITY_EDITOR")]
+            static void TestDeserialize(string destFileName)
+            {
+                Dictionary<string, byte[]> result = new Dictionary<string, byte[]>();
+                IEnumerator enumerator = Deserialize(destFileName, result);
+                while (enumerator.MoveNext())
+                {
+                    Console.WriteLine(enumerator.Current);
+                }
+                foreach (var item in result)
+                {
+                    Console.WriteLine(item.Key);
+                    Console.WriteLine(item.Value.Length);
+                }
+            }
+
+            public static IEnumerator Deserialize(string sourceFileName, Dictionary<string, byte[]> result, string keyStr = "567jr766kn64o8[/;,dfs")
+            {
+                var temp = sourceFileName + ".temp";
+
+                try
+                {
+                    File.WriteAllBytes(temp, AES.Decrypt(File.ReadAllBytes(sourceFileName), keyStr));
+                }
+                catch (Exception)
+                {
+                    yield break;
+                }
+
+                yield return null;
+
+                try
+                {
+                    foreach (var item in GzipHelper.GZIP.Deserialize(temp))
+                    {
+                        result[item.Key] = item.Value;
+                    }
+                }
+                catch (Exception)
+                {
+                    yield break;
+                }
+                finally
+                {
+                    File.Delete(temp);
+                }
+            }
         }
     }
 }

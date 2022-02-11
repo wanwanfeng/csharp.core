@@ -9,6 +9,57 @@ namespace Library.Helper
 {
 	public partial class GzipHelper : EncryptHelper
 	{
+		public class ZIP
+		{
+			public static void Serialize(Dictionary<string, FileInfo> sourceFile, string destFileName)
+			{
+				using (FileStream fileStream = new FileStream(destFileName, FileMode.Create, FileAccess.Write))
+				using (ZipArchive zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
+				{
+					foreach (var item in sourceFile)
+					{
+						ZipArchiveEntry zipArchiveEntry = zipArchive.CreateEntry(item.Key);
+						using (var fr = File.OpenRead(item.Value.FullName))
+						using (var s = zipArchiveEntry.Open())
+						{
+							fr.CopyTo(s);
+						}
+					}
+				}
+				TestDeserialize(destFileName);
+			}
+
+			[System.Diagnostics.Conditional("UNITY_EDITOR")]
+			static void TestDeserialize(string destFileName)
+			{
+				Dictionary<string, byte[]> result = Deserialize(destFileName);
+				foreach (var item in result)
+				{
+                    Console.WriteLine(item.Key);
+                    Console.WriteLine(item.Value.Length);
+				}
+			}
+
+			public static Dictionary<string, byte[]> Deserialize(string sourceFileName)
+			{
+				Dictionary<string, byte[]> result = new Dictionary<string, byte[]>();
+				using (FileStream fileStream = new FileStream(sourceFileName, FileMode.Open, FileAccess.Read))
+				using (ZipArchive zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read, true))
+				{
+					foreach (var item in zipArchive.Entries)
+					{
+						using (MemoryStream ms = new MemoryStream())
+						using (var s = item.Open())
+						{
+							s.CopyTo(ms);
+							result[item.FullName] = ms.ToArray();
+						}
+					}
+				}
+				return result;
+			}
+		}
+
 		public class GZIP
 		{
 			public static void Serialize(Dictionary<string, FileInfo> sourceFile, string destFileName)
@@ -26,21 +77,13 @@ namespace Library.Helper
 						bw.Write(bytes);
 					}
 				}
-
-				File.WriteAllBytes(destFileName, AES.Encrypt(File.ReadAllBytes(destFileName), "567jr766kn64o8[/;,dfs"));
-
 				//TestDeserialize(destFileName);
 			}
 
             [System.Diagnostics.Conditional("UNITY_EDITOR")]
             static void TestDeserialize(string destFileName)
 			{
-				Dictionary<string, byte[]> result = new Dictionary<string, byte[]>();
-				IEnumerator enumerator = Deserialize(destFileName, result);
-				while (enumerator.MoveNext())
-				{
-					Console.WriteLine(enumerator.Current);
-				}
+				Dictionary<string, byte[]> result = Deserialize(destFileName);
 				foreach (var item in result)
 				{
 					Console.WriteLine(item.Key);
@@ -48,45 +91,23 @@ namespace Library.Helper
 				}
 			}
 
-			public static IEnumerator Deserialize(string sourceFileName, Dictionary<string, byte[]> result)
+			public static Dictionary<string, byte[]> Deserialize(string sourceFileName)
 			{
-				var temp = sourceFileName + ".temp";
-
-				try
+				Dictionary<string, byte[]> result = new Dictionary<string, byte[]>();
+				using (FileStream fileStream = new FileStream(sourceFileName, FileMode.Open, FileAccess.Read))
+				using (GZipStream decompressedStream = new GZipStream(fileStream, CompressionMode.Decompress))
+				using (BinaryReader br = new BinaryReader(decompressedStream))
 				{
-					File.WriteAllBytes(temp, AES.Decrypt(File.ReadAllBytes(sourceFileName), "567jr766kn64o8[/;,dfs"));
-				}
-				catch (Exception)
-				{
-					yield break;
-				}
-
-				yield return null;
-
-				try
-				{
-					using (FileStream fileStream = new FileStream(temp, FileMode.Open, FileAccess.Read))
-					using (GZipStream decompressedStream = new GZipStream(fileStream, CompressionMode.Decompress))
-					using (BinaryReader br = new BinaryReader(decompressedStream))
+					var count = br.ReadInt32();
+					for (int i = 0; i < count; i++)
 					{
-						var count = br.ReadInt32();
-						for (int i = 0; i < count; i++)
-						{
-							var key = br.ReadString();
-							var length = br.ReadInt32();
-							var value = br.ReadBytes(length);
-							result[key] = value;
-						}
+						var key = br.ReadString();
+						var length = br.ReadInt32();
+						var value = br.ReadBytes(length);
+						result[key] = value;
 					}
 				}
-				catch (Exception)
-				{
-					yield break;
-				}
-				finally
-				{
-					File.Delete(temp);
-				}
+				return result;
 			}
 
 			public static void WriteAllText(string destFileName, string content)

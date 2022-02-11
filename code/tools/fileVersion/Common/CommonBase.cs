@@ -260,7 +260,7 @@ namespace FileVersion
             var isHaveMd5Dir = TargetMd5Dir(out targetMd5Dir, dir, targetDir);
             var dirZip = (!isHaveMd5Dir ? targetDir : targetMd5Dir);
 
-            string message = Library.Compress.DecompressUtils.MakeZipFile(dirZip, 9);
+            string message = Library.Compress.DecompressUtils.MakeZipFile(dirZip);
             if (string.IsNullOrEmpty(message))
                 Console.WriteLine("文件压缩成功！");
             else

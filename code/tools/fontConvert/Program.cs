@@ -7,7 +7,6 @@ using fontConvert.Script;
 using Library;
 using Library.Extensions;
 using Library.Helper;
-using LitJson;
 
 namespace fontConvert
 {

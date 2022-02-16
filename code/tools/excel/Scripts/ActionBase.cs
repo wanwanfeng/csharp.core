@@ -244,7 +244,14 @@ namespace Script
             {
                 foreach (KeyValuePair<string, List<List<object>>> pair in table)
                 {
-                    var fullpath = root.Select(p => Path.Combine(p, pair.Key)).FirstOrDefault(File.Exists);
+                    //请注意pair.Key是否以‘/’开头
+                    var fullpath = root.Select(p => p + pair.Key).FirstOrDefault(File.Exists);
+
+                    if (string.IsNullOrEmpty(fullpath))
+                    {
+                        Console.WriteLine("不存在的文件 !" + pair.Key);
+                        continue;
+                    }
 
                     try
                     {
